@@ -3,8 +3,12 @@ name: deckweaver
 description: >
   AI-driven multi-format SVG content generation system. Converts source documents
   (PDF/DOCX/URL/Markdown) into high-quality SVG pages and exports to PPTX through
-  multi-role collaboration. Use when user asks to "create PPT", "make presentation",
-  "生成PPT", "做PPT", "制作演示文稿", or mentions "deckweaver" or "ppt-master".
+  multi-role collaboration. Use automatically when the user asks to create or
+  transform content into a presentation, slide deck, PowerPoint, PPT, or PPTX,
+  including phrases such as "create PPT", "make presentation", "make a deck",
+  "build slides", "turn this into slides", "生成PPT", "做PPT", "做一个ppt",
+  "做一个 PPT", "做个PPT", "做个 PPT", "制作演示文稿", "生成演示文稿",
+  "把这个做成PPT", "把这份材料做成PPT", or mentions "deckweaver" or "ppt-master".
 ---
 
 # DeckWeaver Skill
