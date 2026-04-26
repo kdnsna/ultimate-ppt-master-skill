@@ -1,6 +1,6 @@
 interface:
-  display_name: "DeckWeaver"
+  display_name: "终极融合PPT大师"
   short_description: "Create PPTX or magazine-style web decks"
-  default_prompt: "Use $deckweaver to help me choose a PPT style and create a presentation from my source material."
+  default_prompt: "Use $ultimate-ppt-master to help me choose a PPT style and create a presentation from my source material."
 policy:
   allow_implicit_invocation: true

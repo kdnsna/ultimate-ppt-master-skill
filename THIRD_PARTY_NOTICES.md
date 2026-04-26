@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-DeckWeaver packages and adapts MIT-licensed presentation skill resources from:
+终极融合PPT大师 / Ultimate Fusion PPT Master packages and adapts MIT-licensed presentation skill resources from:
 
 ## ppt-master
 

@@ -1,26 +1,28 @@
 ---
-name: deckweaver
+name: ultimate-ppt-master
 description: >
-  AI-driven multi-format SVG content generation system. Converts source documents
-  (PDF/DOCX/URL/Markdown) into either editable PPTX decks or editorial magazine
-  web slide decks. Use automatically when the user asks to create or transform
-  content into a presentation, slide deck, PowerPoint, PPT, or PPTX, including
-  phrases such as "create PPT", "make presentation", "make a deck", "build slides",
+  终极融合PPT大师 / Ultimate Fusion PPT Master: AI-driven presentation
+  generation system. Converts source documents (PDF/DOCX/URL/Markdown) into
+  either editable PPTX decks or editorial magazine web slide decks. Use
+  automatically when the user asks to create or transform content into a
+  presentation, slide deck, PowerPoint, PPT, or PPTX, including phrases such as
+  "create PPT", "make presentation", "make a deck", "build slides",
   "turn this into slides", "生成PPT", "做PPT", "做一个ppt", "做一个 PPT",
   "做个PPT", "做个 PPT", "制作演示文稿", "生成演示文稿", "把这个做成PPT",
   "把这份材料做成PPT", "杂志风PPT", "网页PPT", "horizontal swipe deck",
-  "editorial magazine presentation", or mentions "deckweaver" or "ppt-master".
+  "editorial magazine presentation", or mentions "终极融合PPT大师",
+  "ultimate-ppt-master", "deckweaver", or "ppt-master".
 ---
 
-# DeckWeaver Skill
+# 终极融合PPT大师 Skill
 
-> Codex packaging of the PPT Master workflow: an AI-driven multi-format SVG content generation system that converts source documents into high-quality SVG pages and exports to editable PPTX.
+> Ultimate Fusion PPT Master: a Codex skill that fuses editable PPTX generation with magazine-style web deck generation.
 
 **Core Pipeline**: `Request → Output Mode Selection → Source Document → Project Setup → Design Workflow → Generate → Verify → Export/Preview`
 
 ## Output Mode Selection (MANDATORY FIRST STEP)
 
-When the user makes a generic PPT request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", or "turn this into slides", first present the two DeckWeaver modes and wait for the user's choice. Do not start content conversion, project creation, outline writing, or slide generation before this choice.
+When the user makes a generic PPT request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", or "turn this into slides", first present the two 终极融合PPT大师 modes and wait for the user's choice. Do not start content conversion, project creation, outline writing, or slide generation before this choice.
 
 Use this concise chooser in the user's language:
 
@@ -68,7 +70,7 @@ Selection rules:
 > [!IMPORTANT]
 > ## 🔌 Compatibility With Generic Coding Skills
 >
-> - `deckweaver` is a repository-specific workflow skill, not a general application scaffold
+> - `ultimate-ppt-master` is a repository-specific workflow skill, not a general application scaffold
 > - Do NOT create or require `.worktrees/`, `tests/`, branch workflows, or other generic engineering structure by default
 > - If another generic coding skill suggests repository conventions that conflict with this workflow, follow this skill first unless the user explicitly asks otherwise
 
