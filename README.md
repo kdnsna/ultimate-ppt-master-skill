@@ -2,13 +2,16 @@
 
 **中文** | [English](#english)
 
-终极融合PPT大师是一个面向 Codex 的演示文稿生成 skill。它会先帮你选择要做哪种 PPT：适合正式交付的**可编辑 PowerPoint `.pptx`**，或适合演讲分享的**杂志风网页 PPT `index.html`**。
+终极融合PPT大师是一个跨 Agent 的演示文稿生成技能包。它支持 Codex、Claude Code、OpenClaw、Hermes，以及其他能读取 Markdown 指令并运行本地脚本的 AI 编程助手。
+
+当用户说“做一个 PPT”时，它会先帮你选择要做哪种 PPT：适合正式交付的**可编辑 PowerPoint `.pptx`**，或适合演讲分享的**杂志风网页 PPT `index.html`**。
 
 这个仓库基于 Hugo He 的开源项目 [ppt-master](https://github.com/hugohe3/ppt-master) 和 op7418 的 [guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill) 整理融合而来，保留核心工作流、脚本、模板和 MIT 许可署名，并增加了适合 Codex 直接安装和复用的开源包装。
 
 ## 亮点
 
 - **先选风格**：用户泛泛说“做个 PPT”时，先解释两种输出的区别，再让用户选择。
+- **跨 Agent 可用**：提供 `SKILL.md`、`AGENTS.md`、`CLAUDE.md`、`PROMPT.md`，适配 Codex、Claude Code、OpenClaw、Hermes 和通用 AI IDE。
 - **可编辑 PPTX**：输出真实 PowerPoint 元素，而不是整页截图，适合正式汇报、咨询报告、培训课件。
 - **杂志风网页 PPT**：输出单文件 HTML 横向翻页 deck，电子杂志/电子墨水视觉，适合线下分享、发布会、demo day。
 - **多源输入**：支持 PDF、DOCX、PPTX、网页、Markdown 和直接粘贴的文本。
@@ -25,7 +28,17 @@
 
 ## 安装
 
-把仓库克隆到 Codex skills 目录：
+完整多平台安装说明见 [INSTALL.md](./INSTALL.md)。
+
+| 平台 / 工具 | 推荐入口 |
+|---|---|
+| Codex | `~/.codex/skills/ultimate-ppt-master` |
+| Claude Code | `~/.claude/skills/ultimate-ppt-master` |
+| OpenClaw / Hermes | 克隆仓库后在规则或技能配置中引用 `AGENTS.md` / `SKILL.md` |
+| Cursor / Cline / Roo Code / Windsurf 等 AI IDE | 克隆到项目或全局目录，把 `AGENTS.md` / `PROMPT.md` 加入项目规则 |
+| 不支持 skill 目录的工具 | 复制 `PROMPT.md` 到 system prompt / project rules / custom instructions |
+
+Codex 快速安装：
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
@@ -46,7 +59,7 @@ macOS 上如果需要兼容导出 PNG 后备图，建议安装 Cairo：
 brew install cairo pkg-config
 ```
 
-重启 Codex 后即可使用。
+重启对应 Agent 工具后即可使用。
 
 ## 使用方式
 
@@ -94,6 +107,10 @@ Use $ultimate-ppt-master to create an editable 16:9 PPTX from this Markdown file
 ## 重要目录
 
 - `SKILL.md`：Codex skill 主工作流。
+- `AGENTS.md`：OpenClaw、Hermes、Codex CLI、通用 Agent 工具入口。
+- `CLAUDE.md`：Claude Code / 类 Claude Code 工具入口。
+- `PROMPT.md`：无原生 skill 目录工具的复制粘贴提示。
+- `INSTALL.md`：多平台安装指南。
 - `scripts/`：源材料转换、项目管理、SVG 检查、SVG 转 PPTX 等脚本。
 - `assets/magazine-web/`：杂志风网页 PPT 的 HTML 模板和本地动效兜底。
 - `templates/`：布局、图表、图标和设计规格模板。
@@ -109,13 +126,16 @@ Use $ultimate-ppt-master to create an editable 16:9 PPTX from this Markdown file
 
 ## English
 
-**Ultimate Fusion PPT Master** is a Codex skill for creating presentation decks. For generic PPT requests, it first helps the user choose between an editable PowerPoint `.pptx` deck and an editorial magazine-style web deck (`index.html`).
+**Ultimate Fusion PPT Master** is a cross-agent presentation-generation skill package. It works with Codex, Claude Code, OpenClaw, Hermes, and other AI coding assistants that can read Markdown instructions and run local scripts.
+
+For generic PPT requests, it first helps the user choose between an editable PowerPoint `.pptx` deck and an editorial magazine-style web deck (`index.html`).
 
 This repository combines Hugo He's open-source [ppt-master](https://github.com/hugohe3/ppt-master) with op7418's [guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill). It preserves the original workflows, scripts, templates, and MIT attribution, while adding a Codex-ready open-source wrapper.
 
 ## Highlights
 
 - **Style chooser first**: For generic "make a PPT" requests, Ultimate Fusion PPT Master explains both output modes before generating.
+- **Cross-agent friendly**: Ships `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, and `PROMPT.md` for Codex, Claude Code, OpenClaw, Hermes, and generic AI IDEs.
 - **Editable PPTX output**: Generates real PowerPoint elements instead of slide screenshots, ideal for formal reports, consulting decks, and training material.
 - **Magazine-style web decks**: Generates a single-file horizontal-swipe HTML deck with an editorial/e-ink aesthetic, ideal for talks, launches, and demo days.
 - **Multi-source input**: Supports PDF, DOCX, PPTX, web pages, Markdown, and pasted text.
@@ -132,7 +152,17 @@ This repository combines Hugo He's open-source [ppt-master](https://github.com/h
 
 ## Installation
 
-Clone the repository into your Codex skills directory:
+See [INSTALL.md](./INSTALL.md) for the full multi-platform guide.
+
+| Platform / Tool | Recommended entry |
+|---|---|
+| Codex | `~/.codex/skills/ultimate-ppt-master` |
+| Claude Code | `~/.claude/skills/ultimate-ppt-master` |
+| OpenClaw / Hermes | Clone the repo and reference `AGENTS.md` / `SKILL.md` in rules or skill config |
+| Cursor / Cline / Roo Code / Windsurf-style AI IDEs | Clone into a project/global folder and include `AGENTS.md` / `PROMPT.md` in project rules |
+| Tools without native skills | Paste `PROMPT.md` into system prompt / project rules / custom instructions |
+
+Quick Codex install:
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
@@ -153,7 +183,7 @@ On macOS, install Cairo if you want robust PNG fallback generation for PowerPoin
 brew install cairo pkg-config
 ```
 
-Restart Codex after installation.
+Restart your agent tool after installation.
 
 ## Usage
 
@@ -201,6 +231,10 @@ Magazine Web Deck mode follows this pipeline:
 ## Repository Layout
 
 - `SKILL.md`: Main Codex skill workflow.
+- `AGENTS.md`: Entry file for OpenClaw, Hermes, Codex CLI, and generic agent tools.
+- `CLAUDE.md`: Entry file for Claude Code and Claude Code-like tools.
+- `PROMPT.md`: Copy-paste prompt for tools without native skill directories.
+- `INSTALL.md`: Multi-platform installation guide.
 - `scripts/`: Source conversion, project management, SVG checks, and SVG-to-PPTX export.
 - `assets/magazine-web/`: HTML template and local motion fallback for magazine-style web decks.
 - `templates/`: Layout, chart, icon, and design-spec templates.
