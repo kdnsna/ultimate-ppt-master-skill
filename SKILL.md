@@ -2,20 +2,47 @@
 name: deckweaver
 description: >
   AI-driven multi-format SVG content generation system. Converts source documents
-  (PDF/DOCX/URL/Markdown) into high-quality SVG pages and exports to PPTX through
-  multi-role collaboration. Use automatically when the user asks to create or
-  transform content into a presentation, slide deck, PowerPoint, PPT, or PPTX,
-  including phrases such as "create PPT", "make presentation", "make a deck",
-  "build slides", "turn this into slides", "生成PPT", "做PPT", "做一个ppt",
-  "做一个 PPT", "做个PPT", "做个 PPT", "制作演示文稿", "生成演示文稿",
-  "把这个做成PPT", "把这份材料做成PPT", or mentions "deckweaver" or "ppt-master".
+  (PDF/DOCX/URL/Markdown) into either editable PPTX decks or editorial magazine
+  web slide decks. Use automatically when the user asks to create or transform
+  content into a presentation, slide deck, PowerPoint, PPT, or PPTX, including
+  phrases such as "create PPT", "make presentation", "make a deck", "build slides",
+  "turn this into slides", "生成PPT", "做PPT", "做一个ppt", "做一个 PPT",
+  "做个PPT", "做个 PPT", "制作演示文稿", "生成演示文稿", "把这个做成PPT",
+  "把这份材料做成PPT", "杂志风PPT", "网页PPT", "horizontal swipe deck",
+  "editorial magazine presentation", or mentions "deckweaver" or "ppt-master".
 ---
 
 # DeckWeaver Skill
 
 > Codex packaging of the PPT Master workflow: an AI-driven multi-format SVG content generation system that converts source documents into high-quality SVG pages and exports to editable PPTX.
 
-**Core Pipeline**: `Source Document → Create Project → Template Option → Strategist → [Image_Generator] → Executor → Post-processing → Export`
+**Core Pipeline**: `Request → Output Mode Selection → Source Document → Project Setup → Design Workflow → Generate → Verify → Export/Preview`
+
+## Output Mode Selection (MANDATORY FIRST STEP)
+
+When the user makes a generic PPT request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", or "turn this into slides", first present the two DeckWeaver modes and wait for the user's choice. Do not start content conversion, project creation, outline writing, or slide generation before this choice.
+
+Use this concise chooser in the user's language:
+
+```markdown
+我可以做两种 PPT，先选一种：
+
+1. 可编辑 PowerPoint（PPTX）
+   适合：正式汇报、咨询/商业报告、培训课件、需要交给别人继续改的文件。
+   特点：输出 .pptx，里面是真实文字、形状和图表，PowerPoint 里可继续编辑。
+
+2. 杂志风网页 PPT（HTML）
+   适合：线下分享、发布会、个人演讲、demo day、想要强视觉风格的展示。
+   特点：输出单个 index.html，横向翻页，电子杂志/电子墨水风格，有 WebGL 背景和动效；不适合多人在 PowerPoint 里继续编辑。
+
+你想做哪一种？如果不确定，我建议正式材料选 1，演讲分享选 2。
+```
+
+Selection rules:
+- If the user explicitly asks for editable PPTX, PowerPoint, `.pptx`, business/report/consulting/training deck, or "可编辑", choose **Mode 1: Editable PPTX**.
+- If the user explicitly asks for magazine style, web PPT, HTML slides, horizontal swipe deck, editorial magazine, e-ink/electronic ink, keynote/showcase/demo-day visual deck, choose **Mode 2: Magazine Web Deck**.
+- If the user has already selected "1", "PPTX", "可编辑", "2", "网页", "杂志风", or equivalent, proceed with that mode without asking again.
+- If the user asks for both modes, complete them as separate deliverables and keep their project folders separate.
 
 > [!CAUTION]
 > ## 🚨 Global Execution Discipline (MANDATORY)
@@ -80,6 +107,8 @@ For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 | Layout templates | `${SKILL_DIR}/templates/layouts/layouts_index.json` | Query available page layout templates |
 | Visualization templates | `${SKILL_DIR}/templates/charts/charts_index.json` | Query available visualization SVG templates (charts, infographics, diagrams, frameworks) |
 | Icon library | `${SKILL_DIR}/templates/icons/` | See `${SKILL_DIR}/templates/icons/README.md`; search icons on demand with `ls templates/icons/<library>/ \| grep <keyword>` |
+| Magazine Web template | `${SKILL_DIR}/assets/magazine-web/template.html` | Single-file editorial web deck seed |
+| Magazine Web references | `${SKILL_DIR}/references/magazine-web/` | Themes, layouts, components, and checklist for magazine-style HTML decks |
 
 ## Standalone Workflows
 
@@ -89,7 +118,66 @@ For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 
 ---
 
-## Workflow
+## Mode 2: Magazine Web Deck Workflow
+
+Use this workflow only when Output Mode Selection chooses the magazine-style web deck.
+
+### Web Step 1: Clarify the Deck Brief
+
+If the user has not already provided these details, ask concise questions one at a time: audience/scenario, talk duration or target page count, source material, image availability, theme preference, and hard constraints. If the user has a complete outline and images, proceed.
+
+If the user needs help with structure, propose a narrative arc:
+
+`Hook → Context → Core → Shift → Takeaway`
+
+### Web Step 2: Create the HTML Deck Folder
+
+Create a folder for the web deck, usually `<project_name>/ppt/`, with an adjacent `images/` directory. Copy the seed template:
+
+```bash
+mkdir -p "<project_path>/ppt/images" "<project_path>/ppt/assets"
+cp "${SKILL_DIR}/assets/magazine-web/template.html" "<project_path>/ppt/index.html"
+cp "${SKILL_DIR}/assets/magazine-web/motion.min.js" "<project_path>/ppt/assets/motion.min.js"
+```
+
+Immediately replace the `<title>` placeholder in `index.html`; grep for `[必填]` and remove all remaining placeholders before delivery.
+
+### Web Step 3: Choose Theme and Layouts
+
+Read only the needed magazine references:
+
+- Theme choice: `${SKILL_DIR}/references/magazine-web/themes.md`
+- Layout skeletons and theme rhythm rules: `${SKILL_DIR}/references/magazine-web/layouts.md`
+- Component details: `${SKILL_DIR}/references/magazine-web/components.md`
+- Final QA: `${SKILL_DIR}/references/magazine-web/checklist.md`
+
+Rules:
+- Use one of the five curated themes; do not invent custom hex colors unless the user explicitly overrides the aesthetic system.
+- Plan page rhythm before writing slides: every `<section>` must include `light`, `dark`, `hero light`, or `hero dark`.
+- Use the layout skeletons instead of writing slides from scratch.
+- Before adding slide markup, inspect the `<style>` block in `index.html` and confirm every class used by the chosen skeleton exists.
+- Put images under `ppt/images/` and reference them with relative paths like `images/01-cover.jpg`.
+
+### Web Step 4: Generate, Preview, and Check
+
+Fill `<main id="deck">` with the selected sections, then run these checks:
+
+```bash
+grep -n "\\[必填\\]" "<project_path>/ppt/index.html"
+grep -n 'class="slide' "<project_path>/ppt/index.html"
+```
+
+Open the file directly in a browser:
+
+```bash
+open "<project_path>/ppt/index.html"
+```
+
+Use `${SKILL_DIR}/references/magazine-web/checklist.md` for final QA. P0 issues must be fixed before delivery. The output is `index.html`, not a `.pptx`.
+
+---
+
+## Mode 1: Editable PPTX Workflow
 
 ### Step 1: Source Content Processing
 

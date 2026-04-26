@@ -1,6 +1,6 @@
 interface:
   display_name: "DeckWeaver"
-  short_description: "Generate editable PPTX decks from documents"
-  default_prompt: "Use $deckweaver to create an editable PPTX presentation from my source material."
+  short_description: "Create PPTX or magazine-style web decks"
+  default_prompt: "Use $deckweaver to help me choose a PPT style and create a presentation from my source material."
 policy:
   allow_implicit_invocation: true
