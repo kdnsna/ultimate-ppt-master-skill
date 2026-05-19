@@ -2,8 +2,8 @@
 name: ultimate-ppt-master
 description: >
   终极融合PPT大师 / Ultimate Fusion PPT Master: AI-driven presentation
-  generation system. Converts source documents (PDF/DOCX/URL/Markdown) into
-  either editable PPTX decks or editorial magazine web slide decks. Use
+  generation system. Converts source documents (PDF/DOCX/XLSX/URL/Markdown) into
+  either editable PPTX decks or editorial/Swiss magazine web slide decks. Use
   automatically when the user asks to create or transform content into a
   presentation, slide deck, PowerPoint, PPT, or PPTX, including phrases such as
   "create PPT", "make presentation", "make a deck", "build slides",
@@ -42,7 +42,7 @@ Use this concise chooser in the user's language:
 
 Selection rules:
 - If the user explicitly asks for editable PPTX, PowerPoint, `.pptx`, business/report/consulting/training deck, or "可编辑", choose **Mode 1: Editable PPTX**.
-- If the user explicitly asks for magazine style, web PPT, HTML slides, horizontal swipe deck, editorial magazine, e-ink/electronic ink, keynote/showcase/demo-day visual deck, choose **Mode 2: Magazine Web Deck**.
+- If the user explicitly asks for magazine style, web PPT, HTML slides, horizontal swipe deck, editorial magazine, e-ink/electronic ink, Swiss Style, 瑞士风, keynote/showcase/demo-day visual deck, choose **Mode 2: Magazine Web Deck**.
 - If the user has already selected "1", "PPTX", "可编辑", "2", "网页", "杂志风", or equivalent, proceed with that mode without asking again.
 - If the user asks for both modes, complete them as separate deliverables and keep their project folders separate.
 
@@ -59,6 +59,7 @@ Selection rules:
 > 6. **NO SUB-AGENT SVG GENERATION** — Executor Step 6 SVG generation is context-dependent and MUST be completed by the current main agent end-to-end. Delegating page SVG generation to sub-agents is FORBIDDEN
 > 7. **SEQUENTIAL PAGE GENERATION ONLY** — In Executor Step 6, after the global design context is confirmed, SVG pages MUST be generated sequentially page by page in one continuous pass. Grouped page batches (for example, 5 pages at a time) are FORBIDDEN
 > 8. **SPEC_LOCK RE-READ PER PAGE** — Before generating each SVG page, Executor MUST `read_file <project_path>/spec_lock.md`. All colors / fonts / icons / images MUST come from this file — no values from memory or invented on the fly. Executor MUST also look up the current page's `page_rhythm` tag and apply the matching layout discipline (`anchor` / `dense` / `breathing` — see executor-base.md §2.1). This rule exists to resist context-compression drift on long decks and to break the uniform "every page is a card grid" default
+> 9. **SVG MUST BE HAND-WRITTEN, NOT SCRIPT-GENERATED** — Editable PPTX SVG pages are written by the main agent directly, one page at a time. Do not batch-generate deck SVGs with Python / Node / shell scripts.
 
 > [!IMPORTANT]
 > ## 🌐 Language & Communication Rule
@@ -88,16 +89,20 @@ Selection rules:
 |--------|---------|
 | `${SKILL_DIR}/scripts/source_to_md/pdf_to_md.py` | PDF to Markdown |
 | `${SKILL_DIR}/scripts/source_to_md/doc_to_md.py` | Documents to Markdown — native Python for DOCX/HTML/EPUB/IPYNB, pandoc fallback for legacy formats (.doc/.odt/.rtf/.tex/.rst/.org/.typ) |
+| `${SKILL_DIR}/scripts/source_to_md/excel_to_md.py` | Excel workbooks to Markdown — supports .xlsx/.xlsm; legacy .xls should be resaved as .xlsx |
 | `${SKILL_DIR}/scripts/source_to_md/ppt_to_md.py` | PowerPoint to Markdown |
-| `${SKILL_DIR}/scripts/source_to_md/web_to_md.py` | Web page to Markdown |
-| `${SKILL_DIR}/scripts/source_to_md/web_to_md.cjs` | Node.js fallback for WeChat / TLS-blocked sites (use only if `curl_cffi` is unavailable; `web_to_md.py` now handles WeChat when `curl_cffi` is installed) |
+| `${SKILL_DIR}/scripts/source_to_md/web_to_md.py` | Web page to Markdown (supports WeChat/high-security pages via `curl_cffi`) |
+| `${SKILL_DIR}/scripts/source_to_md/web_to_md.cjs` | Legacy Node.js fallback kept for this fusion package; prefer `web_to_md.py` first |
 | `${SKILL_DIR}/scripts/project_manager.py` | Project init / validate / manage |
 | `${SKILL_DIR}/scripts/analyze_images.py` | Image analysis |
 | `${SKILL_DIR}/scripts/image_gen.py` | AI image generation (multi-provider) |
+| `${SKILL_DIR}/scripts/image_search.py` | Web image search helper for PPTX image acquisition |
 | `${SKILL_DIR}/scripts/svg_quality_checker.py` | SVG quality check |
 | `${SKILL_DIR}/scripts/total_md_split.py` | Speaker notes splitting |
 | `${SKILL_DIR}/scripts/finalize_svg.py` | SVG post-processing (unified entry) |
 | `${SKILL_DIR}/scripts/svg_to_pptx.py` | Export to PPTX |
+| `${SKILL_DIR}/scripts/animation_config.py` | Optional object-level PPTX animation sidecar scaffolding |
+| `${SKILL_DIR}/scripts/notes_to_audio.py` | Optional recorded narration audio generation |
 | `${SKILL_DIR}/scripts/update_spec.py` | Propagate a `spec_lock.md` color / font_family change across all generated SVGs |
 
 For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
@@ -109,14 +114,21 @@ For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 | Layout templates | `${SKILL_DIR}/templates/layouts/layouts_index.json` | Query available page layout templates |
 | Visualization templates | `${SKILL_DIR}/templates/charts/charts_index.json` | Query available visualization SVG templates (charts, infographics, diagrams, frameworks) |
 | Icon library | `${SKILL_DIR}/templates/icons/` | See `${SKILL_DIR}/templates/icons/README.md`; search icons on demand with `ls templates/icons/<library>/ \| grep <keyword>` |
-| Magazine Web template | `${SKILL_DIR}/assets/magazine-web/template.html` | Single-file editorial web deck seed |
-| Magazine Web references | `${SKILL_DIR}/references/magazine-web/` | Themes, layouts, components, and checklist for magazine-style HTML decks |
+| Magazine Web Style A template | `${SKILL_DIR}/assets/magazine-web/template.html` | Single-file editorial/e-ink web deck seed |
+| Magazine Web Style B template | `${SKILL_DIR}/assets/magazine-web/template-swiss.html` | Single-file Swiss Style web deck seed |
+| Magazine Web references | `${SKILL_DIR}/references/magazine-web/` | Themes, layouts, components, image prompts, screenshot framing, and QA checklists |
 
 ## Standalone Workflows
 
 | Workflow | Path | Purpose |
 |----------|------|---------|
+| `topic-research` | `workflows/topic-research.md` | Pre-pipeline research when the user supplies only a topic with no source files |
 | `create-template` | `workflows/create-template.md` | Standalone template creation workflow |
+| `resume-execute` | `workflows/resume-execute.md` | Resume SVG execution in a fresh chat after Step 1-5 |
+| `verify-charts` | `workflows/verify-charts.md` | Chart coordinate calibration before export |
+| `customize-animations` | `workflows/customize-animations.md` | Optional object-level PPTX animation customization |
+| `generate-audio` | `workflows/generate-audio.md` | Optional recorded narration/audio workflow |
+| `live-preview` | `workflows/live-preview.md` | Browser-based live preview and annotation workflow |
 
 ---
 
@@ -126,7 +138,14 @@ Use this workflow only when Output Mode Selection chooses the magazine-style web
 
 ### Web Step 1: Clarify the Deck Brief
 
-If the user has not already provided these details, ask concise questions one at a time: audience/scenario, talk duration or target page count, source material, image availability, theme preference, and hard constraints. If the user has a complete outline and images, proceed.
+Choose one visual sub-style before copying a template:
+
+| Style | Use when | Template | References |
+|---|---|---|---|
+| **A · 电子杂志 × 电子墨水** (default) | the user says magazine, editorial, e-ink, Monocle-like, humanistic, narrative, or does not specify a sub-style | `assets/magazine-web/template.html` | `themes.md`, `layouts.md`, `components.md` |
+| **B · 瑞士国际主义 / Swiss Style** | the user says Swiss Style, 瑞士风, Helvetica, grid, information design, data-driven, product/engineering/KPI deck | `assets/magazine-web/template-swiss.html` | `themes-swiss.md`, `layouts-swiss.md`, `swiss-layout-lock.md` |
+
+If the user has not already provided these details, ask concise questions one at a time: sub-style A/B, audience/scenario, talk duration or target page count, source material, image availability/screenshot handling, theme preference, and hard constraints. If enough information is present, proceed with a stated assumption. Preserve Style A as the default so the original magazine/e-ink aesthetic remains unchanged.
 
 If the user needs help with structure, propose a narrative arc:
 
@@ -138,27 +157,45 @@ Create a folder for the web deck, usually `<project_name>/ppt/`, with an adjacen
 
 ```bash
 mkdir -p "<project_path>/ppt/images" "<project_path>/ppt/assets"
-cp "${SKILL_DIR}/assets/magazine-web/template.html" "<project_path>/ppt/index.html"
 cp "${SKILL_DIR}/assets/magazine-web/motion.min.js" "<project_path>/ppt/assets/motion.min.js"
+```
+
+Style A · editorial/e-ink:
+
+```bash
+cp "${SKILL_DIR}/assets/magazine-web/template.html" "<project_path>/ppt/index.html"
+```
+
+Style B · Swiss Style:
+
+```bash
+cp "${SKILL_DIR}/assets/magazine-web/template-swiss.html" "<project_path>/ppt/index.html"
 ```
 
 Immediately replace the `<title>` placeholder in `index.html`; grep for `[必填]` and remove all remaining placeholders before delivery.
 
 ### Web Step 3: Choose Theme and Layouts
 
-Read only the needed magazine references:
+Read only the needed magazine references based on selected style:
 
-- Theme choice: `${SKILL_DIR}/references/magazine-web/themes.md`
-- Layout skeletons and theme rhythm rules: `${SKILL_DIR}/references/magazine-web/layouts.md`
-- Component details: `${SKILL_DIR}/references/magazine-web/components.md`
+- Style A theme choice: `${SKILL_DIR}/references/magazine-web/themes.md`
+- Style A layout skeletons and theme rhythm rules: `${SKILL_DIR}/references/magazine-web/layouts.md`
+- Style B theme choice: `${SKILL_DIR}/references/magazine-web/themes-swiss.md`
+- Style B locked layout skeletons: `${SKILL_DIR}/references/magazine-web/layouts-swiss.md`
+- Style B layout lock rules: `${SKILL_DIR}/references/magazine-web/swiss-layout-lock.md`
+- Shared component details: `${SKILL_DIR}/references/magazine-web/components.md`
+- Screenshot framing: `${SKILL_DIR}/references/magazine-web/screenshot-framing.md` (only when screenshots/UI captures are used)
+- Optional generated image prompts: `${SKILL_DIR}/references/magazine-web/image-prompts.md`
 - Final QA: `${SKILL_DIR}/references/magazine-web/checklist.md`
 
 Rules:
-- Use one of the five curated themes; do not invent custom hex colors unless the user explicitly overrides the aesthetic system.
+- For Style A, use one of the five curated themes; for Style B, use one of the Swiss theme presets. Do not invent custom hex colors unless the user explicitly overrides the aesthetic system.
+- Do not mix Style A and Style B class systems in one deck. Copy one template and use the matching layout reference only.
 - Plan page rhythm before writing slides: every `<section>` must include `light`, `dark`, `hero light`, or `hero dark`.
 - Use the layout skeletons instead of writing slides from scratch.
 - Before adding slide markup, inspect the `<style>` block in `index.html` and confirm every class used by the chosen skeleton exists.
 - Put images under `ppt/images/` and reference them with relative paths like `images/01-cover.jpg`.
+- For Style B, every slide should carry a registered `data-layout` value from `swiss-layout-lock.md`, and local images should include `data-image-slot` when the layout defines an image slot.
 
 ### Web Step 4: Generate, Preview, and Check
 
@@ -167,6 +204,12 @@ Fill `<main id="deck">` with the selected sections, then run these checks:
 ```bash
 grep -n "\\[必填\\]" "<project_path>/ppt/index.html"
 grep -n 'class="slide' "<project_path>/ppt/index.html"
+```
+
+For Style B, also run the static Swiss lock validator:
+
+```bash
+node "${SKILL_DIR}/scripts/validate-swiss-deck.mjs" "<project_path>/ppt/index.html"
 ```
 
 Open the file directly in a browser:
@@ -185,17 +228,23 @@ Use `${SKILL_DIR}/references/magazine-web/checklist.md` for final QA. P0 issues 
 
 🚧 **GATE**: User has provided source material (PDF / DOCX / EPUB / URL / Markdown file / text description / conversation content — any form is acceptable).
 
+If the user provides only a topic name or brief requirements with no source files or substantive source content, run `workflows/topic-research.md` first, then return here with the generated Markdown/source materials.
+
 When the user provides non-Markdown content, convert immediately:
 
 | User Provides | Command |
 |---------------|---------|
 | PDF file | `python3 ${SKILL_DIR}/scripts/source_to_md/pdf_to_md.py <file>` |
 | DOCX / Word / Office document | `python3 ${SKILL_DIR}/scripts/source_to_md/doc_to_md.py <file>` |
+| XLSX / XLSM / Excel workbook | `python3 ${SKILL_DIR}/scripts/source_to_md/excel_to_md.py <file>` |
+| CSV / TSV | Read directly as plain-text table source |
 | PPTX / PowerPoint deck | `python3 ${SKILL_DIR}/scripts/source_to_md/ppt_to_md.py <file>` |
 | EPUB / HTML / LaTeX / RST / other | `python3 ${SKILL_DIR}/scripts/source_to_md/doc_to_md.py <file>` |
 | Web link | `python3 ${SKILL_DIR}/scripts/source_to_md/web_to_md.py <URL>` |
 | WeChat / high-security site | `python3 ${SKILL_DIR}/scripts/source_to_md/web_to_md.py <URL>` (requires `curl_cffi`; falls back to `node web_to_md.cjs <URL>` only if that package is unavailable) |
 | Markdown | Read directly |
+
+> **Office vector assets (EMF/WMF) from DOCX/PPTX sources**: preserve extracted EMF/WMF files as first-class vector assets. Do not convert them to PNG unless the user explicitly accepts rasterization; `finalize_svg.py` skips them and `svg_to_pptx.py` embeds them as native Office media.
 
 **✅ Checkpoint — Confirm source content is ready, proceed to Step 2.**
 
@@ -284,6 +333,8 @@ Read references/strategist.md
 7. Typography plan
 8. Image usage approach
 
+After the eight items, append one short split-mode note in the user's language. For large page counts or bulky sources, recommend switching to `workflows/resume-execute.md` after Step 5 by opening a fresh chat and entering `继续生成 projects/<project_name>`; for normal scale, state that continuous mode is the default and split mode remains available.
+
 If the user has provided images, run the analysis script **before outputting the design spec** (do NOT directly read/open image files — use the script output only):
 ```bash
 python3 ${SKILL_DIR}/scripts/analyze_images.py <project_path>/images
@@ -306,20 +357,25 @@ python3 ${SKILL_DIR}/scripts/analyze_images.py <project_path>/images
 
 ---
 
-### Step 5: Image_Generator Phase (Conditional)
+### Step 5: Image Acquisition Phase (Conditional)
 
 🚧 **GATE**: Step 4 complete; Design Specification & Content Outline generated and user confirmed.
 
-> **Trigger condition**: Image approach includes "AI generation". If not triggered, skip directly to Step 6 (Step 6 GATE must still be satisfied).
+> **Trigger condition**: at least one Design Spec image row needs `Acquire Via: ai` and/or `Acquire Via: web`. If every row is `user` or `placeholder`, skip directly to Step 6.
 
-Read `references/image-generator.md`
+Always read the common framework first:
 
-1. Extract all images with status `Pending` from the design spec
-2. Generate prompt document → `<project_path>/images/image_prompts.md`
-3. Generate images (CLI tool recommended):
-   ```bash
-   python3 ${SKILL_DIR}/scripts/image_gen.py "prompt" --aspect_ratio 16:9 --image_size 1K -o <project_path>/images
-   ```
+```
+Read references/image-base.md
+```
+
+Then lazy-load only the needed path-specific reference:
+
+| Acquire Via | Load reference | Run |
+|---|---|---|
+| `ai` | `references/image-generator.md` | `python3 ${SKILL_DIR}/scripts/image_gen.py --manifest <project_path>/images/image_prompts.json` |
+| `web` | `references/image-searcher.md` | `python3 ${SKILL_DIR}/scripts/image_search.py ...` |
+| `user` / `placeholder` | skip | skip |
 
 **✅ Checkpoint — Confirm image generation attempted for every row, proceed to Step 6**:
 ```markdown
@@ -340,16 +396,28 @@ Read `references/image-generator.md`
 Read the role definition based on the selected style:
 ```
 Read references/executor-base.md          # REQUIRED: common guidelines
+Read references/shared-standards.md       # REQUIRED: SVG/PPT technical constraints
 Read references/executor-general.md       # General flexible style
 Read references/executor-consultant.md    # Consulting style
 Read references/executor-consultant-top.md # Top consulting style (MBB level)
 ```
 
-> Only need to read executor-base + one style file.
+> Only need to read executor-base + shared-standards + one style file.
 
 **Design Parameter Confirmation (Mandatory)**: Before generating the first SVG, the Executor MUST review and output key design parameters from the Design Specification (canvas dimensions, color scheme, font plan, body font size) to ensure spec adherence. See executor-base.md Section 2 for details.
 
-**Per-page spec_lock re-read (Mandatory)**: Before generating **each** SVG page, Executor MUST `read_file <project_path>/spec_lock.md` and use only the colors / fonts / icons / images listed there. This resists context-compression drift on long decks. See executor-base.md §2.1 for details.
+**Live Preview Auto-Startup (Mandatory)**: before generating the first SVG, start the browser editor in live mode and keep it running through Executor + export:
+```bash
+python3 ${SKILL_DIR}/scripts/svg_editor/server.py <project_path> --live
+```
+- Start it immediately when Executor begins; `svg_output/` may still be empty.
+- Default URL is `http://localhost:5050`; if the port is occupied, use `--port <other>` and report the actual URL.
+- Run it as a long-running side process. Do not wait for it to exit before generating pages.
+- Do not read or apply submitted annotations during generation. If the user later asks to apply annotations, use `workflows/live-preview.md` after export.
+
+**Pre-generation Batch Read (Mandatory)**: before the first SVG, batch-read every distinct layout SVG referenced in `spec_lock.page_layouts` and every distinct chart SVG referenced in `spec_lock.page_charts` (plus backup chart references). One read per file, up front.
+
+**Per-page spec_lock re-read (Mandatory)**: Before generating **each** SVG page, Executor MUST `read_file <project_path>/spec_lock.md` and use only the colors / fonts / icons / images listed there, plus the per-page `page_rhythm`, `page_layouts`, and `page_charts` lookups. This resists context-compression drift on long decks. See executor-base.md §2.1 for details.
 
 > ⚠️ **Main-agent only rule**: SVG generation in Step 6 MUST remain with the current main agent because page design depends on full upstream context (source content, design spec, template mapping, image decisions, and cross-page consistency). Do NOT delegate any slide SVG generation to sub-agents.
 > ⚠️ **Generation rhythm rule**: After confirming the global design parameters, the Executor MUST generate pages sequentially, one page at a time, while staying in the same continuous main-agent context. Do NOT split Step 6 into grouped page batches such as 5 pages per batch.
@@ -376,11 +444,15 @@ python3 ${SKILL_DIR}/scripts/svg_quality_checker.py <project_path>
 - [x] Speaker notes generated at notes/total.md
 ```
 
+> **Chart pages?** If this deck contains data charts, run `workflows/verify-charts.md` before Step 7 to calibrate coordinates. Skip when the deck has no chart pages.
+
 ---
 
 ### Step 7: Post-processing & Export
 
 🚧 **GATE**: Step 6 complete; all SVGs generated to `svg_output/`; speaker notes `notes/total.md` generated.
+
+🚧 **Image readiness GATE**: if Step 5 left any `Needs-Manual` image rows, every expected file must exist at `project/images/<filename>` before running Step 7.1. If files are missing, pause and report filenames plus required locations.
 
 > ⚠️ The following three sub-steps MUST be **executed individually one at a time**. Each command must complete and be confirmed successful before running the next.
 > ❌ **NEVER** put all three commands in a single code block or single shell invocation.
@@ -399,13 +471,26 @@ python3 ${SKILL_DIR}/scripts/finalize_svg.py <project_path>
 
 **Step 7.3** — Export PPTX (embeds speaker notes by default):
 ```bash
-python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path> -s final
-# Output: exports/<project_name>_<timestamp>.pptx + exports/<project_name>_<timestamp>_svg.pptx
+python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path>
+# Output: exports/<project_name>_<timestamp>.pptx
+#
+# Optional SVG snapshot preview:
+# python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path> --svg-snapshot
 ```
 
 > ❌ **NEVER** use `cp` as a substitute for `finalize_svg.py` — it performs multiple critical processing steps
-> ❌ **NEVER** export directly from `svg_output/` — MUST use `-s final` to export from `svg_final/`
 > ❌ **NEVER** add extra flags like `--only`
+
+**Optional animation flags**: defaults already enable rich entrance animations. Adjust only when the user asks:
+- `-t <effect>` page transition; default `fade`
+- `-a <effect>` per-element entrance animation; default `mixed`
+- `--animation-trigger {on-click,with-previous,after-previous}`
+- `--animation-config <path>` optional object-level sidecar, usually created through `workflows/customize-animations.md`
+- `--auto-advance <seconds>` kiosk-style auto-play
+
+**Optional recorded narration**: only when the user asks for narration/audio/video export, run `workflows/generate-audio.md`. Do not call `notes_to_audio.py` directly without that workflow, because backend/voice/rate/embed choices must be confirmed once.
+
+> **Post-export annotation window**: if the live preview service is still running and the user submitted annotations, apply them only after export via `workflows/live-preview.md`.
 
 ---
 

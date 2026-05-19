@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Ultimate PPT Master hero diagram</title>
+  <desc id="desc">A premium dark product diagram showing documents flowing into an AI presentation workflow and exporting to editable PPTX and magazine web decks.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#080A0F"/>
+      <stop offset="0.55" stop-color="#10151D"/>
+      <stop offset="1" stop-color="#16120C"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F2D28A"/>
+      <stop offset="1" stop-color="#B68A3A"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5CE1E6"/>
+      <stop offset="1" stop-color="#5C8DFF"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#000000" flood-opacity="0.38"/>
+    </filter>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#FFFFFF" stroke-opacity="0.035"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#grid)"/>
+  <circle cx="1280" cy="130" r="260" fill="#5C8DFF" opacity="0.06"/>
+  <circle cx="270" cy="760" r="300" fill="#F2D28A" opacity="0.055"/>
+
+  <g transform="translate(110 110)">
+    <text x="0" y="0" fill="#F7F2E8" font-family="Inter, Helvetica, Arial, sans-serif" font-size="42" font-weight="700">Ultimate PPT Master</text>
+    <text x="0" y="58" fill="#AEB7C4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="22">Documents to native PowerPoint and cinematic web decks</text>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <rect x="108" y="245" width="350" height="410" rx="26" fill="#111821" stroke="#FFFFFF" stroke-opacity="0.08"/>
+    <text x="146" y="302" fill="#F7F2E8" font-family="Inter, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">Source material</text>
+    <text x="146" y="338" fill="#8F9BAA" font-family="Inter, Helvetica, Arial, sans-serif" font-size="16">Drop in real work, not prompts only.</text>
+    <g transform="translate(146 388)" font-family="Inter, Helvetica, Arial, sans-serif">
+      <rect width="114" height="48" rx="14" fill="#1B2531"/><text x="26" y="31" fill="#F7F2E8" font-size="16" font-weight="700">PDF</text>
+      <rect x="132" width="114" height="48" rx="14" fill="#1B2531"/><text x="157" y="31" fill="#F7F2E8" font-size="16" font-weight="700">DOCX</text>
+      <rect y="68" width="114" height="48" rx="14" fill="#1B2531"/><text x="23" y="99" fill="#F7F2E8" font-size="16" font-weight="700">XLSX</text>
+      <rect x="132" y="68" width="114" height="48" rx="14" fill="#1B2531"/><text x="157" y="99" fill="#F7F2E8" font-size="16" font-weight="700">PPTX</text>
+      <rect y="136" width="114" height="48" rx="14" fill="#1B2531"/><text x="25" y="167" fill="#F7F2E8" font-size="16" font-weight="700">URL</text>
+      <rect x="132" y="136" width="114" height="48" rx="14" fill="#1B2531"/><text x="166" y="167" fill="#F7F2E8" font-size="16" font-weight="700">MD</text>
+    </g>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <rect x="548" y="196" width="504" height="508" rx="32" fill="#0F141B" stroke="#FFFFFF" stroke-opacity="0.1"/>
+    <rect x="590" y="244" width="420" height="64" rx="18" fill="#161E28"/>
+    <text x="620" y="284" fill="#F7F2E8" font-family="Inter, Helvetica, Arial, sans-serif" font-size="22" font-weight="700">Agentic presentation workflow</text>
+    <g font-family="Inter, Helvetica, Arial, sans-serif" font-size="17">
+      <rect x="610" y="350" width="160" height="58" rx="17" fill="#1B2531"/>
+      <text x="647" y="386" fill="#D7DEE8">Strategy</text>
+      <rect x="830" y="350" width="160" height="58" rx="17" fill="#1B2531"/>
+      <text x="876" y="386" fill="#D7DEE8">Design</text>
+      <rect x="610" y="450" width="160" height="58" rx="17" fill="#1B2531"/>
+      <text x="654" y="486" fill="#D7DEE8">Render</text>
+      <rect x="830" y="450" width="160" height="58" rx="17" fill="#1B2531"/>
+      <text x="875" y="486" fill="#D7DEE8">Verify</text>
+      <path d="M770 379H830M910 408V450M830 479H770M690 450V408" fill="none" stroke="url(#blue)" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+    </g>
+    <rect x="610" y="565" width="380" height="70" rx="20" fill="#131A22" stroke="url(#gold)" stroke-opacity="0.7"/>
+    <text x="640" y="596" fill="#F2D28A" font-family="Inter, Helvetica, Arial, sans-serif" font-size="17" font-weight="700">Live preview + editable annotations</text>
+    <text x="640" y="622" fill="#93A0B1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="14">Tune the deck while the agent keeps the source of truth.</text>
+  </g>
+
+  <path d="M458 450C500 450 506 450 548 450" fill="none" stroke="#4A5565" stroke-width="3"/>
+  <path d="M1048 386C1110 356 1136 322 1198 306" fill="none" stroke="#4A5565" stroke-width="3"/>
+  <path d="M1048 514C1110 548 1136 588 1198 606" fill="none" stroke="#4A5565" stroke-width="3"/>
+
+  <g filter="url(#softShadow)" font-family="Inter, Helvetica, Arial, sans-serif">
+    <rect x="1198" y="214" width="300" height="180" rx="26" fill="#111821" stroke="#FFFFFF" stroke-opacity="0.1"/>
+    <text x="1232" y="272" fill="#F7F2E8" font-size="25" font-weight="800">Editable PPTX</text>
+    <text x="1232" y="310" fill="#9CA8B7" font-size="16">Real text boxes, shapes, charts,</text>
+    <text x="1232" y="335" fill="#9CA8B7" font-size="16">animations, notes, narration.</text>
+    <rect x="1232" y="356" width="112" height="8" rx="4" fill="url(#blue)"/>
+
+    <rect x="1198" y="512" width="300" height="180" rx="26" fill="#111821" stroke="#FFFFFF" stroke-opacity="0.1"/>
+    <text x="1232" y="570" fill="#F7F2E8" font-size="25" font-weight="800">Web Decks</text>
+    <text x="1232" y="608" fill="#9CA8B7" font-size="16">Editorial magazine and Swiss</text>
+    <text x="1232" y="633" fill="#9CA8B7" font-size="16">layouts for talks and launches.</text>
+    <rect x="1232" y="654" width="112" height="8" rx="4" fill="url(#gold)"/>
+  </g>
+</svg>

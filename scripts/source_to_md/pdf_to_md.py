@@ -415,10 +415,23 @@ def clean_text(text: str) -> str:
 
 
 def merge_adjacent_formatting(text: str) -> str:
-    """Merge adjacent formatting markers, e.g. **text1****text2** -> **text1 text2**"""
-    text = re.sub(r'\*\*\s*\*\*', ' ', text)
-    text = re.sub(r'\*\s*\*', ' ', text)
-    text = re.sub(r'\*\*\*\s*\*\*\*', ' ', text)
+    """Merge adjacent same-style formatted spans split across PDF tokens.
+
+    PyMuPDF often emits a phrase as several spans, so per-span wrapping in
+    ``format_span_text`` produces ``**X****Y**`` (bold) or ``***X******Y***``
+    (bold-italic) where one phrase is intended. Collapse the abutting markers
+    so the run reads as a single phrase: ``**X Y**`` / ``***X Y***``.
+
+    Italic-italic adjacency (``*X**Y*``) is indistinguishable from a plain
+    bold span's open/close pair and is left alone — merging it would corrupt
+    every legitimate ``**bold**`` phrase on the page. The previous regexes
+    ``\\*\\s*\\*`` and ``\\*\\*\\*\\s*\\*\\*\\*`` did exactly that, deleting
+    all bold formatting from the converted Markdown.
+    """
+    # Bold-italic adjacency first so the inner ``******`` isn't half-eaten
+    # by the bold pass.
+    text = re.sub(r'\*{6}', ' ', text)
+    text = re.sub(r'\*{4}', ' ', text)
     return text
 
 
@@ -442,15 +455,27 @@ def should_merge_lines(current: dict, next_line: dict) -> bool:
     return True
 
 
-def extract_pdf_to_markdown(pdf_path: str, output_path: str = None) -> str:
-    """
-    Extract text, images, and tables from a PDF and convert to Markdown.
+def extract_pdf_to_markdown(pdf_path: str, output_path: str = None, images: str = "filtered") -> str:
+    """Extract text, images, and tables from a PDF and convert to Markdown.
+
+    Args:
+        pdf_path: Path to the PDF file.
+        output_path: Optional output path for the Markdown file.
+        images: Image extraction mode.
+            "filtered" = apply size/quality filters (default),
+            "all"      = extract all images without filtering,
+            "none"     = skip all images.
     """
     try:
         doc = fitz.open(pdf_path)
     except Exception as e:
         print(f"[ERROR] Failed to open PDF file: {e}")
         return ""
+
+    if len(doc) >= 200:
+        print(f"[HINT] {len(doc)} pages — for very large PDFs, consider splitting "
+              f"the source by chapter beforehand (e.g. with pdftk / qpdf / PyPDF2) "
+              f"and converting each part individually.")
 
     filename = Path(pdf_path).stem
     title = re.sub(r'^\d+-', '', filename).strip()
@@ -476,8 +501,6 @@ def extract_pdf_to_markdown(pdf_path: str, output_path: str = None) -> str:
         output_path = Path(output_path)
         rel_img_dir = f"{output_path.stem}_files"
         img_dir = output_path.parent / rel_img_dir
-        if not img_dir.exists():
-            img_dir.mkdir(parents=True, exist_ok=True)
 
     img_count = 0
 
@@ -592,7 +615,9 @@ def extract_pdf_to_markdown(pdf_path: str, output_path: str = None) -> str:
                     })
 
             elif block["type"] == 1:
-                if should_keep_image(block, page.rect, seen_image_hashes):
+                if images == "none":
+                    pass
+                elif images == "all" or should_keep_image(block, page.rect, seen_image_hashes):
                     page_elements.append({
                         "y0": block["bbox"][1],
                         "type": 1,
@@ -701,6 +726,7 @@ def extract_pdf_to_markdown(pdf_path: str, output_path: str = None) -> str:
                     image_path = img_dir / image_name
 
                     try:
+                        img_dir.mkdir(parents=True, exist_ok=True)
                         with open(image_path, "wb") as f:
                             f.write(image_data)
 
@@ -731,12 +757,13 @@ def extract_pdf_to_markdown(pdf_path: str, output_path: str = None) -> str:
     return markdown_content
 
 
-def process_directory(input_dir: str, output_dir: str | None = None) -> None:
+def process_directory(input_dir: str, output_dir: str | None = None, images: str = "filtered") -> None:
     """Convert all PDFs in a directory to Markdown.
 
     Args:
         input_dir: Directory containing PDF files.
         output_dir: Optional output directory for Markdown files.
+        images: Image extraction mode passed through to each file conversion.
     """
     input_path = Path(input_dir)
 
@@ -752,7 +779,7 @@ def process_directory(input_dir: str, output_dir: str | None = None) -> None:
     for pdf_file in pdf_files:
         output_file = output_path / (pdf_file.stem + '.md')
         print(f"Processing: {pdf_file.name}")
-        extract_pdf_to_markdown(str(pdf_file), str(output_file))
+        extract_pdf_to_markdown(str(pdf_file), str(output_file), images=images)
 
 
 def main() -> int:
@@ -779,6 +806,12 @@ Structure detection features:
 
     parser.add_argument('input', help='PDF file or directory containing PDFs')
     parser.add_argument('-o', '--output', help='Output file or directory')
+    parser.add_argument(
+        '--images',
+        choices=['all', 'filtered', 'none'],
+        default='filtered',
+        help='Image extraction mode: filtered=apply size/quality filters (default), all=no filtering, none=skip images',
+    )
 
     args = parser.parse_args()
 
@@ -786,9 +819,9 @@ Structure detection features:
 
     if input_path.is_file():
         output = args.output or str(input_path.with_suffix('.md'))
-        extract_pdf_to_markdown(str(input_path), output)
+        extract_pdf_to_markdown(str(input_path), output, images=args.images)
     elif input_path.is_dir():
-        process_directory(str(input_path), args.output)
+        process_directory(str(input_path), args.output, images=args.images)
     else:
         print(f"Error: File or directory not found: {args.input}")
         return 1

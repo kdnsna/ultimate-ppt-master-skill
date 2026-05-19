@@ -1,40 +1,37 @@
-# Page Layout Template Library (21 Templates)
+# Page Layout Template Library (17 Templates)
 
 Pre-built PPT page layout templates supporting multiple styles and use cases.
 
 - **Full Index**: [README.md](./README.md) (human browsing — includes categories, primary colors, detailed tone)
-- **Slim Index**: [layouts_index.json](./layouts_index.json) (lightweight lookup — `label` / `summary` / `keywords` only)
+- **Slim Index**: [layouts_index.json](./layouts_index.json) (lightweight lookup — `summary` / `keywords` per template id)
 
-> **Template selection is opt-in.** The main workflow defaults to free design and does NOT read `layouts_index.json` unless the user explicitly requests a template. See `SKILL.md` Step 3.
+> **Template selection is opt-in by explicit path.** The main workflow defaults to free design. A template is only used when the user gives an explicit directory path (e.g. `skills/ppt-master/templates/layouts/academic_defense/` or any other path) in their initial message. Bare names like "academic_defense" do not trigger — `layouts_index.json` and this README are discovery aids for finding the path, not triggers in themselves. See `SKILL.md` Step 3.
 
 ---
 
 ## Quick Template Index
 
+<!-- quick-index:begin -->
 | Template Name | Category | Use Cases | Primary Color | Design Tone |
 |---------------|----------|-----------|---------------|-------------|
-| `google_style` | Brand | Annual reports, tech sharing, data presentation | Google Four Colors `#4285F4` `#EA4335` `#FBBC04` `#34A853` | Modern clean, data-driven, ample whitespace |
-| `mckinsey` | Brand | Strategic consulting, executive reports, investment analysis | McKinsey Blue `#005587` | Structured thinking, minimalist premium, MECE principle |
-| `anthropic` | Brand | AI tech sharing, developer conferences, product launches | Anthropic Orange `#D97757` | Tech-forward, conclusion-first, dark cover |
-| `china_telecom_template` | Brand | Telecom solutions, digital transformation plans,政企汇报 | Telecom Red `#C00000` | Restrained, authoritative, telecom enterprise style |
-| `中汽研_常规` | Brand | Product certification, evaluation & testing | Deep Blue `#004098` | [Standard] Professional authority, consulting style |
-| `中汽研_商务` | Brand | Business visits, technical exchanges | Blue Gradient `#003366` | [Business] Modern tech, composed and sophisticated |
-| `中汽研_现代` | Brand | Strategic launches, future tech | Deep Blue `#001529` | [Future] Future Tech, neon glow |
-| `中国电建_常规` | Brand | Power & energy, engineering, state-owned enterprise reports | PowerChina Blue `#00418D` | Craftsmanship, steady and reliable |
-| `中国电建_现代` | Brand | International engineering, premium roadshows, tech innovation | Deep Sea Blue `#001F45` | [Modern] Grand narrative, digital tech |
-| `招商银行` | Brand | Premium reports, VIP services, annual reports | CMB Red `#C41230` | Minimalist luxury, financial texture, borderless |
-| `exhibit` | General | Exhibit-driven strategic reports, executive presentations, board briefings | Gradient top bar + Gold accents | Conclusion-first, data-driven, confidential |
-| `academic_defense` | Scenario | Thesis defense, academic reports, grant proposals | Deep Blue + Red accents | Clear hierarchy, academic standards |
-| `psychology_attachment` | Scenario | Psychotherapy training, counseling lectures | Blue-green gradient + Colorful semantic colors | Warm professional, therapeutic feel |
-| `medical_university` | Scenario | Medical reports, case discussions, research presentations | Medical Blue `#0066B3` | Professional rigorous, life-affirming |
-| `government_red` | Government/Enterprise | Government work reports, party-building presentations | Government Red `#8B0000` | Solemn authority, grand and imposing |
-| `government_blue` | Government/Enterprise | Smart cities, open governance, digital transformation | Tech Blue `#0050B3` | Modern tech, rigorous and rational |
-| `ai_ops` | Government/Enterprise | Telecom AI ops, IT system overview, digital intelligence solutions | Telecom Red `#C00000` + Blue `#2E75B6` | High information density, modular layout, telecom style |
-| `pixel_retro` | Special | Git/tech introductions, retro gaming themes | Neon colors `#00FF41` `#FF0080` | Pixel art, cyberpunk |
-| `科技蓝商务` | General | Corporate reports, product launches, proposals | Tech Blue `#0078D7` | Tech, business, professional, clean |
-| `smart_red` | General | Tech company profiles, education solutions | Smart Red-Orange `#DE3545` | Modern, vibrant, geometric |
-| `重庆大学` | Scenario | Academic defense, research presentations | CQU Blue `#006BB7` | Academic solidity, mountain-city character |
----
+| `academic_defense` | General | Thesis defense, academic presentations, research progress reports, grant applications | `#003366` | Professional, rigorous, research-oriented, clear hierarchy |
+| `ai_ops` | General | Telecom AI operations architecture, IT system overviews, digital transformation proposals, smart infrastructure reports | `#C00000` | Information-dense, structured, modular zoning, telecom/enterprise style |
+| `anthropic` | General | AI tech talks, developer conferences, technical training, product launches | `#D97757` | Tech-forward, professional, modern, conclusion-first |
+| `china_telecom_template` | General | China Telecom related briefings, 政企数字化方案, 转型规划, 内部汇报 | `#C00000` | Authoritative, structured, restrained, enterprise-government hybrid |
+| `google_style` | General | Annual work reports, technical sharing, project showcases, data-driven presentations | `#4285F4` | Professional, modern, clean and restrained, data-driven, generous whitespace |
+| `government_blue` | General | Key project briefings, Five-Year Plan presentations, work summaries, investment promotion, policy interpretation | `#0050B3` | Grand, tech-forward, modern, professional government style |
+| `government_red` | General | Government briefings, policy interpretation, work summaries, project introductions, investment promotion | `#8B0000` | Authoritative, dignified, professional, modern government style |
+| `medical_university` | General | Medical academic reports, case discussions, research presentations, hospital work reports, medical education and training | `#0066B3` | Professional, rigorous, life-affirming, tech-forward, trustworthy |
+| `pixel_retro` | General | Tech talks, programming tutorials, game introductions, geek-style showcases | `#0D1117` | Retro gaming, neon cyberpunk, geek tech, 8-bit style |
+| `psychology_attachment` | General | Psychotherapy training, academic lectures, counseling case analysis, professional sharing | `#2E5C8E` | Professional, warm, healing, trustworthy |
+| `中国电建_常规` | General | Engineering project reports, technical proposal presentations, business negotiations, corporate promotion, annual summaries | `#00418D` | Professional, composed, international, state-owned enterprise style |
+| `中国电建_现代` | General | Major engineering reports, international market promotion, technology achievement showcases, high-end business negotiations | `#00418D` | Grand narrative, modern precision, digital tech, international vision |
+| `中汽研_商务` | General | Product certification display, evaluation presentations, technology promotion, high-end business reporting | `#003366` | Modern tech, authoritative & professional, composed & grand |
+| `中汽研_常规` | General | Product certification display, evaluation presentations, technology promotion, business visits | `#004098` | Professional, authoritative, trustworthy, consulting style |
+| `中汽研_现代` | General | Forward-looking technology showcases, strategic releases, high-end business reporting | `#001529` | Futuristic, tech-forward, deep & refined |
+| `招商银行` | General | 交易银行产品介绍、销售收款方案汇报、客户案例拆解、分行培训材料 | `#C8152D` | Brand-consistent, structured, product-focused, refined finance |
+| `重庆大学` | General | Academic defense, research reports, teaching presentations, scholarly exchange | `#006BB7` | Academically grounded · Mountain City charm · Modern minimalism |
+<!-- quick-index:end -->
 
 ## Template Categories
 
@@ -46,7 +43,6 @@ Templates mimicking **specific well-known brands/institutions** with their exclu
 | Template | Description |
 |----------|-------------|
 | `google_style` | Google Material Design style, four-color brand identity |
-| `mckinsey` | McKinsey consulting style, data-driven and structured |
 | `anthropic` | Anthropic AI style, dark tech-forward aesthetic |
 | `china_telecom_template` | China Telecom brand style, red-gray structural header + ribbon footer |
 | `中汽研_常规` | CATARC standard style (v1), suitable for certification and evaluation |
@@ -56,17 +52,7 @@ Templates mimicking **specific well-known brands/institutions** with their exclu
 | `中国电建_现代` | PowerChina modern style (v2), emphasis on grand narrative and digital tech |
 | `招商银行` | China Merchants Bank v2.0, minimalist luxury, borderless open layout |
 
-### 2. General Style Templates
-
-Universal business styles not tied to any specific brand, broadly applicable.
-
-| Template | Description |
-|----------|-------------|
-| `exhibit` | Exhibit-driven style, conclusion-first layout with Exhibit takeaway bar, gradient top bar, grid decoration |
-| `科技蓝商务` | Tech business style, rigorous and professional, hexagonal texture |
-| `smart_red` | Smart red-orange business style, modern and vibrant, geometric cutaway design |
-
-### 3. Scenario-Specific Templates
+### 2. Scenario-Specific Templates
 
 Designed for **specific use cases**, with content structures tailored to scenario requirements.
 
@@ -77,7 +63,7 @@ Designed for **specific use cases**, with content structures tailored to scenari
 | `medical_university` | Hospital / medical university template, suitable for medical reports |
 | `重庆大学` | Chongqing University template, blending mountain-city layered imagery with modern academic style |
 
-### 4. Government & Enterprise Templates
+### 3. Government & Enterprise Templates
 
 Industry-standard designs for **government agencies and general state-owned enterprises**.
 > **Distinction**: Unlike brand styles, these are not targeted at specific organizations but provide templates matching the common aesthetic preferences of government/SOE contexts (e.g., official document red, smart governance blue).
@@ -88,7 +74,7 @@ Industry-standard designs for **government agencies and general state-owned ente
 | `government_blue` | Blue government style, suitable for smart cities, digital governance reports |
 | `ai_ops` | Enterprise digital intelligence style, telecom AI ops architecture, high-density reports (includes `reference_style.svg` style reference) |
 
-### 5. Special Style Templates
+### 4. Special Style Templates
 
 Unconventional visual styles for specific creative scenarios.
 
@@ -195,20 +181,11 @@ Templates use `{{PLACEHOLDER}}` format to mark replaceable content:
 
 ## Usage
 
-### Copy from Template Library to Project
+To use a template, give the AI an explicit directory path in your initial message — e.g. "用 `skills/ppt-master/templates/layouts/academic_defense/` 这个模板做……". The Step 3 logic copies that directory's SVGs + `design_spec.md` + assets into your project before Strategist starts.
 
-```bash
-# Copy exhibit style template to project
-cp templates/layouts/exhibit/* projects/<project>/templates/
+The directory does not have to live under `templates/layouts/`. A template kept in `projects/<other_project>/template/` or any other location works the same way as long as you give the path.
 
-# Copy Google style template to project
-cp templates/layouts/google_style/* projects/<project>/templates/
-
-# Copy government style template to project (e.g., government red)
-cp templates/layouts/government_red/* projects/<project>/templates/
-```
-
-### After Copying
+After the copy:
 
 1. Read `design_spec.md` to understand the design specification
 2. Adjust colors based on project requirements (if needed)
@@ -227,9 +204,9 @@ cp templates/layouts/government_red/* projects/<project>/templates/
 4. All SVGs use `viewBox="0 0 1280 720"`
 5. Follow SVG technical constraints (see below)
 6. Validate the template directory with `python3 scripts/svg_quality_checker.py templates/layouts/<template_name> --format ppt169`
-7. Register the new template in `templates/layouts/layouts_index.json` with three fields: `label`, `summary`, `keywords`
+7. Register the new template by running `python3 scripts/register_template.py <template_id>` — it derives the `summary` and `keywords` index entry from `design_spec.md` and refreshes the Quick Index above
 
-`layouts_index.json` is the lightweight lookup used when a user explicitly opts into the template flow. A template folder without an index entry will not be discoverable by that flow.
+`layouts_index.json` is the lightweight lookup used to **discover** library templates (e.g. answering "what templates exist?"). It is not consulted when triggering Step 3 — Step 3 triggers on an explicit directory path the user supplied, regardless of whether that path is in the index. A template folder without an index entry still works fine if the user names its path; it just won't show up in discovery listings.
 
 ### SVG Technical Constraints (All Templates Must Comply)
 

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 760" role="img" aria-labelledby="title desc">
+  <title id="title">Ultimate PPT Master style matrix</title>
+  <desc id="desc">A matrix showing four output strengths: editable PowerPoint, editorial web deck, Swiss Style web deck, and agent workflow.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0A0D12"/>
+      <stop offset="1" stop-color="#171717"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F3D795"/>
+      <stop offset="1" stop-color="#7ED7F6"/>
+    </linearGradient>
+    <filter id="shadow" x="-15%" y="-20%" width="130%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="20" flood-color="#000" flood-opacity="0.34"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="760" fill="url(#bg)"/>
+  <g opacity="0.08" stroke="#FFFFFF" stroke-width="1">
+    <path d="M0 120H1600M0 240H1600M0 360H1600M0 480H1600M0 600H1600"/>
+    <path d="M200 0V760M400 0V760M600 0V760M800 0V760M1000 0V760M1200 0V760M1400 0V760"/>
+  </g>
+  <g font-family="Inter, Helvetica, Arial, sans-serif">
+    <text x="92" y="92" fill="#F7F2E8" font-size="42" font-weight="800">One skill. Three presentation surfaces.</text>
+    <text x="92" y="136" fill="#9FA9B7" font-size="21">Pick the format by audience and handoff requirements, not by what the tool happens to support.</text>
+  </g>
+
+  <g transform="translate(90 218)" filter="url(#shadow)" font-family="Inter, Helvetica, Arial, sans-serif">
+    <g>
+      <rect width="330" height="340" rx="30" fill="#111821" stroke="#FFFFFF" stroke-opacity="0.09"/>
+      <rect x="34" y="34" width="76" height="76" rx="20" fill="#172435"/>
+      <path d="M54 82h36M54 62h56M54 102h44" stroke="#7ED7F6" stroke-width="6" stroke-linecap="round"/>
+      <text x="34" y="152" fill="#F7F2E8" font-size="27" font-weight="800">Editable PPTX</text>
+      <text x="34" y="198" fill="#AEB7C4" font-size="17">For formal delivery, consulting,</text>
+      <text x="34" y="224" fill="#AEB7C4" font-size="17">training, and client handoff.</text>
+      <text x="34" y="278" fill="#F3D795" font-size="16" font-weight="800">Native shapes, text, charts</text>
+    </g>
+    <g transform="translate(364 0)">
+      <rect width="330" height="340" rx="30" fill="#F6F0E4" stroke="#FFFFFF" stroke-opacity="0.1"/>
+      <rect x="34" y="34" width="76" height="76" rx="20" fill="#171717"/>
+      <path d="M54 72c12-18 26-18 38 0s26 18 38 0" fill="none" stroke="#F3D795" stroke-width="6" stroke-linecap="round"/>
+      <text x="34" y="152" fill="#161616" font-size="27" font-weight="800">Editorial Web</text>
+      <text x="34" y="198" fill="#596273" font-size="17">For talks, launches, essays,</text>
+      <text x="34" y="224" fill="#596273" font-size="17">and cinematic storytelling.</text>
+      <text x="34" y="278" fill="#8A6626" font-size="16" font-weight="800">Magazine rhythm, WebGL motion</text>
+    </g>
+    <g transform="translate(728 0)">
+      <rect width="330" height="340" rx="30" fill="#F7F7F2" stroke="#FFFFFF" stroke-opacity="0.1"/>
+      <rect x="34" y="34" width="76" height="76" rx="20" fill="#0B42F0"/>
+      <circle cx="58" cy="58" r="5" fill="#EFFF00"/>
+      <circle cx="86" cy="58" r="5" fill="#EFFF00"/>
+      <circle cx="58" cy="86" r="5" fill="#EFFF00"/>
+      <circle cx="86" cy="86" r="5" fill="#EFFF00"/>
+      <text x="34" y="152" fill="#0B0E14" font-size="27" font-weight="800">Swiss Style</text>
+      <text x="34" y="198" fill="#596273" font-size="17">For product, data, engineering,</text>
+      <text x="34" y="224" fill="#596273" font-size="17">and information design decks.</text>
+      <text x="34" y="278" fill="#0B42F0" font-size="16" font-weight="800">Grid, scale, contrast, discipline</text>
+    </g>
+    <g transform="translate(1092 0)">
+      <rect width="330" height="340" rx="30" fill="#111821" stroke="#FFFFFF" stroke-opacity="0.09"/>
+      <rect x="34" y="34" width="76" height="76" rx="20" fill="#1D2632"/>
+      <path d="M58 80h48M82 56v48" stroke="url(#accent)" stroke-width="6" stroke-linecap="round"/>
+      <text x="34" y="152" fill="#F7F2E8" font-size="27" font-weight="800">Agent Workflow</text>
+      <text x="34" y="198" fill="#AEB7C4" font-size="17">For source-grounded generation,</text>
+      <text x="34" y="224" fill="#AEB7C4" font-size="17">preview, annotation, verification.</text>
+      <text x="34" y="278" fill="#7ED7F6" font-size="16" font-weight="800">Codex, Claude Code, Hermes</text>
+    </g>
+  </g>
+
+  <g transform="translate(92 635)" font-family="Inter, Helvetica, Arial, sans-serif">
+    <rect width="1416" height="58" rx="20" fill="#FFFFFF" opacity="0.06"/>
+    <text x="32" y="37" fill="#D6DEE8" font-size="18">Use PPTX when the deck must be edited. Use web deck when the performance matters. Use Swiss Style when precision and data density matter.</text>
+  </g>
+</svg>

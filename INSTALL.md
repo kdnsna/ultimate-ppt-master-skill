@@ -99,6 +99,13 @@ python3.10 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
+如果使用网页 PPT 的 Swiss Style 校验器，需要本机有 Node.js：
+
+```bash
+node --version
+node scripts/validate-swiss-deck.mjs <project_path>/ppt/index.html
+```
+
 macOS 上如果要保证 PPTX 兼容导出，建议安装 Cairo：
 
 ```bash
@@ -230,6 +237,13 @@ Python 3.10+ is required.
 ```bash
 python3.10 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
+```
+
+Node.js is needed only for the Magazine Web Deck Swiss Style validator:
+
+```bash
+node --version
+node scripts/validate-swiss-deck.mjs <project_path>/ppt/index.html
 ```
 
 For robust PPTX compatibility output on macOS:

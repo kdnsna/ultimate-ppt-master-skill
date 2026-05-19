@@ -1,288 +1,322 @@
+> See [`image-base.md`](./image-base.md) for the common framework. For the web sourcing path, see [`image-searcher.md`](./image-searcher.md).
+
 # Image_Generator Reference Manual
 
-> This file is the streamlined reference for the Image_Generator role. Common standards (SVG technical constraints, canvas formats, post-processing pipeline, etc.) are in [shared-standards.md](./shared-standards.md).
+Role definition for the **AI image generation path**: convert each `Acquire Via: ai` row into an optimized prompt, generate the image, and save it to `project/images/`.
 
-## Core Mission
-
-Receive the "Image Resource List" from the Design Specification & Content Outline output by the Strategist, create optimized prompts for each image pending generation, generate images via AI tools, and save them to the project's `images/` directory.
-
-**Trigger condition**: When AI image generation is needed (standalone use or invoked within pipeline)
-
-| Mode | Trigger | Description |
-|------|---------|-------------|
-| **Standalone** | Directly describe image needs | Generate single or multiple AI images |
-| **In-pipeline** | `generate-ppt` with AI image generation selected | Batch-generate image assets for a project |
-
-> Next step in pipeline: Executor generates SVGs
+**Trigger**: resource list rows with `Acquire Via: ai`. The role is loaded only when at least one such row exists.
 
 ---
 
-## 1. Input & Output
+## 1. Core Principle — Maximize AI Image Capability in Service of the Deck
 
-### Input
+AI images exist to serve the deck's communication goal. Pick whatever combination of `page_role` and `text_policy` makes the page work best.
 
-- **Design Specification & Content Outline** (from Strategist): project theme, target audience, design style, color scheme, canvas format
-- **Image Resource List** (key input):
+**Two page roles** (orthogonal to type):
 
-  | Filename | Dimensions | Purpose | Type | Status | Generation Description |
-  |----------|-----------|---------|------|--------|----------------------|
-  | cover_bg.png | 1920x1080 | Cover background | Background | Pending | Modern tech abstract background, deep blue gradient |
+| `page_role` | Use |
+|---|---|
+| `local` | Image occupies a region of an SVG page (left half, right column, hero band, accent corner). Composition is the AI's call — fill the region as the page design wants |
+| `hero_page` | Image is the page's main voice — cover, chapter divider, mood transition, single-number hero, closing quote. SVG above may be minimal or empty |
 
-  Status values are defined in [`svg-image-embedding.md`](svg-image-embedding.md). Image_Generator consumes only `Pending` rows and changes them to `Generated` or `Needs-Manual`.
+**Two text policies** (orthogonal to page_role):
 
-### Output
+| `text_policy` | Use |
+|---|---|
+| `none` | No text inside the image |
+| `embedded` | Image contains text as part of the artwork — decorative lettering, designed title, hand-lettered keywords, infographic labels, anything the page needs |
 
-| Deliverable | Path / Description | Requirements |
-|------------|-------------------|--------------|
-| Prompt document | `project/images/image_prompts.md` | **Must** be saved using file write tool — cannot just be output in conversation |
-| Optimized prompts | Individual prompt per image | Directly usable with AI image generation tools; doubles as alt text |
-| Image files | `project/images/` directory | Named per the resource list filenames |
-| Updated list | Status changes | `Pending` -> `Generated` (success) or `Pending` -> `Needs-Manual` (generation attempted and failed) |
+**Hard rule — only what's actually hard**:
 
----
+- Same `deck_rendering` + same `deck_palette` for every image in the deck
+- HEX codes and color names are rendering guidance — never visible text in the image
+- Long body copy / data points / bulleted lists / long quotes stay in SVG (improving them later means regenerating the image, which is expensive)
+- Prompts are one coherent prose paragraph, not tag soup (a model-output reality, not an aesthetic choice)
 
-## 2. Unified Prompt Structure
-
-### 2.1 Standard Output Format
-
-Every image must be output in the following format:
-
-```markdown
-### Image N: {filename}
-
-| Attribute | Value |
-| --------- | ----- |
-| Purpose   | {which page / what function} |
-| Type      | {Background / Illustration / Photography / Diagram / Decorative} |
-| Dimensions | {width}x{height} ({aspect ratio}) |
-| Original description | {description provided by user in the list} |
-
-**Prompt**:
-{subject description}, {style directive}, {color directive}, {composition directive}, {quality directive}
-
-**Negative Prompt**:
-{elements to exclude}
-
-**Alt Text**:
-> {Description for accessibility and image captions}
-```
-
-### 2.2 Prompt Components
-
-| Component | Description | Example |
-|-----------|-------------|---------|
-| Subject description | Core content | `Abstract geometric shapes`, `Team collaboration scene` |
-| Style directive | Visual style | `flat design`, `3D isometric`, `watercolor style` |
-| Color directive | Color scheme | `color palette: navy blue (#1E3A5F), gold (#D4AF37)` |
-| Composition directive | Layout ratio | `16:9 aspect ratio`, `centered composition` |
-| Quality directive | Resolution quality | `high quality`, `4K resolution`, `sharp details` |
-| Negative prompt | Exclude elements | `text, watermark, blurry, low quality` |
-
-### 2.3 Style Keywords Quick Reference
-
-| Design Style | Recommended Image Style | Core Keywords |
-|-------------|------------------------|---------------|
-| General Versatile | Modern illustration, flat design | `modern`, `flat design`, `gradient`, `vibrant colors` |
-| General Consulting | Clean professional, corporate | `professional`, `clean`, `corporate`, `minimalist` |
-| Top Consulting | Premium minimal, abstract geometric | `premium`, `sophisticated`, `geometric`, `abstract`, `elegant` |
-| Technology / SaaS | Futuristic, digital | `futuristic`, `digital`, `tech grid`, `circuit pattern`, `neon accents`, `dark background` |
-| Education / Training | Friendly, instructional | `friendly`, `instructional`, `whiteboard style`, `pastel colors`, `simple shapes` |
-| Marketing / Branding | Bold, energetic | `bold`, `energetic`, `dynamic composition`, `vivid colors`, `action-oriented` |
-| Healthcare / Medical | Clean, reassuring | `clean`, `clinical`, `soft blue-green palette`, `organic curves`, `reassuring` |
-| Finance / Banking | Conservative, trustworthy | `conservative`, `trustworthy`, `blue-gray palette`, `structured`, `precise` |
-| Creative / Design | Artistic, experimental | `artistic`, `experimental`, `asymmetric`, `textured`, `hand-crafted feel` |
-
-### 2.4 Color Integration Method
-
-Extract colors from design spec, convert to prompt directives:
-
-```
-Primary: #1E3A5F (Deep Navy)  →  "deep navy blue (#1E3A5F)"
-Secondary: #F8F9FA (Light Gray) →  "light gray (#F8F9FA)"
-Accent: #D4AF37 (Gold)        →  "gold accent (#D4AF37)"
-
-Full directive: "color palette: deep navy blue (#1E3A5F), light gray (#F8F9FA), gold accent (#D4AF37)"
-```
-
-### 2.5 Canvas Format & Aspect Ratio
-
-| Canvas Format | Background Aspect Ratio | Recommended Resolution |
-|--------------|------------------------|----------------------|
-| PPT 16:9 | 16:9 | 1920x1080 or 2560x1440 |
-| PPT 4:3 | 4:3 | 1600x1200 |
-| Xiaohongshu (RED) | 3:4 | 1242x1660 |
-| WeChat Moments | 1:1 | 1080x1080 |
-| Story | 9:16 | 1080x1920 |
-
-> Supported aspect ratios: `1:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, `21:9` (Gemini also supports `1:4`, `1:8`, `4:1`, `8:1`)
-
-### 2.6 Multi-Image Coherence Strategy
-
-When generating multiple images for a single deck, visual coherence is critical. Use a **Deck Style Anchor** — a shared prefix of 15-25 words prepended to every image prompt.
-
-**Construction**: Combine style keywords (Section 2.3) + color directive (Section 2.4) + quality directive into one reusable prefix.
-
-**Example**:
-```
-Deck Style Anchor:
-"modern flat design illustration, color palette: deep navy (#1E3A5F), light gray (#F8F9FA), gold accent (#D4AF37), clean minimalist, high quality, 4K"
-
-Image 1 prompt: [Deck Style Anchor], abstract technology network showing connected nodes...
-Image 2 prompt: [Deck Style Anchor], team of professionals collaborating at a desk...
-Image 3 prompt: [Deck Style Anchor], growth chart with upward trending line...
-```
-
-**Exception**: Background images may replace style keywords with `background`, `backdrop`, `negative space for text overlay` while keeping the same color directive. This ensures color consistency without compromising background functionality.
-
-**Rule**: Define the Deck Style Anchor once in the prompt document header (Section 5), then reference it in every individual prompt.
+Everything else is the AI's judgment per page. No mandated padding, no type-locked text_policy, no scenario whitelists for hero_page.
 
 ---
 
-## 3. Image Type Classification & Handling
+## 2. Three Dimensions
 
-### Type Determination Flow
+Every AI image is described by three orthogonal dimensions. Lock them in this order: **Rendering** (deck-wide) → **Palette** (deck-wide) → **Type** (per image).
 
-1. Full-page / large-area backdrop → **Background** (3.1)
-2. Real scenes / people / products → **Photography** (3.2)
-3. Flat / illustration / cartoon style → **Illustration** (3.3)
-4. Process / architecture / relationships → **Diagram** (3.4)
-5. Partial decoration / texture → **Decorative Pattern** (3.5)
+| Dimension | Decides | When fixed |
+|---|---|---|
+| **Rendering** | Visual style family (vector / sketch-notes / 3d-isometric / corporate-photo / …) | Once per deck — every AI image in the deck shares one rendering |
+| **Palette** | How the deck's HEX colors are *used* (proportion + role + temperament). HEX values come from `design_spec.colors`, not from the palette | Once per deck |
+| **Type** | What the image's internal composition looks like (background / hero / infographic / framework / comparison / timeline / scene / flowchart / typography) | Per image |
 
-### 3.1 Background
+> **What rendering vs palette means**: rendering is *how the image is drawn* (line quality, texture, depth). Palette is *how colors are distributed and behave* (which color dominates, which is accent, what proportion). The HEX values come from Strategist; palette is the **usage contract** for those HEX values.
 
-**Identifying characteristics**: Full-page background for covers or chapter pages; must support text overlay
+### 2.1 Where to find each dimension
 
-| Key Point | Description |
-|-----------|-------------|
-| Emphasize background nature | Add `background`, `backdrop` |
-| Reserve text area | `negative space in center for text overlay` |
-| Avoid strong subjects | Use abstract, gradient, geometric elements |
-| Low-contrast details | `subtle`, `soft`, `muted` |
+| Reference | Loaded |
+|---|---|
+| [`image-renderings/_index.md`](./image-renderings/_index.md) — rendering catalog + auto-selection table | Always (Step 1 below) |
+| [`image-palettes/_index.md`](./image-palettes/_index.md) — palette catalog + auto-selection table | Always (Step 1 below) |
+| [`image-type-templates/_index.md`](./image-type-templates/_index.md) — type catalog + auto-selection table | Always (Step 1 below) |
+| `image-renderings/<chosen>.md` | After Step 2 picks the rendering — only the chosen one |
+| `image-palettes/<chosen>.md` | After Step 2 picks the palette — only the chosen one |
+| `image-type-templates/<chosen>.md` | After Step 3 picks the type per image — only the types actually used |
 
-**Template**: `Abstract {theme element} background, {style} style, {primary color} to {secondary color} gradient, subtle {decorative elements}, clean negative space in center for text overlay, {aspect ratio} aspect ratio, high resolution, professional presentation background`
+**Hard rule — on-demand loading**:
 
-**Negative prompt**: `text, letters, watermark, faces, busy patterns, high contrast details`
-
-### 3.2 Photography
-
-**Identifying characteristics**: Real scenes, people, products, architecture — photographic quality
-
-| Key Point | Description |
-|-----------|-------------|
-| Emphasize realism | `photography`, `photorealistic`, `real photo` |
-| Lighting effects | `natural lighting`, `soft shadows`, `studio lighting` |
-| Background handling | `white background` / `blurred background` / `contextual setting` |
-| People diversity | `diverse`, `professional attire` |
-
-**Template**: `{subject description}, professional photography, {lighting type} lighting, {background type} background, color grading matching {color scheme}, high quality, sharp focus, 8K resolution`
-
-**Negative prompt**: `watermark, text overlay, artificial, CGI, illustration, cartoon, distorted faces`
-
-### 3.3 Illustration
-
-**Identifying characteristics**: Flat design, vector style, cartoon, concept diagrams
-
-| Key Point | Description |
-|-----------|-------------|
-| Specify style | `flat design`, `isometric`, `vector style`, `hand-drawn` |
-| Simplify details | `simplified`, `clean lines`, `minimal details` |
-| Unified palette | Strictly use design spec colors |
-| Background choice | `white background` or `transparent background` |
-
-**Template**: `{subject description}, {illustration style} illustration style, {detail level} with clean lines, color palette: {color list}, {background type} background, professional {purpose} illustration`
-
-**Negative prompt**: `realistic, photography, 3D render, complex textures, watermark`
-
-### 3.4 Diagram
-
-**Identifying characteristics**: Flowcharts, architecture diagrams, concept relationship maps, data visualizations
-
-| Key Point | Description |
-|-----------|-------------|
-| Clear structure | `clear structure`, `organized layout`, `logical flow` |
-| Connection representation | `arrows indicating flow`, `connecting lines` |
-| Academic / professional feel | `suitable for academic publication`, `professional diagram` |
-| Light background | `white background` or `light gray background` |
-
-**Template**: `{diagram type} diagram showing {content description}, {component description} connected by {connection method}, {style} style with {color scheme}, white background, clear labels, professional technical diagram`
-
-**Negative prompt**: `cluttered, messy, overlapping elements, dark background, realistic, photography`
-
-### 3.5 Decorative Pattern
-
-**Identifying characteristics**: Partial decoration, textures, borders, divider elements
-
-| Key Point | Description |
-|-----------|-------------|
-| Repeatability | `seamless`, `tileable`, `repeatable` (if needed) |
-| Understated support | `subtle`, `understated`, `supporting element` |
-| Transparency-friendly | `transparent background` or `isolated element` |
-| Small-size readability | Consider legibility at small dimensions |
-
-**Template**: `{pattern type} decorative pattern, {style} style, {color scheme}, {background type} background, subtle and elegant, suitable for {purpose}`
-
-**Negative prompt**: `busy, cluttered, high contrast, distracting, photorealistic`
+- Read the three `_index.md` files once at role entry.
+- After locking dimensions, read **only** the specific rendering / palette / type files you selected.
+- **Never** glob-read an entire subdirectory (`image-renderings/*.md` is forbidden). Token cost balloons and the AI loses focus.
 
 ---
 
-## 4. Image Generation Workflow
+## 3. Workflow
 
-### 4.1 Analysis Phase
+### Step 1 — Load the dimension indices
 
-1. Read the design spec; understand overall project style
-2. Extract color scheme, canvas format, target audience
-3. Analyze each image in the resource list individually
-4. Determine each image's type (refer to Section 3)
+Read all three index files. They are short (~50 lines each) and contain auto-selection tables that let you map `design_spec` signals → dimension values without reading every detail file.
 
-### 4.2 Prompt Generation Phase
+```
+read_file references/image-renderings/_index.md
+read_file references/image-palettes/_index.md
+read_file references/image-type-templates/_index.md
+```
 
-For each image with "Pending" status:
+### Step 2 — Resolve deck-wide rendering + palette
 
-1. **Determine type** → Background / Photography / Illustration / Diagram / Decorative
-2. **Understand purpose** → Which page? What function?
-3. **Analyze original description** → Information from the user's "Generation description"
-4. **Apply type-specific key points** → Reference the corresponding type's table
-5. **Generate optimized prompt** → Use the 2.1 standard output format
-6. **Save prompt document** → **Must** write to `project/images/image_prompts.md`
+**Primary path — Strategist already locked these in `spec_lock.md colors`**:
 
-### 4.3 Image Generation Phase
+```
+image_rendering: vector-illustration
+image_palette: cool-corporate
+```
 
-> Prerequisite: Section 4.2 must be complete; `images/image_prompts.md` must exist
+If both fields are present, use them directly — Strategist made the decision in h.5 with full d-e-f-g-h linkage context. Do NOT re-decide.
 
-#### Path Selection (Deterministic)
+**Fallback path — when `spec_lock.md` lacks both fields** (legacy decks or pipelines that skipped h.5):
 
-| Trigger | Path | Mechanism |
-|---------|------|-----------|
-| **Default** — no explicit override from the user | **Path A**: `image_gen.py` CLI | Uses `.env` `IMAGE_BACKEND` configuration |
-| **User explicitly names the host's native image tool** (e.g. "use Codex's built-in image generation", "use Antigravity's image tool") | **Path B**: Host-native tool | Agent invokes the host's own image generation capability and saves outputs to `project/images/` |
+| Signal | Maps to |
+|---|---|
+| `design_spec.md d. Style` mode + descriptor | Rendering (consult renderings `_index.md` auto-selection table) |
+| `design_spec.md e. Color Scheme` (HEX) + content vibe | Palette (consult palettes `_index.md` auto-selection table) |
+| `design_spec.md f. Icon library` | Sanity check: chosen rendering should be compatible with the icon library's visual weight |
 
-Agent must NOT silently switch paths based on perceived host capability. Path B is triggered only by an explicit user instruction for this project or this generation batch. In the absence of such instruction, Path A is the unconditional default.
+If the auto-selection table surfaces multiple candidates, pick the first; do not present a choice to the user.
 
-#### Path A — `image_gen.py` CLI (Default)
+> **Tell the user**: when falling back, print one line "spec_lock.md missing `image_rendering`/`image_palette` — inferring `<X>` / `<Y>` from design_spec. For optimal deck consistency, lock these in Strategist h.5." Then proceed.
+
+Then `read_file` the **single resolved** rendering file and the **single resolved** palette file. These two files give you:
+
+- The 80-120 word style paragraph (rendering)
+- The proportion / role / temperament rules for the deck's three HEX values (palette)
+- Two ready-to-paste prompt snippets per file (fewshot)
+
+### Step 3 — Per-image type + assembly
+
+For each `Acquire Via: ai` row in `design_spec.md §VIII`:
+
+1. **Determine type** by matching the row's `Purpose` against types `_index.md` auto-selection table (cover background → `background`; product launch hero → `hero`; methodology visualization → `framework`; etc.) The narrative-shorthand `Type` column in §VIII (Background/Photography/Illustration/Diagram/Decorative) is a hint, not the type's final value — `Purpose` is authoritative for picking among the 9 internal-composition types.
+2. **Determine `text_policy`** — Strategist's value wins when set. Otherwise pick `none` or `embedded` based on whether in-image text serves the page. Long body / data / lists stay in SVG.
+3. **Determine `page_role`** — Strategist's value wins when set. Otherwise pick `local` or `hero_page` based on whether the image carries the page or sits inside one.
+4. `read_file references/image-type-templates/<type>.md` (only if not already read — types are commonly reused across images in one deck)
+5. **Assemble the prompt** by combining:
+   - The rendering's style paragraph (from Step 2)
+   - The palette's proportion + role rules applied to the deck's HEX values (from Step 2)
+   - The type's structural layout (from Step 3)
+   - The image's specific `Reference` intent (from `design_spec.md §VIII`)
+   - The container sizing guidance from the type file (so the model knows it's painting a local block, not a full canvas)
+   - The hard rules from §5 below (HEX-not-as-text, simplified figures, text policy)
+
+The assembled prompt is **one cohesive paragraph**, not a bulleted list of tags. See §4 for the assembly template.
+
+### Step 4 — Write the manifest and generate
+
+Write `project/images/image_prompts.json` per §6. Then run `image_gen.py --manifest` (§7 Path A). The CLI iterates `items[]`, writes status back, and re-renders the Markdown sidecar.
+
+---
+
+## 4. Prompt Assembly Template
+
+Every assembled prompt follows this paragraph structure. **Write prose, not tag soup**.
+
+```
+[Rendering style paragraph — 80-120 words from the chosen rendering file].
+[Palette behavior — apply the chosen palette's proportion + role rules to the deck's HEX values, e.g. "primary #1E3A5F dominates as the main shape, secondary #F8F9FA provides 60% breathing space, accent #D4AF37 appears in one or two emphasis points only"].
+[Type-specific composition — from the chosen type file, e.g. "central hub node with four radiating satellite nodes connected by clean lines"].
+[Image-specific subject — translated from the row's Reference intent into concrete visual nouns].
+[Container note — "composed as a {W}x{H}px image for {page_role} use"; add composition cues only when the page actually needs them (e.g. "leave the lower band relatively calm — SVG title overlays it")].
+[Hard rules — see §5].
+```
+
+**Word budget**: 150-300 words. Embedded-text prompts skew longer; pure background prompts can be shorter.
+
+**Forbidden — tag-soup prompts**:
+
+```
+❌ "modern, flat design, gradient, vibrant, professional, clean, 4K, high quality"
+```
+
+This produces generic, model-average output. The model is not weighting your tags — write **one coherent visual scene** instead.
+
+---
+
+## 5. Global Hard Rules
+
+These rules apply to **every** prompt regardless of dimension choices. Append them as a closing sentence to every assembled prompt.
+
+### 5.1 HEX is rendering guidance, not text
+
+Image generation models occasionally paint color names and HEX values as **visible labels in the image** (a `#1E3A5F` swatch literally drawn as the string "#1E3A5F"). This destroys the image.
+
+**Append to every prompt**:
+
+> Color values (HEX codes like #1E3A5F) and color names are rendering guidance only — do NOT display HEX codes, color names, or palette labels as visible text anywhere in the image.
+
+### 5.2 Simplified human figures, no realistic faces
+
+When the image contains people:
+
+> Human figures appear as simplified stylized silhouettes or symbolic representations — no photorealistic faces, no detailed anatomy, no celebrity likeness. Express role/emotion through posture, attire, and simple gestures.
+
+Exception: when the chosen rendering is `corporate-photo`, photorealism is intentional — replace the above with: `Diverse, professionally attired subjects. Editorial photography style, natural composition`.
+
+### 5.3 Text policy — none vs embedded
+
+| `text_policy` | Prompt cue |
+|---|---|
+| `none` | "NO text of any kind anywhere in the image — no letters, numbers, signs, watermarks, labels, or written symbols." |
+| `embedded` | Describe the text directly inside the visual scene: the word(s), how they're rendered (decorative lettering / designed title / hand-lettered keyword), and the artistic treatment. Examples below. |
+
+**Prompt phrasing examples for embedded text** (not an exhaustive list):
+
+- Decorative: "large 'GROWTH' lettering as a background element, 3D extruded retro chrome style"
+- Designed title: "main title 'Q3 STRATEGY' typeset in clean geometric sans-serif, centered"
+- Hand-lettered set: "small hand-lettered annotations 'fast', 'cheap', 'good' woven into the sketch"
+
+**Echoing the deck's SVG typography** — when the page's SVG already locked a font family in `spec_lock.md typography`, the AI image's lettering should describe a compatible style so cover/chapter titles in the image cohere with body text on adjacent SVG pages.
+
+| `spec_lock typography.font_family` contains | Prompt descriptor for AI image text |
+|---|---|
+| `KaiTi` / `FangSong` / `Georgia` / serif families | "elegant serif lettering, refined letterforms" |
+| `Microsoft YaHei` / `PingFang SC` / `Arial` / sans-serif families | "clean geometric sans-serif, modern letterforms" |
+| `SimHei` / `Impact` / `Arial Black` / display families | "bold display lettering, heavy expressive strokes" |
+| `Consolas` / `Courier New` / monospace families | "monospace technical lettering, fixed-width" |
+| Decorative / handwritten contexts (sketch-notes / ink-notes rendering, or no family specified) | "hand-lettered organic strokes, natural variation" |
+
+Pick the row whose family appears in the SVG stack. For decorative text (background lettering, posters), this constraint relaxes — describe the artistic treatment freely. Designed titles (cover main title, chapter heading) should echo the deck's family.
+
+**CJK note**: most image models render Chinese characters poorly. For embedded text on a CJK deck, prefer English in the image or accept malformed glyphs.
+
+### 5.4 No brand names or trademarks in the subject
+
+> The image must not depict identifiable brand logos, trademarks, or product likenesses unless the row's Reference explicitly names a real brand asset the user owns.
+
+---
+
+## 6. Manifest Schema
+
+Write `project/images/image_prompts.json` with this shape:
+
+```json
+{
+  "project": "{project_name}",
+  "generated_at": "{ISO-8601 date}",
+  "deck_rendering": "vector-illustration",
+  "deck_palette": "cool-corporate",
+  "color_scheme": {
+    "primary": "#1E3A5F",
+    "secondary": "#F8F9FA",
+    "accent": "#D4AF37"
+  },
+  "items": [
+    {
+      "filename": "cover_bg.png",
+      "purpose": "Cover background (Slide 01)",
+      "type": "background",
+      "page_role": "local",
+      "text_policy": "none",
+      "aspect_ratio": "16:9",
+      "image_size": "2K",
+      "prompt": "{fully assembled paragraph per §4}",
+      "alt_text": "Modern tech abstract background with deep blue gradient and digital waves",
+      "status": "Pending"
+    }
+  ]
+}
+```
+
+### Field reference
+
+| Field | Required | Source | Description |
+|---|---|---|---|
+| `deck_rendering` | yes | Step 2 lock | Single rendering name shared by all items in this deck |
+| `deck_palette` | yes | Step 2 lock | Single palette name shared by all items |
+| `color_scheme` | yes | `design_spec.md §III` | HEX triplet from Strategist |
+| `items[].filename` | yes | `§VIII` resource list | Output filename with extension |
+| `items[].type` | yes | Step 3 per-image | One of: `background`, `hero`, `portrait`, `typography`, `infographic`, `flowchart`, `framework`, `matrix`, `cycle`, `funnel`, `pyramid`, `comparison`, `timeline`, `map`, `scene` |
+| `items[].page_role` | yes | Step 3 per-image | `local` (default — region block on SVG page) or `hero_page` (image is page's main voice; SVG overlay minimal or empty) |
+| `items[].text_policy` | yes | Step 3 per-image | `none` (default — no text in image) or `embedded` (image contains decorative lettering, designed title, or hand-lettered keywords) |
+| `items[].aspect_ratio` | yes | Container sizing | Passed to `image_gen.py --aspect_ratio` |
+| `items[].prompt` | yes | §4 assembly | The full assembled paragraph |
+| `items[].image_size` | no | Container sizing | `512px` / `1K` / `2K` / `4K` |
+| `items[].alt_text` | no | Accessibility | Short caption |
+| `items[].status` | yes | CLI manages | `Pending` initially; CLI updates to `Generated` / `Failed` / `Needs-Manual` |
+
+> Existing manifests without `deck_rendering` / `deck_palette` / `type` / `page_role` / `text_policy` remain valid — older items default to `page_role: local`, `text_policy: none`. Legacy `page_role: full_page` (pre-2026-05-15) is read as `hero_page`.
+
+---
+
+## 7. Generation Execution
+
+> Prerequisite: §3 Steps 1-3 complete; `images/image_prompts.json` exists and validates.
+
+### Path Selection (Deterministic)
+
+C (AI-generated) supports three implementation modes sharing one `image_prompts.json` source:
+
+| Trigger | Mode | Mechanism |
+|---|---|---|
+| **Default** — `IMAGE_BACKEND` configured | **Path A**: `image_gen.py --manifest` | One command runs the whole manifest with concurrency; status writes back per item |
+| `IMAGE_BACKEND` not configured (or Path A fails) AND host has a native image tool | **Path B**: Host-native tool | Agent invokes the host's image capability; outputs land at `project/images/<filename>` |
+| **Both Path A and Path B fail/unavailable** | **Offline Manual Mode** | Manifest stays on disk; user generates externally from `items[].prompt` and places files at `project/images/<filename>` |
+
+**Selection logic** — monotonic A → B → C fallback chain (automatic, no user prompting):
+
+1. **Try Path A** — if `IMAGE_BACKEND` is configured (env or `.env`), run `image_gen.py --manifest`. If it fails twice in a row, fall to Path B.
+2. **Try Path B** — if `IMAGE_BACKEND` was not configured (A skipped), or A failed, and the host has a native image tool (Codex / Antigravity / Claude Code / similar), the agent invokes the host's image capability directly.
+3. **Fall to C (Offline Manual)** — if B is also unavailable (no host-native tool) or fails, write prompts to `images/image_prompts.json` and hand off to the user.
+
+**User override**: If the user explicitly names Path B ("use Codex's image tool"), skip A and start at B. Explicit naming is the only way to bypass an earlier path in the chain; otherwise the chain is monotonic.
+
+**Hard rule**: Step 4 is execution, not re-decision. Never present an interactive choice between paths here — image strategy was locked in Strategist Step 4 h item.
+
+> All three modes share one output contract: file at `project/images/<filename>`. Step 6 SVG references are mode-agnostic.
+
+### Path A — `image_gen.py --manifest` (Default)
 
 ```bash
-python3 scripts/image_gen.py "your prompt" \
-  --aspect_ratio 16:9 --image_size 1K \
-  --output project/images --filename cover_bg
+python3 scripts/image_gen.py \
+  --manifest project/images/image_prompts.json \
+  --output project/images
 ```
+
+The CLI iterates `items[]` with adaptive concurrency, writes `status` back per item, and is **idempotent**: re-running only re-processes entries whose status is `Pending` or `Failed`.
 
 **Parameters**:
 
 | Parameter | Short | Description | Default |
-|-----------|-------|-------------|---------|
-| `prompt` | - | Positive prompt (positional arg) | - |
-| `--negative_prompt` | `-n` | Negative prompt | None |
-| `--aspect_ratio` | - | Image aspect ratio | `1:1` |
-| `--image_size` | - | Size (`1K`/`2K`/`4K`) | `1K` |
-| `--output` | `-o` | Output directory | Current directory |
-| `--filename` | `-f` | Output filename (no extension) | Auto-named |
-| `--backend` | `-b` | Override backend (see `--list-backends` for options) | None |
-| `--model` | `-m` | Model name | Backend default |
-| `--list-backends` | - | Print support tiers and exit | `false` |
+|---|---|---|---|
+| `--manifest` | - | Path to `image_prompts.json` | — |
+| `--concurrency` | - | Max concurrent requests; halves on rate-limit, min 1 | `IMAGE_CONCURRENCY` env or `3` |
+| `--image_size` | - | Default size (`512px`/`1K`/`2K`/`4K`); per-item `image_size` wins | `1K` |
+| `--output` | `-o` | Output directory | Manifest's parent dir |
+| `--backend` | `-b` | Override `IMAGE_BACKEND` for this run | env |
+| `--model` | `-m` | Default model; per-item `model` wins | Backend default |
+| `--list-backends` | - | Print support tiers and exit | — |
+
+> The single-image form `image_gen.py "prompt" --filename ...` is preserved for ad-hoc one-offs (re-rolling a single image) but is no longer the primary path.
 
 **Configuration sources**:
 - Current process environment variables
-- Project-root `.env` as fallback
+- First `.env` found in this order: current working directory, clone repo root, `~/.ppt-master/.env`
 
 Precedence:
 - Current process environment wins
@@ -291,11 +325,12 @@ Precedence:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `IMAGE_BACKEND` | Required | Backend identifier; run `image_gen.py --list-backends` for the current set |
+| `IMAGE_CONCURRENCY` | Optional | Manifest-mode default concurrency (CLI `--concurrency` wins) |
 | `{PROVIDER}_API_KEY` | Required | Provider-specific API key, e.g. `GEMINI_API_KEY`, `ZHIPU_API_KEY` |
 | `{PROVIDER}_BASE_URL` | Optional | Provider-specific custom endpoint |
 | `{PROVIDER}_MODEL` | Optional | Provider-specific model override |
 
-> Use provider-specific names only (e.g. `GEMINI_API_KEY`, `OPENAI_API_KEY`). See `.env.example` for the full set per backend.
+> Use provider-specific names only (e.g. `GEMINI_API_KEY`, `OPENAI_API_KEY`). See `.env.example` in clone mode or `${SKILL_DIR}/.env.example` in skill-install mode for the full set per backend.
 
 > `IMAGE_API_KEY`, `IMAGE_MODEL`, and `IMAGE_BASE_URL` are intentionally unsupported.
 
@@ -303,200 +338,108 @@ Precedence:
 
 **Support tiers (recommended usage)**: Core / Extended / Experimental. Run `image_gen.py --list-backends` for the current assignments.
 
-**Generation pacing (mandatory)**:
-- Execute only one generation command at a time; wait for file confirmation before the next
-- Recommend 2-5 second intervals between images to avoid concurrency failures
+**Concurrency (manifest mode)**:
+- Default 3 concurrent requests, halves on the first rate-limit response, minimum 1 (= serial fallback)
+- Rate-limited items requeue automatically; per-item failures are recorded with `last_error` and skipped
+- Interrupting mid-run is safe — completed items keep `status: Generated` and are skipped on re-run
+- On normal completion the Markdown sidecar is re-rendered automatically; if the run is interrupted, run `--render-md` manually to refresh the sidecar
 
-#### Path B — Host-Native Image Tool (On Explicit User Request)
+### Path B — Host-Native Image Tool
 
-Triggered only when the user explicitly asks the skill to use the host's built-in image generation (e.g. Codex, Antigravity, or any other host that provides a native image tool).
+Triggered automatically when `IMAGE_BACKEND` is not configured (or Path A fails) **and** the host provides a native image generation tool (Codex, Antigravity, Claude Code's image tool, and similar). No user prompting required — the agent detects the host capability and proceeds. The user may also explicitly name this path ("use Codex's image tool") to force it even when `IMAGE_BACKEND` is configured.
 
-- Agent invokes the host's native image tool directly; prompts come from the same `image_prompts.md`
+- Agent invokes the host's native image tool directly; prompts come from `items[].prompt`
 - Outputs **must** land at `project/images/<filename-from-resource-list>` with dimensions matching the Image Resource List
+- After each placement, set the corresponding item's `status` to `Generated` in the manifest
 - Executor downstream is path-agnostic — no spec change required between Path A and Path B
 
-#### Failure Handling (Applies to Both Paths)
+### Offline Manual Mode (C's third implementation mode)
 
-If generation fails for a given image:
+**Trigger**: Both Path A and Path B fail or are unavailable.
 
-1. **Retry once.** If the retry also fails, stop attempting that image — do not loop further.
-2. **Do NOT halt the pipeline.** Report the failures to the user: list the affected filenames and the error reason, and ask the user to generate those images manually and place them at `project/images/<filename>` with the exact filename from the resource list.
-3. **Mark the affected rows** in the Image Resource List as `Needs-Manual` (not `Generated`).
-4. **Proceed to the Executor phase.** Executor consumes whatever is in `project/images/` at its runtime; missing files are handled downstream (placeholder or user prompt), not by blocking here.
+**Workflow** (no user prompting; system enters this mode automatically):
 
-If the user chooses to generate manually on a platform that watermarks outputs (e.g. Gemini web), the repository includes `scripts/gemini_watermark_remover.py` as a utility.
+1. Verify `images/image_prompts.json` was written
+2. Set `status: "Needs-Manual"` on every affected item per [`image-base.md`](./image-base.md) §6
+3. Continue to Step 6 — SVG references `images/<filename>` optimistically; Step 7 entry verifies presence
+4. Print one consolidated handoff to the user:
+   - Filenames awaiting manual generation
+   - Pointer to `images/image_prompts.md` (paste-ready `### Image N:` block per item) or `image_prompts.json` (`items[].prompt`)
+   - Target placement: `project/images/<filename>` matching the resource list exactly
+   - Resume command: re-run Step 7 once all expected files exist
 
-#### Guardrails (Both Paths)
+**User-initiated**: When Strategist Step 4 captured "user wants manual generation" up front, Path A is skipped from the start; the workflow above runs as a planned mode.
 
-- Agent must NOT claim an image is generated without producing an actual file at the expected path
-- Agent must NOT mark an image as `Needs-Manual` without a real generation attempt having failed
-- Status transitions are evidence-driven: `Pending` -> `Generated` (file exists at expected path) or `Pending` -> `Needs-Manual` (generation attempted and failed after one retry)
+> The pipeline tolerates `Needs-Manual` rows end-to-end. The user can leave the project, generate offline at their own pace, then resume Step 7.
 
-### 4.4 Verification Phase
+#### AI-specific Failure Handling (extends image-base.md §6)
 
-- Confirm all successfully generated images are saved to `images/` directory
-- Check filenames match the resource list
-- Update image resource list: `Generated` for files present at the expected path, `Needs-Manual` for rows whose generation failed after one retry
-- Any `Needs-Manual` rows must have been reported to the user with filename and error reason before this phase completes
+If Path A's backend fails twice in a row:
 
----
+1. Do not halt. Automatically attempt to fall back to **Path B (Host-Native Tool)**.
+2. If Path B also fails or is unavailable, mark the row `Needs-Manual`.
+3. Report to user: filename, prompt used, error message.
+4. Fall through to **Offline Manual Mode** above.
 
-## 5. Prompt Document Template
+> If the alternate platform watermarks outputs (e.g. Gemini web), the repository includes `scripts/gemini_watermark_remover.py`.
 
-Use the following structure when creating `project/images/image_prompts.md`:
+#### Guardrails (All Modes)
 
-```markdown
-# Image Generation Prompts
+**Hard rule**:
 
-> Project: {project_name}
-> Generated: {date}
-> Color scheme: Primary {#HEX} | Secondary {#HEX} | Accent {#HEX}
-
----
-
-## Image List Overview
-
-| # | Filename | Type | Dimensions | Status |
-|---|----------|------|-----------|--------|
-| 1 | cover_bg.png | Background | 1920x1080 | Pending |
+- Do not claim an image is generated without an actual file at the expected path
+- `Needs-Manual` is set after a failed attempt OR on entering Offline Manual Mode — not as a way to skip work that automation could have done
+- Status transitions are evidence-driven: `Pending` → `Generated` (file exists) or `Pending` → `Needs-Manual` (no automation, or attempt failed once)
 
 ---
 
-## Detailed Prompts
+## 8. Common Issues & Variant Workflow
 
-### Image 1: cover_bg.png
+### Reference field is blank — quick examples
 
-| Attribute | Value |
-|-----------|-------|
-| Purpose | Cover background |
-| Type | Background |
-| Dimensions | 1920x1080 (16:9) |
-| Original description | Modern tech abstract background, deep blue gradient |
+When the Resource List row has no `Reference`, infer a reasonable image from `Purpose`. Examples (not prescriptions):
 
-**Prompt**:
-Abstract futuristic background with flowing digital waves...
-
-**Alt Text**:
-> Modern tech abstract background with deep blue gradient, digital waves, and particle effects
-
----
-
-## Usage Instructions
-
-1. Copy the "Prompt" above into an AI image generation tool
-2. Recommended platforms: Midjourney / DALL-E 3 / Gemini / Stable Diffusion
-3. Rename generated images to the corresponding filenames
-4. Place in the `images/` directory
-```
-
----
-
-## 6. Negative Prompt Quick Reference
-
-### By Image Type
-
-| Type | Recommended Negative Prompt |
-|------|---------------------------|
-| Background | `text, letters, watermark, faces, busy patterns, high contrast details` |
-| Photography | `watermark, text overlay, artificial, CGI, illustration, cartoon, distorted faces` |
-| Illustration | `realistic, photography, 3D render, complex textures, watermark` |
-| Diagram | `cluttered, messy, overlapping elements, dark background, realistic` |
-| Decorative pattern | `busy, cluttered, high contrast, distracting, photorealistic` |
-
-### Universal Negative Prompts
-
-- **Standard**: `text, watermark, signature, blurry, distorted, low quality`
-- **Extended** (people scenarios): `text, watermark, signature, blurry, low quality, distorted, extra fingers, mutated hands, poorly drawn face, bad anatomy, extra limbs, disfigured, deformed`
-
----
-
-## 7. Common Issues
-
-### Default Inference When No "Generation Description" Provided
-
-| Purpose | Default Inference |
-|---------|------------------|
-| Cover background | Abstract gradient background, reserve central text area |
-| Chapter page background | Clean geometric pattern, monochrome focus |
-| Team introduction page | Team collaboration scene illustration (flat style) |
-| Data display page | Clean geometric pattern or solid color background |
-| Product showcase | Product photography style, white or gradient background |
+| Purpose | A reasonable starting point |
+|---------|-----------------------------|
+| Cover | `type: background` or `hero`; choose page_role and text_policy by what the cover should communicate |
+| Chapter divider | `type: background` or `hero`; often `hero_page` with a designed chapter title |
+| Methodology / framework illustration | `type: framework` |
+| Process / workflow illustration | `type: flowchart` |
+| Before/After or two-option page | `type: comparison` |
+| Team / lifestyle photo | `type: scene`; rendering = `corporate-photo` or `warm-scene` |
+| Big-number / hero quote block | `type: typography` or `hero`; often `hero_page` |
+| Mood transition / atmosphere | `type: scene` or `background`; often `hero_page` |
 
 ### When Images Are Unsatisfactory
 
-Diagnose the problem category and apply a targeted prompt fix:
+Diagnose the failure category, adjust the **one specific dimension** responsible, do not rewrite the whole prompt.
 
-| Problem | Diagnosis | Prompt Adjustment |
-|---------|-----------|-------------------|
-| Wrong style | Image looks photorealistic when flat design was intended | Change style directive: replace `photography` with `flat design illustration` |
-| Wrong colors | Colors don't match the design spec palette | Strengthen color directive: add explicit HEX codes, repeat color names |
-| Wrong composition | Subject is off-center or layout doesn't fit the slide | Adjust composition directive: add `centered composition`, `rule of thirds`, or `wide negative space on left` |
-| Wrong subject | Image depicts something different from what was described | Rewrite subject description with more specificity and concrete details |
-| Low quality | Image is blurry, has artifacts, or lacks detail | Add `highly detailed, sharp focus, professional quality, 8K resolution` |
+| Symptom | Most likely cause | Adjustment |
+|---|---|---|
+| Image looks generic, model-average | Tag-soup prompt | Rewrite as one coherent paragraph per §4 |
+| Wrong style family (looks photorealistic when flat was intended) | Rendering mismatch or rendering paragraph diluted | Reaffirm chosen rendering's style paragraph at the top of the prompt |
+| Colors don't match deck | HEX not echoed in prompt, or palette proportion rule omitted | Repeat HEX values 2-3 times in the prompt; restate palette proportion rule |
+| Hex code or color name visible as text in image | Missing §5.1 closing sentence | Append the §5.1 hard rule verbatim |
+| Garbled letters in supposedly text-free image | `text_policy: none` rule too weak | Strengthen with explicit list: "no letters, no numbers, no words, no signs, no labels, no captions, no watermarks" |
+| SVG text overlay clashes with busy image area | Page design needs negative space the prompt didn't request | Add a composition cue like "leave the {center / left third / lower band} relatively calm for text overlay" — only when the page actually overlays text on top of the image |
+| Subject vague | Reference field too abstract | Rewrite reference with concrete nouns (verbs + objects) |
+| Faces too realistic / uncanny | §5.2 rule omitted, or rendering is photo-incompatible | Either append §5.2, or switch rendering to a non-photo family |
 
 **Variant workflow**:
-1. Keep the original prompt as "Variant A" in `image_prompts.md`
-2. Create modified prompt as "Variant B" with targeted fixes from the table above
-3. If needed, create "Variant C" with a different stylistic approach
-4. Label all variants clearly so the user can compare results
+
+1. Set the unsatisfactory item's `status` back to `Pending` and update its `prompt` in place
+2. Re-run `image_gen.py --manifest` — only that item is re-processed
+3. To try multiple stylistic approaches, append additional items with distinct filenames (e.g. `cover_bg_v2.png`) rather than overwriting
 
 ---
 
-## 8. Role Collaboration
+## 9. Forbidden
 
-### Handoff with Strategist
-
-| Direction | Content |
-|-----------|---------|
-| Receives | Design Specification & Content Outline (with image resource list) |
-| Trigger condition | User selected "C) AI generation" in "Image usage" |
-| Key information | Color scheme, design style, canvas format |
-
-### Handoff with Executor
-
-| Direction | Content |
-|-----------|---------|
-| Delivers | All images placed in `project/images/` directory |
-| Executor reference | `<image href="../images/xxx.png" .../>` |
-| Path note | SVGs in `svg_output/`, images in `images/`; use relative path `../images/` |
-
----
-
-## 9. Task Completion Checkpoint
-
-### Must-complete Items
-
-- [ ] Created prompt document `project/images/image_prompts.md`
-- [ ] Each image has: type determination + optimized prompt + negative prompt + Alt Text
-- [ ] Uses unified output format (2.1 standard format)
-- [ ] Phase completion confirmation output
-
-### Image Readiness (at least one must be satisfied)
-
-- [ ] All images saved to `project/images/` directory
-- [ ] Or: User clearly informed to self-generate using `image_prompts.md`
-
-### Pipeline Flow
-
-- [ ] User prompted to proceed to next step (switch to Executor role)
-
-> **Critical check**: If `images/image_prompts.md` was not created, or the output format does not comply with 2.1 standard, the task is NOT complete.
-
-### Completion Confirmation Output Format
-
-```markdown
-## Image_Generator Phase Complete
-
-- [x] Created prompt document `project/images/image_prompts.md`
-- [x] Generated optimized prompts for X images
-- [x] All images saved to `images/` directory
-- [x] Updated image resource list status
-
-**Image Status Summary**:
-
-| Filename | Type | Dimensions | Status |
-|----------|------|-----------|--------|
-| cover_bg.png | Background | 1920x1080 | Generated |
-
-**Next step**: Switch to Executor role to begin SVG generation
-```
+- Generating prompts for `web` rows — those go through [`image-searcher.md`](./image-searcher.md)
+- Brand names or HEX codes inside the subject description (degrades output)
+- Mixing renderings or palettes across images in the same deck
+- Tag-soup prompts (keyword lists separated by commas without a coherent visual scene)
+- Globbing `image-renderings/*.md` or any subdirectory — read only the chosen file
+- Placing an image without updating its `image_prompts.json` `status` and the resource list status
+- Switching rendering or palette for a single image — `hero_page` is not an exception to deck-wide coherence
+- Embedding body copy, data points, bullet lists, or long quotes inside an image — those route to SVG

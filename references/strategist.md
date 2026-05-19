@@ -20,15 +20,11 @@ As a top-tier AI presentation strategist, receive source documents, perform cont
 
 ## 1. Eight Confirmations Process
 
-🚧 **GATE — Mandatory read before proceeding**: Before starting analysis or writing any part of the Design Specification, you **MUST** `read_file` the reference template:
-```
-read_file templates/design_spec_reference.md
-```
-The design_spec.md output **MUST** follow this template's structure exactly (Sections I through XI). After writing, perform a section-by-section self-check: I Project Information ✓ → II Canvas Spec ✓ → III Visual Theme ✓ → IV Typography ✓ → V Layout Principles ✓ → VI Icon Usage ✓ → VII Visualization Reference List ✓ → VIII Image Resource List ✓ → IX Content Outline ✓ → X Speaker Notes Requirements ✓ → XI Technical Constraints Reminder ✓. Any missing section must be completed before outputting the file.
+🚧 **GATE — Mandatory read first**: `read_file templates/design_spec_reference.md` before any analysis or writing. The design_spec.md output MUST follow that template's 11-section structure exactly. After writing, self-check each section is present: I Project Info → II Canvas → III Visual Theme → IV Typography → V Layout → VI Icon → VII Visualization → VIII Image → IX Outline → X Speaker Notes → XI Tech Constraints.
 
-⛔ **BLOCKING**: After completing the read above, provide professional recommendations for the following eight items, then **present them as a bundled package to the user and wait for explicit confirmation or modifications**.
+⛔ **BLOCKING**: After the read, present professional recommendations for the eight items below as a bundled package and wait for explicit user confirmation.
 
-> **Execution discipline**: This is the last BLOCKING checkpoint in the pipeline (besides template selection). Once the user confirms, the AI must automatically complete the Design Specification & Content Outline and seamlessly proceed to subsequent image generation (if applicable), SVG generation, and post-processing — no additional questions or pauses in between.
+> **Execution discipline**: This is the last BLOCKING checkpoint in the pipeline. After confirmation, complete the Design Spec and proceed to image generation / SVG / post-processing without further pauses.
 
 ### a. Canvas Format Confirmation
 
@@ -44,13 +40,17 @@ Confirm target audience, usage occasion, and core message; provide initial asses
 
 ### d. Style Objective Confirmation
 
-| Style | Core Focus | Target Audience | One-line Description |
+Two layers. Output: `d. Style: <Mode> + <Visual style descriptor>`.
+
+#### Layer 1 — Communication mode
+
+| Mode | Core Focus | Target Audience | One-line Description |
 |-------|-----------|----------------|---------------------|
 | **A) General Versatile** | Visual impact first | Public / clients / trainees | "Catch the eye at a glance" |
 | **B) General Consulting** | Data clarity first | Teams / management | "Let data speak" |
 | **C) Top Consulting** | Logical persuasion first | Executives / board | "Lead with conclusions" |
 
-**Style selection decision tree**:
+Mode selection decision tree:
 
 ```
 Content characteristics?
@@ -64,7 +64,31 @@ Audience?
   └── Executives / board / investors → C) Top Consulting
 ```
 
+#### Layer 2 — Visual style
+
+Anchors the downstream confirmations e (Color), f (Icon), g (Typography), h (Image).
+
+**Source**:
+- User named a style → record verbatim as a short descriptor (normalize multilingual phrasings to a single canonical form)
+- No user description → propose a default that fits the content (e.g., warm cultural tones for heritage content; clean minimalism for tech briefings; high-contrast editorial for magazine essays). Present as a recommendation; the user may override
+
+**Common descriptors** (free-form, combinable, not enums):
+
+| Axis | Examples |
+|---|---|
+| Aesthetic | minimalist / information-dense / Keynote / editorial / hand-drawn |
+| Scenario | business consulting / academic defense / government briefing / product launch / education / pitch deck |
+| Visual character | dark tech / pixel retro / neo-Chinese / Scandinavian / Memphis / cyberpunk / vaporwave |
+
+Accept user combinations and one-off coinages ("Scandinavian + slight industrial"). The list is for recall, not constraint.
+
+> **Template vs descriptor**: a style mention may sound like a template name ("Google style" vs the `google_style/` template directory). Step 3 only triggers on an explicit template directory path supplied by the user — bare names and style words never copy templates. If a template was triggered upstream, its files are already in `<project_path>/templates/`. Layer 2 only handles descriptors that did NOT come with a template path.
+
+**Downstream effect**: e / f / g / h values realize the Layer 2 descriptor on top of the Layer 1 mode. Example: "A) Versatile + neo-Chinese" → e leans cinnabar / ink / rice-paper; g pairs serif (KaiTi-class) with sans body; f minimal line icons; h restrained traditional imagery with negative space.
+
 ### e. Color Scheme Recommendation
+
+**Hard rule**: User / template colors are truth. If the user has specified colors (HEX, brand colors, or natural-language directives like "use blue as primary"), or a template was loaded with its own theme colors, lock those directly and skip the recommendation table. Do not adjust them to fit any palette or industry default. Only when no color signal exists from user or template do you proactively propose a scheme below.
 
 Proactively provide a color scheme (HEX values) based on content characteristics and industry.
 
@@ -93,6 +117,9 @@ The built-in icon library contains multiple stylistic libraries plus a brand-log
 See [`../templates/icons/README.md`](../templates/icons/README.md) for the current library inventory, counts, prefixes, and SVG placeholder details.
 
 > **Mandatory rules when choosing C**:
+>
+> **At the eight-confirmation stage — decide the library only. Do NOT run `ls | grep` yet.**
+>
 > 1. **Pick exactly one stylistic library** — read the source material, then choose the library whose visual character best serves the deck:
 >    - **`chunk-filled`** — fill, straight-line geometry (M/L/H/V/Z only); sharp right angles; heavy, solid, architectural
 >    - **`tabler-filled`** — fill, bezier curves and arcs (C/A); smooth, rounded, organic; medium weight, approachable
@@ -100,68 +127,81 @@ See [`../templates/icons/README.md`](../templates/icons/README.md) for the curre
 >    - **`phosphor-duotone`** — duotone; main shape + 20% opacity backplate; medium weight, layered, contemporary
 >    - ⚠️ **One presentation = one stylistic library** for generic icons (home, chart, users, etc.). Mixing `chunk-filled` / `tabler-filled` / `tabler-outline` / `phosphor-duotone` is FORBIDDEN. If the chosen library lacks an exact icon, find the closest alternative **within that same library**.
 >    - **Brand-logo exception**: `simple-icons` is NOT a stylistic library. Add it to the deck's icon inventory **only when** the deck genuinely contains real company / product / service brand marks (customer logos, tech-stack icons, social handles). Never substitute it for a missing generic icon.
-> 2. Search for icon availability: `ls skills/ppt-master/templates/icons/<chosen-library>/ | grep <keyword>`
-> 3. Use the verified filename (without `.svg`) as the icon name
-> 4. Always include the library prefix (e.g., `chunk-filled/home` or `tabler-filled/home`)
-> 5. List the final icon inventory and chosen library in the Design Spec; Executor may only use icons from this list
-> 6. **Stroke weight lock (stroke-style libraries only)** — when the chosen library is stroke-based (currently `tabler-outline`; applies to any future stroke library too), pick exactly one deck-wide value from `{1.5, 2, 3}` and record it as `stroke_width` in `spec_lock.md icons`. Default is `2`; pick `1.5` for refined / editorial tone, `3` for bolder presence on dense decks. Non-stroke libraries (`chunk-filled` / `tabler-filled` / `phosphor-duotone` / `simple-icons`) ignore this — omit the field entirely.
->    - **Why not `4` or higher?** On Tabler's 24×24 viewBox a 4-px stroke is 1/6 of the icon width — adjacent strokes merge and inner negative space collapses, so the icon stops reading as line art. If you want heavier visual presence, **switch the library** (to `tabler-filled` or `chunk-filled`) instead of fattening the stroke; that is precisely why multiple stylistic libraries exist.
+> 2. **Stroke weight lock (stroke-style libraries only)** — for stroke-based libraries (currently `tabler-outline`), pick one deck-wide value from `{1.5, 2, 3}` (default `2`). For heavier presence, switch library instead of going above `3`.
 >
-> **Do NOT preload any index file** — use `ls | grep` to search on demand with zero token cost.
+> **After all eight confirmations are approved — when writing `design_spec.md` §VI / `spec_lock.md`**, then materialize the icon inventory:
+>
+> 3. Enumerate the concepts the deck actually needs (home, chart, users, …) based on the confirmed outline.
+> 4. Search for each concept's filename in the chosen library: `ls skills/ppt-master/templates/icons/<chosen-library>/ | grep <keyword>`
+> 5. Use the verified filename (without `.svg`) as the icon name; always include the library prefix (e.g., `chunk-filled/home`).
+> 6. List the final icon inventory and chosen library in `design_spec.md` §VI; record the same in `spec_lock.md icons` (including `stroke_width` for stroke-style libraries). Executor may only use icons from this list.
+>
+> **Do NOT preload any index file** — when the inventory step arrives, use `ls | grep` to search on demand with zero token cost.
 
 ### g. Typography Plan Confirmation (Font + Size)
 
 #### Font Combinations
 
-> **Starting points, not a menu.** Each row below is one common direction — pick the closest match and adapt, or propose a new combination when the content tone calls for it. Per-role assignment is expected: `title` / `body` / `emphasis` / `code` may each use a different family. A deck is not required to stick to one family throughout.
->
-> **⚠️ PPT-safe font discipline (HARD rule).** PPTX stores a single `typeface` per text run — there is no runtime fallback stack. On a machine that lacks the declared font, PowerPoint substitutes with its own default (typically Calibri), breaking the design. Therefore every CSS `font-family` stack declared in the spec MUST end with a cross-platform pre-installed font:
-> - CJK-capable stacks → end with `"Microsoft YaHei", sans-serif` (sans) or `SimSun, serif` (serif)
-> - Latin-only stacks → end with `Arial, sans-serif` or `"Times New Roman", serif`
-> - Monospace stacks → end with `Consolas, "Courier New", monospace`
->
-> Any stack that *leads* with a non-pre-installed font (Inter / HarmonyOS Sans / any Google Fonts family / any brand-specific typeface like McKinsey Bower) is only acceptable when the Design Spec explicitly notes "requires the target machine to have this font installed, or the PPTX to embed it." Never leave a non-safe font as the final fallback.
+> Same-deck fonts must form **contrast** (different family, weight, or proportion) or **concord** (one family throughout). "Similar but not identical" pairings *across roles* are forbidden — see blacklist below. *Within one stack*, pairing a Windows font with a macOS counterpart (e.g. `Microsoft YaHei` + `PingFang SC`) is encouraged as a browser-preview nicety; converter writes only the first into PPTX.
 
-**Cross-platform pre-installed reference** (Windows + Mac out of the box):
+> **⚠️ PPT-safe font discipline (HARD rule).** PPTX has no runtime fallback — missing fonts substitute to Calibri. Every stack MUST end with a pre-installed font:
+> - CJK → `"Microsoft YaHei"` / `SimHei` / `SimSun` / `FangSong` / `KaiTi`
+> - Latin sans → `Arial` / `Calibri` / `Segoe UI` / `Verdana` / `Trebuchet MS`
+> - Latin serif → `"Times New Roman"` / `Georgia` / `Cambria` / `Palatino` / `Garamond`
+> - Mono → `Consolas` / `"Courier New"`
+> - Display → `Impact` / `"Arial Black"`
+>
+> Stacks led by non-pre-installed fonts (Inter / HarmonyOS Sans / Source Han / brand typefaces like McKinsey Bower) are only acceptable when the Design Spec notes "requires install or PPTX embed".
+
+**Forbidden — similar-but-not-identical pairings across roles** (do not split title vs body across these; within one stack as cross-platform fallback they remain encouraged):
+
+- `Microsoft YaHei` ↔ `PingFang SC` ↔ `Heiti SC`
+- `SimSun` ↔ `Songti SC` ↔ `STSong`
+- `Arial` ↔ `Helvetica Neue` ↔ `Segoe UI`
+- `"Times New Roman"` ↔ `Times`
+- `Georgia` ↔ `Cambria`
+
+**Mandatory**: propose **two** combinations to the user — one concord (safe), one contrast (with tension). Do not default to "title = body, same font" without explicit user request.
+
+**Cross-platform pre-installed reference**:
 
 | Category | Safe families |
 |----------|--------------|
 | CJK sans | Microsoft YaHei, SimHei, PingFang SC, Heiti SC |
-| CJK serif | SimSun, FangSong, KaiTi, Songti SC, STSong |
-| Latin sans | Arial, Calibri, Segoe UI, Verdana, Helvetica, Helvetica Neue |
-| Latin serif | Times New Roman, Georgia, Cambria, Times, Palatino |
-| Monospace | Consolas, Courier New, Menlo, Monaco |
+| CJK serif | SimSun, FangSong, KaiTi, Songti SC |
+| Latin sans | Arial, Calibri, Segoe UI, Verdana, Trebuchet MS, Helvetica Neue |
+| Latin serif | Times New Roman, Georgia, Cambria, Palatino, Garamond, Book Antiqua |
+| Mono | Consolas, Courier New |
 | Display | Impact, Arial Black |
 
-**Seed combinations** (all stacks are PPT-safe — end on pre-installed fonts):
+**Seed combinations** (all PPT-safe; first column names the contrast axis, not a scenario):
 
-| Direction | Typical scenarios | Title stack | Body stack | Code stack |
-|-----------|-------------------|-------------|------------|------------|
-| **Modern CJK sans** (default) | Tech launches, enterprise reports, most contemporary decks | `"Microsoft YaHei", "PingFang SC", sans-serif` | same as Title | — |
-| **Government / 政务** | Government reports, party-building, formal briefings | `SimHei, "Microsoft YaHei", sans-serif` | `SimSun, serif` | — |
-| **Academic serif** | Research, legal, theses, serious analysis | `Georgia, "Times New Roman", serif` | `"Times New Roman", SimSun, serif` | — |
-| **Editorial display** | Magazine covers, luxury, finance, brand storytelling | `Georgia, SimSun, serif` (Bold/Heavy) | `"Microsoft YaHei", "PingFang SC", sans-serif` | — |
-| **Tech / developer** | Code-focused tech talks, developer docs, API / CLI explainers | `Arial, sans-serif` | same as Title | `Consolas, "Courier New", monospace` |
-| **International English** | English-primary decks, international audiences | `"Helvetica Neue", Arial, sans-serif` | same as Title | — |
-| **Impact / 海报** | Cover headlines, call-to-action, poster-style slides | `Impact, "Arial Black", "Microsoft YaHei", sans-serif` | `"Microsoft YaHei", "PingFang SC", sans-serif` | — |
+| Contrast axis | Title stack | Body stack | Code stack |
+|---|---|---|---|
+| Serif × sans | `Georgia, KaiTi, serif` | `"Microsoft YaHei", "PingFang SC", sans-serif` | — |
+| Kai × hei | `KaiTi, Georgia, serif` | `"Microsoft YaHei", "PingFang SC", sans-serif` | — |
+| Fangsong × hei | `FangSong, "Times New Roman", serif` | `SimHei, "Microsoft YaHei", sans-serif` | — |
+| Double serif | `Palatino, FangSong, serif` | `Cambria, SimSun, serif` | — |
+| Same family, weight contrast (900 / 300) | `"Microsoft YaHei", "PingFang SC", sans-serif` | same | — |
+| Display × neutral | `Impact, "Arial Black", SimHei, sans-serif` | `Arial, "Microsoft YaHei", sans-serif` | — |
+| Cool serif (academic) | `Cambria, SimSun, serif` | `"Times New Roman", SimSun, serif` | — |
+| Hei × song (政务) | `SimHei, "Microsoft YaHei", sans-serif` | `SimSun, serif` | — |
+| Tech / developer | `Arial, "Microsoft YaHei", sans-serif` | same | `Consolas, "Courier New", monospace` |
+| Concord (default fallback) | `"Microsoft YaHei", "PingFang SC", sans-serif` | same | — |
 
-> **Stack length discipline (soft rule).** 3-4 fonts per stack is enough — more is waste. Converter behavior (see [`drawingml_utils.py parse_font_family`](../scripts/svg_to_pptx/drawingml_utils.py)) only picks the **first** Latin font and the **first** CJK font; everything after is silently dropped in PPTX. macOS-only families (`Songti SC` → SimSun; `Menlo` / `Monaco` → Consolas; `Helvetica` → Arial) are mapped via `FONT_FALLBACK_WIN`, so stacking both the macOS family and its Windows equivalent is redundant. Convention: lead with Windows-preinstalled fonts (Microsoft YaHei / SimSun / Arial / Georgia / Consolas) so PPT viewers see the intended typeface immediately; keep at most **one** macOS-exclusive family (typically `"PingFang SC"`) as a browser-preview nicety.
+> **Stack length discipline (soft rule).** ≤4 fonts per stack. Lead with Windows-preinstalled fonts (Microsoft YaHei / SimSun / Arial / Georgia / Consolas); keep at most **one** macOS-exclusive family (typically `"PingFang SC"`). Converter only picks the first Latin and first CJK font ([`drawingml_utils.py parse_font_family`](../scripts/svg_to_pptx/drawingml_utils.py)); macOS→Windows fallback is auto-mapped via `FONT_FALLBACK_WIN`.
 
-> **Directions that require font installation or embedding** (NOT in the safe seed table above):
-> - **Retro / pixel** — Press Start 2P / VT323 / Silkscreen (not pre-installed on any OS; degrades to a wildly different font without install)
-> - **Rounded friendly** — Nunito / Quicksand / M PLUS Rounded / OPPO Sans (no true cross-platform rounded pre-installed; closest safe substitutes are `Trebuchet MS` / `Verdana` but they are not truly rounded)
-> - **Modern web sans** — Inter / HarmonyOS Sans / Source Han Sans / Noto Sans (not pre-installed; viewers without the font see Calibri)
-> - **Brand-specific typography** — McKinsey Bower, Anthropic house fonts, corporate VI typefaces
->
-> Only declare these when the deck runs on controlled machines (all viewers install the font first) or when the PPTX embeds the font. Always note the constraint in the Design Spec.
->
-> **Guidance for the Strategist**: state the intended direction in one phrase (e.g., "modern CJK sans"), then list the actual families per role in the design spec. The spec is the source of truth; the table above is only a quick pick.
+> **Non-pre-installed directions** (require install or PPTX embed; note the constraint in Design Spec):
+> - **Retro / pixel** — Press Start 2P / VT323 / Silkscreen
+> - **Rounded friendly** — Nunito / Quicksand / M PLUS Rounded / OPPO Sans (closest safe substitute: `Trebuchet MS` / `Verdana`)
+> - **Modern web sans** — Inter / HarmonyOS Sans / Source Han Sans / Noto Sans
+> - **Brand-specific** — McKinsey Bower, corporate VI typefaces
 
 #### Font Size Ramp (all sizes in px)
 
-> **Ramp discipline, not a fixed menu.** Every size in the deck is derived from the `body` baseline as a ratio. The `spec_lock.md typography` block declares `body` as the anchor plus whichever common slots this deck actually uses (`title` / `subtitle` / `annotation` by default; add `cover_title` / `hero_number` / `chart_annotation` etc. when the content calls for them). Executor may use intermediate sizes during generation as long as the size's ratio to `body` lands within the corresponding role's band below — the list is a ramp, not an allowed-values enumeration.
+> **Ramp, not a fixed menu.** All sizes derive from the `body` baseline as a ratio. `spec_lock.md typography` declares `body` plus the slots this deck uses (`title` / `subtitle` / `annotation` by default; add `cover_title` / `hero_number` / `chart_annotation` as needed). Executor may pick any intermediate px within a role's ratio band.
 
-Selection principle: Baseline choice is driven by **content density**, not design style. `18px` and `24px` are the two most commonly used values — any other integer baseline is fine as long as it is reasonable for the content (e.g., 16px for chart-heavy pages, 20 / 22px for medium density, 28–32px for poster / cover-like decks with very little text). The ratio bands apply to whatever `body` the deck declares.
+Baseline choice follows **content density**, not style. Common: `18px` (dense) / `24px` (relaxed). Other integers are fine — `16px` for chart-heavy, `20-22px` for medium, `28-32px` for poster/cover.
 
 | Common recommendation | Points per Page | Body Baseline | Suitable Scenarios |
 |----------------|----------------|---------------|-------------------|
@@ -179,9 +219,7 @@ Selection principle: Baseline choice is driven by **content density**, not desig
 | Annotation / caption | 0.7-0.85x | 17-20px | 13-15px |
 | Page number / footnote | 0.5-0.65x | 12-16px | 9-12px |
 
-> Columns show two commonly recommended baselines only for illustration. For any other baseline — 16, 20, 22, 28, 32 … — multiply each row's ratio against that value to derive this deck's actual bands. The checker's `_check_spec_lock_drift` reads the live `body` value from `spec_lock.md` and applies ratio bands on top, so no code change is needed to support a different baseline.
->
-> Executor may pick any px value within a role's band (e.g., 40px hero number, 13px chart annotation, 72px cover headline) without having to pre-declare every intermediate value in `spec_lock.md`. Values outside **every** band remain forbidden — those need the lock extended first.
+> Two baseline columns are illustrative only — for any other baseline (16/20/22/28/32…), multiply the row's ratio. Checker reads live `body` from `spec_lock.md`. Executor may pick any px within a role's band without pre-declaring; values outside **every** band require lock extension first.
 
 ### h. Image Usage Confirmation
 
@@ -190,11 +228,166 @@ Selection principle: Baseline choice is driven by **content density**, not desig
 | **A** | No images | Data reports, process documentation |
 | **B** | User-provided | Has existing image assets |
 | **C** | AI-generated | Custom illustrations, backgrounds needed |
-| **D** | Placeholders | Images to be added later |
+| **D** | Web-sourced | Real-world reference imagery, editorial support, stock-style needs (no API key required for default providers) |
+| **E** | Placeholders | Images to be added later |
+
+**When recommending C** — surface its three implementation modes so the user knows "no API key" is a supported state:
+
+| Mode | Trigger | Mechanism |
+|---|---|---|
+| **Path A** | `IMAGE_BACKEND` configured (default) | `image_gen.py` runs in Step 5 |
+| **Path B** | `IMAGE_BACKEND` not configured AND host has a native image tool (Codex / Antigravity / Claude Code / similar) — auto-selected, no user prompting needed | Host-native generation |
+| **Offline Manual** | `IMAGE_BACKEND` not configured AND host has no native image tool | Prompts written to `images/image_prompts.json`; user generates externally and places files in `project/images/` |
+
+Selection is automatic in Step 5 (A → B → Manual). Detailed contract: [`image-generator.md`](./image-generator.md) §3.2.
+
+Selections may be mixed at the row level — e.g. a deck can use C for hero illustrations while sourcing D for supporting team photos.
+
+#### h.5 AI Image Strategy — lock rendering + palette (only when C is selected)
+
+When the deck includes any `ai` rows, Strategist locks a **deck-wide rendering** and **deck-wide palette** here. These two values are written into `design_spec.md §III` and `spec_lock.md colors` / `images` sections, then consumed by Image_Generator. Every AI image in the deck shares them — this is what makes multiple AI images feel like one deck.
+
+🚧 **GATE — before recommending values**: `read_file references/image-renderings/_index.md` and `read_file references/image-palettes/_index.md`. They contain the catalog, auto-selection tables, and a rendering × palette compatibility matrix.
+
+#### Three-candidate presentation (default path)
+
+**Hard rule**: Unless the user has already named a specific rendering or palette (chat or template), present **≥3 distinct rendering × palette combinations** and let the user pick. Never auto-lock a single combination silently.
+
+**Per-candidate schema** (exactly 4 lines, no extras):
+
+```
+[Plan A] <temperament label> — <rendering> × <palette>
+  Visual: <shape / line / material / light, 1-2 phrases>
+  Color: <secondary HEX (ratio) + primary HEX (ratio) + accent HEX (ratio); HEX values from e.>
+  Mood: <2-3 traits>; like <real-world analogy: company / publication / event>
+```
+
+After the candidates, append one line:
+
+```
+> Reference images: see references/ai-image-comparison/ for matching PNGs by name.
+```
+
+**Hard rules for candidate construction**:
+
+| Rule | Behavior |
+|---|---|
+| Filter by e.'s HEX | Only include palettes whose temperament can carry the user's HEX. Vivid red → exclude `cool-corporate` / `mono-ink`; include `vivid-launch` / `warm-earth` / `editorial-classic`. |
+| HEX values in `Color` line MUST be e.'s real values | Palette contributes only the 60-30-10 ratio + role assignment. Never substitute the palette's typical HEX. |
+| Span a personality spectrum | Typically: one conservative-default (industry norm), one shifted-tone (same fit, 1-2 ticks different), one bold-contrast (more expressive, may challenge default). No near-duplicates. |
+| `Mood` line MUST include a real-world analogy | Company / publication / event the user can picture. Adjective stacks alone are forbidden. |
+| Adapt labels to chat language | Schema is English by default. Chinese chat → render as 「方案 A / 视觉 / 色彩 / 情绪」. Structure stays the same; only the labels translate. |
+| Skip presentation when user has specified | User-named rendering or palette (chat / template) bypasses the candidate flow — lock directly per the truth-precedence rule. |
+
+**Forbidden — padding with conflicts**: if e.'s HEX cannot find ≥3 compatible palettes, present the smaller set (2 candidates) and state "your color is unusual — only N palettes can carry it without conflict." Never fill remaining slots with known-conflicting options.
+
+**Worked example** (e. = `#1E3A5F` navy + `#F8F9FA` off-white + `#D4AF37` gold; d. = consulting; chat in English):
+
+```
+[Plan A] Restrained Professional — vector-illustration × cool-corporate
+  Visual: flat vector, solid color blocks, no gradients or shadows
+  Color: off-white #F8F9FA (60-70%) + deep navy #1E3A5F main (25-30%) + gold #D4AF37 accent (<5%)
+  Mood: steady, trustworthy, restrained gravitas; like a McKinsey consulting report
+
+[Plan B] Editorial Depth — editorial × editorial-classic
+  Visual: magazine layout, 8% paper texture, column-based partitioning
+  Color: off-white #F8F9FA paper (55%) + deep navy #1E3A5F column (30%) + gold #D4AF37 rule line (10-14%)
+  Mood: refined, considered, paced; like an Economist feature spread
+
+[Plan C] Future Energy — 3d-isometric × tech-neon
+  Visual: isometric 3D, soft shading, 8% glow halos around bright elements
+  Color: off-white #F8F9FA digital field (50%) + deep navy #1E3A5F main (35%) + gold #D4AF37 emphasis (10-15%)
+  Mood: forward, energetic, futuristic; like an Apple or Stripe product keynote
+
+> Reference images: see references/ai-image-comparison/ for matching PNGs by name.
+```
+
+After the user picks a candidate (or supplies a custom variant), proceed to "Recording the lock" below.
+
+---
+
+#### Catalog reference (for candidate construction)
+
+The tables below are source data Strategist reads when constructing the three candidates above. They are no longer the final output by themselves.
+
+**Rendering recommendation** (soft — user may override with any other rendering from the catalog):
+
+| `d. Style` signal | Recommended rendering | Alternates |
+|---|---|---|
+| Top Consulting / strategic / MBB | `editorial` or `vector-illustration` | `blueprint`, `minimalist-swiss` |
+| General Consulting / corporate report / 学术答辩 | `vector-illustration` | `flat`, `editorial` |
+| High-end consulting / luxury / 高端 / design-firm | `minimalist-swiss` | `editorial`, `vector-illustration` |
+| Tech / SaaS / AI / 架构 | `3d-isometric`, `blueprint`, `digital-dashboard` | `flat` |
+| Modern SaaS / fintech / health-tech / premium app | `glassmorphism` | `digital-dashboard`, `flat` |
+| Product launch / brand / marketing | `flat`, `3d-isometric`, `corporate-photo` | `vector-illustration` |
+| Education / training / 教学 / 培训 | `sketch-notes` | `vector-illustration`, `paper-cut` |
+| Children / storybook / 儿童 / 治愈 | `fantasy-animation` | `paper-cut`, `watercolor`, `sketch-notes` |
+| Cultural / folk / festival / 文化 / 节日 | `paper-cut` | `vintage-poster`, `screen-print` |
+| Methodology / Before-After / 方法论 / manifesto | `ink-notes` | `editorial` |
+| Government / formal / 政务 | `editorial` or `corporate-photo` | `vector-illustration` |
+| Finance / journalism / 财经 | `editorial`, `digital-dashboard` | `vector-illustration` |
+| Personal story / 个人成长 / lifestyle | `watercolor`, `warm-scene` | `corporate-photo`, `paper-cut` |
+| Cultural / media / opinion / cinematic | `screen-print`, `vintage-poster` | `editorial`, `warm-scene` |
+| Brand heritage / hospitality / 老字号 / 周年 | `vintage-poster` | `screen-print`, `editorial` |
+| Gaming / retro / 复古 / 像素 | `pixel-art` | `vintage-poster` |
+| Environment / wellness / 环保 | `nature` | `watercolor`, `paper-cut` |
+| Classroom / blackboard / 课堂 | `chalkboard` | `sketch-notes` |
+| Team / company / product photo | `corporate-photo` | — |
+
+**Palette recommendation** (soft — user may override):
+
+| Content vibe / industry | Recommended palette | Alternates |
+|---|---|---|
+| Consulting / finance / B2B / corporate / 学术答辩 | `cool-corporate` | `editorial-classic`, `frost-ice` |
+| Tech / SaaS / AI | `tech-neon` | `cool-corporate`, `dark-cinematic` |
+| Modern SaaS / fintech / health-tech | `frost-ice` | `cool-corporate`, `tech-neon` |
+| Health / medical / beauty / skincare | `frost-ice` | `nature-organic`, `earthy-dusty` |
+| Education / training | `macaron` | `warm-earth` |
+| Methodology / Before-After | `mono-ink` | `editorial-classic` |
+| Personal / lifestyle / brand story | `warm-earth` | `nature-organic`, `earthy-dusty` |
+| Interior / wellness / mindfulness / slow living | `earthy-dusty` | `warm-earth`, `nature-organic` |
+| Product launch / marketing | `vivid-launch` | `tech-neon`, `sunset-gradient` |
+| Creative agency / travel / music / lifestyle | `sunset-gradient` | `vivid-launch`, `warm-earth` |
+| Luxury / fashion / jewelry / premium / heritage | `jewel-tone` | `dark-cinematic`, `editorial-classic` |
+| Children / storybook | `macaron` | `warm-earth` |
+| Premium / film / entertainment | `dark-cinematic` | `jewel-tone`, `duotone` |
+| Cultural / media / cover-art | `duotone` | `editorial-classic` |
+| Environment / wellness | `nature-organic` | `warm-earth`, `earthy-dusty` |
+| Finance / journalism | `editorial-classic` | `cool-corporate` |
+
+After auto-selecting, cross-check `image-palettes/_index.md` compatibility matrix — if rendering × palette is `✗`, swap to the alternate palette.
+
+**d-e-f-g linkage sanity check** (do this after picking rendering + palette):
+
+| Linkage | What to verify |
+|---|---|
+| **d. Style ↔ rendering** | Rendering family should match the Style descriptor's temperament (corporate ≠ sketch-notes; tech ≠ watercolor). Already enforced by the recommendation table above. |
+| **e. Color HEX ↔ palette** | HEX is truth — palette is just the "how to use these HEX" rulebook for AI images (saturation / contrast / 60-30-10 / material). Mismatch → **always swap palette to fit the HEX, never adjust the HEX to fit a palette**. E.g. user gives a vivid red but you auto-picked cool-corporate — switch to vivid-launch or warm-earth, do not propose dimming the red. |
+| **f. Icon library ↔ rendering** | `tabler-outline` pairs well with all renderings (most versatile). `chunk-filled` / `tabler-filled` pair better with `vector-illustration` / `flat` / `editorial`. `phosphor-duotone` pairs with `flat` / `digital-dashboard`. Mismatch is not fatal but worth flagging. |
+| **g. Typography ↔ rendering** | Serif title → pairs well with `editorial`, `corporate-photo`, `screen-print`. Hand-lettered direction → already implied by `sketch-notes` / `ink-notes` (the rendering carries the lettering, no separate font requirement). Display font → `vivid-launch` / `screen-print`. Mismatch is rarely fatal; note in conversation if it feels off. |
+
+**Recording the lock** — after picking, write to:
+
+- `design_spec.md §III Visual Theme` — add two lines under the color table:
+  ```
+  - **Image Rendering**: vector-illustration
+  - **Image Palette**: cool-corporate
+  ```
+- `spec_lock.md colors` section — add two extra rows at the bottom:
+  ```
+  - image_rendering: vector-illustration
+  - image_palette: cool-corporate
+  ```
+
+Image_Generator reads these two fields and applies them deck-wide. If both are absent (legacy decks), Image_Generator falls back to inferring them from `d. Style` and `e. Color` — quality is acceptable but not optimal. Always lock both when C is selected.
+
+#### hero_page suggestion (same confirmation turn)
+
+After the user picks a candidate, scan the outline and surface any pages where the image makes more sense as the page's main voice than as a local block. Present them as a short list and let the user confirm, edit, or skip. Result is recorded as `page_role: hero_page` on the matching `ai` rows. Density is judgment-based — no fixed quota.
 
 **When selection includes B**, you must run `python3 scripts/analyze_images.py <project_path>/images` before outputting the spec, and integrate scan results into the image resource list.
 
-**When B/C/D is selected**, add an image resource list to the spec:
+**When B / C / D / E is selected**, add an image resource list to the spec:
 
 | Column | Description |
 |--------|-------------|
@@ -202,21 +395,48 @@ Selection principle: Baseline choice is driven by **content density**, not desig
 | Dimensions | e.g., `1280x720` |
 | Ratio | e.g., `1.78` |
 | Layout suggestion | e.g., `Wide landscape (suitable for full-screen/illustration)` |
+| **Layout pattern** | **MANDATORY** — one or more `#<id> <name>` joined by ` + ` from `image-layout-patterns.md`. Combine a Primary id with optional Modifier ids when the page needs it (e.g. `#48 side-by-side comparison + #21 rounded rectangle crop + #29 two-stop scrim`). A single Primary is fine when the page calls for it. See the GATE earlier in this section. Empty cells or invented ids are invalid. |
 | Purpose | e.g., `Cover background` |
-| Type | Background / Photography / Illustration / Diagram / Decorative pattern |
+| Type | Narrative shorthand: Background / Photography / Illustration / Diagram / Decorative pattern. (The internal-composition type used by Image_Generator — one of `background / hero / typography / infographic / flowchart / framework / comparison / timeline / scene` — is inferred from `Purpose` per [`image-type-templates/_index.md`](./image-type-templates/_index.md); no need to label every row.) |
+| **Acquire Via** | `ai` / `web` / `user` / `placeholder` — drives Step 5 dispatch |
 | Status | Initial status must be `Pending`, `Existing`, or `Placeholder`; see [`svg-image-embedding.md`](svg-image-embedding.md) for the full status enum |
-| Generation description | Fill in detailed description for AI generation |
+| **Reference** | Free-form **intent description** (NOT a search query); feeds Image_Generator (ai) or Image_Searcher (web) |
+| `text_policy` (optional, `ai` rows only) | `none` (no text in image) or `embedded` (text is part of the artwork). Leave blank when Image_Generator should decide per row. Long body / data / lists stay in SVG. |
+| `page_role` (optional, `ai` rows only) | `local` (image is a region block on an SVG page) or `hero_page` (image is the page's main voice). Leave blank when Image_Generator should decide per row. |
 
-**Generation description quality guide** — the description is the seed for Image_Generator's prompt, so specificity matters:
+**No-crop flag (exception only)**: most images are croppable — Executor defaults to `preserveAspectRatio="xMidYMid slice"`. When an image must NOT lose pixels (data screenshots, charts, certificates, contracts, dense diagrams), append `no-crop` to its `spec_lock.md images` entry. Executor will then size the container to the native ratio and use `meet`. Don't tag the rest.
 
-| Quality | Example | Why |
-|---------|---------|-----|
-| Bad | "team photo" | Too vague — style, setting, lighting, composition all unknown |
-| Good | "Professional team of 4 diverse people collaborating at a modern office desk, natural lighting, laptop visible" | Specifies subject count, setting, lighting, and props |
-| Bad | "tech background" | No color, style, or composition guidance |
-| Good | "Abstract flowing digital waves in deep navy (#1E3A5F) to midnight blue gradient, subtle particle effects, clean center area for text overlay" | Specifies subject, colors with HEX, effects, and text area needs |
-| Bad | "chart" | Image_Generator cannot know what type of chart or data |
-| Good | "Clean flowchart showing 4 sequential steps connected by arrows, flat design, light gray background, blue accent nodes" | Specifies diagram type, count, style, colors |
+**Reference field**: Write visual intent, not provider mechanics.
+
+| ✅ Intent description | ❌ Avoid |
+|---|---|
+| "Diverse engineering team collaborating around a laptop, modern office, natural light" | "team laptop office" |
+| "Abstract atmospheric backdrop for academic-defense cover, calm center for text overlay, hint of campus skyline" | "use openverse, search 'office'" |
+| "Sunlit forest path in autumn" | "team photo" |
+
+**Per-row Reference grammar**:
+
+| Acquire Via | Reference pattern |
+|---|---|
+| `ai` | **Subject + intent + composition** only. Do NOT repeat style words ("flat design", "modern", "vector") or HEX values — both are already locked deck-wide by h.5 (rendering + palette) and `design_spec §III` (colors). Image_Generator's prompt assembler injects them automatically. |
+| `web` | Concrete subject/place/object first, then 1-3 quality descriptors |
+
+**Allowed web quality descriptors**:
+
+| Descriptor | Use |
+|---|---|
+| `professional editorial photography` | Stock-style photography |
+| `clean composition` | Covers, section dividers, image-text layouts |
+| `natural light` | People, workplace, travel, lifestyle scenes |
+| `high-resolution` | Large visual areas |
+
+**Forbidden — web negative prompts**: `not tourist snapshot`, `no phone photo`, `avoid amateur style`.
+
+| Mode | Good Reference |
+|---|---|
+| `web` | "Diverse team collaborating at a modern office desk, professional editorial photography, natural light, laptop visible" |
+| `ai` | "Atmospheric backdrop suggesting digital innovation; calm central area reserved for slide title overlay; light geometric anchor at one edge" |
+| `ai` | "Four-stage value chain from raw input to R&D output; icons should suggest tax-form → cost-reduction → equipment-upgrade → innovation; no text labels (SVG overlays them)" |
 
 **Image type descriptions**:
 
@@ -228,16 +448,24 @@ Selection principle: Baseline choice is driven by **content density**, not desig
 | Diagram | Flowcharts, architecture diagrams, concept relationship maps |
 | Decorative pattern | Partial decoration, textures, borders, divider elements |
 
-**Image narrative intent** (decide this *before* consulting the ratio table — it determines whether the image even lives in a container):
+🚧 **GATE — before writing §VIII Image Resource List**: when image approach is B/C/D/E (anything other than A "no images"), this is a three-layer hard requirement, not a suggestion:
+
+1. **Read** — `read_file references/image-layout-patterns.md`. The file enumerates 72 numbered techniques split into **Part 1 — Primary Structures** (#1–#19 container layouts, #38–#46 image-as-canvas + native overlay, #47–#56 multi-image) and **Part 2 — Modifier Layers** (#20–#26 non-rectangular crops, #27–#37 overlays & masks, #57–#61 texture, #62–#72 special). The four `Image narrative intent` values below cover only broad categories.
+2. **Produce** — every row in §VIII Image Resource List MUST fill the `Layout pattern` column with one or more `#<id> <name>` joined by ` + ` drawn verbatim from this file (Primary + optional Modifiers). Rows with empty `Layout pattern` or with an id that does not exist in the file are invalid.
+3. **Image-as-canvas coverage** — for any deck with ≥4 image-bearing pages, at least one page MUST use a `#38–#46` pattern (image-as-canvas + native overlay) unless every image is a pure cover / chapter divider / atmosphere backdrop. This family is the most-skipped one and is usually the right answer for content-rich pages with photographs. If the deck legitimately has no opportunity for it, state the reason in §VIII directly under the table.
+
+**Skip-detection signal for self-audit**: if you notice that every page's `Layout pattern` column resolves to #2/#3 (left-third or right-third), #5/#6 (top-bottom band), or generic side-by-side, you have not actually consulted the file — re-read and reconsider. The default left/right and top/bottom split bias is the failure mode this gate exists to break.
+
+**Image narrative intent** (decide *before* the ratio table — determines whether the image lives in a container at all):
 
 | Intent | Form | When to use |
 |--------|------|-------------|
-| **Hero / full-bleed** | Image fills the canvas (or a dominant zone); title / caption floats over with a gradient or opacity overlay for legibility | Covers, chapter dividers, `breathing` impact pages — when the image *is* the message, not a companion to body copy |
-| **Atmosphere / background layer** | Image sits behind content as a low-contrast backdrop (reduced opacity or dark overlay); content reads against the treated layer | Section backgrounds, mood-setting pages — when the image sets tone but text carries the information |
-| **Side-by-side** | Image and text occupy adjacent blocks as coequal units — the ratio table below governs container sizing in this case | Most content pages — when image and explanation need to be read together |
-| **Accent / inline** | Small image tucked next to related text as an illustrative element, not a container; no forced ratio matching | Supporting visuals, spot illustrations, small diagrams explaining a term |
+| **Hero / full-bleed** | Image fills canvas/dominant zone; title floats over with gradient or opacity overlay | Covers, chapter dividers, `breathing` pages — image *is* the message |
+| **Atmosphere / background** | Image as low-contrast backdrop (reduced opacity or dark overlay); text reads on top | Section backgrounds, mood-setting — image sets tone, text carries info |
+| **Side-by-side** | Image and text as adjacent coequal blocks — ratio table below governs container sizing | Most content pages — image and text read together |
+| **Accent / inline** | Small image beside related text, not a container; no ratio matching | Supporting visuals, spot illustrations |
 
-> Intent is driven by **what the image is doing narratively**, not by image ratio. The same 16:9 photo can be a hero on one page and a side-by-side block on the next depending on the page's purpose. Do not default every image-bearing page to side-by-side.
+> Intent follows narrative purpose, not image ratio. Don't default every image page to side-by-side.
 
 **Side-by-side ratio alignment** (consult only when the chosen intent is *side-by-side*; detailed calculation rules in `references/image-layout-spec.md`):
 
@@ -249,7 +477,7 @@ Selection principle: Baseline choice is driven by **content density**, not desig
 | 0.8-1.2 (square) | Left-right split |
 | < 0.8 (portrait) | Left-right split, image on left |
 
-Core logic (side-by-side only): the container's aspect ratio must closely match the image's original ratio. Never force a wide image into a square container or a portrait image into a narrow horizontal strip. For hero / atmosphere / accent intents, ratio alignment is not a constraint — composition is governed by the page's narrative, not the image's numeric ratio.
+Side-by-side only: container ratio must match image ratio. Hero / atmosphere / accent intents ignore ratio alignment.
 
 > **Portrait canvases** (Xiaohongshu, Story): Layout rules differ — top-bottom is preferred for most ratios since left-right columns become too narrow. See "Portrait Canvas Override" in `references/image-layout-spec.md`.
 
@@ -257,29 +485,46 @@ Core logic (side-by-side only): the container's aspect ratio must closely match 
 
 > **Pipeline handoff**: When C) AI generation is selected, Image_Generator consumes `Pending` rows and updates them to `Generated` or `Needs-Manual` before Executor proceeds. Status names are defined in [`svg-image-embedding.md`](svg-image-embedding.md).
 
-### Visualization Reference (Non-blocking — Strategist recommends, no user confirmation needed)
+### Template Match — Visualization + Structural Patterns (Non-blocking — Strategist recommends, no user confirmation needed)
 
-When content outline pages involve **data visualization or infographic-style structured information design** (comparisons, trends, proportions, KPIs, flows, timelines, org structures, strategic frameworks, etc.), Strategist should select appropriate visualization types from the built-in template library.
+The catalog covers **both data charts and structural information designs**. A "match" is not limited to numeric pages — any page whose content shape matches a `Pick for ...` clause is a candidate:
 
-> **Reading is mandatory; using is per-page judgment.**
-> - Fully read `templates/charts/charts_index.json` before content planning. Each `summary` is a selection rule (`"Pick for … Skip if …"`), not a description.
-> - Not every page needs a chart. But when a page's information structure matches a catalog entry, design with that template as reference — do not improvise.
+- **Data-type pages**: comparisons, trends, proportions, KPIs, financials, rankings, distributions, conversion funnels
+- **Structural-type pages**: team rosters, agendas, principles & values, methodology phases, customer journey, capability maps, OKR cascades, roadmaps, strategic frameworks (SWOT / BCG / PEST / Porter's Five Forces / Value Chain — matched via `quadrant_text_bullets`, `quadrant_bubble_scatter`, `vertical_pillars`, `hub_inward_arrows`, `chevron_chain_with_tail` respectively)
+
+The most common Strategist failure mode is missing the structural half — treating "chart" as "numeric chart only" and leaving team / agenda / principles / journey pages as text-only when a template would fit. Read the catalog with both lenses.
+
+> **Reading is mandatory; the catalog is a starting point, not a copy target.**
+> - Fully read `templates/charts/charts_index.json` **before drafting the Eight Confirmations** — the read happens up front, not when you sit down to write Section VII. The file contains `meta` + `charts.<key>.summary` only; each `summary` is a selection rule (`"Pick for … Skip if …"`), not a description. There is **no category, quickLookup, or keyword index** — selection is done by semantically matching each page's content shape against all 71 summaries in one pass.
+> - Not every page needs a chart. When a page's information structure matches a catalog entry, **use that template as a structural starting point** — keep the visualization type and core layout logic, then adapt composition, density, color, decoration, and accompanying elements to fit this deck's content and visual tone. Free adjustment is encouraged; what is forbidden is (a) generating without reading the catalog, and (b) blind verbatim mimicry that ignores the page's actual content weight.
 >
 > **Workflow**:
-> 1. Match each page against `summary` / `keywords` across all entries; use `quickLookup` for cross-check.
+> 1. Read all 71 summaries; for each page, identify the Pick clause that matches the page's content shape AND does not match any Skip clause.
 > 2. Prefer specificity (`vertical_list` over generic `numbered_steps`).
 > 3. One primary visualization per page; a supporting layout may accompany it.
 > 4. List selections in Design Spec section VII; section IX only notes the visualization type name per page.
 >
-> **Read-audit (mandatory, written at the top of section VII)**:
+> **Source vocabulary mismatch** — the catalog is in English. When source content uses Chinese / industry jargon ("中台", "架构图", "述职", "管道", "前后端"), translate the intent first, then match against summaries. The catalog deliberately keeps no keyword index — full-read forces semantic matching rather than lexical grep.
+>
+> **Read-audit (mandatory, section VII format)** — single combined table; `summary-quote` column is the anti-fabrication audit, `path` + `usage` serve Executor lookup. Format defined in [`templates/design_spec_reference.md`](../templates/design_spec_reference.md) §VII:
 > ```
-> Catalog read: <N> templates / <M> categories
-> Runners-up considered: <key_A> (rejected: <reason>), <key_B> (rejected: <reason>), <key_C> (rejected: <reason>)
+> Catalog read: 71 templates
+>
+> | Page | Template      | Path                              | Summary-quote (verbatim) | Usage |
+> | ---- | ------------- | --------------------------------- | ------------------------ | ----- |
+> | P03  | bar_chart     | templates/charts/bar_chart.svg    | "<verbatim first sentence>" | <intent> |
+> | P07  | line_chart    | templates/charts/line_chart.svg   | "<verbatim first sentence>" | <intent> |
+> | P11  | pie_chart     | templates/charts/pie_chart.svg    | "<verbatim first sentence>" | <intent> |
+>
+> Runners-up considered (3 entries minimum, drawn from real second-best matches):
+> - <key_A> | rejected for P03: <reason citing this deck's specifics>
+> - <key_B> | rejected for P07: <reason>
+> - <key_C> | rejected for P11: <reason>
 > ```
-> Runners-up must be templates that were genuinely the second-best match for some page in this deck. If fewer than 3 visualization pages exist, list what exists and note "fewer than 3 viz pages".
+> The `summary-quote` must be copy-pasted from `charts_index.json` — paraphrasing or summarizing breaks the audit. Every template name listed (selected or rejected) must `grep` cleanly inside `charts_index.json` (so misspelled or invented keys fail). If fewer than 3 visualization pages exist, list what exists and note "fewer than 3 viz pages"; runners-up still required for each page that does exist.
 >
 > **Fallback when no template fits**:
-> 1. Re-scan `categories` and `quickLookup` — concepts often live under non-obvious labels (e.g. "causal chain" → `process_flow` / `sankey_chart` under `process`).
+> 1. Re-read the full summary list with the page's intent re-stated in plain language — "non-obvious" matches often surface on the second pass (e.g. "causal chain" → `process_flow` or `sankey_chart`).
 > 2. If still no fit: data-driven content → table layout; conceptual/illustrative → "AI-generated image" (Image_Generator handles); structural → "custom layout".
 > 3. Mark the page `no-template-match` in section VII with the fallback chosen and why. Do NOT silently substitute a close-but-wrong chart.
 
@@ -295,67 +540,53 @@ When content outline pages involve **data visualization or infographic-style str
 
 ### A) General Versatile — Executor_General
 
-**Unique capabilities**:
-- Full-width images + gradient overlays (essential for promotions)
-- Free creative layouts (not grid-constrained)
-- Three style variants: image-text hybrid, minimalist keynote, creative design
-
-**Typical scenarios**: Investment promotion, product launches, training materials, brand campaigns
-
-**Avoid**: Overly rigid/formal, dense data tables
+- **Capabilities**: full-width images + gradient overlays; free creative layouts; variants (image-text / minimalist / creative)
+- **Scenarios**: promotions, product launches, training, brand campaigns
+- **Avoid**: rigid/formal tone, dense data tables
 
 ### B) General Consulting — Executor_Consultant
 
-**Unique capabilities**:
-- KPI dashboards (4-card layout, large numbers + trend arrows)
-- Professional chart combinations (bar, line, pie, funnel)
-- Data color grading (red/yellow/green status indicators)
-
-**Typical scenarios**: Progress reports, financial analysis, government reports, proposals/bids
-
-**Avoid**: Flashy decorations, image-dominated slides
+- **Capabilities**: KPI dashboards (4-card, big numbers + trend arrows); chart combinations (bar/line/pie/funnel); status color grading (R/Y/G)
+- **Scenarios**: progress reports, financial analysis, government reports, proposals
+- **Avoid**: flashy decoration, image-dominated slides
 
 ### C) Top Consulting — Executor_Consultant_Top
 
-**Unique capabilities**:
-
-| Capability | Description |
-|-----------|-------------|
-| Data contextualization | Every data point must have a comparison ("grew 63% — industry average only 12%") |
+| Rule | Detail |
+|------|--------|
+| Data contextualization | Every data point gets a comparison ("grew 63% — industry avg 12%") |
 | SCQA framework | Situation → Complication → Question → Answer |
-| Pyramid principle | Conclusion first; core insight in the title position |
-| Strategic coloring | Colors serve information, not decoration |
+| Pyramid principle | Conclusion first; core insight in title |
+| Strategic coloring | Color serves information, not decoration |
 | Chart vs Table | Trends → charts; precise values → tables |
 
-**Unique page elements**: Gradient top bar + dark takeaway box, confidential marking + rigorous footer, MECE decomposition / driver tree / waterfall chart
-
-**Typical scenarios**: Strategic decision reports, deep analysis reports, consulting deliverables (MBB level)
-
-**Avoid**: Isolated data, subjective statements, decorative elements
+- **Page elements**: gradient top bar + dark takeaway box, confidential marking + footer, MECE / driver tree / waterfall
+- **Scenarios**: strategic decisions, deep analysis, MBB-level deliverables
+- **Avoid**: isolated data, subjective statements, decoration
 
 ---
 
 ## 3. Color Knowledge Base
 
-### Consulting Style Colors (Professional Authority)
+### Consulting Style Colors
 
-| Brand / Style | HEX | Psychological Feel |
-|---------------|-----|-------------------|
-| Deloitte Blue | `#0076A8` | Professional, reliable |
-| McKinsey Blue | `#005587` | Authoritative, deep |
-| BCG Dark Blue | `#003F6C` | Stable, trustworthy |
-| PwC Orange | `#D04A02` | Energetic, innovative |
-| EY Yellow | `#FFE600` | Optimistic, clear |
+| Brand | HEX |
+|-------|-----|
+| Deloitte Blue | `#0076A8` |
+| McKinsey Blue | `#005587` |
+| BCG Dark Blue | `#003F6C` |
+| PwC Orange | `#D04A02` |
+| EY Yellow | `#FFE600` |
 
-### General Versatile Colors (Modern Energy)
+### General Versatile Colors
 
-| Style | HEX | Suitable Scenarios |
-|-------|-----|-------------------|
-| Tech Blue | `#2196F3` | Technology, internet |
-| Vibrant Orange | `#FF9800` | Marketing, promotion |
-| Growth Green | `#4CAF50` | Health, environmental, growth |
-| Professional Purple | `#9C27B0` | Creative, premium |
-| Alert Red | `#F44336` | Urgent, important |
+| Style | HEX |
+|-------|-----|
+| Tech Blue | `#2196F3` |
+| Vibrant Orange | `#FF9800` |
+| Growth Green | `#4CAF50` |
+| Professional Purple | `#9C27B0` |
+| Alert Red | `#F44336` |
 
 ### Data Visualization Colors
 
@@ -367,7 +598,7 @@ When content outline pages involve **data visualization or infographic-style str
 
 ## 4. Layout Pattern Library
 
-> **Principle — proportion follows information weight, not preset ratios.** This is a pattern library, not a menu. Combine patterns on one page, break the grid for `breathing` pages, or propose a pattern not listed when the content calls for it. Defaulting every page to a symmetric grid is what produces the "AI-generated" look.
+> **Principle — proportion follows information weight, not preset ratios.** Combine patterns, break the grid for `breathing` pages, or propose new patterns. Defaulting every page to symmetric grid produces the "AI-generated" look.
 
 | Pattern | Suitable Scenarios | PPT 16:9 Reference Dimensions |
 |--------|-------------------|-------------------------------|
@@ -389,15 +620,13 @@ When content outline pages involve **data visualization or infographic-style str
 
 ## 5. Template Flexibility Principle
 
-> Templates are starting points, not endpoints. **The layout list is a pattern library, not a menu** — combine patterns on one page, or propose a pattern outside the list when the content demands it.
+Templates are starting points. The Strategist may adjust based on content and audience:
 
-The Strategist should make professional judgments on the template basis generated by `scripts/project_manager.py`, considering user needs, content characteristics, and audience:
-
-1. Ratio systems are adjustable (font size ratios are reference values)
-2. Color schemes are customizable (based on brand and content)
-3. Layout patterns can be combined, nested, or broken (see §4 Layout Pattern Library — 11 patterns as reference, not an exhaustive list)
-4. Content structure is extensible (12-chapter framework can be expanded or reduced)
-5. Spacing / border radius details adjusted by Executor based on content density and `page_rhythm` tag
+1. Font size ratios — reference values, adjustable
+2. Color schemes — customize per brand/content
+3. Layout patterns — combine, nest, or break (§4 lists 11 patterns as reference, not exhaustive)
+4. 12-chapter framework — expand or reduce
+5. Spacing / border radius — Executor adjusts per content density and `page_rhythm`
 
 ---
 
@@ -405,11 +634,11 @@ The Strategist should make professional judgments on the template basis generate
 
 ### 6.1 Content Planning Strategy
 
-| Style | Content Outline | Design Spec | Speaker Notes |
-|-------|----------------|-------------|---------------|
-| A) General Versatile | Intelligently deconstruct source doc; define core theme per page | Visual theme, color scheme, layout principles | Concise presentation script |
-| B) General Consulting | Structured logical sections; data-driven insights | Consulting-style colors, structured content layout | Professional terms, data interpretation, conclusion-first |
-| C) Top Consulting | SCQA framework, pyramid principle conclusion-first | Data contextualization, strategic color usage | Highly condensed, logically rigorous, conclusion-driven |
+| Style | Content Outline | Speaker Notes |
+|-------|----------------|---------------|
+| A) General Versatile | Per-page core theme from source doc | Concise script |
+| B) General Consulting | Structured sections, data-driven insights | Professional terms, conclusion-first |
+| C) Top Consulting | SCQA + pyramid principle | Highly condensed, conclusion-driven |
 
 ### 6.2 Outline Output Specification (Must include 11 chapters)
 
@@ -431,42 +660,45 @@ The Strategist should make professional judgments on the template basis generate
 1. Read reference template: `templates/design_spec_reference.md`
 2. Generate complete spec from scratch based on analysis
 3. Save to: `projects/<project_name>.../design_spec.md`
-4. **Generate execution lock**: read `templates/spec_lock_reference.md` and produce `projects/<project_name>.../spec_lock.md` — a distilled, machine-readable short form of the color / typography / icon / image / **page_rhythm** decisions above. This file is what the Executor re-reads before every page (see [executor-base.md](executor-base.md) §2.1). The values in `spec_lock.md` MUST exactly match the decisions recorded in `design_spec.md`; if they ever diverge, `spec_lock.md` wins and `design_spec.md` should be treated as historical narrative.
+4. **Generate execution lock**: read `templates/spec_lock_reference.md` and produce `projects/<project_name>.../spec_lock.md` — a distilled, machine-readable short form of the color / typography / icon / image / **page_rhythm** / **page_layouts** / **page_charts** decisions above. This file is what the Executor re-reads before every page (see [executor-base.md](executor-base.md) §2.1). The values in `spec_lock.md` MUST exactly match the decisions recorded in `design_spec.md`; if they ever diverge, `spec_lock.md` wins and `design_spec.md` should be treated as historical narrative.
    - **page_rhythm is mandatory**: Based on the page list in §IX Content Outline, assign each page one of `anchor` / `dense` / `breathing` (see `spec_lock_reference.md` for the full vocabulary). This is what breaks the uniform "every page is a card grid" feel — without it the Executor defaults all pages to `dense`.
-   - **Rhythm follows narrative, not quota**: `breathing` pages should appear at natural narrative pauses — chapter transitions, a single argument worth standalone emphasis (hero quote / big number / feature image), an SCQA "Question" bridge, or a deliberate stop after a chain of dense argumentation. If the content is genuinely a high-density data briefing or rigorous consulting analysis, the deck may legitimately be nearly all `dense` — **do NOT invent filler pages** ("Thank you", "Chapter divider with no content") to pad the rhythm, because filler is itself a hallmark AI-generated pattern. Validation test: every `breathing` page must answer "what independent thing is this page saying?" — if it can't, it shouldn't exist.
+   - **Rhythm follows narrative, not quota**: `breathing` pages mark natural pauses — chapter transitions, standalone emphasis (hero quote / big number), SCQA bridges. Dense decks may legitimately be all `dense`. **Do NOT invent filler pages** ("Thank you", empty dividers) to pad rhythm — every `breathing` page must say something independent.
+   - **page_layouts (write only when a template is in use)**: For each page that inherits a template SVG, add `P<NN>: <svg_basename>` (e.g., `P04: 03a_content_image_text`). Pages designed freely get **no entry** — Executor reads the absence as "free design, no inheritance". If zero pages use a template, omit the section entirely.
+   - **page_charts (write only for chart pages that match a catalog template)**: For each page in `design_spec.md §VII` whose `reference template path` points to `templates/charts/<name>.svg`, add `P<NN>: <chart_name>`. Pages with `no-template-match` in §VII MUST NOT appear here (Executor would look for a non-existent reference). If the deck has no data-visualization pages, omit the section.
+   - **Hard rule**: Use both `page_layouts` and `page_charts` for the same page only when the layout template is a compatible shell for the chart. Do not pair chart pages with conflicting page layouts (e.g., `waterfall_chart` + timeline layout, KPI cards + circle-diagram layout). If no compatible layout exists, omit the page from `page_layouts`.
 
 ---
 
 ## 7. Project Folder
 
-The project folder should be created before entering the Strategist role. If not yet created, execute:
+Project folder must exist before Strategist runs. If not, execute:
 
 ```bash
 python3 scripts/project_manager.py init <project_name> --format <canvas_format>
 ```
 
-The Strategist saves the Design Specification & Content Outline to `projects/<project_name>_<format>_<YYYYMMDD>/design_spec.md`.
+Save outputs to `projects/<project_name>_<format>_<YYYYMMDD>/design_spec.md`.
 
 ---
 
 ## 8. Complete Design Spec and Prompt Next Steps
 
-After writing `design_spec.md` **and** `spec_lock.md`, provide the next-step prompt based on the confirmed template option and image usage selection. This prompt is a workflow handoff instruction, not a section inside `design_spec.md`.
+After writing `design_spec.md` and `spec_lock.md`, output the next-step prompt below. This is a handoff instruction, not part of `design_spec.md`. Pick the variant by whether Step 3 copied a template into `<project_path>/templates/`.
 
-### Template Option A (Using existing template)
+### Template mode (template applied in Step 3)
 
 ```
 ✅ Design spec complete. Template ready.
 Next step:
 - Images include AI generation → Invoke Image_Generator
-- Images do not include AI generation → Invoke Executor
+- Otherwise → Invoke Executor
 ```
 
-### Template Option B (No template)
+### Free design (default, no template)
 
 ```
 ✅ Design spec complete.
 Next step:
 - Images include AI generation → Invoke Image_Generator
-- Images do not include AI generation → Invoke Executor (free design for every page)
+- Otherwise → Invoke Executor (free design for every page)
 ```

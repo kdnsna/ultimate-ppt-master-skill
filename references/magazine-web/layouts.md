@@ -18,13 +18,30 @@ layouts.md 使用的所有类（`h-hero` / `h-xl` / `h-sub` / `h-md` / `lead` / 
 
 | 场景 | 推荐比例 | 写法 |
 |------|---------|------|
-| 左文右图 主图 | 16:10 或 4:3 | `aspect-ratio:16/10; max-height:54vh` |
-| 图片网格（多图对比） | 统一 | **固定 `height:26vh`，不用 aspect-ratio** |
-| 左小图 + 右文字 | 1:1 或 3:2 | `aspect-ratio:1/1; max-width:40vw` |
-| 全屏主视觉 | 16:9 | `aspect-ratio:16/9; max-height:64vh` |
-| 图文混排小插图 | 3:2 | `aspect-ratio:3/2; max-width:30vw` |
+| 左文右图 主图 | 16:10 或 4:3 | `.frame-img.r-16x10` 或 `.frame-img.r-4x3` |
+| 图片网格（多图对比） | 统一 | `.frame-img.h-22` / `.frame-img.h-26`，不用 aspect-ratio |
+| 小型面板组 | 统一 | `.frame-img.h-16` / `.frame-img.h-18`，同组必须同高 |
+| 左小图 + 右文字 | 1:1 或 3:2 | `.frame-img.r-1x1` 或 `.frame-img.r-3x2` |
+| 全屏主视觉 | 16:9 | `.frame-img.r-16x9` |
+| 信息图 / 截图再设计 | 16:9 或 16:10 | `.frame-img.r-16x9.fit-contain` 或 `.frame-img.r-16x10.fit-contain` |
+| 图文混排小插图 | 3:2 或 3:4 | `.frame-img.r-3x2` 或 `.frame-img.r-3x4` |
 
-图片必须包在 `<figure class="frame-img">` 里，里面的 `<img>` 会自动 `object-fit:cover + object-position:top center`，只裁底部，不裁顶/左/右。
+图片必须包在 `<figure class="frame-img">` 里。默认照片会 `object-fit:cover + object-position:top center`,只裁底部,不裁顶/左/右。信息图和截图再设计必须加 `.fit-contain`,避免文字或标注被裁切。
+
+### B2. 图片与内容的垂直对齐
+
+图片应该跟正文内容区对齐,不要默认贴到大标题顶端。特别是左文右图和图文混排页:
+
+- 如果左列是 kicker + 大标题 + 正文 + callout,右列图片通常从正文高度开始,可给图片加 `style="margin-top:7vh"` 到 `9vh`
+- 如果图片是信息图或 UI 情景图,优先对齐正文首行或说明文字,不要和超大标题顶端齐平
+- 如果一张截图/UI 情景图在横向页面里变成很长的条,不要硬拉满宽;改成极宽横图素材,或拆成 2-3 个局部面板拼排
+- 多图面板必须使用同一个高度类,不要混用 `h-16` / `h-22` 或手写不同 `height`
+
+### B3. 标题与正文的间距
+
+- 两段式页面(顶部标题 + 下方长正文/引用/图表)必须在标题和内容之间留出明显间距,推荐 `margin-top:6vh` 到 `8vh`
+- 居中大标题页必须让主标题在页面水平居中,使用 `.center` 或 `text-align:center; margin-inline:auto`
+- 复杂内容页(大标题 + 小标题 + 详细内容)要让大标题和下方内容分层,下方内容使用左右两端对齐的 grid 或 rowline,不要全部堆在一条中轴线上
 
 ### C. 图片定位准则（避免图片堆到页面最底部、被浏览器工具栏遮挡）
 
@@ -293,7 +310,7 @@ layouts.md 使用的所有类（`h-hero` / `h-xl` / `h-sub` / `h-md` / `lead` / 
       </div>
     </div>
     <!-- 右列：图片用标准 16/10 比例 + max-height，不要 align-self:end -->
-    <figure class="frame-img" style="aspect-ratio:16/10; max-height:56vh" data-anim>
+    <figure class="frame-img r-16x10" data-anim>
       <img src="images/codepilot.png" alt="CodePilot 产品截图">
       <figcaption class="img-cap">CodePilot · 产品截图</figcaption>
     </figure>
@@ -309,7 +326,7 @@ layouts.md 使用的所有类（`h-hero` / `h-xl` / `h-sub` / `h-md` / `lead` / 
 - 用 `grid-2-7-5`（左 7 份、右 5 份），`align-items:start` 已在 template 预设
 - **左列**用 flex column + `justify-content:space-between`：标题贴顶，callout 自然贴底
 - **右列图片** **不要加 `align-self:end`**。会让图片滑到 cell 底部，低分屏下被浏览器工具栏遮挡
-- 图片必须用 **标准比例 16/10 或 4/3 + `max-height:56vh`**，不要用原图奇葩比例（`2592/1798` 这种）
+- 图片必须用 **标准比例类 `.r-16x10` 或 `.r-4x3`**，不要用原图奇葩比例（`2592/1798` 这种）
 
 ---
 
@@ -599,7 +616,7 @@ layouts.md 使用的所有类（`h-hero` / `h-xl` / `h-sub` / `h-md` / `lead` / 
       </div>
     </div>
     <!-- 右列:辅助图 · 竖版或方形 -->
-    <figure class="frame-img" style="aspect-ratio:3/4; max-height:60vh" data-anim>
+    <figure class="frame-img r-3x4" data-anim>
       <img src="images/figma.png" alt="Figma design system">
       <figcaption class="img-cap">Figma · Design System</figcaption>
     </figure>

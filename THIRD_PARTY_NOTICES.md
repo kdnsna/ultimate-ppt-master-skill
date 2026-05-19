@@ -7,11 +7,11 @@
 - Source: https://github.com/hugohe3/ppt-master
 - Copyright: Copyright (c) 2025-2026 Hugo He
 - License: MIT
-- Used for: editable PPTX workflow, SVG-to-PPTX scripts, layouts, charts, icons, and role references.
+- Used for: editable PPTX workflow, SVG-to-PPTX scripts, live preview/animation/narration helpers, layouts, charts, icons, and role references.
 
 ## guizang-ppt-skill
 
 - Source: https://github.com/op7418/guizang-ppt-skill
 - Copyright: Copyright (c) 2026 op7418 (歸藏)
 - License: MIT
-- Used for: magazine-style single-file HTML deck workflow, template, Motion One local fallback, themes, layouts, components, and checklist.
+- Used for: magazine-style single-file HTML deck workflow, editorial and Swiss templates, Motion One local fallback, themes, layouts, screenshot backgrounds, components, validators, and checklist.

@@ -15,7 +15,7 @@ For a generic request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "m
    Best for formal reports, consulting/business decks, training material, and files that others must edit later. Output is a .pptx with editable text, shapes, charts, and slide elements.
 
 2. Magazine-style web deck (HTML)
-   Best for talks, launches, demo days, personal keynotes, and highly visual presentations. Output is a single index.html with horizontal navigation, WebGL background, editorial magazine / e-ink visual style, and motion.
+   Best for talks, launches, demo days, personal keynotes, and highly visual presentations. Output is a single index.html with horizontal navigation, WebGL background, editorial magazine / e-ink visual style, and motion. The original editorial/e-ink style is the default; Swiss Style is available when the user asks for Swiss, grid, Helvetica, product, data, or engineering presentation aesthetics.
 
 Do not start conversion, outline writing, slide generation, or project creation until the user chooses a mode, unless the user already made the mode explicit.
 
@@ -23,6 +23,7 @@ For editable PPTX mode, follow SKILL_DIR/SKILL.md "Mode 1: Editable PPTX Workflo
 For magazine web deck mode, follow SKILL_DIR/SKILL.md "Mode 2: Magazine Web Deck Workflow".
 
 Use Python 3.10+ for scripts. Prefer SKILL_DIR/.venv/bin/python if available.
+Node.js is only needed for Swiss Style web deck validation with scripts/validate-swiss-deck.mjs.
 Load references progressively: only read the files needed for the selected mode.
 ```
 

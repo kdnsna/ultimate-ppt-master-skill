@@ -1,247 +1,241 @@
-# 终极融合PPT大师
+# Ultimate PPT Master
 
-**中文** | [English](#english)
+> From source documents to editable PowerPoint decks and cinematic web presentations.
 
-终极融合PPT大师是一个跨 Agent 的演示文稿生成技能包。它支持 Codex、Claude Code、OpenClaw、Hermes，以及其他能读取 Markdown 指令并运行本地脚本的 AI 编程助手。
+![Ultimate PPT Master hero](assets/readme/hero.svg)
 
-当用户说“做一个 PPT”时，它会先帮你选择要做哪种 PPT：适合正式交付的**可编辑 PowerPoint `.pptx`**，或适合演讲分享的**杂志风网页 PPT `index.html`**。
+<p align="center">
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill"><img alt="GitHub Repo" src="https://img.shields.io/badge/GitHub-ultimate--ppt--master--skill-111827?style=for-the-badge&logo=github"></a>
+  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-C8A24A?style=for-the-badge">
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
+  <img alt="PowerPoint" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
+  <img alt="HTML Decks" src="https://img.shields.io/badge/Output-Magazine%20HTML-111827?style=for-the-badge">
+</p>
 
-这个仓库基于 Hugo He 的开源项目 [ppt-master](https://github.com/hugohe3/ppt-master) 和 op7418 的 [guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill) 整理融合而来，保留核心工作流、脚本、模板和 MIT 许可署名，并增加了适合 Codex 直接安装和复用的开源包装。
+Most AI presentation tools can make slides look plausible. The problem starts five minutes later: the deck is a screenshot, the layout is locked, the brand system is gone, and the user still has to rebuild the parts that matter.
 
-## 亮点
+Ultimate PPT Master is built for that moment. It is a portable agent skill for Codex, Claude Code, OpenClaw, Hermes, Cursor-style IDEs, and other coding agents. It turns real source material into two production-grade outputs:
 
-- **先选风格**：用户泛泛说“做个 PPT”时，先解释两种输出的区别，再让用户选择。
-- **跨 Agent 可用**：提供 `SKILL.md`、`AGENTS.md`、`CLAUDE.md`、`PROMPT.md`，适配 Codex、Claude Code、OpenClaw、Hermes 和通用 AI IDE。
-- **可编辑 PPTX**：输出真实 PowerPoint 元素，而不是整页截图，适合正式汇报、咨询报告、培训课件。
-- **杂志风网页 PPT**：输出单文件 HTML 横向翻页 deck，电子杂志/电子墨水视觉，适合线下分享、发布会、demo day。
-- **多源输入**：支持 PDF、DOCX、PPTX、网页、Markdown 和直接粘贴的文本。
-- **设计工作流**：包含策略规划、设计规格锁定、页面生成、质量检查和导出步骤。
-- **模板资源**：内置布局、图表、图标和多种专业演示风格参考。
-- **本地优先**：材料处理和文件生成主要在本地完成。
+- **Editable PowerPoint (`.pptx`)** with native text boxes, shapes, charts, speaker notes, animations, and optional narration.
+- **Magazine-style web decks (`index.html`)** for launches, talks, internal sharing, demo days, and visual storytelling.
 
-## 两种输出模式
-
-| 模式 | 输出 | 适合 | 特点 |
-|---|---|---|---|
-| 可编辑 PowerPoint | `.pptx` | 正式汇报、商业/咨询报告、培训课件、需要交给别人继续改 | PowerPoint 里可编辑文字、形状和图表 |
-| 杂志风网页 PPT | `index.html` | 线下分享、产品发布、个人演讲、demo day、强视觉展示 | 横向翻页、WebGL 背景、电子杂志风、动效更强 |
-
-## 安装
-
-完整多平台安装说明见 [INSTALL.md](./INSTALL.md)。
-
-| 平台 / 工具 | 推荐入口 |
-|---|---|
-| Codex | `~/.codex/skills/ultimate-ppt-master` |
-| Claude Code | `~/.claude/skills/ultimate-ppt-master` |
-| OpenClaw / Hermes | 克隆仓库后在规则或技能配置中引用 `AGENTS.md` / `SKILL.md` |
-| Cursor / Cline / Roo Code / Windsurf 等 AI IDE | 克隆到项目或全局目录，把 `AGENTS.md` / `PROMPT.md` 加入项目规则 |
-| 不支持 skill 目录的工具 | 复制 `PROMPT.md` 到 system prompt / project rules / custom instructions |
-
-Codex 快速安装：
-
-```bash
-git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
-```
-
-安装 Python 依赖：
-
-```bash
-cd ~/.codex/skills/ultimate-ppt-master
-python3.10 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r requirements.txt
-```
-
-macOS 上如果需要兼容导出 PNG 后备图，建议安装 Cairo：
-
-```bash
-brew install cairo pkg-config
-```
-
-重启对应 Agent 工具后即可使用。
-
-## 使用方式
-
-在 Codex 里直接说：
-
-```text
-使用 $ultimate-ppt-master 帮我把 reports/q3-report.pdf 做成 10 页中文 PPT。
-```
-
-终极融合PPT大师会先问你选哪一种：
-
-```text
-1. 可编辑 PowerPoint（PPTX）
-2. 杂志风网页 PPT（HTML）
-```
-
-你也可以直接指定：
-
-```text
-Use $ultimate-ppt-master to create an editable 16:9 PPTX from this Markdown file.
-```
-
-```text
-使用 $ultimate-ppt-master 做一份杂志风网页 PPT，用于 20 分钟线下分享。
-```
-
-可编辑 PPTX 模式会按以下主流程执行：
-
-1. 转换或读取源材料。
-2. 创建项目目录。
-3. 确认画布、页数、受众、风格、配色、字体、图标和图片策略。
-4. 生成 `design_spec.md` 和 `spec_lock.md`。
-5. 按页生成 SVG。
-6. 后处理、质量检查并导出 PPTX。
-
-杂志风网页 PPT 模式会按以下主流程执行：
-
-1. 澄清受众、时长、素材、图片、主题和硬约束。
-2. 复制 `assets/magazine-web/template.html` 到项目目录。
-3. 从 5 套主题和 10 种布局骨架中选择。
-4. 填充单文件 HTML deck。
-5. 对照 `references/magazine-web/checklist.md` 自检。
-6. 直接在浏览器打开 `index.html` 预览和迭代。
-
-## 重要目录
-
-- `SKILL.md`：Codex skill 主工作流。
-- `AGENTS.md`：OpenClaw、Hermes、Codex CLI、通用 Agent 工具入口。
-- `CLAUDE.md`：Claude Code / 类 Claude Code 工具入口。
-- `PROMPT.md`：无原生 skill 目录工具的复制粘贴提示。
-- `INSTALL.md`：多平台安装指南。
-- `scripts/`：源材料转换、项目管理、SVG 检查、SVG 转 PPTX 等脚本。
-- `assets/magazine-web/`：杂志风网页 PPT 的 HTML 模板和本地动效兜底。
-- `templates/`：布局、图表、图标和设计规格模板。
-- `references/`：策略师、执行器、图片生成和共享标准等角色说明。
-- `references/magazine-web/`：杂志风网页 PPT 的主题、布局、组件和检查清单。
-- `workflows/`：独立扩展工作流，例如创建新模板。
-
-## 致谢与许可
-
-终极融合PPT大师基于 [ppt-master](https://github.com/hugohe3/ppt-master) 和 [guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill) 整理融合。原作者分别为 Hugo He 和 op7418（歸藏）。原项目和本仓库均采用 MIT License。使用、修改或分发时请保留版权和许可声明，详见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
+The goal is not "one prompt to random slides." The goal is a repeatable presentation workflow that respects source material, locks a design spec, generates page by page, previews visually, verifies output, and exports something people can actually use.
 
 ---
 
-## English
+## Why This Gets Stars
 
-**Ultimate Fusion PPT Master** is a cross-agent presentation-generation skill package. It works with Codex, Claude Code, OpenClaw, Hermes, and other AI coding assistants that can read Markdown instructions and run local scripts.
+GitHub users tend to reward presentation tools that solve a real workflow problem, not just a pretty demo. Recent open-source presentation projects show the same demand pattern:
 
-For generic PPT requests, it first helps the user choose between an editable PowerPoint `.pptx` deck and an editorial magazine-style web deck (`index.html`).
+| What users want | Why it matters | How Ultimate PPT Master answers |
+|---|---|---|
+| **Editable output** | Teams must revise decks in PowerPoint after AI generation | Native PPTX export, not flattened slide screenshots |
+| **Source-grounded generation** | Real decks start from reports, docs, spreadsheets, URLs, and old slides | PDF, DOCX, XLSX, PPTX, URL, Markdown, pasted text |
+| **No SaaS lock-in** | Developers want control over files, models, and workflow | Local-first skill package; agent runs scripts on your machine |
+| **Design quality** | A usable deck needs rhythm, hierarchy, whitespace, and a clear visual system | Strategy phase, spec lock, professional templates, chart library |
+| **Iteration after generation** | First drafts need visual corrections | Live preview, annotations, quality checks, chart calibration |
+| **Multiple presentation surfaces** | A client handoff and a keynote are different products | Editable PPTX plus editorial and Swiss Style web decks |
 
-This repository combines Hugo He's open-source [ppt-master](https://github.com/hugohe3/ppt-master) with op7418's [guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill). It preserves the original workflows, scripts, templates, and MIT attribution, while adding a Codex-ready open-source wrapper.
+Reference landscape: [ppt-master](https://github.com/hugohe3/ppt-master), [Presenton](https://github.com/presenton/presenton), [Slidev](https://github.com/slidevjs/slidev), [Marp](https://github.com/marp-team/marp), [reveal.js](https://github.com/hakimel/reveal.js), and [banana-slides](https://github.com/Anionex/banana-slides) all point to the same market: people want faster presentation creation, but they still need control, editability, and taste.
 
-## Highlights
+---
 
-- **Style chooser first**: For generic "make a PPT" requests, Ultimate Fusion PPT Master explains both output modes before generating.
-- **Cross-agent friendly**: Ships `SKILL.md`, `AGENTS.md`, `CLAUDE.md`, and `PROMPT.md` for Codex, Claude Code, OpenClaw, Hermes, and generic AI IDEs.
-- **Editable PPTX output**: Generates real PowerPoint elements instead of slide screenshots, ideal for formal reports, consulting decks, and training material.
-- **Magazine-style web decks**: Generates a single-file horizontal-swipe HTML deck with an editorial/e-ink aesthetic, ideal for talks, launches, and demo days.
-- **Multi-source input**: Supports PDF, DOCX, PPTX, web pages, Markdown, and pasted text.
-- **Structured design workflow**: Covers strategy, design spec locking, page generation, quality checks, and export.
-- **Built-in resources**: Includes layouts, charts, icons, and professional presentation references.
-- **Local-first pipeline**: Source processing and file generation primarily run on your machine.
+## Two Engines, One Workflow
 
-## Output Modes
+![Ultimate PPT Master workflow](assets/readme/workflow.svg)
 
-| Mode | Output | Best for | Traits |
-|---|---|---|---|
-| Editable PowerPoint | `.pptx` | formal reporting, business/consulting decks, training decks, files others need to edit | editable text, shapes, and charts in PowerPoint |
-| Magazine Web Deck | `index.html` | talks, launches, personal keynotes, demo days, visual showcases | horizontal swipe navigation, WebGL background, editorial style, stronger motion |
+### 1. Editable PowerPoint Engine
 
-## Installation
+Use this when the deck needs to be delivered, reviewed, or modified by other people.
 
-See [INSTALL.md](./INSTALL.md) for the full multi-platform guide.
+- Real PowerPoint elements: text boxes, shapes, tables, charts, and media.
+- Source conversion from PDF, DOCX, XLSX, PPTX, URL, Markdown, and pasted text.
+- Strategy phase that locks audience, page count, style, color, typography, image policy, and page rhythm.
+- Sequential SVG authoring with `spec_lock.md` re-read before each page.
+- Live browser preview with element-level annotations.
+- Quality checker before export.
+- Optional transitions, per-element animations, speaker notes, recorded narration, and chart coordinate verification.
 
-| Platform / Tool | Recommended entry |
-|---|---|
-| Codex | `~/.codex/skills/ultimate-ppt-master` |
-| Claude Code | `~/.claude/skills/ultimate-ppt-master` |
-| OpenClaw / Hermes | Clone the repo and reference `AGENTS.md` / `SKILL.md` in rules or skill config |
-| Cursor / Cline / Roo Code / Windsurf-style AI IDEs | Clone into a project/global folder and include `AGENTS.md` / `PROMPT.md` in project rules |
-| Tools without native skills | Paste `PROMPT.md` into system prompt / project rules / custom instructions |
+### 2. Magazine Web Deck Engine
 
-Quick Codex install:
+Use this when the presentation itself is the experience: demo day, keynote, private sharing, product launch, industry talk, or a visually memorable internal readout.
+
+- Single-file `index.html` deck.
+- Horizontal navigation with keyboard, wheel, and touch support.
+- WebGL visual runtime and local motion fallback.
+- Style A: **Editorial Magazine x E-ink** for narrative, culture, industry, and human-centered talks.
+- Style B: **Swiss Style** for product, engineering, data, system diagrams, and information design.
+- Built-in screenshot framing, image prompt references, theme rules, layout skeletons, and QA checklist.
+
+![Ultimate PPT Master style matrix](assets/readme/style-matrix.svg)
+
+---
+
+## What Makes It Different
+
+| Category | Typical result | Ultimate PPT Master |
+|---|---|---|
+| Image-based AI slide tools | Pretty but hard to edit | Native editable PPTX path |
+| Template-only generators | Fast but rigid | Free design plus reusable template workflows |
+| Markdown slide tools | Great for developers, less natural for business handoff | PPTX for handoff, HTML for performance |
+| SaaS presentation tools | Convenient but locked into a platform | Local-first scripts and portable skill files |
+| One-shot prompt generators | Fast first draft, weak control | Strategy, spec lock, live preview, verification |
+
+This project combines the proven editable PPTX workflow of [Hugo He's ppt-master](https://github.com/hugohe3/ppt-master) with the polished HTML deck aesthetics of [op7418's guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill), then wraps them into a cross-agent package that is easier to install, reuse, and extend.
+
+---
+
+## Visual Directions Included
+
+Ultimate PPT Master is opinionated about taste. It tries to protect the deck from the two common AI failure modes: random decoration and monotonous corporate templates.
+
+| Direction | Best for | Design language |
+|---|---|---|
+| **Consulting / executive PPTX** | board updates, strategy, business analysis | clean hierarchy, action titles, charts, restrained color |
+| **Academic / institutional PPTX** | defense, research, technical teaching | clear sections, formal typography, evidence-first structure |
+| **Data and AI ops PPTX** | architecture, metrics, systems, workflows | dense but organized charts, diagrams, grids |
+| **Editorial web deck** | talks, product stories, industry essays | serif headlines, e-ink texture, magazine rhythm |
+| **Swiss web deck** | product launches, engineering, data reports | modular grid, sharp contrast, Helvetica-like discipline |
+
+---
+
+## Quick Start
+
+### 1. Install
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
-```
-
-Install Python dependencies:
-
-```bash
 cd ~/.codex/skills/ultimate-ppt-master
 python3.10 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
-On macOS, install Cairo if you want robust PNG fallback generation for PowerPoint compatibility:
+For robust PPTX compatibility on macOS, install Cairo:
 
 ```bash
 brew install cairo pkg-config
 ```
 
-Restart your agent tool after installation.
+Node.js is only needed for Swiss Style web deck validation:
 
-## Usage
-
-Ask Codex:
-
-```text
-Use $ultimate-ppt-master to create a 10-slide editable PPTX from reports/q3-report.pdf.
+```bash
+node scripts/validate-swiss-deck.mjs path/to/index.html
 ```
 
-For generic PPT requests, Ultimate Fusion PPT Master first asks you to choose:
+### 2. Ask Your Agent
 
 ```text
-1. Editable PowerPoint (PPTX)
-2. Magazine-style web deck (HTML)
-```
-
-You can also specify the mode directly:
-
-```text
-使用 $ultimate-ppt-master 帮我把这篇 Markdown 做成 16:9 演示文稿。
+Use $ultimate-ppt-master to turn reports/q3-review.pdf into a 12-slide editable PPTX for an executive meeting.
 ```
 
 ```text
-Use $ultimate-ppt-master to make a magazine-style web deck for a 20-minute talk.
+使用 $ultimate-ppt-master 把这个 Markdown 做成一份杂志风网页 PPT，用于 20 分钟线下分享。
 ```
 
-Editable PPTX mode follows this pipeline:
+```text
+Use $ultimate-ppt-master to create a Swiss Style web deck from this product launch outline.
+```
 
-1. Convert or read source material.
-2. Create a project directory.
-3. Confirm canvas, page count, audience, style, colors, typography, icons, and image strategy.
-4. Generate `design_spec.md` and `spec_lock.md`.
-5. Generate SVG pages sequentially.
-6. Post-process, quality-check, and export to PPTX.
+For generic requests like "make a PPT", the skill first asks you to choose:
 
-Magazine Web Deck mode follows this pipeline:
+1. **Editable PowerPoint (`.pptx`)** for formal reports, consulting decks, training, and handoff.
+2. **Magazine Web Deck (`index.html`)** for talks, launches, demo days, and highly visual presentations.
 
-1. Clarify audience, duration, source material, images, theme, and constraints.
-2. Copy `assets/magazine-web/template.html` into the project.
-3. Pick from five themes and ten layout skeletons.
-4. Fill a single-file HTML deck.
-5. Check against `references/magazine-web/checklist.md`.
-6. Open `index.html` directly in the browser for preview and iteration.
+---
 
-## Repository Layout
+## Supported Inputs and Outputs
 
-- `SKILL.md`: Main Codex skill workflow.
-- `AGENTS.md`: Entry file for OpenClaw, Hermes, Codex CLI, and generic agent tools.
-- `CLAUDE.md`: Entry file for Claude Code and Claude Code-like tools.
-- `PROMPT.md`: Copy-paste prompt for tools without native skill directories.
-- `INSTALL.md`: Multi-platform installation guide.
-- `scripts/`: Source conversion, project management, SVG checks, and SVG-to-PPTX export.
-- `assets/magazine-web/`: HTML template and local motion fallback for magazine-style web decks.
-- `templates/`: Layout, chart, icon, and design-spec templates.
-- `references/`: Strategist, executor, image-generation, and shared-standard references.
-- `references/magazine-web/`: Themes, layouts, components, and checklist for magazine-style web decks.
-- `workflows/`: Standalone extensions such as template creation.
+| Input | Editable PPTX | Web Deck |
+|---|---:|---:|
+| PDF | yes | use converted Markdown |
+| DOCX / Word | yes | use converted Markdown |
+| XLSX / Excel | yes | use converted Markdown |
+| Existing PPTX | yes | use converted Markdown / template reference |
+| URL / web page | yes | use converted Markdown |
+| Markdown | yes | yes |
+| Pasted notes or outline | yes | yes |
 
-## Credits and License
+| Output | Use when | Notes |
+|---|---|---|
+| `.pptx` | business handoff, formal reporting, client review | native PowerPoint elements where supported |
+| `.pptx` with animations | presenter-paced or self-running deck | transitions and object entrance effects |
+| `.pptx` with narration | video export or asynchronous delivery | generated from speaker notes |
+| `index.html` | keynote, demo day, visual storytelling | single-file web deck |
 
-Ultimate Fusion PPT Master combines [ppt-master](https://github.com/hugohe3/ppt-master), created by Hugo He, and [guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill), created by op7418 (歸藏). The original projects and this repository are released under the MIT License. Keep the copyright and license notices when using, modifying, or redistributing the software. See [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+---
+
+## Repository Map
+
+| Path | Purpose |
+|---|---|
+| `SKILL.md` | Main workflow entry for Codex and compatible agents |
+| `AGENTS.md` | Portable entry for agentic coding tools |
+| `CLAUDE.md` | Claude Code entry |
+| `PROMPT.md` | Copy-paste prompt for tools without native skill directories |
+| `scripts/` | Source conversion, project setup, preview, validation, PPTX export, image/audio helpers |
+| `templates/` | PPTX layout templates, chart templates, icon library, spec references |
+| `assets/magazine-web/` | Editorial and Swiss HTML deck templates, motion runtime, screenshot backgrounds |
+| `references/` | Strategy, execution, image generation, shared standards, magazine web references |
+| `workflows/` | Optional workflows: create template, live preview, chart verification, animation, narration |
+| `UPSTREAM_SYNC.md` | Current upstream baseline and fusion adaptation policy |
+
+---
+
+## Built On Proven Open Source
+
+Ultimate PPT Master is a fusion package built on two MIT-licensed foundations:
+
+- [ppt-master](https://github.com/hugohe3/ppt-master) by Hugo He: editable PPTX workflow, SVG-to-PPTX export, templates, charts, role references, live preview, animation, narration, and quality tooling.
+- [guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill) by op7418: magazine-style HTML deck workflow, editorial and Swiss templates, themes, layouts, screenshot treatment, and web deck QA.
+
+This repository keeps the upstream copyright and license notices in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) and records sync baselines in [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md).
+
+---
+
+## 中文简介
+
+终极融合PPT大师是一个跨 Agent 的演示文稿生成技能包。它不是简单的“一句话生成 PPT”，而是把真实材料转成可交付演示文稿的完整工作流。
+
+它支持两种输出：
+
+1. **可编辑 PowerPoint (`.pptx`)**
+   适合正式汇报、咨询报告、培训课件、客户交付和需要继续修改的材料。重点是可编辑、可验证、可交付。
+
+2. **杂志风网页 PPT (`index.html`)**
+   适合线下分享、发布会、demo day、个人演讲和强视觉展示。默认是“电子杂志 × 电子墨水”风格，也可以选择“瑞士国际主义 / Swiss Style”信息设计风格。
+
+为什么值得用：
+
+- 支持 PDF、DOCX、XLSX、PPTX、URL、Markdown 和直接粘贴文本。
+- 先做策略和设计锁定，再逐页生成，避免 AI 随机发挥。
+- PPTX 路线输出真实 PowerPoint 元素，不是整页截图。
+- Web 路线输出单文件 HTML，适合演讲和传播。
+- 本地优先，适配 Codex、Claude Code、OpenClaw、Hermes、Cursor 类 IDE 和通用 Agent 工具。
+
+快速安装：
+
+```bash
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
+cd ~/.codex/skills/ultimate-ppt-master
+python3.10 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+然后在 Codex 里说：
+
+```text
+使用 $ultimate-ppt-master 帮我把 reports/q3-review.pdf 做成 12 页可编辑 PPTX。
+```
+
+或者：
+
+```text
+使用 $ultimate-ppt-master 做一份 Swiss Style 网页 PPT，用于产品发布演讲。
+```
+
+---
+
+## License
+
+MIT. See [LICENSE](./LICENSE) and [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).

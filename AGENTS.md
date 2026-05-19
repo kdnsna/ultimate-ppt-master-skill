@@ -16,13 +16,13 @@ Use this skill when the user asks to create, rewrite, convert, or polish a PPT, 
 For generic requests like “做一个 PPT” or “make a deck”, first show the two output modes and wait for the user to choose:
 
 1. Editable PowerPoint (`.pptx`)
-2. Magazine-style web deck (`index.html`)
+2. Magazine-style web deck (`index.html`; default editorial/e-ink style, optional Swiss Style)
 
 Do not start conversion or generation before the user chooses a mode unless the user already made the mode explicit.
 
 ## Runtime
 
-Use Python 3.10+ for scripts. If a local `.venv` exists, prefer `.venv/bin/python`; otherwise create one and install `requirements.txt`.
+Use Python 3.10+ for scripts. If a local `.venv` exists, prefer `.venv/bin/python`; otherwise create one and install `requirements.txt`. Node.js is only needed when validating Swiss Style web decks with `scripts/validate-swiss-deck.mjs`.
 
 For macOS PPTX compatibility output, Cairo may be required:
 

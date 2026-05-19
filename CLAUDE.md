@@ -7,7 +7,7 @@ This repository is a portable Agent Skill package. When Claude Code sees this fi
 - Trigger on PPT / PowerPoint / deck / slides / presentation / 演示文稿 / 幻灯片 requests.
 - For generic “make a PPT” requests, ask the user to choose:
   1. Editable PowerPoint (`.pptx`)
-  2. Magazine-style web deck (`index.html`)
+  2. Magazine-style web deck (`index.html`; default editorial/e-ink style, optional Swiss Style)
 - Do not generate slides before the user chooses a mode, unless the mode is already explicit.
 - Keep source files, generated projects, and exported decks inside the user’s workspace unless the user specifies another location.
 
@@ -16,7 +16,7 @@ This repository is a portable Agent Skill package. When Claude Code sees this fi
 Read `SKILL.md` first. Load extra files only as needed:
 
 - Editable PPTX mode: `references/`, `templates/`, `scripts/`
-- Magazine web deck mode: `assets/magazine-web/`, `references/magazine-web/`
+- Magazine web deck mode: `assets/magazine-web/`, `references/magazine-web/`, and `scripts/validate-swiss-deck.mjs` for Swiss Style decks
 
 ## Installation
 
