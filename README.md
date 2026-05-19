@@ -41,6 +41,7 @@ Version 2.0.0 is the fusion release: it syncs the latest upstream work from the 
 | **Magazine web deck upgrades** | Kept the original Editorial Magazine x E-ink style as the default, and added an optional Swiss Style engine for data, product, and engineering presentations. |
 | **Image workflow expansion** | Added image search references, multi-provider image-generation guidance, prompt templates, palette references, rendering references, and layout patterns. |
 | **README and growth package** | Rebuilt the GitHub homepage with product positioning, visual diagrams, bilingual entry points, and a clearer explanation of why the project is useful. |
+| **Multi-agent install guide** | Added setup paths for Codex, Claude Code, OpenClaw, Hermes, generic agent tools, and prompt-only environments. |
 
 See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for the exact upstream baselines and adaptation policy.
 
@@ -124,7 +125,7 @@ Ultimate PPT Master is opinionated about taste. It tries to protect the deck fro
 
 ## Quick Start
 
-### 1. Install
+### 1. Install for Codex
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
@@ -132,6 +133,48 @@ cd ~/.codex/skills/ultimate-ppt-master
 python3.10 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
+```
+
+Then ask Codex:
+
+```text
+Use $ultimate-ppt-master to turn reports/q3-review.pdf into a 12-slide editable PPTX for an executive meeting.
+```
+
+### 2. Install for Claude Code, OpenClaw, Hermes, and Generic Agents
+
+Ultimate PPT Master is designed to be portable. It works best with agents that can read local files, run shell commands, and write output files. The repository includes multiple entry files so different tools can load the same workflow without needing a custom plugin.
+
+| Agent / Tool | Recommended setup | How to invoke it |
+|---|---|---|
+| **Codex** | Clone to `~/.codex/skills/ultimate-ppt-master` | `Use $ultimate-ppt-master ...` |
+| **Claude Code** | Clone to `~/.claude/skills/ultimate-ppt-master` or any project-readable path | Ask Claude to read `CLAUDE.md` before generating slides |
+| **OpenClaw** | Clone to a stable local path such as `~/agent-skills/ultimate-ppt-master` | Ask the agent to read `AGENTS.md` and follow the `ultimate-ppt-master` workflow |
+| **Hermes** | Clone to a stable local path such as `~/agent-skills/ultimate-ppt-master` | Ask Hermes to read `AGENTS.md`; set the skill directory as `SKILL_DIR` when running scripts |
+| **Any prompt-only agent** | No native skill directory needed | Paste or attach `PROMPT.md`, then provide your source material |
+
+Generic install path:
+
+```bash
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/agent-skills/ultimate-ppt-master
+cd ~/agent-skills/ultimate-ppt-master
+python3.10 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Generic agent prompt:
+
+```text
+Read ~/agent-skills/ultimate-ppt-master/AGENTS.md and follow the ultimate-ppt-master workflow.
+Use the repository path as SKILL_DIR. Turn reports/q3-review.pdf into a 12-slide editable PPTX.
+```
+
+Prompt-only fallback:
+
+```text
+Use the instructions in PROMPT.md from this repository as your presentation-generation workflow.
+If a script path is needed, treat the repository root as SKILL_DIR.
 ```
 
 For robust PPTX compatibility on macOS, install Cairo:
@@ -146,11 +189,7 @@ Node.js is only needed for Swiss Style web deck validation:
 node scripts/validate-swiss-deck.mjs path/to/index.html
 ```
 
-### 2. Ask Your Agent
-
-```text
-Use $ultimate-ppt-master to turn reports/q3-review.pdf into a 12-slide editable PPTX for an executive meeting.
-```
+### 3. Ask Your Agent
 
 ```text
 使用 $ultimate-ppt-master 把这个 Markdown 做成一份杂志风网页 PPT，用于 20 分钟线下分享。
