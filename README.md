@@ -2,10 +2,15 @@
 
 > From source documents to editable PowerPoint decks and cinematic web presentations.
 
+<p align="center">
+  <strong>v2.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a>
+</p>
+
 ![Ultimate PPT Master hero](assets/readme/hero.svg)
 
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill"><img alt="GitHub Repo" src="https://img.shields.io/badge/GitHub-ultimate--ppt--master--skill-111827?style=for-the-badge&logo=github"></a>
+  <img alt="Version 2.0.0" src="https://img.shields.io/badge/Version-2.0.0-7C3AED?style=for-the-badge">
   <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-C8A24A?style=for-the-badge">
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="PowerPoint" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
@@ -20,6 +25,24 @@ Ultimate PPT Master is built for that moment. It is a portable agent skill for C
 - **Magazine-style web decks (`index.html`)** for launches, talks, internal sharing, demo days, and visual storytelling.
 
 The goal is not "one prompt to random slides." The goal is a repeatable presentation workflow that respects source material, locks a design spec, generates page by page, previews visually, verifies output, and exports something people can actually use.
+
+---
+
+## What's New in v2.0.0
+
+Version 2.0.0 is the fusion release: it syncs the latest upstream work from the two projects this package builds on, then adapts that work into one coherent agent workflow.
+
+| Update | What changed |
+|---|---|
+| **Fresh upstream sync** | Synced `hugohe3/ppt-master` and `op7418/guizang-ppt-skill` implementation updates, while preserving this repository's cross-agent adaptation layer. |
+| **Two-mode output chooser** | Generic "make a PPT" requests now route into either editable PowerPoint or magazine-style web deck generation before work begins. |
+| **Expanded source handling** | Added stronger support for PDF, DOCX, XLSX, PPTX, URL, Markdown, and pasted-text workflows. |
+| **Editable PPTX upgrades** | Brought in newer conversion, SVG-to-PPTX, quality-check, chart, template, animation, narration, and live-preview tooling. |
+| **Magazine web deck upgrades** | Kept the original Editorial Magazine x E-ink style as the default, and added an optional Swiss Style engine for data, product, and engineering presentations. |
+| **Image workflow expansion** | Added image search references, multi-provider image-generation guidance, prompt templates, palette references, rendering references, and layout patterns. |
+| **README and growth package** | Rebuilt the GitHub homepage with product positioning, visual diagrams, bilingual entry points, and a clearer explanation of why the project is useful. |
+
+See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for the exact upstream baselines and adaptation policy.
 
 ---
 
@@ -169,6 +192,7 @@ For generic requests like "make a PPT", the skill first asks you to choose:
 
 | Path | Purpose |
 |---|---|
+| `README.zh-CN.md` | Optional Chinese README for Chinese users |
 | `SKILL.md` | Main workflow entry for Codex and compatible agents |
 | `AGENTS.md` | Portable entry for agentic coding tools |
 | `CLAUDE.md` | Claude Code entry |
