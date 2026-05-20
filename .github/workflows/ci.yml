@@ -19,7 +19,9 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: apps/desktop/package-lock.json
+          cache-dependency-path: |
+            apps/desktop/package-lock.json
+            apps/web/package-lock.json
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -38,8 +40,14 @@ jobs:
       - name: Install desktop dependencies
         run: npm --prefix apps/desktop ci
 
+      - name: Install web experience dependencies
+        run: npm --prefix apps/web ci
+
       - name: Build desktop frontend
         run: npm run build:desktop
+
+      - name: Build web experience
+        run: npm run build:web
 
       - name: Audit desktop dependencies
         run: npm --prefix apps/desktop audit --audit-level=high

@@ -1,35 +1,39 @@
 # 中文文档索引
 
-终极融合 PPT 大师有两个入口，都要保留：
+终极融合 PPT 大师现在采用“网页端优先 + Skill 重要可选入口”的方向：
 
-1. **桌面端**：给普通用户，一个本地优先、三步完成的产品入口。
-2. **Agent Skill**：给 Codex、Claude Code、OpenClaw、Hermes、Cursor / Cline / Roo / Windsurf 等工具，一个能执行生产级 PPT 工作流的技能包。
+1. **Web Experience**：主推广入口，用于低门槛体验、解释产品、生成 Agent handoff prompt、查看 Web Deck 示例。
+2. **Agent Skill**：第二核心入口，用于 Codex、Claude Code、Hermes、OpenClaw、Cursor / Cline / Roo / Windsurf 等工具执行生产级 PPT 工作流。
+
+桌面端继续保留，但归为高级本地预览和后续发布维护路线，不再作为近期获客主路径。
 
 ## 怎么选
 
 | 你是谁 | 推荐入口 | 原因 |
 |---|---|---|
-| 小白用户 / 普通创作者 | 桌面端 | 不需要理解脚本，导入资料、选择输出、生成即可。 |
+| 新用户 / 普通访客 | Web Experience | 不用安装、不用账号、不用模型 key，先快速理解产品和生成 prompt。 |
 | GitHub / Agent 用户 | Skill | 效果最好，Agent 可以读资料、跑脚本、预览、修正、导出。 |
-| 团队要稳定交付 | 桌面端 + Skill | 桌面端做资料入口和项目管理，Agent 做深度生成。 |
-| 想接自己的大模型 API | Direct API 预留变量 | v2.0.0 还不是完整内置引擎，需要自定义 adapter。 |
+| 团队要稳定交付 | Web Experience + Skill | 网页端做需求收集和 prompt，Skill 做本地生产。 |
+| 想看桌面端 | Desktop Later | 可源码运行，但签名、公证、Homebrew 后续再做主推。 |
+| 想接自己的大模型 API | Direct API 预留变量 | v2.1.0 还不是完整内置引擎，需要自定义 adapter。 |
 
 ## 常用文档
 
-- 桌面端快速开始：[Quickstart Desktop](../quickstart-desktop.md)
-- Homebrew 分发方案：[Homebrew Distribution Plan](../homebrew-distribution.md)
-- 工作流选择：[Choosing a Workflow](../choosing-a-workflow.md)
+- Web Experience：[Web Experience](./web-experience.md)
 - Agent 配置：[Agent Setup](../agent-setup.md)
+- 工作流选择：[Choosing a Workflow](../choosing-a-workflow.md)
+- 桌面端源码预览：[Quickstart Desktop](../quickstart-desktop.md)
+- Homebrew 分发方案：[Homebrew Distribution Plan](../homebrew-distribution.md)
 - 模型和 Provider 配置：[Model and Provider Setup](../model-provider-setup.md)
 - 问题排查：[Troubleshooting](../troubleshooting.md)
 - 发布维护：[Release and Maintenance](../release-maintenance.md)
 
 ## 最推荐的效果路线
 
-目前效果最稳的是：
+目前最适合推广的路线是：
 
 ```text
-桌面端导入真实资料 -> 生成本地项目 -> 复制 Agent handoff prompt -> 交给 Codex / Claude Code / Hermes / OpenClaw 深加工
+打开 Web Experience -> 选择资料类型/场景/输出/风格 -> 复制 Agent prompt -> 把 prompt 和本地资料路径交给 Codex / Claude Code / Hermes / OpenClaw 深加工
 ```
 
-原因很简单：Agent 不只是“调用一次大模型”，它能读文件、运行脚本、看日志、检查输出、修正失败页面，这比单次 API 调用更接近真实 PPT 生产。
+原因很简单：网页端把“我要什么”讲清楚，Skill 让 Agent 在本地读文件、运行脚本、检查输出、修正失败页面。这比让普通用户一上来安装桌面端、配置系统依赖，更适合传播。

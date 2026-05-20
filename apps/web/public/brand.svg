@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="18" y1="16" x2="111" y2="111" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF7A18"/>
+      <stop offset="0.48" stop-color="#E11D48"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="page" x1="32" y1="30" x2="93" y2="96" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EAF2FF"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="40" y1="84" x2="89" y2="84" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF7A18"/>
+      <stop offset="1" stop-color="#10B981"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bg)"/>
+  <path d="M23 38C36 18 57 16 73 26C89 37 99 30 108 22V107H23V38Z" fill="#FFFFFF" opacity=".13"/>
+  <rect x="35" y="32" width="62" height="54" rx="10" fill="#B9C9EA" opacity=".42" transform="rotate(7 66 59)"/>
+  <rect x="30" y="38" width="65" height="55" rx="10" fill="url(#page)"/>
+  <rect x="40" y="49" width="40" height="5" rx="2.5" fill="#172033"/>
+  <rect x="40" y="58" width="49" height="4" rx="2" fill="#45546B" opacity=".66"/>
+  <rect x="40" y="66" width="34" height="4" rx="2" fill="#45546B" opacity=".42"/>
+  <rect x="40" y="80" width="49" height="8" rx="4" fill="url(#accent)"/>
+  <path d="M94 32l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z" fill="#fff"/>
+</svg>

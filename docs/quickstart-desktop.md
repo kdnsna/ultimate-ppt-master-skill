@@ -1,29 +1,8 @@
 # Quickstart Desktop
 
-The desktop app is the recommended starting point for ordinary creators.
+The desktop app is now an advanced local preview and future distribution path. The public first-touch route is the [Web Experience](./web-experience.md), and the production route is [Agent Setup](./agent-setup.md).
 
-## Recommended macOS Install
-
-The public install path should be a Homebrew Cask:
-
-```bash
-brew install --cask kdnsna/ultimate-ppt-master/ultimate-ppt-master
-open -a "终极融合 PPT 大师"
-```
-
-Update:
-
-```bash
-brew upgrade --cask ultimate-ppt-master
-```
-
-This is the user-facing path. It should not require a source checkout, Node,
-Rust, Python, or Tauri knowledge.
-
-Current release preparation lives in:
-
-- [Casks/ultimate-ppt-master.rb](../Casks/ultimate-ppt-master.rb)
-- [Homebrew Distribution Plan](./homebrew-distribution.md)
+Use this page only when you want to inspect the local Tauri app, contribute desktop changes, or prepare future signed desktop releases.
 
 ## Developer Source Setup
 
@@ -36,10 +15,10 @@ npm run desktop
 
 What happens:
 
-- `.venv` is created if needed.
-- Python dependencies are installed.
-- desktop npm dependencies are installed.
-- `~/.ppt-master/.env` is created from `.env.example` if missing.
+- `.venv` is created if needed;
+- Python dependencies are installed;
+- desktop npm dependencies are installed;
+- `~/.ppt-master/.env` is created from `.env.example` if missing;
 - the native Tauri desktop app starts when Rust/Cargo are available;
 - without Rust/Cargo, the browser UI shell starts for inspection only.
 
@@ -79,6 +58,21 @@ Create a DMG when Finder automation is available:
 ```bash
 npm run package:desktop:dmg
 ```
+
+## Future Public macOS Install
+
+The intended public install shape can still be Homebrew Cask after signing and notarization are ready:
+
+```bash
+brew install --cask kdnsna/ultimate-ppt-master/ultimate-ppt-master
+open -a "终极融合 PPT 大师"
+```
+
+That channel is not the current promotion priority. Release preparation lives in:
+
+- [Casks/ultimate-ppt-master.rb](../Casks/ultimate-ppt-master.rb)
+- [Homebrew Distribution Plan](./homebrew-distribution.md)
+- [Release and Maintenance](./release-maintenance.md)
 
 ## First Useful Smoke Test
 

@@ -6,6 +6,8 @@ Use this checklist when preparing a public release or accepting a contribution.
 
 ```bash
 npm run doctor
+npm --prefix apps/web ci
+npm run build:web
 npm run build:desktop
 npm --prefix apps/desktop audit
 npm run test:worker
@@ -40,11 +42,21 @@ The repository CI lives at:
 
 It should cover:
 
+- web experience dependency install;
+- web experience static build;
 - desktop dependency install;
 - desktop frontend build;
 - dependency audit;
 - Python worker tests;
 - whitespace checks.
+
+The Pages workflow lives at:
+
+```text
+.github/workflows/pages.yml
+```
+
+It builds `apps/web` with `GITHUB_PAGES=true` and deploys the static artifact to GitHub Pages.
 
 The release workflow lives at:
 
@@ -56,6 +68,8 @@ It builds a macOS app zip for the Homebrew Cask asset contract and uploads it to
 the selected GitHub release.
 
 ## Homebrew Cask Channel
+
+Homebrew is currently a future desktop distribution channel, not the main acquisition path. The public first touch is the Web Experience, and the production route is Agent Skill.
 
 The user-facing install should be:
 
@@ -109,10 +123,11 @@ When syncing upstream:
 
 ## Version Notes
 
-v2.0.0 positions this repository as:
+v2.1.0 positions this repository as:
 
-- a local-first desktop product for normal users;
+- a web-first static experience for public discovery, prompt generation, and demo viewing;
 - a portable agent skill for production-grade deck generation;
+- a retained desktop preview for future signed native distribution;
 - a documented foundation for future direct API adapters.
 
 Do not claim the direct API driver is complete until a worker adapter and tests exist.

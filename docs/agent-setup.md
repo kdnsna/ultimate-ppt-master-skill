@@ -2,6 +2,8 @@
 
 Use this guide when you want Ultimate PPT Master to run as a portable agent skill.
 
+For the lowest-friction public entry, start from the [Web Experience](./web-experience.md), copy the generated Agent handoff prompt, then continue here if you want to install the Skill locally.
+
 ## Prerequisites
 
 - Python 3.10+
@@ -117,6 +119,21 @@ If the tool cannot read a skill directory:
 3. Paste it into the tool's system prompt, custom instructions, project rules, or long-term memory.
 4. Tell the tool the absolute local path of this repository.
 
+## Agent Handoff from Web Experience
+
+The Web Experience creates an Agent handoff prompt without uploading source material. Prefer it for public onboarding because it captures:
+
+- source type;
+- delivery scenario;
+- output mode;
+- visual style;
+- language;
+- agent tool;
+- model preference;
+- extra requirements.
+
+After copying the prompt, provide the local source file, source folder, URL, or downloaded `source.md` template to your agent.
+
 ## Agent Handoff from Desktop
 
 The desktop Workbench creates an Agent handoff prompt. Prefer that prompt because it contains:
@@ -127,4 +144,3 @@ The desktop Workbench creates an Agent handoff prompt. Prefer that prompt becaus
 - generated source markdown path;
 - log path;
 - next actions.
-

@@ -13,7 +13,8 @@ Ultimate PPT Master separates three things that many tools mix together:
 | Best deck quality | Your agent's model/login | Recommended. Let the agent read files, run scripts, preview, and repair. |
 | Better visual assets | Provider keys in `~/.ppt-master/.env` | Recommended when using AI images or stock image search. |
 | One-shot API integration | `LLM_*` direct variables | Experimental/reserved. Build your own adapter if needed. |
-| Ordinary desktop use | No model key required for basic local preview | Start with Desktop; hand off to an agent for production. |
+| Ordinary first trial | No model key required for the Web Experience | Start with the static web app; hand off to an agent for production. |
+| Desktop preview | No model key required for basic local preview | Use desktop only when you need the advanced local mode. |
 
 ## Loading Order
 
@@ -92,7 +93,7 @@ LLM_API_KEY=sk-xxx
 LLM_MODEL=gpt-4.1
 ```
 
-Important: v2.0.0 does not ship a complete direct API PPT generation engine. These variables are for future worker adapters and custom integrations.
+Important: v2.1.0 does not ship a complete direct API PPT generation engine. These variables are for future worker adapters and custom integrations.
 
 ## Check Configuration
 
@@ -101,4 +102,3 @@ npm run doctor
 ```
 
 The doctor command should show whether keys exist without printing secret values.
-

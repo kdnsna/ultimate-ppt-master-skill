@@ -12,6 +12,9 @@ Then keep the relevant local evidence. Do not paste private documents or real AP
 
 | Symptom | Check | Fix |
 |---|---|---|
+| Web Experience is blank | browser console, `npm run build:web` | Reinstall `apps/web` dependencies and confirm the Pages asset base path. |
+| Web demo link is 404 | `apps/web/public/examples/desktop-cultural-tourism-demo/web-demo.html` | Rebuild with `GITHUB_PAGES=true npm run build:web` for Pages. |
+| Copy prompt fails | browser clipboard permission | Select the prompt preview manually and copy it. |
 | `npm run desktop` fails | `node --version`, `npm --version`, `npm run doctor` | Run `npm run setup`; install Node/npm if missing. |
 | Python worker fails | `.venv/bin/python --version`, `pip show python-pptx` | Run `npm run setup` or `bash scripts/bootstrap.sh`. |
 | DOCX imports as empty/placeholder | `desktop-manifest.json`, `sources/source.md` | Confirm the file exists and is readable; attach redacted `sourceExtraction` fields. |
@@ -21,7 +24,7 @@ Then keep the relevant local evidence. Do not paste private documents or real AP
 | Native app cannot build | `cargo --version`, `rustc --version` | Install Rust/Cargo, then run `npm run app:desktop`. |
 | DMG build fails | Tauri bundle output | Use `npm run package:desktop` for `.app`; DMG may require Finder automation permission. |
 | Agent ignores this skill | Agent transcript | Tell it to read absolute `AGENTS.md` and set `SKILL_DIR` to the repo path. |
-| Direct API vars do nothing | `.env`, README status | Expected in v2.0.0; direct worker adapter is reserved, not complete. |
+| Direct API vars do nothing | `.env`, README status | Expected in v2.1.0; direct worker adapter is reserved, not complete. |
 
 ## Evidence to Attach to Issues
 
@@ -66,4 +69,3 @@ projects/.../previews/
 - Do not commit raw generated decks that expose business context.
 - Do not paste API keys in issues.
 - For public examples, sanitize organization names, people names, exact budgets, approval paths, and internal responsibilities.
-

@@ -1,6 +1,8 @@
 # Homebrew Distribution Plan
 
-The public user path should be Homebrew Cask first, source install second.
+Homebrew is the future desktop distribution path, not the current primary promotion route. The current public front door is the [Web Experience](./web-experience.md), with [Agent Skill](./agent-setup.md) as the production route.
+
+Use this document when desktop signing, notarization, and cask maintenance become active release work again.
 
 ## Target User Commands
 
@@ -29,7 +31,7 @@ Uninstall:
 brew uninstall --cask ultimate-ppt-master
 ```
 
-## Why This Replaces Source Setup For Users
+## Why This Still Matters Later
 
 The repository source path still matters for developers:
 
@@ -41,8 +43,9 @@ npm run desktop
 ```
 
 But that flow exposes Python, Node, Rust, Tauri, Cairo, local venvs, and build
-fallbacks. It is too much for broad adoption. Homebrew Cask should distribute a
-prebuilt app bundle, so normal users only see an installed macOS app.
+fallbacks. It is too much for broad adoption. When desktop returns as a public
+path, Homebrew Cask should distribute a prebuilt, signed, notarized app bundle,
+so normal users only see an installed macOS app.
 
 ## Required Release Checklist
 
@@ -60,12 +63,13 @@ open -a "终极融合 PPT 大师"
 
 ## GitHub Homepage Rules
 
-The README should behave like a polished app homepage:
+While the web-first plan is active, the README should behave like a polished web/skill product homepage:
 
-- lead with the one-line Homebrew install;
+- lead with `Open Web Experience`;
+- keep `Install / Use as Agent Skill` visible in the first screen;
+- move desktop install into `Desktop Later / Local Preview`;
 - explain the product in one sentence before feature depth;
-- show update/uninstall next to install;
-- keep source install under "Developer mode";
+- keep source install under the desktop maintenance path;
 - avoid making users read Tauri, Rust, Python, or npm details before they know
   why they want the app;
 - be explicit if a build is unsigned or not notarized.
