@@ -56,6 +56,23 @@ node <SKILL_ROOT>/scripts/validate-swiss-deck.mjs path/to/index.html
 - `grep -n "maplibregl.Map" index.html`
 - 浏览器实测 `+` 可放大,`DRAG` 可切换为 `DRAG ON`
 
+### 0-S-4. Swiss 最小字号与字重阶梯必须跟最新模板
+
+**现象**:页面看起来"瑞士"但文字过小、过细或 KPI/标题突然变粗,在投影和移动预览里可读性下降。
+
+**做法**:
+- meta / caption 最小 `13px`,分类标签最小 `14px`,正文最小 `15px`。
+- 如果需要更弱的层级,优先降低 opacity 或使用 `font-weight:300/400`,不要把字号压回 9-12px。
+- 大标题、巨型数字、KPI 遵循"越大越细":`font-weight:200/250/300`。
+- 普通正文使用 `300/400`;只有分类标签、必要锚点、少量强调可以用 `500/600`。
+- 避免在 Swiss 页面中使用 `font-weight:700/800/900`。
+
+**自检命令**:
+```bash
+grep -E "font-size:(9|10|11|12)px|font-size:max\\((9|10|11|12)px|font-weight:(700|800|900)" index.html
+```
+命中后逐个解释;没有明确理由就回到模板基线。
+
 ### 0-A. 瑞士风画布对齐法则(每一页必查 · 最常踩)
 
 **现象**:页眉 chrome-min 和底部 footer 都靠在 5vw 的边线上,但中间区域往内缩了一截,左右对不齐。

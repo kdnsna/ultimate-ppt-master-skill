@@ -156,7 +156,9 @@ Use this when the presentation itself is the experience.
 - Single-file HTML presentation for launches, keynotes, demo days, product stories, and visual internal sharing.
 - Editorial magazine and Swiss Style directions are both supported.
 - The Web Experience can generate a `preview-web-deck.html` first draft; the Agent Skill remains responsible for final production and QA.
-- Public sanitized demo: [examples/desktop-cultural-tourism-demo](./examples/desktop-cultural-tourism-demo).
+- Public sanitized demos:
+  - [Agentic Developer Stack 2026](./examples/agentic-developer-tools-2026)
+  - [Desktop Cultural Tourism Demo](./examples/desktop-cultural-tourism-demo)
 
 ---
 

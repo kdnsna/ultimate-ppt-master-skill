@@ -476,6 +476,9 @@ python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path>
 #
 # Optional SVG snapshot preview:
 # python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path> --svg-snapshot
+#
+# Optional conversion diagnostics:
+# python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path> --trace-conversion
 ```
 
 > ❌ **NEVER** use `cp` as a substitute for `finalize_svg.py` — it performs multiple critical processing steps

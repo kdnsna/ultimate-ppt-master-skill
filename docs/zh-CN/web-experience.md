@@ -16,7 +16,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - 生成可复制的 Agent 指令和 `source.md`；
 - 下载 `source.md` 或完整 `handoff-kit.zip`；
 - handoff kit 内含 `source.md`、`agent-prompt.md`、`project-brief.json`、`preview-web-deck.html`、`engine-plan.md`、`quality-checklist.md` 和 `README.md`；
-- 打开脱敏 Web Deck 示例；
+- 打开脱敏 Agentic Developer Stack 2026 Web Deck 示例；
 - 保持 Skill 安装入口足够显眼。
 
 ## 它不做什么
@@ -61,7 +61,7 @@ GITHUB_PAGES=true npm run build:web
 | 下载 `source.md` | 浏览器下载带当前表单值和页纲的 Markdown brief。 |
 | 下载 `preview-web-deck.html` | 浏览器下载带当前 brief 和 storyboard 的单文件 HTML 预览。 |
 | 下载 `handoff-kit.zip` | 浏览器下载包含 `source.md`、`agent-prompt.md`、`project-brief.json`、`preview-web-deck.html`、`engine-plan.md`、`quality-checklist.md` 和 `README.md` 的 zip。 |
-| 打开 Web Deck 示例 | 静态构建中的 `examples/desktop-cultural-tourism-demo/web-demo.html` 能打开。 |
+| 打开 Web Deck 示例 | 静态构建中的 `examples/agentic-developer-tools-2026/web-demo.html` 能打开。 |
 | Skill 安装说明 | 能跳到 README Skill 区域或 `docs/agent-setup.md`。 |
 | 移动端首屏 | CTA 自动换行，Skill 入口仍然明显。 |
 
@@ -80,4 +80,4 @@ MVP 至少保持这些 brief 生成场景可用：
 
 - 网页端代码：[apps/web](../../apps/web)
 - Pages workflow：[.github/workflows/pages.yml](../../.github/workflows/pages.yml)
-- 公开脱敏 Demo：[examples/desktop-cultural-tourism-demo](../../examples/desktop-cultural-tourism-demo)
+- 公开脱敏 Demo：[examples/agentic-developer-tools-2026](../../examples/agentic-developer-tools-2026)

@@ -9,8 +9,8 @@ work across Codex, Claude Code, OpenClaw, Hermes, and generic agent tools.
 
 | Upstream | Synced commit | Commit date | Synced areas |
 |---|---:|---|---|
-| `hugohe3/ppt-master` | `bd970c05d8fc7df0ffcf09c680621d46dea778a3` | 2026-05-19T02:56:59Z | PPTX scripts, references, templates, workflows, requirements |
-| `op7418/guizang-ppt-skill` | `3d87acc6cc53d3c1573e33d5073c1ec5a5a99196` | 2026-05-16T10:37:37+08:00 | Magazine web assets, Swiss Style template/references, screenshot backgrounds, validator |
+| `hugohe3/ppt-master` | `f40fcf5b782ad802cf938722640683be00d9ace4` | 2026-05-20T06:09:04Z | PPTX scripts/references plus latest optional native conversion trace support; fusion entry files kept local |
+| `op7418/guizang-ppt-skill` | `6bfa520b86ed5a3dffdac0a3323155e2b6f516b6` | 2026-05-19T22:27:55Z | Swiss Style template/reference update for minimum readable type sizes and light-weight hierarchy |
 
 ## Adaptation Policy
 
@@ -18,6 +18,8 @@ work across Codex, Claude Code, OpenClaw, Hermes, and generic agent tools.
 - Keep Style A (`template.html`) as the default magazine/e-ink web deck aesthetic.
 - Add Style B (`template-swiss.html`) as an opt-in Swiss Style variant; do not mix Style A and Style B classes in a deck.
 - Preserve the local `web_to_md.cjs` fallback even though current `ppt-master` prefers the Python `web_to_md.py` path.
+- Keep `--trace-conversion` as an optional diagnostics path; it should not become part of the default export unless a failure or QA investigation needs it.
+- Keep Swiss Style minimum font floors aligned with upstream: meta/caption 13px, labels 14px, body 15px, large titles/KPI at light 200-300 weight.
 - Prefer syncing upstream implementation assets mechanically, then manually adapting the fusion entry files.
 - Run `python3 -m unittest discover -s tests` after every sync to verify the expected upstream capability surface remains wired into the fusion package.
 

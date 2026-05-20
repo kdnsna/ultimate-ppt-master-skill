@@ -57,7 +57,7 @@ interface FormState {
 
 const baseUrl = import.meta.env.BASE_URL;
 const repoUrl = "https://github.com/kdnsna/ultimate-ppt-master-skill";
-const demoUrl = `${baseUrl}examples/desktop-cultural-tourism-demo/web-demo.html`;
+const demoUrl = `${baseUrl}examples/agentic-developer-tools-2026/web-demo.html`;
 const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const storageKey = "ultimate-ppt-master-web-brief-v2";
 

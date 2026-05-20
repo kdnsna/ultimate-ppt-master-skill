@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import mimetypes
 import os
 import re
@@ -306,6 +307,7 @@ def create_pptx_with_native_svg(
     narration_padding: float = 0.5,
     cache_dir: Path | None = None,
     workers: int | None = None,
+    trace_conversion_path: Path | None = None,
 ) -> bool:
     """Create a PPTX file with native SVG.
 
@@ -333,6 +335,7 @@ def create_pptx_with_native_svg(
         narration_audio: Optional dict mapping SVG stem to narration audio file.
         use_narration_timings: Whether to set slide auto-advance from audio duration.
         narration_padding: Extra seconds added after each narration before advancing.
+        trace_conversion_path: Optional path for native SVG conversion trace JSON.
 
     Returns:
         Whether all slides were successfully created.
@@ -445,6 +448,7 @@ def create_pptx_with_native_svg(
         narration_slides_created: set[int] = set()
         audio_exts_used: set[str] = set()
         mixed_animation_offset = 0
+        conversion_traces: list[dict[str, Any]] = []
 
         for i, svg_path in enumerate(svg_files, 1):
             slide_num = i
@@ -453,11 +457,20 @@ def create_pptx_with_native_svg(
                 # ---- Native shapes mode ----
                 if use_native_shapes:
                     slide_cfg = _slide_config(animation_config, svg_path.stem)
-                    slide_xml, media_files_dict, rel_entries, anim_targets = (
+                    slide_xml, media_files_dict, rel_entries, anim_targets, conversion_trace = (
                         convert_svg_to_slide_shapes(
-                            svg_path, slide_num=slide_num, verbose=verbose,
+                            svg_path,
+                            slide_num=slide_num,
+                            verbose=verbose,
+                            trace_conversion=trace_conversion_path is not None,
                         )
                     )
+                    if conversion_trace is not None:
+                        conversion_traces.append({
+                            'slide': slide_num,
+                            'svg': str(svg_path),
+                            'elements': conversion_trace,
+                        })
                     slide_transition, slide_transition_duration, slide_auto_advance = (
                         _slide_transition_settings(
                             slide_cfg,
@@ -800,6 +813,23 @@ def create_pptx_with_native_svg(
                     arcname = file_path.relative_to(extract_dir)
                     zf.write(file_path, arcname)
         shutil.move(str(temp_output_path), str(output_path))
+
+        if trace_conversion_path is not None and conversion_traces:
+            trace_conversion_path.parent.mkdir(parents=True, exist_ok=True)
+            trace_conversion_path.write_text(
+                json.dumps(
+                    {
+                        'output': str(output_path),
+                        'mode': 'native' if use_native_shapes else 'legacy',
+                        'slides': conversion_traces,
+                    },
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                encoding='utf-8',
+            )
+            if verbose:
+                print(f"  Conversion trace: {trace_conversion_path}")
 
         if verbose:
             print()

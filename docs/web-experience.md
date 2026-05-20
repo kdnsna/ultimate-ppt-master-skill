@@ -16,7 +16,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - generates copy-ready Agent instructions and `source.md`;
 - downloads `source.md` or a full `handoff-kit.zip`;
 - includes `source.md`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md` in the handoff kit;
-- opens a sanitized Web Deck demo;
+- opens the sanitized Agentic Developer Stack 2026 Web Deck demo;
 - keeps Skill installation visible as a second core path.
 
 ## What It Does Not Do
@@ -63,7 +63,7 @@ Use these checks before promoting a release:
 | Download `source.md` | Browser downloads a Markdown brief with current form values and outline. |
 | Download `preview-web-deck.html` | Browser downloads a standalone HTML preview with the current brief and storyboard. |
 | Download `handoff-kit.zip` | Browser downloads a zip containing `source.md`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md`. |
-| Open Web Deck demo | `examples/desktop-cultural-tourism-demo/web-demo.html` opens from the static build. |
+| Open Web Deck demo | `examples/agentic-developer-tools-2026/web-demo.html` opens from the static build. |
 | Skill setup link | Opens the README Skill section or `docs/agent-setup.md`. |
 | Mobile viewport | CTA buttons wrap cleanly and the Skill route remains visible. |
 
@@ -82,4 +82,4 @@ The page should also keep both engine paths visible. The web route is for onboar
 
 - App source: [apps/web](../apps/web)
 - Pages workflow: [.github/workflows/pages.yml](../.github/workflows/pages.yml)
-- Shared public demo source: [examples/desktop-cultural-tourism-demo](../examples/desktop-cultural-tourism-demo)
+- Shared public demo source: [examples/agentic-developer-tools-2026](../examples/agentic-developer-tools-2026)

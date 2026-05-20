@@ -46,6 +46,10 @@ class ConvertContext:
     # Top-level <g id="..."> groups, recorded as (shape_id, svg_id) in z-order.
     # Used by the PPTX builder to emit per-element entrance timing.
     anim_targets: list = field(default_factory=list)
+    # Optional diagnostics for SVG -> DrawingML conversion. When enabled by the
+    # CLI, converters append compact per-element records that can be inspected
+    # after a failed or suspicious export.
+    conversion_trace: list[dict[str, object]] | None = None
 
     def next_id(self) -> int:
         """Allocate the next shape ID."""
@@ -132,6 +136,7 @@ class ConvertContext:
             depth=self.depth + 1,
             # anim_targets is intentionally a fresh list on the child;
             # only the root-level context's list is read by the builder.
+            conversion_trace=self.conversion_trace,
         )
 
     def sync_from_child(self, child_ctx: ConvertContext) -> None:

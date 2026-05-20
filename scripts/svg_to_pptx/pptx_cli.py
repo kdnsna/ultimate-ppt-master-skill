@@ -217,6 +217,9 @@ Recorded narration:
     parser.add_argument('--workers', type=int, default=None,
                         help='Parallel workers for SVG→PNG pre-rendering. '
                              'Default: min(cpu, pages, 8). Set 1 for sequential.')
+    parser.add_argument('--trace-conversion', nargs='?', const='auto', default=None,
+                        help='Write a native SVG-to-DrawingML conversion trace JSON. '
+                             'Pass a path, or omit the value to write logs/conversion_trace_<timestamp>.json.')
 
     args = parser.parse_args()
 
@@ -460,6 +463,15 @@ Recorded narration:
     else:
         cache_dir = project_path / '.cache' / 'svg_png'
 
+    trace_conversion_path: Path | None = None
+    if args.trace_conversion:
+        if args.trace_conversion == 'auto':
+            trace_conversion_path = project_path / 'logs' / f'conversion_trace_{timestamp}.json'
+        else:
+            trace_conversion_path = Path(args.trace_conversion)
+            if not trace_conversion_path.is_absolute():
+                trace_conversion_path = project_path / trace_conversion_path
+
     # svg_files is per-product (native vs legacy may now read different
     # directories); everything else is shared.
     shared_kwargs = dict(
@@ -482,6 +494,7 @@ Recorded narration:
         narration_padding=args.narration_padding,
         cache_dir=cache_dir,
         workers=args.workers,
+        trace_conversion_path=trace_conversion_path,
     )
 
     success = True

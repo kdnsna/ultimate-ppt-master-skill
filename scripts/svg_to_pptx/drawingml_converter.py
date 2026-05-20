@@ -365,6 +365,28 @@ def _local_tag(elem: ET.Element) -> str:
     return elem.tag.split('}', 1)[-1] if isinstance(elem.tag, str) and '}' in elem.tag else str(elem.tag)
 
 
+def _trace_conversion(
+    ctx: ConvertContext,
+    elem: ET.Element,
+    status: str,
+    message: str | None = None,
+    bounds_emu: tuple[int, int, int, int] | None = None,
+) -> None:
+    if ctx.conversion_trace is None:
+        return
+    record: dict[str, object] = {
+        'tag': _local_tag(elem),
+        'id': elem.get('id') or '',
+        'status': status,
+        'depth': ctx.depth,
+    }
+    if message:
+        record['message'] = message
+    if bounds_emu is not None:
+        record['bounds_emu'] = list(bounds_emu)
+    ctx.conversion_trace.append(record)
+
+
 def _collect_unsupported_visuals(root: ET.Element) -> list[str]:
     issues: list[str] = []
 
@@ -391,7 +413,8 @@ def convert_svg_to_slide_shapes(
     svg_path: Path,
     slide_num: int = 1,
     verbose: bool = False,
-) -> tuple[str, dict[str, bytes], list[dict[str, str]], list]:
+    trace_conversion: bool = False,
+) -> tuple[str, dict[str, bytes], list[dict[str, str]], list, list[dict[str, object]] | None]:
     """Convert an SVG file to a complete DrawingML slide XML.
 
     Args:
@@ -400,7 +423,7 @@ def convert_svg_to_slide_shapes(
         verbose: Print progress info.
 
     Returns:
-        (slide_xml, media_files, rel_entries, anim_targets) where:
+        (slide_xml, media_files, rel_entries, anim_targets, conversion_trace) where:
         - slide_xml: Complete slide XML string.
         - media_files: Dict of {filename: bytes} for media to write.
         - rel_entries: List of relationship entries to add.
@@ -442,7 +465,13 @@ def convert_svg_to_slide_shapes(
         )
 
     defs = collect_defs(root)
-    ctx = ConvertContext(defs=defs, slide_num=slide_num, svg_dir=Path(svg_path).parent)
+    conversion_trace: list[dict[str, object]] | None = [] if trace_conversion else None
+    ctx = ConvertContext(
+        defs=defs,
+        slide_num=slide_num,
+        svg_dir=Path(svg_path).parent,
+        conversion_trace=conversion_trace,
+    )
 
     shapes: list[str] = []
     converted = 0
@@ -454,17 +483,24 @@ def convert_svg_to_slide_shapes(
     for child in root:
         tag = child.tag.replace(f'{{{SVG_NS}}}', '')
         if tag == 'defs':
+            _trace_conversion(ctx, child, 'skipped', 'defs')
             continue
-        result = convert_element(child, ctx)
+        try:
+            result = convert_element(child, ctx)
+        except Exception as exc:
+            _trace_conversion(ctx, child, 'failed', str(exc))
+            raise
         if result:
             shapes.append(result.xml)
             converted += 1
+            _trace_conversion(ctx, child, 'converted', bounds_emu=result.bounds_emu)
             m = re.search(r'<p:cNvPr id="(\d+)"', result.xml)
             if m:
                 fallback_targets.append((int(m.group(1)), tag))
         else:
             if tag not in _NON_VISUAL_TAGS:
                 skipped += 1
+            _trace_conversion(ctx, child, 'skipped')
 
     # Animation target fallback. Semantic <g id="..."> groups are the
     # preferred anchors (set inside convert_g). When the SVG has none
@@ -501,4 +537,4 @@ def convert_svg_to_slide_shapes(
 <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
 </p:sld>'''
 
-    return slide_xml, ctx.media_files, ctx.rel_entries, ctx.anim_targets
+    return slide_xml, ctx.media_files, ctx.rel_entries, ctx.anim_targets, conversion_trace

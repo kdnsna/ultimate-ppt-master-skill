@@ -156,7 +156,9 @@ Ultimate PPT Master 是建立在两条互补生产路线上的融合前台。仓
 - 单文件 HTML 演示，适合发布会、keynote、demo day、产品故事和强视觉内部分享。
 - 支持电子杂志和 Swiss Style 两条视觉方向。
 - Web Experience 会先生成一个 `preview-web-deck.html` 粗预览；正式生产和 QA 仍由 Agent Skill 完成。
-- 公开脱敏示例：[examples/desktop-cultural-tourism-demo](./examples/desktop-cultural-tourism-demo)。
+- 公开脱敏示例：
+  - [Agentic Developer Stack 2026](./examples/agentic-developer-tools-2026)
+  - [Desktop Cultural Tourism Demo](./examples/desktop-cultural-tourism-demo)
 
 ---
 

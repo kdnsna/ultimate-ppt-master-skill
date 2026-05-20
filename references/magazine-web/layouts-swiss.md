@@ -38,6 +38,8 @@
 - 字体:`var(--sans)` Inter / Helvetica Neue + `var(--mono)` JetBrains Mono
 - 字重:**200 (ExtraLight) 大字** / **300 (Light) 正文** / **600 (SemiBold) t-cat 小标**
 - 大标题遵循原始 PPT 的实际页面用法:主标题 `font-weight:200`,重点词/数字 `font-weight:300`;不要因为旧 CSS helper 里残留过 800/900 就把 Swiss 大标题加粗
+- 最小字号遵循最新 Swiss 模板基线:meta/caption 不低于 `13px`,分类标签不低于 `14px`,普通正文不低于 `15px`;不要为了"更瑞士"把说明文字压回 9-12px
+- 字重阶梯遵循"越大越细":巨型数字/标题用 `200-300`,正文用 `300-400`,只有分类标签和必要锚点用 `500-600`;不要在大标题、KPI、step 标题里使用 `700/800/900`
 - 大字号收紧:`letter-spacing:-.04em` / `line-height:.9`
 - mono 数字:`font-feature-settings:"tnum","ss01"`
 
