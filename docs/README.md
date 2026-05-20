@@ -2,7 +2,7 @@
 
 Ultimate PPT Master now has a web-first public direction and two important user routes:
 
-1. **Web Experience** is the main front door for discovery, lightweight trial, prompt generation, and demo viewing.
+1. **Web Experience** is the main front door for discovery, lightweight trial, browser-side brief assembly, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing.
 2. **Agent Skill** is the second core route for high-quality local production with Codex, Claude Code, Hermes, OpenClaw, Cursor-style IDEs, and other agents.
 
 The desktop app remains available as an advanced local preview and future distribution path, but it is not the near-term acquisition path.
@@ -37,7 +37,7 @@ Every public support path should point to an inspectable artifact:
 | Question | First check | Evidence to keep |
 |---|---|---|
 | Does the web app build? | `npm run build:web` | `apps/web/dist`, Pages workflow logs. |
-| Does the prompt generator work? | Web Experience form and copy button | Generated Agent prompt for the selected scenario. |
+| Does the Web Brief Studio work? | Web Experience form, outline, live Web Deck preview, preview tabs, and handoff buttons | Generated Agent prompt, `source.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `handoff-kit.zip`. |
 | Did source extraction work in a local project? | `projects/.../desktop-manifest.json` | `sourceExtraction.status`, `sources/source.md`. |
 | Where did the output go? | Workbench export panel or manifest | `generatedFiles`, `outputs/`, `previews/`. |
 | Why does a deck look wrong? | Project log and source markdown | `logs/desktop-worker.log`, redacted source excerpt. |

@@ -6,7 +6,7 @@ Ultimate PPT Master is intentionally not a single-path product. The public direc
 
 | Choose this | When | Tradeoff |
 |---|---|---|
-| **Web Experience** | You want a quick public trial, a shareable front door, or a guided way to generate an Agent prompt. | Fastest start; it does not generate decks by itself in MVP. |
+| **Web Experience** | You want a quick public trial, a shareable front door, a live Web Deck preview, or a guided way to assemble a deck brief and Agent handoff kit. | Fastest start; it generates a useful preview and handoff kit, but final decks still come from the Skill route in MVP. |
 | **Agent Skill** | You want the best current output quality and are comfortable with Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf-style tools. | More powerful, but requires an agent that can read files and run commands. |
 | **Web Experience + Agent Skill** | You want a polished intake flow and production-grade local generation. | Recommended path: simple web front door, deep agent production loop. |
 | **Desktop Later / Local Preview** | You want to inspect the Tauri app or help maintain future native packaging. | Useful for development, but not the near-term public install path. |
@@ -17,9 +17,10 @@ Ultimate PPT Master is intentionally not a single-path product. The public direc
 For quality and low-friction onboarding, the best route is:
 
 1. Open the Web Experience and choose source type, scenario, output mode, visual style, language, agent tool, and model preference.
-2. Copy the generated Agent handoff prompt.
-3. Provide the prompt plus local source path to Codex, Claude Code, Hermes, OpenClaw, or another capable local agent.
-4. Let the agent read `AGENTS.md` and `SKILL.md`, then run source analysis, strategy, design spec, page generation, preview, validation, PPTX export, and repair.
+2. Paste rough source notes or a short brief.
+3. Review the live Web Deck preview, then download `handoff-kit.zip`.
+4. Provide the kit plus local source path to Codex, Claude Code, Hermes, OpenClaw, or another capable local agent.
+5. Let the agent read `AGENTS.md` and `SKILL.md`, then run source analysis, strategy, design spec, page generation, preview, validation, PPTX export, and repair.
 
 This works better than a plain direct model call because a local agent can:
 
@@ -38,8 +39,12 @@ Use it when the user needs a normal public first touch:
 - no backend upload;
 - no model key;
 - clear choices for source, scenario, output, style, language, agent, and model preference;
-- copy-ready Agent prompt;
-- downloadable `source.md` template;
+- pasted notes area;
+- generated outline and readiness check;
+- dual-engine route cards for Hugo He / ppt-master PPTX and op7418 / Guizang Web Deck production;
+- live `preview-web-deck.html` iframe and HTML download;
+- copy-ready Agent prompt and `source.md`;
+- downloadable `handoff-kit.zip` with `engine-plan.md` and `quality-checklist.md`;
 - visible Skill setup route.
 
 The Web Experience is not a hosted slide generator in MVP. It is the low-cost product explanation and handoff surface.

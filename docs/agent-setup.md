@@ -2,7 +2,7 @@
 
 Use this guide when you want Ultimate PPT Master to run as a portable agent skill.
 
-For the lowest-friction public entry, start from the [Web Experience](./web-experience.md), copy the generated Agent handoff prompt, then continue here if you want to install the Skill locally.
+For the lowest-friction public entry, start from the [Web Experience](./web-experience.md), download the generated `handoff-kit.zip`, then continue here if you want to install the Skill locally.
 
 ## Prerequisites
 
@@ -121,18 +121,20 @@ If the tool cannot read a skill directory:
 
 ## Agent Handoff from Web Experience
 
-The Web Experience creates an Agent handoff prompt without uploading source material. Prefer it for public onboarding because it captures:
+The Web Experience creates a local Agent handoff kit without uploading source material. Prefer it for public onboarding because it captures:
 
 - source type;
 - delivery scenario;
 - output mode;
 - visual style;
+- dual-engine route selection for PPTX and Web Deck;
+- browser-local `preview-web-deck.html`;
 - language;
 - agent tool;
 - model preference;
 - extra requirements.
 
-After copying the prompt, provide the local source file, source folder, URL, or downloaded `source.md` template to your agent.
+The zip includes `source.md`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md`. After downloading it, provide the zip or extracted folder plus any real source file, source folder, or URL to your agent.
 
 ## Agent Handoff from Desktop
 

@@ -15,6 +15,7 @@ Then keep the relevant local evidence. Do not paste private documents or real AP
 | Web Experience is blank | browser console, `npm run build:web` | Reinstall `apps/web` dependencies and confirm the Pages asset base path. |
 | Web demo link is 404 | `apps/web/public/examples/desktop-cultural-tourism-demo/web-demo.html` | Rebuild with `GITHUB_PAGES=true npm run build:web` for Pages. |
 | Copy prompt fails | browser clipboard permission | Select the prompt preview manually and copy it. |
+| Handoff zip does not download | browser download permission | Allow downloads for the site, or use copy/download `source.md` as fallback. |
 | `npm run desktop` fails | `node --version`, `npm --version`, `npm run doctor` | Run `npm run setup`; install Node/npm if missing. |
 | Python worker fails | `.venv/bin/python --version`, `pip show python-pptx` | Run `npm run setup` or `bash scripts/bootstrap.sh`. |
 | DOCX imports as empty/placeholder | `desktop-manifest.json`, `sources/source.md` | Confirm the file exists and is readable; attach redacted `sourceExtraction` fields. |

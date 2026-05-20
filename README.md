@@ -1,6 +1,6 @@
 # Ultimate PPT Master - Web Experience + Agent Skill for PPTX and Web Decks
 
-> A web-first AI presentation workflow: shape the task in a static browser experience, then hand it to Codex, Claude Code, Hermes, OpenClaw, or another agent for production-grade editable PPTX and Web Deck generation.
+> A web-first fusion workflow for AI presentations: assemble a structured deck brief, live Web Deck preview, engine plan, and local handoff kit in the browser, then hand it to Codex, Claude Code, Hermes, OpenClaw, or another agent for production-grade editable PPTX and Web Deck generation.
 
 <p align="center">
   <strong>v2.1.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
@@ -31,7 +31,7 @@ Ultimate PPT Master is now positioned around two practical entry points:
 
 | Entry | Role |
 |---|---|
-| **Open Web Experience** | The low-friction public front door. Configure the presentation task, copy an Agent handoff prompt, download a `source.md` template, and inspect a Web Deck demo. |
+| **Open Web Experience** | The low-friction public front door. Build a structured deck brief, preview a local Web Deck, generate a dual-engine plan, copy Agent instructions, and download a complete `handoff-kit.zip`. |
 | **Install / Use as Agent Skill** | The high-quality production route. Let a local agent read real files, run scripts, preview output, fix layout issues, and export editable PPTX or single-file Web Decks. |
 
 The desktop app remains in the repository, but it is no longer the first promotion path. Signing, notarization, Homebrew distribution, and native packaging are treated as release-maintenance work for later.
@@ -46,15 +46,19 @@ Open the static web app:
 https://kdnsna.github.io/ultimate-ppt-master-skill/
 ```
 
-The web experience is intentionally lightweight:
+The web experience is now a browser-side **Deck Brief Studio**:
 
 - choose source type, target scenario, output mode, visual style, language, agent tool, and model preference;
-- generate a copy-ready Agent handoff prompt in real time;
-- download a local `source.md` starter template;
+- paste source notes or a rough brief directly into the page;
+- generate a slide outline and brief-readiness check;
+- see the Hugo He / ppt-master PPTX route and op7418 / Guizang Web Deck route side by side;
+- preview and download `preview-web-deck.html` as a browser-local rough deck;
+- copy Agent instructions or `source.md`;
+- download a complete `handoff-kit.zip` containing `source.md`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md`;
 - open the sanitized Web Deck demo;
 - jump directly to Skill installation instructions.
 
-MVP boundaries are explicit: no backend, no hosted model, no account system, and no source-material storage. Prompt generation happens in the browser.
+MVP boundaries are explicit: no backend, no hosted model, no account system, and no source-material upload. Brief assembly happens in the browser, and downloaded files stay local.
 
 For local development:
 
@@ -126,7 +130,7 @@ Full guide: [Agent Setup](./docs/agent-setup.md).
 |---|---|---|
 | **Web Experience** | New users, GitHub visitors, demos, social sharing, lightweight trial. | [Open Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/) |
 | **Agent Skill** | Users who already use Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf. | [Agent Setup](./docs/agent-setup.md) |
-| **Web Experience + Skill** | Recommended production flow: configure online, then paste the generated prompt into an agent. | Open the web app, copy prompt, provide source files locally. |
+| **Web Experience + Skill** | Recommended production flow: assemble the handoff kit online, then give the kit to an agent. | Open the web app, download `handoff-kit.zip`, provide real source files locally when needed. |
 | **Desktop Later / Local Preview** | Advanced local mode and future signed desktop distribution. | See [Quickstart Desktop](./docs/quickstart-desktop.md). |
 
 If you are deciding which route to use, read [Choosing a Workflow](./docs/choosing-a-workflow.md).
@@ -134,6 +138,8 @@ If you are deciding which route to use, read [Choosing a Workflow](./docs/choosi
 ---
 
 ## What It Generates
+
+Ultimate PPT Master is a fusion shell over two complementary production routes. The repository preserves upstream attribution in [LICENSE](./LICENSE) and [THIRD_PARTY_NOTICES](./THIRD_PARTY_NOTICES).
 
 ### Editable PowerPoint (`.pptx`)
 
@@ -149,6 +155,7 @@ Use this when the presentation itself is the experience.
 
 - Single-file HTML presentation for launches, keynotes, demo days, product stories, and visual internal sharing.
 - Editorial magazine and Swiss Style directions are both supported.
+- The Web Experience can generate a `preview-web-deck.html` first draft; the Agent Skill remains responsible for final production and QA.
 - Public sanitized demo: [examples/desktop-cultural-tourism-demo](./examples/desktop-cultural-tourism-demo).
 
 ---
@@ -157,7 +164,8 @@ Use this when the presentation itself is the experience.
 
 | Layer | Role |
 |---|---|
-| **Static Web Experience** | Explains the product, collects scenario choices, generates the Agent prompt, and downloads a `source.md` template. |
+| **Static Web Experience** | Builds a structured deck brief, generates an outline, previews `preview-web-deck.html`, and exports `handoff-kit.zip` for local Agent production. |
+| **Fusion engine plan** | Makes the PPTX route, Web Deck route, visual style route, quality checklist, and copyright/notice expectations explicit before handoff. |
 | **Agent Skill** | Lets Codex / Claude Code / Hermes / OpenClaw read `AGENTS.md` and `SKILL.md`, then run the production workflow locally. |
 | **Python + templates** | Create project folders, normalize sources, generate PPTX/Web outputs, and keep logs/artifacts inspectable. |
 | **Desktop Later** | Tauri app remains available for local preview and future signed distribution, but is not the near-term acquisition path. |
@@ -213,7 +221,7 @@ Release-maintenance references:
 
 | Update | What changed |
 |---|---|
-| **Web-first direction** | Added a static Vite Web Experience for prompt generation, `source.md` download, Skill routing, and Web Deck demo access. |
+| **Web-first direction** | Added a static Vite Deck Brief Studio for outline generation, live Web Deck preview, dual-engine planning, `source.md`, `project-brief.json`, handoff zip download, Skill routing, and Web Deck demo access. |
 | **Skill as second core** | README and docs now keep Agent Skill visible as the production-quality route, not buried in developer notes. |
 | **Desktop repositioned** | Tauri desktop remains available, but Homebrew/signing/notarization now live in release-maintenance documentation. |
 | **Higher-quality desktop drafts** | Desktop PPTX output uses styled editable layouts instead of plain bullet smoke-test pages. |

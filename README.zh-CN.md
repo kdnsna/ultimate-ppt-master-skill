@@ -1,6 +1,6 @@
 # 终极融合 PPT 大师 - Web Experience + Agent Skill / 可编辑 PPTX / 网页演示
 
-> 现在主打“网页端优先”：用户先打开静态在线体验页，把需求整理成可执行的 Agent handoff prompt；再把任务交给 Codex、Claude Code、Hermes、OpenClaw 等 Agent 生成可编辑 PPTX 或高质感 Web Deck。
+> 现在主打“网页端优先”的融合路线：用户先打开静态在线体验页，把零散资料整理成结构化 Deck Brief、实时 Web Deck 预览、双引擎计划和本地 handoff-kit；再把任务交给 Codex、Claude Code、Hermes、OpenClaw 等 Agent 生成可编辑 PPTX 或高质感 Web Deck。
 
 <p align="center">
   <strong>v2.1.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
@@ -31,7 +31,7 @@
 
 | 入口 | 作用 |
 |---|---|
-| **打开 Web Experience** | 低门槛推广入口。用户在线选择资料类型、目标场景、输出形式、风格、语言和模型偏好，复制 Agent prompt，下载 `source.md` 模板，看 Web Deck 示例。 |
+| **打开 Web Experience** | 低门槛推广入口。用户在线整理资料 brief、预览 Web Deck、生成双引擎计划、复制 Agent 指令，并下载完整 `handoff-kit.zip`。 |
 | **安装 / 使用 Agent Skill** | 高质量生产路线。让本地 Agent 读取真实资料、运行脚本、预览输出、修复版式问题，并导出可编辑 PPTX 或单文件 Web Deck。 |
 
 桌面端代码继续保留，但不再作为近期首推安装路径。签名、公证、Homebrew 分发和原生打包都放入发布维护文档，等网页端获客路径跑顺后再继续推进。
@@ -46,15 +46,19 @@
 https://kdnsna.github.io/ultimate-ppt-master-skill/
 ```
 
-网页端主打轻量：
+网页端现在是浏览器里的 **Deck Brief Studio**：
 
 - 选择资料类型、目标场景、输出形式、视觉风格、语言、Agent 工具和模型偏好；
-- 实时生成可复制的 Agent handoff prompt；
-- 下载本地 `source.md` 起步模板；
+- 粘贴资料摘要或粗稿；
+- 自动生成页纲和 brief 完整度检查；
+- 同屏展示 Hugo He / ppt-master 的 PPTX 路线和 op7418 / 歸藏的 Web Deck 路线；
+- 实时预览并下载浏览器本地的 `preview-web-deck.html`；
+- 复制 Agent prompt 或 `source.md`；
+- 下载包含 `source.md`、`agent-prompt.md`、`project-brief.json`、`preview-web-deck.html`、`engine-plan.md`、`quality-checklist.md` 和 `README.md` 的 `handoff-kit.zip`；
 - 打开脱敏 Web Deck 示例；
 - 直接跳转到 Skill 安装说明。
 
-MVP 边界也写清楚：不接后端、不托管模型、不保存用户资料。Prompt 生成逻辑完全在浏览器本地完成。
+MVP 边界也写清楚：不接后端、不托管模型、不上传用户资料。Brief 组装完全在浏览器本地完成，下载文件只保存在用户本机。
 
 本地开发：
 
@@ -126,7 +130,7 @@ Skill 适合做这些事：
 |---|---|---|
 | **Web Experience** | 新用户、GitHub 访客、公开传播、轻量试用。 | [打开 Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/) |
 | **Agent Skill** | 已经使用 Codex、Claude Code、Hermes、OpenClaw、Cursor、Cline、Roo、Windsurf 的用户。 | [Agent Setup](./docs/agent-setup.md) |
-| **Web Experience + Skill** | 推荐生产流程：网页端配置，复制 prompt，把本地资料交给 Agent。 | 打开网页端，复制 prompt，再提供资料路径。 |
+| **Web Experience + Skill** | 推荐生产流程：网页端组装 handoff kit，再把本地资料交给 Agent。 | 打开网页端，下载 `handoff-kit.zip`，必要时再提供真实资料路径。 |
 | **Desktop Later / 本地预览** | 高级本地模式和后续签名桌面端分发。 | 看 [Quickstart Desktop](./docs/quickstart-desktop.md)。 |
 
 如果还不确定选哪条路线，看 [Choosing a Workflow](./docs/choosing-a-workflow.md)。
@@ -134,6 +138,8 @@ Skill 适合做这些事：
 ---
 
 ## 它能生成什么
+
+Ultimate PPT Master 是建立在两条互补生产路线上的融合前台。仓库在 [LICENSE](./LICENSE) 和 [THIRD_PARTY_NOTICES](./THIRD_PARTY_NOTICES) 中保留上游版权和第三方声明。
 
 ### 可编辑 PowerPoint (`.pptx`)
 
@@ -149,6 +155,7 @@ Skill 适合做这些事：
 
 - 单文件 HTML 演示，适合发布会、keynote、demo day、产品故事和强视觉内部分享。
 - 支持电子杂志和 Swiss Style 两条视觉方向。
+- Web Experience 会先生成一个 `preview-web-deck.html` 粗预览；正式生产和 QA 仍由 Agent Skill 完成。
 - 公开脱敏示例：[examples/desktop-cultural-tourism-demo](./examples/desktop-cultural-tourism-demo)。
 
 ---
@@ -157,7 +164,8 @@ Skill 适合做这些事：
 
 | 层 | 作用 |
 |---|---|
-| **静态 Web Experience** | 解释产品、收集场景选择、生成 Agent prompt、下载 `source.md` 模板。 |
+| **静态 Web Experience** | 组装结构化 deck brief、生成页纲、预览 `preview-web-deck.html`，并导出给本地 Agent 使用的 `handoff-kit.zip`。 |
+| **Fusion engine plan** | 在 handoff 前明确 PPTX 路线、Web Deck 路线、视觉路线、质量检查和版权声明要求。 |
 | **Agent Skill** | 让 Codex / Claude Code / Hermes / OpenClaw 读取 `AGENTS.md` 和 `SKILL.md`，在本地执行生产工作流。 |
 | **Python + 模板** | 创建项目目录、整理源资料、生成 PPTX/Web 输出，并保留日志和中间产物。 |
 | **Desktop Later** | Tauri 桌面端继续保留，用于本地预览和未来签名分发，但不是近期获客主路径。 |
@@ -213,7 +221,7 @@ npm run desktop
 
 | 更新 | 变化 |
 |---|---|
-| **Web-first 方向** | 新增静态 Vite Web Experience，支持 prompt 生成、`source.md` 下载、Skill 跳转和 Web Deck 示例。 |
+| **Web-first 方向** | 新增静态 Vite Deck Brief Studio，支持页纲生成、实时 Web Deck 预览、双引擎计划、`source.md`、`project-brief.json`、handoff zip、Skill 跳转和 Web Deck 示例。 |
 | **Skill 第二核心** | README 和文档首屏保留 Agent Skill，明确它是生产级高质量路线。 |
 | **桌面端降级为 Later** | Tauri 桌面端继续保留，但 Homebrew、签名、公证移入发布维护文档。 |
 | **更好的桌面端草稿** | Desktop PPTX 输出使用有样式的可编辑布局，不再是纯 bullet smoke test。 |

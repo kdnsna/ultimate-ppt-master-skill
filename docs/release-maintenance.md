@@ -125,7 +125,7 @@ When syncing upstream:
 
 v2.1.0 positions this repository as:
 
-- a web-first static experience for public discovery, prompt generation, and demo viewing;
+- a web-first static experience for public discovery, brief assembly, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing;
 - a portable agent skill for production-grade deck generation;
 - a retained desktop preview for future signed native distribution;
 - a documented foundation for future direct API adapters.
