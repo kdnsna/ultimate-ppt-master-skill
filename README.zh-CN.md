@@ -9,7 +9,7 @@
 ![终极融合 PPT 大师桌面端主图](assets/readme/hero.svg)
 
 <p align="center">
-  <a href="#快速运行桌面端"><strong>运行桌面端</strong></a>
+  <a href="#安装桌面端"><strong>安装桌面端</strong></a>
   ·
   <a href="./README.md"><strong>English README</strong></a>
   ·
@@ -39,11 +39,41 @@
 
 ---
 
+## 安装桌面端
+
+面向普通用户，公开 macOS 安装路径应该优先走 Homebrew：
+
+```bash
+brew install --cask kdnsna/ultimate-ppt-master/ultimate-ppt-master
+open -a "终极融合 PPT 大师"
+```
+
+后续升级：
+
+```bash
+brew upgrade --cask ultimate-ppt-master
+```
+
+这个路径参考的是轻量 macOS 工具的分发方式：用户拿到的是预构建 app、有启动台图标、无需理解 Node/Python/Rust，也不用在源码目录里跑一堆命令。
+
+当前仓库已经放入 Homebrew Cask 和发布约定：[Casks/ultimate-ppt-master.rb](./Casks/ultimate-ppt-master.rb)、[Homebrew Distribution](./docs/homebrew-distribution.md)。真正面向推广时，需要把签名并公证后的 release zip 发布到 `kdnsna/homebrew-ultimate-ppt-master` tap。
+
+开发者仍可源码运行：
+
+```bash
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
+cd ultimate-ppt-master-skill
+npm run setup
+npm run desktop
+```
+
+---
+
 ## 选择你的入口
 
 | 路线 | 适合谁 | 怎么开始 |
 |---|---|---|
-| **桌面端** | 普通创作者、商务用户、老师、咨询顾问，以及想要三步本地流程的人。 | `npm run setup` 然后 `npm run desktop` |
+| **桌面端** | 普通创作者、商务用户、老师、咨询顾问，以及想要三步本地流程的人。 | `brew install --cask kdnsna/ultimate-ppt-master/ultimate-ppt-master` |
 | **Agent Skill** | GitHub / Agent 用户，希望获得当前最强生成质量、脚本执行、预览检查和修复循环。 | 看 [Agent Setup](./docs/agent-setup.md) |
 | **桌面端 + Agent** | 团队既要简单入口，也要最终精修交付。 | 先在桌面端建项目，再复制 Workbench 的 handoff prompt。 |
 | **Direct API / 自定义桥接** | 想接自己的模型 API 或 worker adapter 的开发者。 | 看 [Model and Provider Setup](./docs/model-provider-setup.md)；v2.1.0 只是预留约定。 |
@@ -125,9 +155,9 @@
 
 ---
 
-## 快速运行桌面端
+## 开发者源码运行
 
-首次运行，一键初始化：
+仅在你想从源码启动或参与开发时使用这条路径：
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
@@ -178,6 +208,14 @@ npm run package:desktop:dmg
 ```
 
 初始化脚本不会自动安装 Rust、Homebrew、Cairo 这类系统组件。`npm run doctor` 会明确告诉你哪些可选原生依赖缺失。没有 Rust 也可以用 `npm run desktop` 打开浏览器界面壳做 UI 查看，但真实 PPTX/Web 生成需要原生 Tauri 应用，因为 Python worker 必须写入本地项目文件。
+
+用于 Homebrew 发布的本机打包：
+
+```bash
+npm run package:desktop:homebrew
+```
+
+它会在 `dist/release/` 生成 cask 发布需要的 zip 和校验值。
 
 ---
 

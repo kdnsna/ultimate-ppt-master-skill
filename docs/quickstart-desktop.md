@@ -2,7 +2,30 @@
 
 The desktop app is the recommended starting point for ordinary creators.
 
-## One-command Setup
+## Recommended macOS Install
+
+The public install path should be a Homebrew Cask:
+
+```bash
+brew install --cask kdnsna/ultimate-ppt-master/ultimate-ppt-master
+open -a "终极融合 PPT 大师"
+```
+
+Update:
+
+```bash
+brew upgrade --cask ultimate-ppt-master
+```
+
+This is the user-facing path. It should not require a source checkout, Node,
+Rust, Python, or Tauri knowledge.
+
+Current release preparation lives in:
+
+- [Casks/ultimate-ppt-master.rb](../Casks/ultimate-ppt-master.rb)
+- [Homebrew Distribution Plan](./homebrew-distribution.md)
+
+## Developer Source Setup
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git

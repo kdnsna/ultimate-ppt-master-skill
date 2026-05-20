@@ -11,6 +11,7 @@
     "app:desktop": "npm --prefix apps/desktop run tauri:dev",
     "package:desktop": "npm --prefix apps/desktop run tauri:build",
     "package:desktop:dmg": "npm --prefix apps/desktop run tauri:build:dmg",
+    "package:desktop:homebrew": "bash scripts/package-homebrew-release.sh",
     "test:worker": "bash -lc 'if [ -x .venv/bin/python ]; then .venv/bin/python -m unittest discover -s tests; else python3 -m unittest discover -s tests; fi'"
   }
 }

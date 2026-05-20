@@ -17,6 +17,7 @@
 ## 常用文档
 
 - 桌面端快速开始：[Quickstart Desktop](../quickstart-desktop.md)
+- Homebrew 分发方案：[Homebrew Distribution Plan](../homebrew-distribution.md)
 - 工作流选择：[Choosing a Workflow](../choosing-a-workflow.md)
 - Agent 配置：[Agent Setup](../agent-setup.md)
 - 模型和 Provider 配置：[Model and Provider Setup](../model-provider-setup.md)
@@ -32,4 +33,3 @@
 ```
 
 原因很简单：Agent 不只是“调用一次大模型”，它能读文件、运行脚本、看日志、检查输出、修正失败页面，这比单次 API 调用更接近真实 PPT 生产。
-

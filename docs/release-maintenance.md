@@ -18,6 +18,12 @@ For native packaging on macOS:
 npm run package:desktop
 ```
 
+For a Homebrew Cask release zip:
+
+```bash
+npm run package:desktop:homebrew
+```
+
 DMG packaging is optional:
 
 ```bash
@@ -39,6 +45,33 @@ It should cover:
 - dependency audit;
 - Python worker tests;
 - whitespace checks.
+
+The release workflow lives at:
+
+```text
+.github/workflows/release-desktop.yml
+```
+
+It builds a macOS app zip for the Homebrew Cask asset contract and uploads it to
+the selected GitHub release.
+
+## Homebrew Cask Channel
+
+The user-facing install should be:
+
+```bash
+brew install --cask kdnsna/ultimate-ppt-master/ultimate-ppt-master
+```
+
+Release requirements:
+
+- publish `Ultimate-PPT-Master-<version>-macOS-<arch>.zip` assets;
+- update `Casks/ultimate-ppt-master.rb`;
+- copy the cask into `kdnsna/homebrew-ultimate-ppt-master`;
+- replace `sha256 :no_check` with real checksums before public promotion;
+- sign and notarize the app before calling the channel production-ready.
+
+See [Homebrew Distribution Plan](./homebrew-distribution.md).
 
 ## Public Demo Policy
 
@@ -83,4 +116,3 @@ v2.0.0 positions this repository as:
 - a documented foundation for future direct API adapters.
 
 Do not claim the direct API driver is complete until a worker adapter and tests exist.
-

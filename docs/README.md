@@ -15,6 +15,7 @@ The desktop app is the easiest way to start. The agent skill is the strongest pa
 | I want Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf to generate decks. | Agent Skill | [Agent Setup](./agent-setup.md) |
 | I want to know which workflow gives better results. | Decision guide | [Choosing a Workflow](./choosing-a-workflow.md) |
 | I need model/API/provider keys. | Provider setup | [Model and Provider Setup](./model-provider-setup.md) |
+| I want a Homebrew-style public release. | Distribution | [Homebrew Distribution Plan](./homebrew-distribution.md) |
 | Something failed. | Traceable debugging | [Troubleshooting](./troubleshooting.md) |
 | I maintain or release this repository. | Release checklist | [Release and Maintenance](./release-maintenance.md) |
 | 中文用户想快速定位。 | 中文索引 | [中文文档索引](./zh-CN/README.md) |
@@ -23,7 +24,7 @@ The desktop app is the easiest way to start. The agent skill is the strongest pa
 
 | User type | Recommended path | Why |
 |---|---|---|
-| Non-technical creator | `npm run setup` then `npm run desktop` | Least cognitive load, local-first project folders, guided output choice. |
+| Non-technical creator | `brew install --cask kdnsna/ultimate-ppt-master/ultimate-ppt-master` | Least cognitive load: prebuilt app, Launchpad icon, no source setup. |
 | GitHub/agent user | Install as a skill and ask the agent to read `AGENTS.md` / `SKILL.md` | Best quality today because the agent can inspect source files, run the pipeline, preview, fix, and export. |
 | Team maintaining polished decks | Desktop for intake + Agent Skill for final production | Keeps the interface simple while preserving deep control. |
 | API integrator | Use the documented direct API variables only as a reserved convention | The complete direct API worker adapter is not shipped in v2.0.0. |
@@ -53,4 +54,3 @@ These docs informed the repository guidance:
 - [Claude Code memory](https://code.claude.com/docs/en/memory): project-level `CLAUDE.md` is the shared place for build commands and project conventions.
 - [GitHub issue templates](https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository): issue forms provide structured support paths.
 - [Tauri distribution](https://v2.tauri.app/distribute/): native desktop distribution uses Tauri build and bundle commands.
-

@@ -9,7 +9,7 @@
 ![Ultimate PPT Master Desktop hero](assets/readme/hero.svg)
 
 <p align="center">
-  <a href="#quick-start-desktop"><strong>Run Desktop</strong></a>
+  <a href="#install-desktop"><strong>Install Desktop</strong></a>
   ·
   <a href="./README.zh-CN.md"><strong>中文介绍</strong></a>
   ·
@@ -39,11 +39,41 @@ The desktop app and the agent skill are both first-class. Use the desktop app wh
 
 ---
 
+## Install Desktop
+
+The public macOS path is designed to be Homebrew-first:
+
+```bash
+brew install --cask kdnsna/ultimate-ppt-master/ultimate-ppt-master
+open -a "终极融合 PPT 大师"
+```
+
+Then update with:
+
+```bash
+brew upgrade --cask ultimate-ppt-master
+```
+
+This follows the same lightweight distribution shape as polished macOS tools: a prebuilt app bundle, Launchpad icon, no visible Node/Python/Rust setup, and updates through Homebrew.
+
+Current release note: the cask and release artifact contract now live in this repository under [Casks/ultimate-ppt-master.rb](./Casks/ultimate-ppt-master.rb) and [Homebrew Distribution](./docs/homebrew-distribution.md). For a promotion-grade public release, publish signed and notarized release zips into a `kdnsna/homebrew-ultimate-ppt-master` tap.
+
+Developer source mode is still available:
+
+```bash
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
+cd ultimate-ppt-master-skill
+npm run setup
+npm run desktop
+```
+
+---
+
 ## Choose Your Path
 
 | Path | Best for | Start |
 |---|---|---|
-| **Desktop App** | Ordinary creators, business users, teachers, consultants, and anyone who wants a 3-step local workflow. | `npm run setup` then `npm run desktop` |
+| **Desktop App** | Ordinary creators, business users, teachers, consultants, and anyone who wants a 3-step local workflow. | `brew install --cask kdnsna/ultimate-ppt-master/ultimate-ppt-master` |
 | **Agent Skill** | GitHub users and agent operators who want the strongest current output quality with script execution, preview checks, and repair loops. | Read [Agent Setup](./docs/agent-setup.md) |
 | **Desktop + Agent** | Teams that want simple intake plus production-grade final polish. | Create a project in Desktop, then copy the Workbench handoff prompt. |
 | **Direct API / custom bridge** | Developers building their own worker adapter. | Read [Model and Provider Setup](./docs/model-provider-setup.md); v2.1.0 keeps this as a reserved convention. |
@@ -125,9 +155,9 @@ The app currently focuses on the user-facing experience loop: import, recommend,
 
 ---
 
-## Quick Start Desktop
+## Developer Desktop Setup
 
-First run, one-command setup:
+Use this only when you want to run from source or contribute to the project.
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
@@ -178,6 +208,14 @@ npm run package:desktop:dmg
 ```
 
 The bootstrap script intentionally does not install system packages such as Rust, Homebrew, or Cairo for you. `npm run doctor` tells you exactly which optional native pieces are missing. Without Rust, `npm run desktop` still opens the browser UI shell for inspection, but real PPTX/Web generation requires the native Tauri app because the Python worker must write local project files.
+
+For Homebrew release packaging:
+
+```bash
+npm run package:desktop:homebrew
+```
+
+This creates a zip and checksum under `dist/release/` for the cask release channel.
 
 ---
 
