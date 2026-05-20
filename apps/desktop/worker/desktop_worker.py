@@ -43,6 +43,16 @@ SOURCE_KINDS = {"file", "text", "url", "markdown"}
 TEXT_SUFFIXES = {".md", ".markdown", ".txt", ".csv", ".tsv", ".json"}
 DOCUMENT_SUFFIXES = {".pdf", ".docx", ".xlsx", ".xlsm", ".pptx"}
 DEFAULT_PROJECT_ROOT = "projects/desktop"
+ENV_FILE_NAME = ".env"
+USER_ENV_FILE = Path.home() / ".ppt-master" / ".env"
+PROVIDER_KEY_GROUPS = {
+    "openai": ("OPENAI_API_KEY",),
+    "gemini": ("GEMINI_API_KEY",),
+    "qwen": ("QWEN_API_KEY", "DASHSCOPE_API_KEY"),
+    "pexels": ("PEXELS_API_KEY",),
+    "pixabay": ("PIXABAY_API_KEY",),
+}
+DIRECT_LLM_KEYS = ("LLM_API_KEY", "OPENAI_API_KEY", "GEMINI_API_KEY", "QWEN_API_KEY", "DASHSCOPE_API_KEY")
 
 
 @dataclass(frozen=True)
@@ -195,6 +205,53 @@ def command_exists(name: str) -> bool:
     return shutil.which(name) is not None
 
 
+def strip_env_value(value: str) -> str:
+    value = value.strip()
+    if not value:
+        return ""
+    quote = value[0]
+    if quote in {"'", '"'}:
+        end = value.find(quote, 1)
+        if end > 0:
+            return value[1:end].strip()
+    return value.split(" #", 1)[0].strip().strip("'\"")
+
+
+def resolve_env_file(repo_root: Path) -> Path | None:
+    for candidate in (Path.cwd() / ENV_FILE_NAME, repo_root / ENV_FILE_NAME, USER_ENV_FILE):
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def read_env_file_flags(path: Path | None) -> dict[str, str]:
+    if path is None:
+        return {}
+    values: dict[str, str] = {}
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return values
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, raw_value = stripped.split("=", 1)
+        key = key.strip()
+        if key:
+            values[key] = strip_env_value(raw_value)
+    return values
+
+
+def env_or_file_has(key: str, file_values: dict[str, str]) -> bool:
+    return bool(os.environ.get(key) or file_values.get(key))
+
+
+def env_or_file_value(key: str, file_values: dict[str, str]) -> str:
+    return os.environ.get(key) or file_values.get(key, "")
+
+
 def cairo_available() -> bool:
     if command_exists("pkg-config"):
         result = subprocess.run(
@@ -210,6 +267,11 @@ def cairo_available() -> bool:
 
 def inspect_environment(repo_root: Path) -> dict[str, Any]:
     venv_python = repo_root / ".venv" / "bin" / "python"
+    env_file = resolve_env_file(repo_root)
+    env_file_values = read_env_file_flags(env_file)
+    llm_provider = env_or_file_value("LLM_PROVIDER", env_file_values) or env_or_file_value("LLM_DRIVER", env_file_values)
+    llm_model = env_or_file_value("LLM_MODEL", env_file_values)
+    direct_llm_configured = bool((llm_provider or llm_model) and any(env_or_file_has(key, env_file_values) for key in DIRECT_LLM_KEYS))
     return {
         "repoRoot": str(repo_root),
         "platform": platform.platform(),
@@ -229,11 +291,15 @@ def inspect_environment(repo_root: Path) -> dict[str, Any]:
             "rust": command_exists("rustc") and command_exists("cargo"),
         },
         "providers": {
-            "openai": bool(os.environ.get("OPENAI_API_KEY")),
-            "gemini": bool(os.environ.get("GEMINI_API_KEY")),
-            "qwen": bool(os.environ.get("QWEN_API_KEY") or os.environ.get("DASHSCOPE_API_KEY")),
-            "pexels": bool(os.environ.get("PEXELS_API_KEY")),
-            "pixabay": bool(os.environ.get("PIXABAY_API_KEY")),
+            key: any(env_or_file_has(env_key, env_file_values) for env_key in env_keys)
+            for key, env_keys in PROVIDER_KEY_GROUPS.items()
+        },
+        "config": {
+            "envFile": str(env_file) if env_file else None,
+            "imageBackend": env_or_file_value("IMAGE_BACKEND", env_file_values) or None,
+            "llmProvider": llm_provider or None,
+            "llmModel": llm_model or None,
+            "directLlmConfigured": direct_llm_configured,
         },
     }
 

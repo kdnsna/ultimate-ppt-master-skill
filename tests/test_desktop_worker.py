@@ -1,7 +1,9 @@
 import json
+import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from apps.desktop.worker.desktop_worker import (
     inspect_environment,
@@ -59,6 +61,36 @@ class DesktopWorkerTest(unittest.TestCase):
         self.assertIn("python", env)
         self.assertNotIn("OPENAI_API_KEY", payload)
         self.assertNotIn("sk-", payload)
+
+    def test_inspect_environment_reads_env_file_flags_without_secret_values(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            repo_root = tmp_path / "repo"
+            run_dir = tmp_path / "run"
+            repo_root.mkdir()
+            run_dir.mkdir()
+            (repo_root / ".env").write_text(
+                "IMAGE_BACKEND=openai\nOPENAI_API_KEY=sk-test-secret\nLLM_PROVIDER=openai-compatible\nLLM_MODEL=gpt-4.1\n",
+                encoding="utf-8",
+            )
+
+            original_cwd = Path.cwd()
+            try:
+                os.chdir(run_dir)
+                with patch.dict(os.environ, {"IMAGE_BACKEND": "", "OPENAI_API_KEY": ""}, clear=False):
+                    env = inspect_environment(repo_root)
+            finally:
+                os.chdir(original_cwd)
+
+        payload = json.dumps(env, ensure_ascii=False)
+
+        self.assertTrue(env["providers"]["openai"])
+        self.assertEqual(env["config"]["imageBackend"], "openai")
+        self.assertEqual(env["config"]["envFile"], str(repo_root / ".env"))
+        self.assertTrue(env["config"]["directLlmConfigured"])
+        self.assertEqual(env["config"]["llmProvider"], "openai-compatible")
+        self.assertEqual(env["config"]["llmModel"], "gpt-4.1")
+        self.assertNotIn("sk-test-secret", payload)
 
     def test_run_job_creates_web_preview_manifest(self):
         with tempfile.TemporaryDirectory() as tmp:

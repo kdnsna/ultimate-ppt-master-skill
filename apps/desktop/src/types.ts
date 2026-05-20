@@ -98,6 +98,13 @@ export interface EnvironmentStatus {
     pexels: boolean;
     pixabay: boolean;
   };
+  config?: {
+    envFile?: string | null;
+    imageBackend?: string | null;
+    llmProvider?: string | null;
+    llmModel?: string | null;
+    directLlmConfigured?: boolean;
+  };
 }
 
 export interface RecentProject {

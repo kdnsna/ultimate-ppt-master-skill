@@ -270,6 +270,8 @@ h2 {
 .progress-panel,
 .visual-preview,
 .export-panel,
+.model-guide,
+.language-panel,
 .settings-advanced {
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 28px;
@@ -298,6 +300,10 @@ h2 {
 
 .section-heading {
   margin-bottom: 22px;
+}
+
+.compact-heading {
+  margin-bottom: 14px;
 }
 
 .section-heading h2 {
@@ -854,6 +860,211 @@ h2 {
   gap: 14px;
 }
 
+.model-guide {
+  margin-top: 18px;
+  padding: 24px;
+}
+
+.language-panel {
+  margin-top: 18px;
+  padding: 22px 24px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.language-panel h2 {
+  font-size: 24px;
+}
+
+.language-panel .muted {
+  margin: 8px 0 0;
+}
+
+.language-switch {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 18px;
+  background: rgba(23, 32, 51, 0.06);
+}
+
+.language-switch button {
+  min-width: 96px;
+  height: 38px;
+  border: 0;
+  border-radius: 14px;
+  color: var(--muted);
+  font-weight: 900;
+  background: transparent;
+}
+
+.language-switch button.selected {
+  color: var(--ink);
+  background: white;
+  box-shadow: 0 10px 24px rgba(57, 72, 102, 0.12);
+}
+
+.status-pill {
+  padding: 9px 12px;
+  border-radius: 999px;
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 900;
+  background: #fff7ed;
+  border: 1px solid rgba(249, 115, 22, 0.28);
+}
+
+.status-pill.ok {
+  color: #047857;
+  background: #ecfdf5;
+  border-color: rgba(16, 185, 129, 0.28);
+}
+
+.guide-copy {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 12px;
+  align-items: start;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.guide-copy svg {
+  margin-top: 3px;
+  color: var(--blue);
+}
+
+.guide-copy p {
+  margin: 0;
+}
+
+.config-paths {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.config-paths div {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.config-paths strong,
+.config-paths span {
+  display: block;
+}
+
+.config-paths span {
+  margin-top: 5px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.setup-steps {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.driver-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.driver-row {
+  min-height: 156px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.driver-row strong,
+.driver-row span,
+.driver-row p {
+  display: block;
+}
+
+.driver-row span {
+  width: fit-content;
+  margin-top: 10px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 900;
+  background: #eaf2ff;
+}
+
+.driver-row p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.setup-steps code,
+.provider-row code {
+  color: #334155;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.setup-steps code {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(23, 32, 51, 0.06);
+}
+
+.provider-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.provider-row {
+  display: grid;
+  grid-template-columns: 14px minmax(190px, 0.8fr) minmax(260px, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.provider-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #c7ceda;
+}
+
+.provider-dot.ok {
+  background: var(--green);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+}
+
+.provider-row strong,
+.provider-row small {
+  display: block;
+}
+
+.provider-row small {
+  margin-top: 3px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
 .health-item {
   min-height: 112px;
   padding: 18px;
@@ -935,6 +1146,10 @@ h2 {
   .create-grid,
   .preview-grid,
   .settings-grid,
+  .config-paths,
+  .driver-list,
+  .provider-row,
+  .language-panel,
   .hero-panel,
   .trust-strip,
   .creator-steps,

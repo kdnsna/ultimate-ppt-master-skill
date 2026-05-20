@@ -10,6 +10,7 @@
 - 创建页会按输入类型推荐输出模式、风格和页数区间。
 - 项目页展示预览、输出文件、环境检查、日志和 Agent handoff。
 - 最近项目来自真实 `desktop-manifest.json`，不是静态样例。
+- Settings 里提供中文 / English 界面切换，并加入模型驱动方式与 provider 配置引导。
 
 ## Run the Web Shell
 

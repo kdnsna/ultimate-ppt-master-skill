@@ -1,6 +1,6 @@
-# Ultimate PPT Master
+# Ultimate PPT Master - AI PPT Generator for Editable PowerPoint & Web Decks
 
-> From source documents to editable PowerPoint decks and cinematic web presentations.
+> An AI PPT generator and PowerPoint automation skill that turns PDFs, Word/Excel files, old PPTs, URLs, Markdown, and raw notes into editable PPTX decks or cinematic HTML presentations.
 
 <p align="center">
   <strong>v2.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a>
@@ -11,20 +11,29 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill"><img alt="GitHub Repo" src="https://img.shields.io/badge/GitHub-ultimate--ppt--master--skill-111827?style=for-the-badge&logo=github"></a>
   <img alt="Version 2.0.0" src="https://img.shields.io/badge/Version-2.0.0-7C3AED?style=for-the-badge">
+  <img alt="AI PPT Generator" src="https://img.shields.io/badge/AI%20PPT-Generator-F97316?style=for-the-badge">
+  <img alt="PowerPoint Automation" src="https://img.shields.io/badge/PowerPoint-Automation-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-C8A24A?style=for-the-badge">
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="PowerPoint" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="HTML Decks" src="https://img.shields.io/badge/Output-Magazine%20HTML-111827?style=for-the-badge">
+  <img alt="Local first" src="https://img.shields.io/badge/Local--first-Agent%20Workflow-10B981?style=for-the-badge">
 </p>
 
-Most AI presentation tools can make slides look plausible. The problem starts five minutes later: the deck is a screenshot, the layout is locked, the brand system is gone, and the user still has to rebuild the parts that matter.
+If you came to GitHub searching for **PPT**, **AI PPT**, **PowerPoint generator**, **presentation generator**, **PPTX automation**, or **slide deck agent**, this is the opinionated one: it does not stop at pretty slide images. It builds a workflow for PPTs people can actually edit, review, present, and ship.
 
-Ultimate PPT Master is built for that moment. It is a portable agent skill for Codex, Claude Code, OpenClaw, Hermes, Cursor-style IDEs, and other coding agents. It turns real source material into two production-grade outputs:
+Most AI presentation tools can make slides look plausible. The problem starts five minutes later: the deck is a screenshot, the layout is locked, the brand system is gone, and the user still has to rebuild the parts that matter. **Ultimate PPT Master is built for the part after the first draft.**
 
-- **Editable PowerPoint (`.pptx`)** with native text boxes, shapes, charts, speaker notes, animations, and optional narration.
-- **Magazine-style web decks (`index.html`)** for launches, talks, internal sharing, demo days, and visual storytelling.
+It is a portable agent skill for Codex, Claude Code, OpenClaw, Hermes, Cursor-style IDEs, and other coding agents. Drop in real source material, choose the delivery scene, and generate one of two production-grade outputs:
 
-The goal is not "one prompt to random slides." The goal is a repeatable presentation workflow that respects source material, locks a design spec, generates page by page, previews visually, verifies output, and exports something people can actually use.
+| What you need | What it creates |
+|---|---|
+| Business report, consulting deck, training material, investor update | **Editable PowerPoint (`.pptx`)** with native text boxes, shapes, charts, speaker notes, animations, and optional narration |
+| Product launch, demo day, keynote, internal showcase, visual story | **Magazine-style web deck (`index.html`)** with horizontal navigation, motion, WebGL ambience, and high-design layouts |
+
+The goal is not "one prompt to random slides." The goal is a repeatable AI PPT workflow that respects source material, locks a design spec, generates page by page, previews visually, verifies output, and exports something people can actually use.
+
+**In one sentence:** Ultimate PPT Master turns messy real-world material into editable PowerPoint decks and premium web presentations, without locking your files inside a SaaS product.
 
 ---
 
@@ -138,6 +147,58 @@ npm run tauri:build:dmg
 ```
 
 The current MVP creates local project folders, environment checks, Web Deck previews, and lightweight editable PPTX previews. Production-quality deck generation remains grounded in the full `SKILL.md` workflow.
+
+The desktop settings also include a **Language** switch for Chinese and English users. The choice is saved locally and updates the core creator flow, workbench, environment checks, and model setup guide.
+
+---
+
+## Model and Provider Setup
+
+Yes, production-grade generation needs a model. Ultimate PPT Master does not bundle or resell a cloud model. The recommended path is **Agent-driven generation**: the reasoning and page-by-page authoring are driven by the agent you already use, such as Codex, Claude Code, OpenClaw, Hermes, Cursor-style IDEs, or another local coding agent.
+
+The desktop app is the local product layer: it imports files, recommends output settings, creates project folders, checks dependencies, shows previews, and hands the project to the full agent workflow. It does not upload your files or display secret keys.
+
+| Driver mode | Current status | Best for |
+|---|---|---|
+| **Codex / Claude Code / OpenClaw / Hermes Agent** | Recommended and supported | Full workflow: source reading, strategy, design lock, page writing, script execution, preview, correction, export |
+| **Agent + provider keys** | Supported | Main workflow still runs in the Agent; provider keys unlock image generation, image search, narration, and other media capabilities |
+| **Direct LLM API driver** | Adapter convention reserved | Future desktop worker mode for users who want an OpenAI-compatible, Gemini, Qwen, or self-hosted API to drive the whole generation loop directly |
+
+| Capability | Who provides it | Where to configure it |
+|---|---|---|
+| Content strategy, outline, slide writing, layout decisions | Your Agent's model | Configure inside Codex, Claude Code, Hermes, OpenClaw, or your IDE agent |
+| AI image generation | OpenAI, Gemini, Qwen/DashScope, Zhipu, Volcengine, MiniMax, OpenRouter, etc. | `.env` or process environment |
+| Stock image search | Pexels / Pixabay, with Openverse and Wikimedia fallback | `.env` or process environment |
+| Narration / TTS | edge-tts by default; optional ElevenLabs, MiniMax, Qwen, CosyVoice | `.env` or process environment |
+
+Recommended local config:
+
+```bash
+mkdir -p ~/.ppt-master
+cp .env.example ~/.ppt-master/.env
+```
+
+Then edit `~/.ppt-master/.env`:
+
+```dotenv
+IMAGE_BACKEND=openai
+OPENAI_API_KEY=sk-xxx
+OPENAI_MODEL=gpt-image-2
+
+# Optional image search
+PEXELS_API_KEY=your-pexels-key
+PIXABAY_API_KEY=your-pixabay-key
+
+# Optional direct API driver convention for future worker adapters
+LLM_PROVIDER=openai-compatible
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_API_KEY=sk-xxx
+LLM_MODEL=gpt-4.1
+```
+
+The desktop **Settings** page now includes a Model Setup guide. It detects whether provider keys and reserved direct-API fields are available from the current process environment, the repository `.env`, or `~/.ppt-master/.env`, while only showing status flags and never exposing the secret values.
+
+For v2.0.0, use Agent-driven mode for serious PPT generation. Direct API driver mode is documented as a forward-compatible configuration shape, not a replacement for the full `SKILL.md` workflow yet.
 
 ---
 

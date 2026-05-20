@@ -1,6 +1,6 @@
-# 终极融合 PPT 大师
+# 终极融合 PPT 大师 - AI PPT 生成器 / 可编辑 PowerPoint / 网页演示
 
-> 从真实资料到可编辑 PowerPoint 和高质感网页演示的 Agent 技能包。
+> 面向 Agent 的 AI PPT 生成器：把 PDF、Word、Excel、旧 PPT、网页、Markdown 和粘贴文本，变成可编辑 PPTX 或高质感网页 PPT。
 
 <p align="center">
   <strong>v2.0.0</strong> · <a href="./README.md">English README</a> · 中文
@@ -11,20 +11,29 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill"><img alt="GitHub Repo" src="https://img.shields.io/badge/GitHub-ultimate--ppt--master--skill-111827?style=for-the-badge&logo=github"></a>
   <img alt="Version 2.0.0" src="https://img.shields.io/badge/Version-2.0.0-7C3AED?style=for-the-badge">
+  <img alt="AI PPT Generator" src="https://img.shields.io/badge/AI%20PPT-Generator-F97316?style=for-the-badge">
+  <img alt="PowerPoint Automation" src="https://img.shields.io/badge/PowerPoint-Automation-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-C8A24A?style=for-the-badge">
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
   <img alt="PowerPoint" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="HTML Decks" src="https://img.shields.io/badge/Output-Magazine%20HTML-111827?style=for-the-badge">
+  <img alt="Local first" src="https://img.shields.io/badge/Local--first-Agent%20Workflow-10B981?style=for-the-badge">
 </p>
 
-大多数 AI PPT 工具能给你一份“看起来像 PPT”的结果，但真正的问题往往在生成之后：页面不可编辑、品牌体系不稳定、内容没有来源约束、想改一页就要重做。
+如果你是在 GitHub 搜 **PPT**、**AI PPT**、**PPT 生成器**、**PowerPoint 自动化**、**PPTX 生成**、**演示文稿 Agent**，这个项目想解决的是最痛的那一步：不只是生成一组漂亮截图，而是生成能编辑、能复盘、能交付、能继续迭代的 PPT。
 
-终极融合 PPT 大师解决的是这个后半段问题。它是一个面向 Codex、Claude Code、OpenClaw、Hermes、Cursor 类 IDE 和通用 Agent 的本地技能包，把真实材料转成两类可交付成果：
+大多数 AI PPT 工具能给你一份“看起来像 PPT”的结果，但真正的问题往往在生成之后：页面不可编辑、品牌体系不稳定、内容没有来源约束、想改一页就要重做。**终极融合 PPT 大师解决的是初稿之后的真实工作流。**
 
-- **可编辑 PowerPoint (`.pptx`)**：适合正式汇报、咨询报告、培训课件、客户交付和需要继续修改的材料。
-- **杂志风网页 PPT (`index.html`)**：适合线下分享、发布会、demo day、产品故事和强视觉展示。
+它是一个面向 Codex、Claude Code、OpenClaw、Hermes、Cursor 类 IDE 和通用 Agent 的本地技能包。把真实材料拖进来，选择交付场景，然后生成两类可交付成果：
+
+| 你的需求 | 它输出什么 |
+|---|---|
+| 商务汇报、咨询报告、培训课件、投资人更新、客户交付 | **可编辑 PowerPoint (`.pptx`)**：真实文本框、形状、图表、演讲备注、动画和可选旁白 |
+| 发布会、demo day、产品故事、内部分享、强视觉演讲 | **杂志风网页 PPT (`index.html`)**：横向翻页、动效、WebGL 氛围和高设计感版式 |
 
 核心不是“一句话随机生成 PPT”，而是：先理解资料和场景，锁定设计规范，逐页生成，预览检查，最后导出真正能使用的演示文稿。
+
+**一句话定位：**把杂乱真实资料变成可编辑 PowerPoint 和高级网页演示，同时尽量不把你的文件锁进某个 SaaS。
 
 ---
 
@@ -135,6 +144,58 @@ npm run tauri:build:dmg
 ```
 
 当前 MVP 会创建本地项目目录、检查环境、生成 Web Deck 预览和轻量可编辑 PPTX 预览。生产级高质量生成仍然走完整 `SKILL.md` 工作流。
+
+桌面端 Settings 里已加入 **Language / 界面语言** 切换，支持中文和 English。选择会保存在本机，并影响首页、创建流程、工作台、环境检查和模型配置引导。
+
+---
+
+## 大模型与 Provider 配置
+
+是的，生产级生成需要大模型驱动。但这个项目不内置、不转售、不托管云模型。当前最推荐的是 **Agent 驱动模式**：内容策略、逐页写稿、版式决策主要由你正在使用的 Agent 模型完成，例如 Codex、Claude Code、OpenClaw、Hermes、Cursor 类 IDE 或其他本地 Agent。
+
+桌面 app 负责产品体验层：导入资料、推荐输出设置、创建项目目录、检查依赖、展示预览，并把项目交给完整 Agent 工作流。它默认不上传你的文件，也不会显示密钥明文。
+
+| 驱动方式 | 当前状态 | 适合场景 |
+|---|---|---|
+| **Codex / Claude Code / OpenClaw / Hermes Agent** | 推荐，已支持 | 完整工作流：读资料、做策略、锁设计、逐页生成、跑脚本、预览、修正、导出 |
+| **Agent + Provider Keys** | 已支持 | 主流程仍由 Agent 执行；provider key 用来开启生图、搜图、旁白等媒体能力 |
+| **Direct LLM API Driver** | 已预留配置约定 | 后续桌面 worker 可直接用 OpenAI-compatible、Gemini、Qwen 或自托管 API 驱动完整生成循环 |
+
+| 能力 | 由谁提供 | 在哪里配置 |
+|---|---|---|
+| 内容策略、故事线、逐页写稿、版式决策 | 你使用的 Agent 大模型 | 在 Codex、Claude Code、Hermes、OpenClaw 或 IDE Agent 里配置 |
+| AI 生图 | OpenAI、Gemini、Qwen/DashScope、智谱、火山、MiniMax、OpenRouter 等 | `.env` 或当前进程环境变量 |
+| 图片搜索 | Pexels / Pixabay，另有 Openverse 和 Wikimedia fallback | `.env` 或当前进程环境变量 |
+| 旁白 / TTS | 默认 edge-tts；可选 ElevenLabs、MiniMax、Qwen、CosyVoice | `.env` 或当前进程环境变量 |
+
+推荐本地配置方式：
+
+```bash
+mkdir -p ~/.ppt-master
+cp .env.example ~/.ppt-master/.env
+```
+
+然后编辑 `~/.ppt-master/.env`：
+
+```dotenv
+IMAGE_BACKEND=openai
+OPENAI_API_KEY=sk-xxx
+OPENAI_MODEL=gpt-image-2
+
+# 可选：图片搜索
+PEXELS_API_KEY=your-pexels-key
+PIXABAY_API_KEY=your-pixabay-key
+
+# 可选：为后续 Direct API Worker 预留的直连配置约定
+LLM_PROVIDER=openai-compatible
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_API_KEY=sk-xxx
+LLM_MODEL=gpt-4.1
+```
+
+桌面端 **Settings** 页已经加入 Model Setup 引导，会检测当前进程环境变量、仓库 `.env` 或 `~/.ppt-master/.env` 里的 provider 配置状态和预留直连 API 字段，只显示是否配置成功，不暴露密钥值。
+
+v2.0.0 阶段建议正式生成优先走 Agent 驱动模式。Direct API Driver 目前是面向后续 worker adapter 的配置约定，还不是完整替代 `SKILL.md` 的内置生成引擎。
 
 ---
 
