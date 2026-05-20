@@ -125,6 +125,18 @@ Run as a native Tauri app after installing Rust:
 npm run tauri:dev
 ```
 
+Build the native macOS app bundle:
+
+```bash
+npm run tauri:build
+```
+
+Create a DMG release package when Finder automation is available:
+
+```bash
+npm run tauri:build:dmg
+```
+
 The current MVP creates local project folders, environment checks, Web Deck previews, and lightweight editable PPTX previews. Production-quality deck generation remains grounded in the full `SKILL.md` workflow.
 
 ---

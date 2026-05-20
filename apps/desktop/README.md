@@ -33,6 +33,18 @@ Rust is required for native Tauri commands and app packaging.
 npm run tauri:dev
 ```
 
+Build the native macOS app bundle:
+
+```bash
+npm run tauri:build
+```
+
+Create a DMG release package when Finder automation is available:
+
+```bash
+npm run tauri:build:dmg
+```
+
 The Python worker can also be tested directly:
 
 ```bash

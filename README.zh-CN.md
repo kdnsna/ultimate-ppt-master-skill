@@ -122,6 +122,18 @@ npm run build
 npm run tauri:dev
 ```
 
+构建原生 macOS `.app`：
+
+```bash
+npm run tauri:build
+```
+
+在 Finder 自动化可用时生成 DMG 发布包：
+
+```bash
+npm run tauri:build:dmg
+```
+
 当前 MVP 会创建本地项目目录、检查环境、生成 Web Deck 预览和轻量可编辑 PPTX 预览。生产级高质量生成仍然走完整 `SKILL.md` 工作流。
 
 ---
