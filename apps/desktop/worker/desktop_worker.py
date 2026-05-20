@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Desktop worker for the Ultimate PPT Master app.
 
-The worker is intentionally small: it creates a local project folder, normalizes
-the user's source into a first-pass outline, and emits preview artifacts that the
-desktop app can show immediately. The full agentic PPT workflow still lives in
-SKILL.md and scripts/.
+The worker creates a local project folder, normalizes the user's source into a
+first-pass outline, and emits a production draft that is strong enough for local
+review. Full agentic refinement still lives in SKILL.md and scripts/, but the
+desktop output should use the same design assets and visual language instead of
+a throwaway smoke-test shell.
 """
 
 from __future__ import annotations
@@ -30,11 +31,13 @@ from urllib.parse import urlparse
 try:
     from pptx import Presentation
     from pptx.dml.color import RGBColor
+    from pptx.enum.shapes import MSO_SHAPE
     from pptx.enum.text import PP_ALIGN
     from pptx.util import Inches, Pt
 except Exception:  # pragma: no cover - covered by environment checks
     Presentation = None  # type: ignore
     RGBColor = None  # type: ignore
+    MSO_SHAPE = None  # type: ignore
     PP_ALIGN = None  # type: ignore
     Inches = None  # type: ignore
     Pt = None  # type: ignore
@@ -519,7 +522,7 @@ def source_to_text(job: dict[str, Any], project_path: Path, repo_root: Path) -> 
     else:
         text = (
             f"Imported file: {source_path.name}\n\n"
-            "This desktop MVP created a local project shell. For full document extraction, "
+            "This desktop draft created a local project shell. For full document extraction, "
             "run the full ultimate-ppt-master workflow from SKILL.md."
         )
         generated_markdown_path.write_text(text, encoding="utf-8")
@@ -554,6 +557,60 @@ def is_section_heading(line: str) -> bool:
 def clip_text(value: Any, limit: int = 88) -> str:
     text = str(value).strip()
     return text if len(text) <= limit else f"{text[:limit - 1]}…"
+
+
+def clip_sentence(value: Any, limit: int = 58) -> str:
+    text = re.sub(r"\s+", " ", str(value).strip())
+    text = re.sub(r"^[_*`#>-]+|[_*`#>-]+$", "", text).strip()
+    return text if len(text) <= limit else f"{text[:limit - 1]}…"
+
+
+def split_title(value: str, line_limit: int = 16, max_lines: int = 3) -> list[str]:
+    title = re.sub(r"\s+", "", value.strip())
+    if not title:
+        return ["Untitled"]
+    lines = [title[idx: idx + line_limit] for idx in range(0, len(title), line_limit)]
+    closing = "，。！？；：、）》」』”’"
+    opening = "《（「『“‘"
+    for idx in range(1, len(lines)):
+        if lines[idx] and lines[idx][0] in closing and lines[idx - 1]:
+            lines[idx - 1] += lines[idx][0]
+            lines[idx] = lines[idx][1:]
+        if lines[idx - 1] and lines[idx - 1][-1] in opening and lines[idx]:
+            lines[idx] = lines[idx - 1][-1] + lines[idx]
+            lines[idx - 1] = lines[idx - 1][:-1]
+    lines = [line for line in lines if line]
+    if len(lines) > max_lines:
+        lines = lines[:max_lines]
+        lines[-1] = lines[-1].rstrip("…") + "…"
+    return lines
+
+
+def cover_title_lines(value: str, line_limit: int = 12, max_lines: int = 3) -> list[str]:
+    raw = re.sub(r"\s+", "", value.strip())
+    quoted = re.search(r"[“\"]([^”\"]{2,16})[”\"]", raw)
+    if quoted:
+        lead = quoted.group(1)
+        tail = raw[quoted.end():]
+        tail = re.sub(r"^[暨及和与·:：-]+", "", tail)
+        tail = re.sub(r"(的)?(请示|方案|材料|初稿|汇报|报告|通知).*$", "", tail)
+        tail = tail.replace("2026年", "2026")
+        if max_lines >= 3 and tail.endswith("消费主题活动") and len(tail) > len("消费主题活动"):
+            tail_lines = [tail[: -len("消费主题活动")], "消费主题活动"]
+        else:
+            tail_lines = split_title(tail, line_limit, max(1, max_lines - 1)) if tail else []
+        return [lead, *tail_lines][:max_lines]
+    raw = re.sub(r"^关于(举办|开展|推进|落实)", "", raw)
+    raw = re.sub(r"(的)?(请示|方案|材料|初稿|汇报|报告|通知).*$", "", raw)
+    return split_title(raw, line_limit, max_lines)
+
+
+def slide_title(value: str, limit: int = 34) -> str:
+    return clip_sentence(value, limit)
+
+
+def slide_body(value: str, limit: int = 50) -> str:
+    return clip_sentence(value, limit)
 
 
 def build_sections(lines: list[str]) -> list[dict[str, Any]]:
@@ -659,22 +716,109 @@ def write_preview_svg(outline: list[dict[str, Any]], project_path: Path, style: 
   <text x="88" y="154" fill="{accent}" font-family="Avenir Next, PingFang SC, sans-serif" font-size="28" font-weight="800">{html.escape(slide['eyebrow'])}</text>
   <text x="88" y="292" fill="{ink}" font-family="Avenir Next, PingFang SC, sans-serif" font-size="72" font-weight="850">{html.escape(slide['title'])}</text>
   {bullet_text}
-  <text x="88" y="750" fill="#667085" font-family="Avenir Next, PingFang SC, sans-serif" font-size="24">Desktop MVP preview · Full production workflow remains agent-driven</text>
+  <text x="88" y="750" fill="#667085" font-family="Avenir Next, PingFang SC, sans-serif" font-size="24">Production draft · Full refinement workflow remains agent-driven</text>
 </svg>"""
     path = project_path / "preview" / "cover.svg"
     path.write_text(svg, encoding="utf-8")
     return svg
 
 
-def add_text_box(slide: Any, left: float, top: float, width: float, height: float, text: str, size: int, color: tuple[int, int, int], bold: bool = False) -> None:
+def shape_rect() -> Any:
+    return MSO_SHAPE.RECTANGLE if MSO_SHAPE is not None else 1
+
+
+def add_text_box(
+    slide: Any,
+    left: float,
+    top: float,
+    width: float,
+    height: float,
+    text: str,
+    size: int,
+    color: tuple[int, int, int],
+    bold: bool = False,
+    align: Any | None = None,
+    font_name: str = "Aptos",
+) -> Any:
     box = slide.shapes.add_textbox(Inches(left), Inches(top), Inches(width), Inches(height))
     frame = box.text_frame
     frame.clear()
+    frame.word_wrap = True
+    frame.margin_left = Inches(0.02)
+    frame.margin_right = Inches(0.02)
+    frame.margin_top = Inches(0.01)
+    frame.margin_bottom = Inches(0.01)
     p = frame.paragraphs[0]
     p.text = text
+    if align is not None:
+        p.alignment = align
+    p.font.name = font_name
     p.font.size = Pt(size)
     p.font.bold = bold
     p.font.color.rgb = RGBColor(*color)
+    return box
+
+
+def add_filled_rect(slide: Any, left: float, top: float, width: float, height: float, fill: tuple[int, int, int], line: tuple[int, int, int] | None = None) -> Any:
+    shape = slide.shapes.add_shape(shape_rect(), Inches(left), Inches(top), Inches(width), Inches(height))
+    shape.fill.solid()
+    shape.fill.fore_color.rgb = RGBColor(*fill)
+    if line is None:
+        shape.line.fill.background()
+    else:
+        shape.line.color.rgb = RGBColor(*line)
+    return shape
+
+
+def ppt_palette(style: str) -> dict[str, tuple[int, int, int]]:
+    palettes = {
+        "business": {
+            "paper": (248, 246, 240),
+            "ink": (18, 28, 45),
+            "muted": (85, 95, 112),
+            "accent": (231, 84, 41),
+            "accent2": (31, 97, 141),
+            "soft": (255, 238, 221),
+            "card": (255, 255, 255),
+        },
+        "consulting": {
+            "paper": (246, 248, 251),
+            "ink": (17, 24, 39),
+            "muted": (75, 85, 99),
+            "accent": (37, 99, 235),
+            "accent2": (15, 118, 110),
+            "soft": (226, 232, 240),
+            "card": (255, 255, 255),
+        },
+        "academic": {
+            "paper": (244, 248, 255),
+            "ink": (23, 43, 77),
+            "muted": (91, 105, 135),
+            "accent": (16, 122, 105),
+            "accent2": (79, 70, 229),
+            "soft": (222, 241, 236),
+            "card": (255, 255, 255),
+        },
+        "editorial": {
+            "paper": (241, 239, 234),
+            "ink": (23, 21, 19),
+            "muted": (98, 89, 79),
+            "accent": (194, 65, 12),
+            "accent2": (62, 88, 121),
+            "soft": (232, 229, 222),
+            "card": (255, 252, 246),
+        },
+        "swiss": {
+            "paper": (255, 255, 255),
+            "ink": (10, 10, 10),
+            "muted": (82, 82, 82),
+            "accent": (0, 86, 255),
+            "accent2": (225, 29, 72),
+            "soft": (236, 242, 255),
+            "card": (246, 247, 249),
+        },
+    }
+    return palettes.get(style, palettes["business"])
 
 
 def generate_pptx(outline: list[dict[str, Any]], project_path: Path, style: str) -> Path:
@@ -684,69 +828,308 @@ def generate_pptx(outline: list[dict[str, Any]], project_path: Path, style: str)
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
     blank = prs.slide_layouts[6]
-    accent_map = {
-        "business": (249, 115, 22),
-        "consulting": (37, 99, 235),
-        "academic": (16, 185, 129),
-        "editorial": (194, 65, 12),
-        "swiss": (225, 29, 72),
-    }
-    accent = accent_map.get(style, accent_map["business"])
+    palette = ppt_palette(style)
+    paper = palette["paper"]
+    ink = palette["ink"]
+    muted = palette["muted"]
+    accent = palette["accent"]
+    accent2 = palette["accent2"]
+    soft = palette["soft"]
+    card = palette["card"]
+
     for idx, item in enumerate(outline):
         slide = prs.slides.add_slide(blank)
         bg = slide.background.fill
         bg.solid()
-        bg.fore_color.rgb = RGBColor(255, 248, 236)
-        add_text_box(slide, 0.62, 0.48, 2.2, 0.3, item["eyebrow"], 14, accent, True)
-        add_text_box(slide, 0.62, 1.15, 11.3, 1.1, item["title"], 34 if idx == 0 else 30, (23, 32, 51), True)
-        for bullet_idx, bullet in enumerate(item["bullets"][:5]):
-            add_text_box(slide, 0.92, 2.7 + bullet_idx * 0.65, 10.8, 0.42, f"- {bullet}", 18, (73, 84, 104))
-        shape = slide.shapes.add_shape(1, Inches(10.9), Inches(5.9), Inches(1.45), Inches(0.14))
-        shape.fill.solid()
-        shape.fill.fore_color.rgb = RGBColor(*accent)
-        shape.line.fill.background()
+        bg.fore_color.rgb = RGBColor(*paper)
+
+        add_filled_rect(slide, 0, 0, 0.16, 7.5, accent)
+        add_text_box(slide, 0.48, 0.34, 3.1, 0.28, f"{item['eyebrow']} / {idx + 1:02d}", 9, accent, True, font_name="Aptos Mono")
+        add_text_box(slide, 11.2, 0.34, 1.45, 0.28, "DRAFT", 9, muted, True, PP_ALIGN.RIGHT if PP_ALIGN else None, "Aptos Mono")
+
+        if idx == 0:
+            add_filled_rect(slide, 8.65, 0, 4.68, 7.5, accent)
+            add_filled_rect(slide, 0.62, 5.78, 2.6, 0.08, accent2)
+            title_lines = cover_title_lines(str(item["title"]), 14, 3)
+            y = 1.18
+            for line in title_lines:
+                add_text_box(slide, 0.62, y, 7.65, 0.7, line, 34, ink, True, font_name="Aptos Display")
+                y += 0.72
+            lead = " / ".join(slide_body(bullet, 26) for bullet in item["bullets"][:2])
+            add_text_box(slide, 0.66, 4.2, 6.8, 0.76, lead, 18, muted)
+            add_text_box(slide, 9.04, 1.05, 3.38, 0.55, "Editable PowerPoint", 24, (255, 255, 255), True)
+            add_text_box(slide, 9.08, 1.82, 3.25, 1.5, "真实文字、形状、结构和本地项目链路。桌面端先给出可审阅草稿，完整精修交给 Agent 工作流。", 15, (255, 245, 238))
+            add_text_box(slide, 9.08, 6.28, 3.25, 0.32, "Ultimate PPT Master · v2.0.0", 10, (255, 245, 238), font_name="Aptos Mono")
+            continue
+
+        if idx % 5 == 0:
+            bg.fore_color.rgb = RGBColor(*ink)
+            add_filled_rect(slide, 0, 0, 13.333, 0.18, accent)
+            add_text_box(slide, 0.72, 0.62, 1.7, 0.4, f"{idx:02d}", 26, accent, True, font_name="Aptos Display")
+            add_text_box(slide, 0.72, 2.04, 10.8, 1.25, slide_title(str(item["title"]), 28), 38, (255, 255, 255), True, font_name="Aptos Display")
+            add_text_box(slide, 0.76, 4.0, 8.8, 0.9, " / ".join(slide_body(b, 22) for b in item["bullets"][:3]), 17, (221, 226, 235))
+            add_text_box(slide, 9.5, 5.85, 2.55, 0.3, "SECTION BREAK", 10, (221, 226, 235), True, PP_ALIGN.RIGHT if PP_ALIGN else None, "Aptos Mono")
+            continue
+
+        add_text_box(slide, 0.68, 0.96, 11.2, 0.72, slide_title(str(item["title"])), 27, ink, True, font_name="Aptos Display")
+        bullets = [slide_body(bullet) for bullet in item["bullets"][:6]]
+
+        if len(bullets) <= 3:
+            add_filled_rect(slide, 0.72, 2.3, 7.2, 2.7, card)
+            add_filled_rect(slide, 0.72, 2.3, 0.12, 2.7, accent)
+            for bullet_idx, bullet in enumerate(bullets):
+                add_text_box(slide, 1.06, 2.64 + bullet_idx * 0.68, 6.28, 0.42, bullet, 18, ink, bullet_idx == 0)
+            add_filled_rect(slide, 8.6, 2.28, 3.42, 2.72, soft)
+            add_text_box(slide, 9.0, 2.64, 2.62, 0.45, "交付信号", 18, accent, True)
+            add_text_box(slide, 9.0, 3.24, 2.52, 1.0, "将信息收束为可以审阅、继续改、继续交付的页面结构。", 14, muted)
+        else:
+            for bullet_idx, bullet in enumerate(bullets):
+                col = bullet_idx % 2
+                row = bullet_idx // 2
+                left = 0.72 + col * 6.0
+                top = 2.03 + row * 1.42
+                add_filled_rect(slide, left, top, 5.36, 1.02, card, soft)
+                add_text_box(slide, left + 0.25, top + 0.18, 0.46, 0.34, f"{bullet_idx + 1:02d}", 13, accent, True, font_name="Aptos Mono")
+                add_text_box(slide, left + 0.82, top + 0.16, 4.28, 0.56, bullet, 14, ink)
+
+        add_filled_rect(slide, 0.72, 6.72, 9.5, 0.02, soft)
+        add_text_box(slide, 0.72, 6.86, 7.4, 0.26, "Production draft · open in PowerPoint for editable review", 8, muted, font_name="Aptos Mono")
+        add_text_box(slide, 10.8, 6.82, 1.4, 0.28, f"{idx + 1:02d}", 10, accent, True, PP_ALIGN.RIGHT if PP_ALIGN else None, "Aptos Mono")
     output = project_path / "outputs" / "ultimate-ppt-master-preview.pptx"
     prs.save(output)
     return output
 
 
-def generate_web_deck(outline: list[dict[str, Any]], project_path: Path, style: str) -> tuple[Path, str]:
-    accent = "#E11D48" if style == "swiss" else "#F97316"
-    sections = []
-    for idx, slide in enumerate(outline):
-        bullets = "\n".join(f"<li>{html.escape(str(item))}</li>" for item in slide["bullets"][:5])
-        sections.append(
-            f"""<section class="slide {'hero' if idx == 0 else ''}">
-  <p class="eyebrow">{html.escape(slide['eyebrow'])}</p>
-  <h1>{html.escape(slide['title'])}</h1>
-  <ul>{bullets}</ul>
-</section>"""
+def copy_web_assets(project_path: Path, repo_root: Path) -> None:
+    assets_dir = project_path / "outputs" / "assets"
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    motion_src = repo_root / "assets" / "magazine-web" / "motion.min.js"
+    if motion_src.exists():
+        shutil.copy2(motion_src, assets_dir / "motion.min.js")
+
+
+def replace_template_slides(template: str, slides_html: str) -> str:
+    if "<!-- SLIDES_HERE -->" in template:
+        return template.replace("<!-- SLIDES_HERE -->", slides_html)
+    marker = "<!-- SLIDES_HERE"
+    if marker not in template:
+        raise RuntimeError("Magazine Web template is missing SLIDES_HERE marker.")
+    start = template.index(marker)
+    end_marker = "\n</div>\n\n<div id=\"nav\""
+    end = template.find(end_marker, start)
+    if end < 0:
+        raise RuntimeError("Unable to locate deck closing tag in Magazine Web template.")
+    return template[:start] + slides_html + template[end:]
+
+
+def chrome(title: str, page: int, total: int) -> str:
+    return f"""<div class="chrome">
+    <div>{html.escape(title)} · Ultimate PPT Master</div>
+    <div>{page:02d} / {total:02d}</div>
+  </div>"""
+
+
+def foot(label: str) -> str:
+    return f"""<div class="foot">
+    <div>{html.escape(label)}</div>
+    <div>— · —</div>
+  </div>"""
+
+
+def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> str:
+    total = len(outline)
+    sections: list[str] = []
+    title_lines = cover_title_lines(str(outline[0]["title"]), 10, 3)
+    title = "<br>".join(html.escape(line) for line in title_lines)
+    title_size = "min(4.5vw,8.2vh)" if len(str(outline[0]["title"])) > 24 else "min(6.4vw,11vh)"
+    lead_items = outline[1]["bullets"][:2] if len(outline) > 1 else outline[0]["bullets"][:2]
+    subtitle = " · ".join(html.escape(slide_body(item, 30)) for item in lead_items)
+    cover_points = []
+    for idx, item in enumerate(outline[1:4], start=1):
+        point = slide_body(item["bullets"][0] if item["bullets"] else item["title"], 34)
+        cover_points.append(
+            f"""<div class="stat-card" data-anim>
+        <div class="stat-label">Theme {idx:02d}</div>
+        <div class="stat-nb">{idx}<span class="stat-unit">项</span></div>
+        <div class="stat-note">{html.escape(point)}</div>
+      </div>"""
         )
-    deck = f"""<!doctype html>
-<html lang="zh-CN">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ultimate PPT Master Desktop Preview</title>
-  <style>
-    :root {{ color-scheme: light; --accent: {accent}; --ink: #172033; --muted: #667085; }}
-    body {{ margin: 0; font-family: Avenir Next, PingFang SC, Microsoft YaHei, sans-serif; background: #fff8ec; color: var(--ink); }}
-    main {{ display: flex; overflow-x: auto; scroll-snap-type: x mandatory; height: 100vh; }}
-    .slide {{ min-width: 100vw; box-sizing: border-box; padding: 8vh 9vw; scroll-snap-align: start; display: grid; align-content: center; background: radial-gradient(circle at 18% 12%, rgba(249,115,22,.16), transparent 32%), linear-gradient(135deg, #fff8ec, #f4f8ff 58%, #fff3e8); }}
-    .slide:nth-child(even) {{ background: radial-gradient(circle at 80% 18%, rgba(37,99,235,.16), transparent 30%), linear-gradient(135deg, #f8fbff, #fff8ec); }}
-    .eyebrow {{ color: var(--accent); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }}
-    h1 {{ font-size: clamp(44px, 7vw, 86px); line-height: .98; max-width: 980px; margin: 0 0 36px; }}
-    ul {{ list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; max-width: 820px; }}
-    li {{ font-size: clamp(20px, 2.4vw, 30px); color: var(--muted); }}
-    li::before {{ content: ""; display: inline-block; width: 14px; height: 14px; border-radius: 99px; background: var(--accent); margin-right: 14px; }}
-  </style>
-</head>
-<body>
-  <main>
-    {' '.join(sections)}
-  </main>
-</body>
-</html>"""
+    cover_cards = "\n".join(cover_points)
+    sections.append(f"""<section class="slide hero light" data-animate="hero">
+  {chrome(deck_title, 1, total)}
+  <div class="frame" style="display:grid;grid-template-columns:1.28fr .82fr;gap:5vw;align-items:center;min-height:80vh">
+    <div style="display:grid;gap:3vh;align-content:center">
+      <div class="kicker" data-anim>Production Draft · Local First</div>
+      <h1 class="h-hero" style="font-size:{title_size};line-height:1.08;max-width:58vw" data-anim>{title}</h1>
+      <p class="lead" style="max-width:50vw" data-anim>{subtitle}</p>
+      <div class="meta-row" data-anim><span>Editable PPTX</span><span>·</span><span>Magazine Web Deck</span><span>·</span><span>Agent Ready</span></div>
+    </div>
+    <div style="display:grid;gap:2.4vh;align-content:center">
+      <div class="callout" style="border-left-color:#c2410c;background:rgba(194,65,12,.08)" data-anim>
+        <div class="q-big">从原始办公材料进入桌面生成链路，先给出可审阅、可复用、可继续精修的演示草稿。</div>
+        <span class="cite">DOCX → Markdown → Deck</span>
+      </div>
+      <div class="grid-3" style="gap:2vw;flex:initial">{cover_cards}</div>
+    </div>
+  </div>
+  {foot("真实资料 · 本地生成 · 可继续深加工")}
+</section>""")
+
+    for idx, slide in enumerate(outline[1:], start=2):
+        bullets = [html.escape(slide_body(item, 48)) for item in slide["bullets"][:6]]
+        title_html = html.escape(slide_title(str(slide["title"]), 32))
+        if idx == 2:
+            cards = "\n".join(
+                f"""<div class="stat-card" data-anim>
+        <div class="stat-label">Signal {n + 1:02d}</div>
+        <div class="stat-nb">{n + 1}<span class="stat-unit">项</span></div>
+        <div class="stat-note">{bullet}</div>
+      </div>"""
+                for n, bullet in enumerate(bullets[:6])
+            )
+            sections.append(f"""<section class="slide light">
+  {chrome(deck_title, idx, total)}
+  <div class="frame" style="padding-top:5vh">
+    <div class="kicker" data-anim>{html.escape(str(slide['eyebrow']))}</div>
+    <h2 class="h-xl" data-anim>{title_html}</h2>
+    <div class="grid-6" style="margin-top:5vh">{cards}</div>
+  </div>
+  {foot("核心信号")}
+</section>""")
+        elif idx % 3 == 0:
+            left = bullets[:3]
+            right = bullets[3:6] or bullets[:3]
+            left_html = "<br>".join(left)
+            right_html = "".join(f"<div class=\"rowline\" data-anim><div class=\"k\">{n + 1:02d}</div><div class=\"v\">{bullet}</div><div class=\"m\">Action</div></div>" for n, bullet in enumerate(right))
+            sections.append(f"""<section class="slide dark" data-animate="directional">
+  {chrome(deck_title, idx, total)}
+  <div class="frame grid-2-7-5" style="padding-top:6vh">
+    <div>
+      <div class="kicker" data-anim>{html.escape(str(slide['eyebrow']))}</div>
+      <h2 class="h-xl" style="font-size:6.8vw" data-anim>{title_html}</h2>
+      <div class="callout" style="margin-top:4vh" data-anim>{left_html}</div>
+    </div>
+    <div style="padding-top:7vh">{right_html}</div>
+  </div>
+  {foot("结构化安排")}
+</section>""")
+        elif idx % 4 == 0:
+            steps = "\n".join(
+                f"""<div class="step" data-anim="step">
+          <div class="step-nb">{n + 1:02d}</div>
+          <div class="step-title">{html.escape(slide_title(bullet, 12))}</div>
+          <div class="step-desc">{bullet}</div>
+        </div>"""
+                for n, bullet in enumerate(bullets[:5])
+            )
+            sections.append(f"""<section class="slide light" data-animate="pipeline">
+  {chrome(deck_title, idx, total)}
+  <div class="frame">
+    <div class="kicker">Pipeline · 推进路径</div>
+    <h2 class="h-xl">{title_html}</h2>
+    <div class="pipeline-section">
+      <div class="pipeline-label">执行链路 · Action Flow</div>
+      <div class="pipeline">{steps}</div>
+    </div>
+  </div>
+  {foot("流程与责任")}
+</section>""")
+        else:
+            body = " ".join(bullets[:3])
+            sections.append(f"""<section class="slide hero {'light' if idx % 2 else 'dark'}" data-animate="quote">
+  {chrome(deck_title, idx, total)}
+  <div class="frame" style="display:grid;gap:5vh;align-content:center;min-height:80vh">
+    <div class="kicker" data-anim>{html.escape(str(slide['eyebrow']))}</div>
+    <h2 class="h-xl" data-anim>{title_html}</h2>
+    <p class="lead" style="max-width:58vw" data-anim>{html.escape(body)}</p>
+  </div>
+  {foot("观点页")}
+</section>""")
+    return "\n\n".join(sections)
+
+
+def build_swiss_sections(outline: list[dict[str, Any]], deck_title: str) -> str:
+    total = len(outline)
+    sections: list[str] = []
+    title = "<br>".join(html.escape(line) for line in cover_title_lines(str(outline[0]["title"]), 10, 3))
+    lead_items = outline[1]["bullets"][:2] if len(outline) > 1 else outline[0]["bullets"][:2]
+    lead = " · ".join(html.escape(slide_body(item, 30)) for item in lead_items)
+    sections.append(f"""<section class="slide accent" data-layout="SWISS-COVER-ASCII" data-animate="hero">
+  <div class="canvas-card">
+    <canvas class="ascii-bg" aria-hidden="true"></canvas>
+    <div class="chrome-min"><div class="l">{html.escape(deck_title)} · Field Note</div><div class="r">SS · 01 / {total:02d}</div></div>
+    <div style="flex:1;padding:0;display:grid;grid-template-rows:auto 1fr auto;gap:2.6vh">
+      <div data-anim="kicker" class="t-meta" style="color:rgba(255,255,255,.78);letter-spacing:.22em">LOCAL-FIRST PRESENTATION</div>
+      <h1 data-anim="title" style="align-self:center;font-family:var(--sans),var(--sans-zh);font-weight:200;font-size:min(6.2vw,11vh);line-height:1.02;letter-spacing:-.025em;color:#fff">{title}</h1>
+      <div data-anim="bottom" style="display:grid;grid-template-rows:auto auto;gap:1.6vh;border-top:1px solid rgba(255,255,255,.22);padding-top:2vh">
+        <div class="lead" style="max-width:54ch;color:rgba(255,255,255,.86);font-weight:300">{lead}</div>
+        <div style="display:flex;justify-content:space-between;align-items:end"><div class="t-meta" style="color:rgba(255,255,255,.6)">Ultimate PPT Master</div><div class="t-meta" style="color:rgba(255,255,255,.6)">→ swipe / arrow keys</div></div>
+      </div>
+    </div>
+  </div>
+</section>""")
+
+    layouts = ["S02", "S08", "S14", "S19", "S11", "S16", "S03"]
+    for idx, slide in enumerate(outline[1:], start=2):
+        layout = layouts[(idx - 2) % len(layouts)]
+        bullets = [html.escape(slide_body(item, 48)) for item in slide["bullets"][:6]]
+        title_html = html.escape(slide_title(str(slide["title"]), 28))
+        if layout == "S02":
+            cards = "\n".join(
+                f"""<div class="stat-card {'accent-top' if n == 0 else 'thin'}" data-anim>
+          <div class="stat-label">Point {n + 1:02d}</div>
+          <div class="stat-nb">{n + 1}<span class="stat-unit">项</span></div>
+          <div class="stat-note">{bullet}</div>
+        </div>"""
+                for n, bullet in enumerate(bullets[:6])
+            )
+            body = f"""<div class="grid-6" style="margin-top:4vh">{cards}</div>"""
+        elif layout == "S14":
+            blocks = "\n".join(
+                f"""<div class="stack-block {'b-accent' if n == 1 else 'b-grey'}" data-anim>
+          <div class="layer-nb">L{n + 1:02d}</div>
+          <div class="layer-ttl">{html.escape(slide_title(bullet, 14))}</div>
+          <div class="layer-desc">{bullet}</div>
+        </div>"""
+                for n, bullet in enumerate(bullets[:4])
+            )
+            body = f"""<div style="display:grid;grid-template-columns:repeat({max(1, min(4, len(bullets)))},1fr);gap:16px;margin-top:4vh">{blocks}</div>"""
+        else:
+            cards = "\n".join(
+                f"""<div class="sub-card {'accent' if n == 0 and idx % 2 == 0 else ''}" data-anim>
+          <div class="nb-corner">{n + 1:02d}</div>
+          <div class="ttl">{html.escape(slide_title(bullet, 14))}</div>
+          <div class="desc">{bullet}</div>
+        </div>"""
+                for n, bullet in enumerate(bullets[:4])
+            )
+            body = f"""<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:4vh">{cards}</div>"""
+        sections.append(f"""<section class="slide {'dark' if idx % 3 == 0 else 'grey'}" data-layout="{layout}" data-animate="grid-reveal">
+  <div class="canvas-card">
+    <div class="chrome-min"><div class="l">{html.escape(deck_title)}</div><div class="r">{idx:02d} / {total:02d}</div></div>
+    <div style="flex:1;padding:0;display:grid;grid-template-rows:auto 1fr auto;gap:3vh">
+      <div data-anim="line" style="display:flex;flex-direction:column;gap:1.2vh">
+        <div class="t-meta">{html.escape(str(slide['eyebrow']))}</div>
+        <h2 class="h-xl-zh" style="font-size:min(5.6vw,10vh);line-height:1.02">{title_html}</h2>
+      </div>
+      <div data-anim="up">{body}</div>
+      <div class="t-meta" style="text-align:right;color:var(--text-helper)">Production draft · Agent ready</div>
+    </div>
+  </div>
+</section>""")
+    return "\n\n".join(sections)
+
+
+def generate_web_deck(outline: list[dict[str, Any]], project_path: Path, style: str, repo_root: Path) -> tuple[Path, str]:
+    copy_web_assets(project_path, repo_root)
+    template_name = "template-swiss.html" if style == "swiss" else "template.html"
+    template_path = repo_root / "assets" / "magazine-web" / template_name
+    template = template_path.read_text(encoding="utf-8")
+    deck_title = slide_title(str(outline[0]["title"]), 22)
+    sections = build_swiss_sections(outline, deck_title) if style == "swiss" else build_editorial_sections(outline, deck_title)
+    deck = replace_template_slides(template, sections)
+    deck = deck.replace("[必填] 替换为 PPT 标题 · Deck Title", f"{deck_title} · Ultimate PPT Master")
+    deck = re.sub(r"\[必填\][^<\n]*", "", deck)
     output = project_path / "outputs" / "index.html"
     output.write_text(deck, encoding="utf-8")
     return output, deck
@@ -760,7 +1143,7 @@ def write_runbook(project_path: Path, job: dict[str, Any], source_name: str) -> 
             f"- Source: `{source_name}`\n"
             f"- Output mode: `{job['outputMode']}`\n"
             f"- Style preset: `{job['stylePreset']}`\n\n"
-            "This desktop MVP created immediate preview artifacts. For production-quality decks, "
+            "This desktop app created an immediate production draft. For final delivery quality, "
             "open this project with an agent and follow the root `SKILL.md` workflow using the "
             "`sources/source.md` file as the source material.\n"
         ),
@@ -815,7 +1198,7 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
         generated_files.append(str(generate_pptx(outline, project_path, valid["stylePreset"])))
         generated_files.append(str(project_path / "preview" / "cover.svg"))
     else:
-        html_path, preview_html = generate_web_deck(outline, project_path, valid["stylePreset"])
+        html_path, preview_html = generate_web_deck(outline, project_path, valid["stylePreset"], repo_root)
         generated_files.append(str(html_path))
 
     runbook = write_runbook(project_path, valid, source_name)

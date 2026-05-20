@@ -8,6 +8,7 @@ from unittest.mock import patch
 from xml.sax.saxutils import escape
 
 from apps.desktop.worker.desktop_worker import (
+    cover_title_lines,
     inspect_environment,
     list_recent_projects,
     recommend_settings,
@@ -56,6 +57,12 @@ def write_minimal_docx(path: Path, paragraphs: list[str]) -> None:
 
 
 class DesktopWorkerTest(unittest.TestCase):
+    def test_cover_title_lines_prefers_quoted_project_name(self):
+        self.assertEqual(
+            cover_title_lines("关于举办交通银行“文旅大戏”暨2026年山东夏季消费主题活动的请示"),
+            ["文旅大戏", "2026山东夏季", "消费主题活动"],
+        )
+
     def test_validate_job_accepts_minimal_markdown_pptx_job(self):
         job = validate_job(
             {
@@ -152,6 +159,10 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertTrue(any(path.endswith("index.html") for path in result["generatedFiles"]))
             self.assertIn("产品发布", result["previewHtml"])
             self.assertEqual(result["outputMode"], "web")
+            self.assertIn('id="deck"', result["previewHtml"])
+            self.assertIn("motion.min.js", result["previewHtml"])
+            self.assertNotIn("[必填]", result["previewHtml"])
+            self.assertTrue((Path(result["projectPath"]) / "outputs" / "assets" / "motion.min.js").exists())
             self.assertIn("recommendations", result)
             self.assertIn("checks", result)
             self.assertIn("nextActions", result)
@@ -178,6 +189,7 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertTrue(any(path.endswith(".pptx") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("cover.svg") for path in result["generatedFiles"]))
             self.assertIn("Editable Deck", result["previewSvg"])
+            self.assertIn("Production draft", result["previewSvg"])
             self.assertEqual(result["outputMode"], "pptx")
             self.assertTrue(result["thumbnailSvg"].startswith("<svg"))
 
@@ -234,6 +246,7 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertEqual(result["sourceExtraction"]["status"], "extracted")
             self.assertIn("城市文旅消费展示方案", result["previewHtml"])
             self.assertNotIn("Imported file:", result["previewHtml"])
+            self.assertNotIn("[必填]", result["previewHtml"])
 
     def test_list_recent_projects_reads_real_manifests(self):
         with tempfile.TemporaryDirectory() as tmp:
