@@ -248,6 +248,48 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertNotIn("Imported file:", result["previewHtml"])
             self.assertNotIn("[必填]", result["previewHtml"])
 
+    def test_run_job_extracts_url_text_when_converter_succeeds(self):
+        def fake_convert(_repo_root: Path, url: str, output_path: Path) -> str:
+            markdown = f"# URL Launch Brief\n\n- Source URL: {url}\n- Real fetched content"
+            output_path.write_text(markdown, encoding="utf-8")
+            return markdown
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch("apps.desktop.worker.desktop_worker.convert_url_to_markdown", side_effect=fake_convert):
+                result = run_job(
+                    {
+                        "source": {"kind": "url", "value": "https://example.com/launch", "name": "launch-url"},
+                        "outputMode": "web",
+                        "stylePreset": "editorial",
+                        "projectDir": tmp,
+                    },
+                    ROOT,
+                )
+
+            source_md = Path(result["projectPath"]) / "sources" / "source.md"
+            self.assertEqual(result["sourceExtraction"]["status"], "extracted")
+            self.assertIn("URL Launch Brief", source_md.read_text(encoding="utf-8"))
+            self.assertIn("URL Launch Brief", result["previewHtml"])
+            self.assertNotIn("Use the full agent workflow to fetch", result["previewHtml"])
+
+    def test_run_job_keeps_url_handoff_when_converter_fails(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with patch("apps.desktop.worker.desktop_worker.convert_url_to_markdown", side_effect=RuntimeError("network blocked")):
+                result = run_job(
+                    {
+                        "source": {"kind": "url", "value": "https://example.invalid/launch", "name": "blocked-url"},
+                        "outputMode": "pptx",
+                        "stylePreset": "business",
+                        "projectDir": tmp,
+                    },
+                    ROOT,
+                )
+
+            source_md = Path(result["projectPath"]) / "sources" / "source.md"
+            self.assertEqual(result["sourceExtraction"]["status"], "handoffRequired")
+            self.assertIn("network blocked", result["sourceExtraction"]["detail"])
+            self.assertIn("Desktop URL extraction failed", source_md.read_text(encoding="utf-8"))
+
     def test_list_recent_projects_reads_real_manifests(self):
         with tempfile.TemporaryDirectory() as tmp:
             result = run_job(

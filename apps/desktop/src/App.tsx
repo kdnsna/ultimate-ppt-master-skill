@@ -1203,9 +1203,9 @@ function describeSourceReadiness(kind: SourceKind, value: string, name: string, 
   }
   if (kind === "url") {
     return {
-      status: "handoffRequired",
-      title: en ? "URL staged for Agent handoff" : "URL 已准备交给 Agent",
-      detail: en ? "The desktop app stores the URL; fetching and grounding happen in the Agent workflow." : "桌面端会保存 URL；网页抓取和事实校验由 Agent 工作流完成。"
+      status: "extracted",
+      title: en ? "URL will be fetched into source.md" : "URL 会抓取成 source.md",
+      detail: en ? "Native desktop generation uses the bundled web_to_md converter when the page is accessible; blocked pages fall back to Agent handoff." : "原生桌面端会用内置 web_to_md 抓取可访问网页；被拦截页面会降级为 Agent handoff。"
     };
   }
   if (suffix === "docx") {

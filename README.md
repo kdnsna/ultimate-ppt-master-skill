@@ -64,6 +64,7 @@ Ultimate PPT Master Desktop is for people who want the speed of AI but still nee
 | **Editable PPTX path** | Formal decks must be revised by teams, clients, teachers, and managers in PowerPoint. |
 | **Premium Web Deck path** | Launches, demo days, talks, and internal showcases need a more visual presentation surface. |
 | **Real DOCX extraction** | Word meeting material is converted into `source.md` before preview generation, instead of becoming a placeholder shell. |
+| **URL-to-Markdown intake** | Web pages are fetched into `source.md` when accessible; blocked pages fall back to a clear Agent handoff state. |
 | **Local-first projects** | Source files, outputs, previews, manifests, and logs stay in local project folders by default. |
 | **Agent-compatible depth** | The desktop shell stays simple while advanced generation remains available through `SKILL.md`. |
 | **Bilingual UI** | Settings include Chinese / English switching for international users. |
@@ -82,7 +83,7 @@ Use this when the deck must be reviewed, changed, delivered, or archived.
 
 - Native PowerPoint-style output for formal handoff.
 - Designed for business reports, consulting decks, training material, academic decks, and investor updates.
-- DOCX sources are extracted locally into `sources/source.md`, then used for immediate PPTX preview generation.
+- DOCX and accessible URL sources are extracted locally into `sources/source.md`, then used for immediate PPTX preview generation.
 - Keeps the "real file" mindset: text, shapes, charts, notes, and export checks matter more than flattened screenshots.
 - Production-grade generation is handled by the full agent workflow, where the agent can read source material, lock a design spec, generate pages, preview, verify, and export.
 

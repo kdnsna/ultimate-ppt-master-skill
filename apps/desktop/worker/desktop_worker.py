@@ -461,6 +461,37 @@ def convert_docx_to_markdown(repo_root: Path, input_path: Path, output_path: Pat
     return markdown
 
 
+def convert_url_to_markdown(repo_root: Path, url: str, output_path: Path) -> str:
+    converter_path = repo_root / "scripts" / "source_to_md" / "web_to_md.py"
+    if not converter_path.exists():
+        raise RuntimeError("URL converter is missing at scripts/source_to_md/web_to_md.py")
+
+    spec = importlib.util.spec_from_file_location("ultimate_ppt_web_to_md", converter_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Unable to load URL converter.")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    process_url = getattr(module, "process_url", None)
+    if not callable(process_url):
+        raise RuntimeError("URL converter does not expose process_url().")
+
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+    with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+        ok, _source, error = process_url(url, str(output_path))
+
+    if not ok or not output_path.exists():
+        converter_output = "\n".join(part for part in (stdout.getvalue().strip(), stderr.getvalue().strip(), str(error or "").strip()) if part)
+        detail = converter_output or "URL converter returned no Markdown."
+        raise RuntimeError(f"URL parsing failed: {detail}")
+
+    markdown = output_path.read_text(encoding="utf-8", errors="replace")
+    if not markdown.strip():
+        raise RuntimeError("URL parsing failed: URL converter wrote an empty Markdown file.")
+    return markdown
+
+
 def source_to_text(job: dict[str, Any], project_path: Path, repo_root: Path) -> tuple[str, str, dict[str, str]]:
     source = job["source"]
     kind = source["kind"]
@@ -485,17 +516,33 @@ def source_to_text(job: dict[str, Any], project_path: Path, repo_root: Path) -> 
 
     if kind == "url":
         (sources_dir / "source.url").write_text(value + "\n", encoding="utf-8")
-        text = f"URL source: {value}\n\nUse the full agent workflow to fetch and ground this page before production export."
-        generated_markdown_path.write_text(text, encoding="utf-8")
-        return (
-            text,
-            "source.url",
-            build_source_extraction(
-                "handoffRequired",
-                "已保存 URL；网页抓取和事实校验由 Agent 工作流接管。",
-                generated_markdown_path,
-            ),
-        )
+        try:
+            text = convert_url_to_markdown(repo_root, value, generated_markdown_path)
+            return (
+                text,
+                "source.url",
+                build_source_extraction(
+                    "extracted",
+                    "已抓取 URL 正文并生成可用于 PPTX/Web 的 source.md。",
+                    generated_markdown_path,
+                ),
+            )
+        except Exception as err:
+            text = (
+                f"URL source: {value}\n\n"
+                "Desktop URL extraction failed, so this project was staged for Agent handoff.\n\n"
+                f"Error: {err}"
+            )
+            generated_markdown_path.write_text(text, encoding="utf-8")
+            return (
+                text,
+                "source.url",
+                build_source_extraction(
+                    "handoffRequired",
+                    f"已保存 URL；桌面抓取失败，网页抓取和事实校验由 Agent 工作流接管。错误：{clip_text(err, 120)}",
+                    generated_markdown_path,
+                ),
+            )
 
     source_path = Path(value).expanduser()
     if not source_path.exists():
