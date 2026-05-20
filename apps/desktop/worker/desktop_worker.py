@@ -859,7 +859,7 @@ def generate_pptx(outline: list[dict[str, Any]], project_path: Path, style: str)
             add_text_box(slide, 0.66, 4.2, 6.8, 0.76, lead, 18, muted)
             add_text_box(slide, 9.04, 1.05, 3.38, 0.55, "Editable PowerPoint", 24, (255, 255, 255), True)
             add_text_box(slide, 9.08, 1.82, 3.25, 1.5, "真实文字、形状、结构和本地项目链路。桌面端先给出可审阅草稿，完整精修交给 Agent 工作流。", 15, (255, 245, 238))
-            add_text_box(slide, 9.08, 6.28, 3.25, 0.32, "Ultimate PPT Master · v2.0.0", 10, (255, 245, 238), font_name="Aptos Mono")
+            add_text_box(slide, 9.08, 6.28, 3.25, 0.32, "Ultimate PPT Master · v2.1.0", 10, (255, 245, 238), font_name="Aptos Mono")
             continue
 
         if idx % 5 == 0:

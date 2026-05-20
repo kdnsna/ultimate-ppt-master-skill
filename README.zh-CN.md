@@ -3,7 +3,7 @@
 > 本地优先的 AI PPT 桌面应用和可移植 Agent Skill：把真实资料变成可编辑 PowerPoint 或高视觉 Web Deck。
 
 <p align="center">
-  <strong>v2.0.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./apps/desktop">桌面端</a> · <a href="./docs/zh-CN">中文文档</a>
+  <strong>v2.1.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./apps/desktop">桌面端</a> · <a href="./docs/zh-CN">中文文档</a>
 </p>
 
 ![终极融合 PPT 大师桌面端主图](assets/readme/hero.svg)
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.0.0" src="https://img.shields.io/badge/Version-2.0.0-7C3AED?style=for-the-badge">
+  <img alt="Version 2.1.0" src="https://img.shields.io/badge/Version-2.1.0-7C3AED?style=for-the-badge">
   <img alt="AI PPT Desktop" src="https://img.shields.io/badge/AI%20PPT-Desktop%20%2B%20Skill-F97316?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-2563EB?style=for-the-badge">
@@ -46,7 +46,7 @@
 | **桌面端** | 普通创作者、商务用户、老师、咨询顾问，以及想要三步本地流程的人。 | `npm run setup` 然后 `npm run desktop` |
 | **Agent Skill** | GitHub / Agent 用户，希望获得当前最强生成质量、脚本执行、预览检查和修复循环。 | 看 [Agent Setup](./docs/agent-setup.md) |
 | **桌面端 + Agent** | 团队既要简单入口，也要最终精修交付。 | 先在桌面端建项目，再复制 Workbench 的 handoff prompt。 |
-| **Direct API / 自定义桥接** | 想接自己的模型 API 或 worker adapter 的开发者。 | 看 [Model and Provider Setup](./docs/model-provider-setup.md)；v2.0.0 只是预留约定。 |
+| **Direct API / 自定义桥接** | 想接自己的模型 API 或 worker adapter 的开发者。 | 看 [Model and Provider Setup](./docs/model-provider-setup.md)；v2.1.0 只是预留约定。 |
 
 如果你还不确定选哪条路线，看 [中文文档索引](./docs/zh-CN/README.md) 和 [Choosing a Workflow](./docs/choosing-a-workflow.md)。
 
@@ -190,7 +190,7 @@ npm run package:desktop:dmg
 | **Agent + Provider Keys** | 已支持 | 主流程由 Agent 执行；provider key 开启生图、搜图、旁白等媒体能力。 |
 | **Direct LLM API Driver** | 预留配置约定 | 后续 worker adapter 可接入 OpenAI-compatible、Gemini、Qwen 或自托管 API。 |
 
-当前推荐：桌面端最容易上手；Agent Skill 目前效果最好，因为 Agent 能读真实文件、运行脚本、检查预览、修复导出。Direct API 变量适合自定义桥接，但在 v2.0.0 还不是完整内置生成器。
+当前推荐：桌面端最容易上手；Agent Skill 目前效果最好，因为 Agent 能读真实文件、运行脚本、检查预览、修复导出。Direct API 变量适合自定义桥接，但在 v2.1.0 还不是完整内置生成器。
 
 推荐本地 provider 配置：
 
@@ -291,7 +291,7 @@ Use the repository path as SKILL_DIR. Turn reports/q3-review.pdf into a 12-slide
 
 ## Roadmap
 
-v2.0.0 之后的桌面端方向：
+v2.1.0 之后的桌面端方向：
 
 - 对单页进行自然语言修改。
 - 在项目工作台重新生成单页。
@@ -303,7 +303,17 @@ v2.0.0 之后的桌面端方向：
 
 ---
 
-## v2.0.0 更新内容
+## v2.1.0 更新内容
+
+| 更新项 | 变化 |
+|---|---|
+| **桌面端草稿质量升级** | 桌面端 PPTX 现在输出带设计版式的可编辑草稿，不再是简陋 bullet 烟测页。 |
+| **恢复原网页模板体系** | Web Deck 现在使用杂志风 / Swiss HTML 模板、本地 `motion.min.js` 和原始 `id="deck"` 翻页系统。 |
+| **中文办公标题优化** | 封面会优先抽取引号中的项目名，并避免真实 DOCX 材料里出现尴尬中文断行。 |
+| **输出质量回归测试** | Worker 测试覆盖模板资源、占位符清理、DOCX 正文解析和 production-draft 预览标记。 |
+| **版本链路对齐** | 仓库、桌面包、Tauri 元数据、README 资产和生成草稿页脚统一到 `v2.1.0`。 |
+
+## v2.0.0 历史亮点
 
 | 更新项 | 变化 |
 |---|---|

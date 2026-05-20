@@ -3,7 +3,7 @@
 > A local-first AI PPT desktop app and portable agent skill that turns real source material into editable PowerPoint decks and high-impact web presentations.
 
 <p align="center">
-  <strong>v2.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./apps/desktop">Desktop App</a> · <a href="./docs">Docs</a>
+  <strong>v2.1.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./apps/desktop">Desktop App</a> · <a href="./docs">Docs</a>
 </p>
 
 ![Ultimate PPT Master Desktop hero](assets/readme/hero.svg)
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.0.0" src="https://img.shields.io/badge/Version-2.0.0-7C3AED?style=for-the-badge">
+  <img alt="Version 2.1.0" src="https://img.shields.io/badge/Version-2.1.0-7C3AED?style=for-the-badge">
   <img alt="AI PPT Desktop" src="https://img.shields.io/badge/AI%20PPT-Desktop%20%2B%20Skill-F97316?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-2563EB?style=for-the-badge">
@@ -46,7 +46,7 @@ The desktop app and the agent skill are both first-class. Use the desktop app wh
 | **Desktop App** | Ordinary creators, business users, teachers, consultants, and anyone who wants a 3-step local workflow. | `npm run setup` then `npm run desktop` |
 | **Agent Skill** | GitHub users and agent operators who want the strongest current output quality with script execution, preview checks, and repair loops. | Read [Agent Setup](./docs/agent-setup.md) |
 | **Desktop + Agent** | Teams that want simple intake plus production-grade final polish. | Create a project in Desktop, then copy the Workbench handoff prompt. |
-| **Direct API / custom bridge** | Developers building their own worker adapter. | Read [Model and Provider Setup](./docs/model-provider-setup.md); v2.0.0 keeps this as a reserved convention. |
+| **Direct API / custom bridge** | Developers building their own worker adapter. | Read [Model and Provider Setup](./docs/model-provider-setup.md); v2.1.0 keeps this as a reserved convention. |
 
 If you are deciding which route to use, read [Choosing a Workflow](./docs/choosing-a-workflow.md).
 
@@ -190,7 +190,7 @@ Production-quality decks need a model, but this project does not bundle or resel
 | **Agent + provider keys** | Supported | The agent runs the main workflow; provider keys unlock image generation, image search, narration, and media capabilities. |
 | **Direct LLM API driver** | Reserved convention | Future desktop worker adapter for OpenAI-compatible, Gemini, Qwen, or self-hosted APIs. |
 
-Current recommendation: Desktop is the easiest way to start; Agent Skill gives the best results today because the agent can read source files, run scripts, inspect previews, and repair exports. Direct API variables are useful for custom bridges, but they are not a complete built-in generator in v2.0.0.
+Current recommendation: Desktop is the easiest way to start; Agent Skill gives the best results today because the agent can read source files, run scripts, inspect previews, and repair exports. Direct API variables are useful for custom bridges, but they are not a complete built-in generator in v2.1.0.
 
 Recommended local provider config:
 
@@ -291,7 +291,7 @@ Full guide: [Agent Setup](./docs/agent-setup.md). For generic repository instruc
 
 ## Roadmap
 
-Desktop improvements planned after v2.0.0:
+Desktop improvements planned after v2.1.0:
 
 - Natural-language edits for a selected slide.
 - Single-slide regeneration from the project workbench.
@@ -303,7 +303,17 @@ Desktop improvements planned after v2.0.0:
 
 ---
 
-## What Changed in v2.0.0
+## What Changed in v2.1.0
+
+| Update | What changed |
+|---|---|
+| **Higher-quality desktop drafts** | Desktop PPTX output now uses styled editable layouts instead of plain bullet smoke-test pages. |
+| **Original web deck assets restored** | Web Deck output now uses the magazine/Swiss HTML templates, local `motion.min.js`, and the original `id="deck"` paging system. |
+| **Better Chinese office-document titles** | Cover generation now extracts quoted project names and avoids awkward Chinese title breaks for real DOCX material. |
+| **Regression tests for output quality** | Worker tests now check template assets, placeholder removal, DOCX extraction, and production-draft preview markers. |
+| **Version alignment** | Repository, desktop package, Tauri metadata, README assets, and generated draft footers are aligned on `v2.1.0`. |
+
+## Previous v2.0.0 Highlights
 
 | Update | What changed |
 |---|---|

@@ -1317,7 +1317,7 @@ function humanizeError(error: unknown, language: AppLanguage = "zh") {
   return text;
 }
 
-const sampleMarkdown = `# 终极融合 PPT 大师 v2.0.0
+const sampleMarkdown = `# 终极融合 PPT 大师 v2.1.0
 
 - 把真实资料变成可编辑 PPTX 或杂志风网页 PPT
 - 支持 PDF、DOCX、XLSX、PPTX、URL、Markdown 和粘贴文本

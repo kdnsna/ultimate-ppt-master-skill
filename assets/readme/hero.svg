@@ -57,7 +57,7 @@
     <circle cx="28" cy="22" r="8" fill="#F97316"/>
     <circle cx="54" cy="22" r="8" fill="#FACC15"/>
     <circle cx="80" cy="22" r="8" fill="#10B981"/>
-    <text x="108" y="28" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" font-size="15" font-weight="800" fill="#526173">v2.0.0 Desktop Release</text>
+    <text x="108" y="28" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" font-size="15" font-weight="800" fill="#526173">v2.1.0 Desktop Release</text>
 
     <text x="0" y="112" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" font-size="58" font-weight="900" fill="#172033">Ultimate PPT Master Desktop</text>
     <text x="0" y="160" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" font-size="35" font-weight="900" fill="#7C3AED">终极融合 PPT 大师桌面端</text>
