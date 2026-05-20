@@ -2,6 +2,13 @@
 
 Desktop product shell for Ultimate PPT Master: Tauri + React/TypeScript + local Python worker.
 
+Public user docs:
+
+- [Quickstart Desktop](../../docs/quickstart-desktop.md)
+- [Choosing a Workflow](../../docs/choosing-a-workflow.md)
+- [Model and Provider Setup](../../docs/model-provider-setup.md)
+- [Troubleshooting](../../docs/troubleshooting.md)
+
 The app keeps the first workflow intentionally simple:
 
 1. Import source material.
@@ -130,6 +137,8 @@ PIXABAY_API_KEY=your-pixabay-key
 ```
 
 Direct API worker driving is reserved for a future adapter and should not be described as complete in this app yet.
+
+For the full model/provider matrix, see [Model and Provider Setup](../../docs/model-provider-setup.md).
 
 ## Worker Smoke Test
 

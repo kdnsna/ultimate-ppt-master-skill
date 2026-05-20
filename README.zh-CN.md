@@ -1,9 +1,9 @@
-# 终极融合 PPT 大师桌面端 - AI PPT Studio / 可编辑 PowerPoint / 高质感网页演示
+# 终极融合 PPT 大师 - AI PPT 桌面端 + Agent Skill / 可编辑 PowerPoint / 高质感网页演示
 
-> 本地优先的 AI PPT 桌面应用和 Agent 工作流：把真实资料变成可编辑 PowerPoint 或高视觉 Web Deck。
+> 本地优先的 AI PPT 桌面应用和可移植 Agent Skill：把真实资料变成可编辑 PowerPoint 或高视觉 Web Deck。
 
 <p align="center">
-  <strong>v2.0.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./apps/desktop">桌面端</a>
+  <strong>v2.0.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./apps/desktop">桌面端</a> · <a href="./docs/zh-CN">中文文档</a>
 </p>
 
 ![终极融合 PPT 大师桌面端主图](assets/readme/hero.svg)
@@ -13,12 +13,14 @@
   ·
   <a href="./README.md"><strong>English README</strong></a>
   ·
+  <a href="./docs/zh-CN"><strong>中文文档</strong></a>
+  ·
   <a href="#开发者--agent-接入"><strong>Agent 接入</strong></a>
 </p>
 
 <p align="center">
   <img alt="Version 2.0.0" src="https://img.shields.io/badge/Version-2.0.0-7C3AED?style=for-the-badge">
-  <img alt="AI PPT Desktop" src="https://img.shields.io/badge/AI%20PPT-Desktop%20Studio-F97316?style=for-the-badge">
+  <img alt="AI PPT Desktop" src="https://img.shields.io/badge/AI%20PPT-Desktop%20%2B%20Skill-F97316?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-2563EB?style=for-the-badge">
   <img alt="Local First" src="https://img.shields.io/badge/Local--first-No%20Cloud%20Upload-10B981?style=for-the-badge">
@@ -33,7 +35,20 @@
 |---|---|---|
 | PDF、DOCX、XLSX、PPTX、URL、Markdown、粘贴文本 | 可编辑 PPTX 或高质感 Web Deck | 本地项目、预览、输出文件、日志、Agent handoff |
 
-桌面端是产品入口。底层 Agent 工作流保留专业能力：Codex、Claude Code、OpenClaw、Hermes 或其他代码 Agent 可以读取生成项目，继续执行生产级生成流程，逐页修正并导出。
+桌面端和 Agent Skill 都是一等入口。想要简单产品体验就用桌面端；想要生产级深度生成，就让 Codex、Claude Code、OpenClaw、Hermes 或其他代码 Agent 读取生成项目，继续执行完整工作流，逐页修正并导出。
+
+---
+
+## 选择你的入口
+
+| 路线 | 适合谁 | 怎么开始 |
+|---|---|---|
+| **桌面端** | 普通创作者、商务用户、老师、咨询顾问，以及想要三步本地流程的人。 | `npm run setup` 然后 `npm run desktop` |
+| **Agent Skill** | GitHub / Agent 用户，希望获得当前最强生成质量、脚本执行、预览检查和修复循环。 | 看 [Agent Setup](./docs/agent-setup.md) |
+| **桌面端 + Agent** | 团队既要简单入口，也要最终精修交付。 | 先在桌面端建项目，再复制 Workbench 的 handoff prompt。 |
+| **Direct API / 自定义桥接** | 想接自己的模型 API 或 worker adapter 的开发者。 | 看 [Model and Provider Setup](./docs/model-provider-setup.md)；v2.0.0 只是预留约定。 |
+
+如果你还不确定选哪条路线，看 [中文文档索引](./docs/zh-CN/README.md) 和 [Choosing a Workflow](./docs/choosing-a-workflow.md)。
 
 ---
 
@@ -175,6 +190,8 @@ npm run package:desktop:dmg
 | **Agent + Provider Keys** | 已支持 | 主流程由 Agent 执行；provider key 开启生图、搜图、旁白等媒体能力。 |
 | **Direct LLM API Driver** | 预留配置约定 | 后续 worker adapter 可接入 OpenAI-compatible、Gemini、Qwen 或自托管 API。 |
 
+当前推荐：桌面端最容易上手；Agent Skill 目前效果最好，因为 Agent 能读真实文件、运行脚本、检查预览、修复导出。Direct API 变量适合自定义桥接，但在 v2.0.0 还不是完整内置生成器。
+
 推荐本地 provider 配置：
 
 ```bash
@@ -207,6 +224,8 @@ LLM_MODEL=gpt-4.1
 ```bash
 npm run doctor
 ```
+
+完整说明见 [Model and Provider Setup](./docs/model-provider-setup.md)。
 
 ---
 
@@ -253,6 +272,21 @@ Use the repository path as SKILL_DIR. Turn reports/q3-review.pdf into a 12-slide
 | **Hermes** | 稳定本地路径，例如 `~/agent-skills/ultimate-ppt-master` | 让 Hermes 读取 `AGENTS.md`，仓库目录作为 `SKILL_DIR`。 |
 | **Prompt-only Agent** | 不需要原生 skill 目录 | 粘贴或附加 `PROMPT.md`。 |
 
+完整说明见 [Agent Setup](./docs/agent-setup.md)。通用 Agent 从 [AGENTS.md](./AGENTS.md) 开始；Claude Code 从 [CLAUDE.md](./CLAUDE.md) 开始；不支持 skill 目录的工具使用 [PROMPT.md](./PROMPT.md)。
+
+---
+
+## 文档导航
+
+| 需求 | 文档 |
+|---|---|
+| 选择桌面端 / Skill / Direct API | [Choosing a Workflow](./docs/choosing-a-workflow.md) |
+| 跑桌面端 | [Quickstart Desktop](./docs/quickstart-desktop.md) |
+| 配置 Codex、Claude Code、OpenClaw、Hermes、Cursor、Cline、Roo、Windsurf | [Agent Setup](./docs/agent-setup.md) |
+| 配置模型和 Provider Key | [Model and Provider Setup](./docs/model-provider-setup.md) |
+| 排查安装、DOCX 解析、输出、Provider、Tauri 或 Agent 加载问题 | [Troubleshooting](./docs/troubleshooting.md) |
+| 发布、CI、隐私、上游同步维护 | [Release and Maintenance](./docs/release-maintenance.md) |
+
 ---
 
 ## Roadmap
@@ -273,7 +307,7 @@ v2.0.0 之后的桌面端方向：
 
 | 更新项 | 变化 |
 |---|---|
-| **桌面端 MVP** | 新增 `apps/desktop`，采用 Tauri + React/TypeScript + 本地 Python worker。 |
+| **桌面端基础能力** | 新增 `apps/desktop`，采用 Tauri + React/TypeScript + 本地 Python worker。 |
 | **桌面 UX 增强** | 新增 Projects、Create、Workbench、Settings、真实 manifest、信任检查、语言切换和模型配置引导。 |
 | **DOCX 输入闭环** | 桌面 worker 现在会把 DOCX 正文解析为 `source.md`，并在 manifest 中记录 `sourceExtraction` 状态。 |
 | **发布检查** | 新增 CI，覆盖桌面构建、worker 单测、依赖审计和空白检查。 |

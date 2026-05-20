@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a reproducible desktop, worker, export, or repository bug.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please remove private document text, API keys, exact budgets, names, and internal paths before posting.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the visible failure and what you expected.
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Command or app flow
+      placeholder: npm run desktop -> Create -> DOCX -> PPTX -> Generate
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Desktop app
+        - Python worker
+        - PPTX export
+        - Web Deck export
+        - Agent skill
+        - Documentation
+        - CI/build
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Paste versions and doctor output with secrets removed.
+      value: |
+        OS:
+        Node:
+        npm:
+        Python:
+        Rust/Cargo:
+        npm run doctor:
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Trace evidence
+      description: Include redacted manifest/log details if available.
+      value: |
+        sourceExtraction.status:
+        sourceExtraction.detail:
+        generatedFiles:
+        Relevant log lines:
+    validations:
+      required: false
+

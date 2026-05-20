@@ -1,0 +1,36 @@
+name: Setup or configuration help
+description: Get help with setup, provider keys, model configuration, Tauri, or agent loading.
+title: "[Setup]: "
+labels: ["setup", "question"]
+body:
+  - type: checkboxes
+    id: route
+    attributes:
+      label: Which route are you using?
+      options:
+        - label: Desktop app
+        - label: Codex skill
+        - label: Claude Code
+        - label: OpenClaw / Hermes / generic agent
+        - label: Direct API / custom bridge
+  - type: textarea
+    id: command
+    attributes:
+      label: Command or configuration used
+      description: Paste command/config with secrets removed.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Doctor output
+      description: Run `npm run doctor` and paste the redacted output.
+    validations:
+      required: false
+  - type: textarea
+    id: question
+    attributes:
+      label: What do you need help with?
+    validations:
+      required: true
+

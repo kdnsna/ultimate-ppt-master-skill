@@ -1,0 +1,6 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation Map
+    url: https://github.com/kdnsna/ultimate-ppt-master-skill/blob/main/docs/README.md
+    about: Start here for desktop, agent, provider, and troubleshooting guides.
+

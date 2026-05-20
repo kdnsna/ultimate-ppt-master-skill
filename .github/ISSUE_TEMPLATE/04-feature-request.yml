@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest a focused desktop, agent, provider, or export improvement.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: What job should this help someone complete?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Keep it focused. This product should stay simple and not become a full PowerPoint editor.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Desktop UX
+        - Agent workflow
+        - Direct API adapter
+        - PPTX export
+        - Web Deck export
+        - Provider integration
+        - Documentation
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+

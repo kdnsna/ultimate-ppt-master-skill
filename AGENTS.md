@@ -8,6 +8,7 @@ Use this repository as a portable presentation-generation skill package for agen
 2. Resolve this repository root as `SKILL_DIR`.
 3. Follow `SKILL.md` before generating any presentation files.
 4. Use `assets/`, `references/`, `templates/`, `workflows/`, and `scripts/` only when the selected workflow needs them.
+5. Keep both public entry points discoverable: Desktop App for guided local use, Agent Skill for production workflow use.
 
 ## Invocation
 
@@ -36,3 +37,13 @@ brew install cairo pkg-config
 - Claude Code can install it under `~/.claude/skills/ultimate-ppt-master`.
 - OpenClaw, Hermes, and similar tools can either place this repository in their skills/rules directory if they provide one, or reference this `AGENTS.md` / `SKILL.md` from the project workspace.
 - Tools without a skill system can paste `PROMPT.md` into their system prompt or project rules.
+
+## Docs And Traceability
+
+- Human docs start at `docs/README.md`.
+- Agent setup details live in `docs/agent-setup.md`.
+- Provider/model configuration lives in `docs/model-provider-setup.md`.
+- Troubleshooting evidence paths live in `docs/troubleshooting.md`.
+- Public issue templates live in `.github/ISSUE_TEMPLATE/`.
+
+When reporting or fixing issues, preserve the trace path: command run, project path, `desktop-manifest.json`, `sourceExtraction`, `sources/source.md`, `logs/desktop-worker.log`, and generated file paths. Do not commit private source documents, raw business outputs, `.env`, or API keys.

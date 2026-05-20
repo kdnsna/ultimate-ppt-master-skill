@@ -1,0 +1,59 @@
+name: Generation quality
+description: Report a deck quality, layout, source extraction, or output mismatch.
+title: "[Quality]: "
+labels: ["quality"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not upload private source documents. Use sanitized excerpts or the public demo format.
+  - type: dropdown
+    id: output
+    attributes:
+      label: Output mode
+      options:
+        - Editable PPTX
+        - Web Deck
+        - Both
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Source type
+      options:
+        - DOCX
+        - PDF
+        - XLSX
+        - PPTX
+        - URL
+        - Markdown
+        - Pasted text
+    validations:
+      required: true
+  - type: input
+    id: style
+    attributes:
+      label: Style preset
+      placeholder: business / consultant / academic / editorial / swiss
+    validations:
+      required: false
+  - type: textarea
+    id: issue
+    attributes:
+      label: What looks wrong?
+      description: Explain the mismatch, missing content, layout issue, or export problem.
+    validations:
+      required: true
+  - type: textarea
+    id: trace
+    attributes:
+      label: Redacted trace
+      value: |
+        Project path:
+        sourceExtraction.status:
+        source.md redacted excerpt:
+        log lines:
+    validations:
+      required: false
+

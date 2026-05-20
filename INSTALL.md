@@ -4,6 +4,8 @@
 
 终极融合PPT大师是一个跨 Agent 的技能包。它不是只为 Codex 准备的：任何能读取本地 Markdown 指令、访问文件系统、运行 Python/Node/Bash 脚本的 AI 编程助手，都可以使用它。
 
+完整文档入口见 [`docs/README.md`](./docs/README.md)，中文索引见 [`docs/zh-CN/README.md`](./docs/zh-CN/README.md)。如果你只想快速安装，继续看本文件。
+
 ## 快速选择
 
 | 工具 | 推荐方式 |
@@ -142,7 +144,7 @@ macOS 上如果要保证 PPTX 兼容导出，建议安装 Cairo：
 brew install cairo pkg-config
 ```
 
-## 桌面应用 MVP
+## 桌面应用
 
 桌面应用位于 `apps/desktop`，第一版使用 Tauri + React/TypeScript + 本地 Python worker。
 
@@ -212,6 +214,8 @@ git diff --check
 ## English
 
 Ultimate Fusion PPT Master is a cross-agent skill package. It is not Codex-only: any AI coding assistant that can read local Markdown instructions, access the filesystem, and run Python/Node/Bash scripts can use it.
+
+The full documentation map lives at [`docs/README.md`](./docs/README.md). If you only want installation commands, continue here.
 
 ## Quick Pick
 
@@ -349,7 +353,7 @@ For robust PPTX compatibility output on macOS:
 brew install cairo pkg-config
 ```
 
-## Desktop App MVP
+## Desktop App
 
 The desktop app lives in `apps/desktop` and uses Tauri + React/TypeScript + a local Python worker.
 

@@ -9,6 +9,8 @@ Repository root: set this as SKILL_DIR.
 
 Use SKILL_DIR/SKILL.md as the source of truth whenever the user asks to create, convert, polish, or redesign a PPT, PowerPoint, slide deck, presentation, 演示文稿, or 幻灯片.
 
+For user-facing setup, configuration, or troubleshooting questions, read SKILL_DIR/docs/README.md first, then follow the specific guide for desktop, agent setup, provider setup, or troubleshooting.
+
 For a generic request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", or "turn this into slides", first ask the user to choose one of two output modes:
 
 1. Editable PowerPoint (PPTX)

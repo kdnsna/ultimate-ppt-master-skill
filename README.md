@@ -1,9 +1,9 @@
-# Ultimate PPT Master Desktop - AI PPT Studio for Editable PowerPoint & Web Decks
+# Ultimate PPT Master - AI PPT Desktop App + Agent Skill for Editable PowerPoint & Web Decks
 
-> A local-first AI PPT desktop app and agent workflow that turns real source material into editable PowerPoint decks and high-impact web presentations.
+> A local-first AI PPT desktop app and portable agent skill that turns real source material into editable PowerPoint decks and high-impact web presentations.
 
 <p align="center">
-  <strong>v2.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./apps/desktop">Desktop App</a>
+  <strong>v2.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./apps/desktop">Desktop App</a> · <a href="./docs">Docs</a>
 </p>
 
 ![Ultimate PPT Master Desktop hero](assets/readme/hero.svg)
@@ -13,12 +13,14 @@
   ·
   <a href="./README.zh-CN.md"><strong>中文介绍</strong></a>
   ·
+  <a href="./docs"><strong>Docs</strong></a>
+  ·
   <a href="#for-developers--agents"><strong>Agent Setup</strong></a>
 </p>
 
 <p align="center">
   <img alt="Version 2.0.0" src="https://img.shields.io/badge/Version-2.0.0-7C3AED?style=for-the-badge">
-  <img alt="AI PPT Desktop" src="https://img.shields.io/badge/AI%20PPT-Desktop%20Studio-F97316?style=for-the-badge">
+  <img alt="AI PPT Desktop" src="https://img.shields.io/badge/AI%20PPT-Desktop%20%2B%20Skill-F97316?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-2563EB?style=for-the-badge">
   <img alt="Local First" src="https://img.shields.io/badge/Local--first-No%20Cloud%20Upload-10B981?style=for-the-badge">
@@ -33,7 +35,20 @@ Most AI slide tools stop at a beautiful screenshot. Ultimate PPT Master Desktop 
 |---|---|---|
 | PDF, DOCX, XLSX, PPTX, URL, Markdown, pasted text | Editable PPTX or cinematic Web Deck | Local project, preview, outputs, logs, Agent handoff |
 
-The desktop app is the front door. The underlying agent workflow keeps the power: Codex, Claude Code, OpenClaw, Hermes, or another coding agent can read the generated project, run the production pipeline, and refine the deck page by page.
+The desktop app and the agent skill are both first-class. Use the desktop app when you want a guided product. Use the skill when you want Codex, Claude Code, OpenClaw, Hermes, or another coding agent to run the full production pipeline and refine the deck page by page.
+
+---
+
+## Choose Your Path
+
+| Path | Best for | Start |
+|---|---|---|
+| **Desktop App** | Ordinary creators, business users, teachers, consultants, and anyone who wants a 3-step local workflow. | `npm run setup` then `npm run desktop` |
+| **Agent Skill** | GitHub users and agent operators who want the strongest current output quality with script execution, preview checks, and repair loops. | Read [Agent Setup](./docs/agent-setup.md) |
+| **Desktop + Agent** | Teams that want simple intake plus production-grade final polish. | Create a project in Desktop, then copy the Workbench handoff prompt. |
+| **Direct API / custom bridge** | Developers building their own worker adapter. | Read [Model and Provider Setup](./docs/model-provider-setup.md); v2.0.0 keeps this as a reserved convention. |
+
+If you are deciding which route to use, read [Choosing a Workflow](./docs/choosing-a-workflow.md).
 
 ---
 
@@ -175,6 +190,8 @@ Production-quality decks need a model, but this project does not bundle or resel
 | **Agent + provider keys** | Supported | The agent runs the main workflow; provider keys unlock image generation, image search, narration, and media capabilities. |
 | **Direct LLM API driver** | Reserved convention | Future desktop worker adapter for OpenAI-compatible, Gemini, Qwen, or self-hosted APIs. |
 
+Current recommendation: Desktop is the easiest way to start; Agent Skill gives the best results today because the agent can read source files, run scripts, inspect previews, and repair exports. Direct API variables are useful for custom bridges, but they are not a complete built-in generator in v2.0.0.
+
 Recommended local provider config:
 
 ```bash
@@ -207,6 +224,8 @@ For a quick environment check after editing provider values:
 ```bash
 npm run doctor
 ```
+
+Full guide: [Model and Provider Setup](./docs/model-provider-setup.md).
 
 ---
 
@@ -253,6 +272,21 @@ Use the repository path as SKILL_DIR. Turn reports/q3-review.pdf into a 12-slide
 | **Hermes** | Stable local path such as `~/agent-skills/ultimate-ppt-master` | Ask Hermes to read `AGENTS.md`; use the repo as `SKILL_DIR`. |
 | **Prompt-only agent** | No native skill directory required | Paste or attach `PROMPT.md`. |
 
+Full guide: [Agent Setup](./docs/agent-setup.md). For generic repository instructions, agents should start from [AGENTS.md](./AGENTS.md); Claude Code users can start from [CLAUDE.md](./CLAUDE.md); prompt-only tools can use [PROMPT.md](./PROMPT.md).
+
+---
+
+## Documentation
+
+| Need | Guide |
+|---|---|
+| Pick Desktop vs Skill vs Direct API | [Choosing a Workflow](./docs/choosing-a-workflow.md) |
+| Run the desktop app | [Quickstart Desktop](./docs/quickstart-desktop.md) |
+| Configure Codex, Claude Code, OpenClaw, Hermes, Cursor, Cline, Roo, Windsurf | [Agent Setup](./docs/agent-setup.md) |
+| Configure model/provider keys | [Model and Provider Setup](./docs/model-provider-setup.md) |
+| Debug setup, DOCX extraction, output, provider, Tauri, or agent loading issues | [Troubleshooting](./docs/troubleshooting.md) |
+| Release/CI/privacy/upstream maintenance | [Release and Maintenance](./docs/release-maintenance.md) |
+
 ---
 
 ## Roadmap
@@ -273,7 +307,7 @@ Desktop improvements planned after v2.0.0:
 
 | Update | What changed |
 |---|---|
-| **Desktop MVP** | Added Tauri + React/TypeScript + local Python worker app under `apps/desktop`. |
+| **Desktop foundation** | Added Tauri + React/TypeScript + local Python worker app under `apps/desktop`. |
 | **Desktop UX upgrade** | Added Projects, Create, Workbench, Settings, real manifests, trust checks, language switching, and model setup guidance. |
 | **DOCX input loop** | Desktop worker now extracts DOCX text into `source.md` and records `sourceExtraction` status in the manifest. |
 | **Release checks** | Added CI for desktop build, worker tests, dependency audit, and whitespace checks. |
