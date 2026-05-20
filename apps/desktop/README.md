@@ -17,7 +17,18 @@ The app keeps the first workflow intentionally simple:
 
 The desktop app does not upload user files and does not expose secret key values. Production-grade deck generation still uses the full repository workflow in `SKILL.md`.
 
-## Run the Web Shell
+## Fast Start from Repository Root
+
+The easiest path is to stay at the repository root:
+
+```bash
+npm run setup
+npm run desktop
+```
+
+Use `npm run doctor` when the app cannot launch or a worker/provider check fails. It checks Python, Node/npm, Rust/Cargo, Cairo, provider keys, and reserved model config without printing secret values.
+
+## Run the Web Shell Directly
 
 ```bash
 cd apps/desktop
@@ -26,6 +37,14 @@ npm run dev
 ```
 
 ## Build the Frontend
+
+From the repository root:
+
+```bash
+npm run build:desktop
+```
+
+Or from this directory:
 
 ```bash
 npm run build
@@ -36,6 +55,12 @@ npm run build
 Rust is required for native Tauri commands and app packaging.
 
 ```bash
+npm run app:desktop
+```
+
+Or from this directory:
+
+```bash
 npm run tauri:dev
 ```
 
@@ -44,10 +69,22 @@ npm run tauri:dev
 Build a stable macOS `.app` bundle:
 
 ```bash
+npm run package:desktop
+```
+
+Or from this directory:
+
+```bash
 npm run tauri:build
 ```
 
 Create a DMG release package when Finder automation is available:
+
+```bash
+npm run package:desktop:dmg
+```
+
+Or from this directory:
 
 ```bash
 npm run tauri:build:dmg

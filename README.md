@@ -96,40 +96,57 @@ The app currently focuses on the user-facing experience loop: import, recommend,
 
 ## Quick Start Desktop
 
-Run the desktop web shell:
+First run, one-command setup:
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
-cd ultimate-ppt-master-skill/apps/desktop
-npm install
-npm run dev
+cd ultimate-ppt-master-skill
+npm run setup
+npm run desktop
 ```
 
-Build the frontend:
+What the setup command does:
+
+| Command | Purpose |
+|---|---|
+| `npm run setup` | Creates `.venv`, installs Python dependencies, installs desktop npm dependencies, and creates `~/.ppt-master/.env` from the template. |
+| `npm run desktop` | Launches the desktop web shell without requiring you to enter `apps/desktop`. |
+| `npm run doctor` | Checks Python, Node/npm, Rust/Cargo, Cairo, provider keys, and reserved model config without printing secrets. |
+| `npm run app:desktop` | Runs the native Tauri app after Rust/Cargo are installed. |
+| `npm run package:desktop` | Builds the stable macOS `.app` bundle. |
+
+If your environment does not use npm from the repository root, the same flow works through scripts:
 
 ```bash
-npm run build
+bash scripts/bootstrap.sh
+bash scripts/run-desktop.sh
+```
+
+Build the frontend from the root:
+
+```bash
+npm run build:desktop
 ```
 
 Run as a native Tauri app after installing Rust:
 
 ```bash
-npm run tauri:dev
+npm run app:desktop
 ```
 
 Build the native macOS `.app` bundle:
 
 ```bash
-npm run tauri:build
+npm run package:desktop
 ```
 
 Create a DMG release package when Finder automation is available:
 
 ```bash
-npm run tauri:build:dmg
+npm run package:desktop:dmg
 ```
 
-The default native build produces a stable `.app` bundle. DMG creation depends on macOS Finder automation and may require local desktop permissions.
+The bootstrap script intentionally does not install system packages such as Rust, Homebrew, or Cairo for you. `npm run doctor` tells you exactly which optional native pieces are missing. Without Rust, `npm run desktop` still gives you the browser-backed desktop shell; Rust is only required for native Tauri mode and packaging.
 
 ---
 
@@ -170,6 +187,12 @@ LLM_MODEL=gpt-4.1
 
 The desktop Settings page detects process environment variables, repository `.env`, and `~/.ppt-master/.env`. It only shows status flags and never exposes secret values.
 
+For a quick environment check after editing provider values:
+
+```bash
+npm run doctor
+```
+
 ---
 
 ## For Developers / Agents
@@ -181,9 +204,8 @@ Ultimate PPT Master is also a portable agent skill. Use this path when you want 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
 cd ~/.codex/skills/ultimate-ppt-master
-python3.10 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r requirements.txt
+npm run setup
+# No Node/npm in this agent environment? Use: bash scripts/bootstrap.sh
 ```
 
 Then ask Codex:
@@ -197,9 +219,8 @@ Use $ultimate-ppt-master to turn reports/q3-review.pdf into a 12-slide editable 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/agent-skills/ultimate-ppt-master
 cd ~/agent-skills/ultimate-ppt-master
-python3.10 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r requirements.txt
+npm run setup
+# No Node/npm in this agent environment? Use: bash scripts/bootstrap.sh
 ```
 
 Agent prompt:

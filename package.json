@@ -1,0 +1,16 @@
+{
+  "name": "ultimate-ppt-master",
+  "private": true,
+  "version": "2.0.0",
+  "description": "Local-first AI PPT desktop app and agent workflow for editable PowerPoint and Web Decks.",
+  "scripts": {
+    "setup": "bash scripts/bootstrap.sh",
+    "desktop": "bash scripts/run-desktop.sh",
+    "doctor": "bash scripts/doctor.sh",
+    "build:desktop": "npm --prefix apps/desktop run build",
+    "app:desktop": "npm --prefix apps/desktop run tauri:dev",
+    "package:desktop": "npm --prefix apps/desktop run tauri:build",
+    "package:desktop:dmg": "npm --prefix apps/desktop run tauri:build:dmg",
+    "test:worker": "bash -lc 'if [ -x .venv/bin/python ]; then .venv/bin/python -m unittest discover -s tests; else python3 -m unittest discover -s tests; fi'"
+  }
+}

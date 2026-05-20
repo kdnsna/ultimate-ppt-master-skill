@@ -96,40 +96,57 @@
 
 ## 快速运行桌面端
 
-运行桌面 Web 壳：
+首次运行，一键初始化：
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
-cd ultimate-ppt-master-skill/apps/desktop
-npm install
-npm run dev
+cd ultimate-ppt-master-skill
+npm run setup
+npm run desktop
 ```
 
-构建前端：
+这些命令分别做什么：
+
+| 命令 | 用途 |
+|---|---|
+| `npm run setup` | 创建 `.venv`，安装 Python 依赖，安装桌面端 npm 依赖，并从模板创建 `~/.ppt-master/.env`。 |
+| `npm run desktop` | 不用进入 `apps/desktop`，直接启动桌面 Web 壳。 |
+| `npm run doctor` | 检查 Python、Node/npm、Rust/Cargo、Cairo、provider key 和预留模型配置，不会打印密钥明文。 |
+| `npm run app:desktop` | 安装 Rust/Cargo 后运行原生 Tauri 应用。 |
+| `npm run package:desktop` | 构建稳定的 macOS `.app`。 |
+
+如果你的环境不习惯从根目录使用 npm，也可以直接运行脚本：
 
 ```bash
-npm run build
+bash scripts/bootstrap.sh
+bash scripts/run-desktop.sh
+```
+
+从根目录构建前端：
+
+```bash
+npm run build:desktop
 ```
 
 安装 Rust 后运行原生 Tauri 应用：
 
 ```bash
-npm run tauri:dev
+npm run app:desktop
 ```
 
 构建 macOS `.app`：
 
 ```bash
-npm run tauri:build
+npm run package:desktop
 ```
 
 在 Finder 自动化可用时生成 DMG 发布包：
 
 ```bash
-npm run tauri:build:dmg
+npm run package:desktop:dmg
 ```
 
-默认原生构建会稳定输出 `.app`。DMG 生成依赖 macOS Finder 自动化，可能需要本机桌面权限。
+初始化脚本不会自动安装 Rust、Homebrew、Cairo 这类系统组件。`npm run doctor` 会明确告诉你哪些可选原生依赖缺失。没有 Rust 也可以用 `npm run desktop` 跑浏览器承载的桌面壳；Rust 只影响原生 Tauri 模式和打包。
 
 ---
 
@@ -170,6 +187,12 @@ LLM_MODEL=gpt-4.1
 
 桌面端 Settings 会检测当前进程环境变量、仓库 `.env` 和 `~/.ppt-master/.env`，只显示配置状态，不暴露密钥明文。
 
+编辑 provider 配置后可以快速检查：
+
+```bash
+npm run doctor
+```
+
 ---
 
 ## 开发者 / Agent 接入
@@ -181,9 +204,8 @@ LLM_MODEL=gpt-4.1
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
 cd ~/.codex/skills/ultimate-ppt-master
-python3.10 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r requirements.txt
+npm run setup
+# 如果 Agent 环境没有 Node/npm，可用：bash scripts/bootstrap.sh
 ```
 
 然后对 Codex 说：
@@ -197,9 +219,8 @@ python3.10 -m venv .venv
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/agent-skills/ultimate-ppt-master
 cd ~/agent-skills/ultimate-ppt-master
-python3.10 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r requirements.txt
+npm run setup
+# 如果 Agent 环境没有 Node/npm，可用：bash scripts/bootstrap.sh
 ```
 
 通用 Agent prompt：
