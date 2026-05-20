@@ -1,16 +1,21 @@
 # Ultimate PPT Master Desktop
 
-轻量桌面壳 MVP：Tauri + React/TypeScript + 本地 Python worker。
+Desktop product shell for Ultimate PPT Master: Tauri + React/TypeScript + local Python worker.
 
-核心入口保持三步：导入资料、选择 PPTX 或 Web Deck、生成本地项目。原生 Tauri 模式会接收真实文件拖拽路径；浏览器预览模式可直接读取 Markdown/TXT，PDF/DOCX/PPTX 等二进制文件需要粘贴绝对路径。
+The app keeps the first workflow intentionally simple:
 
-当前 UX 重点是“普通创作者一眼会用，专业用户一眼信任”：
+1. Import source material.
+2. Choose editable PPTX or Web Deck.
+3. Generate a local project, preview results, inspect logs, and hand off to an Agent when deeper generation is needed.
 
-- 首页只突出 3 步创作舱、信任 badge、最近项目和示例画廊。
-- 创建页会按输入类型推荐输出模式、风格和页数区间。
-- 项目页展示预览、输出文件、环境检查、日志和 Agent handoff。
-- 最近项目来自真实 `desktop-manifest.json`，不是静态样例。
-- Settings 里提供中文 / English 界面切换，并加入模型驱动方式与 provider 配置引导。
+## What the Desktop App Does
+
+- Projects: reads real `desktop-manifest.json` files instead of static examples.
+- Create: supports drag/drop, Markdown/text/URL/file paths, smart recommendations, and style presets.
+- Workbench: shows generation progress, preview, outputs, logs, trust checks, and Agent handoff.
+- Settings: checks Python, Node, Rust/Cargo, Cairo, provider keys, model setup, output directory, and Chinese / English UI language.
+
+The desktop app does not upload user files and does not expose secret key values. Production-grade deck generation still uses the full repository workflow in `SKILL.md`.
 
 ## Run the Web Shell
 
@@ -34,7 +39,9 @@ Rust is required for native Tauri commands and app packaging.
 npm run tauri:dev
 ```
 
-Build the native macOS app bundle:
+## Build Native Packages
+
+Build a stable macOS `.app` bundle:
 
 ```bash
 npm run tauri:build
@@ -46,7 +53,32 @@ Create a DMG release package when Finder automation is available:
 npm run tauri:build:dmg
 ```
 
-The Python worker can also be tested directly:
+The default build target is `.app` because DMG packaging depends on macOS Finder automation and can fail when the current process lacks desktop automation permission.
+
+## Model and Provider Setup
+
+Recommended path: run production generation through an Agent such as Codex, Claude Code, OpenClaw, or Hermes.
+
+Optional provider capabilities are configured with environment variables or `.env`:
+
+```bash
+mkdir -p ~/.ppt-master
+cp ../../.env.example ~/.ppt-master/.env
+```
+
+Then configure values such as:
+
+```dotenv
+IMAGE_BACKEND=openai
+OPENAI_API_KEY=sk-xxx
+OPENAI_MODEL=gpt-image-2
+PEXELS_API_KEY=your-pexels-key
+PIXABAY_API_KEY=your-pixabay-key
+```
+
+Direct API worker driving is reserved for a future adapter and should not be described as complete in this app yet.
+
+## Worker Smoke Test
 
 ```bash
 python3 worker/desktop_worker.py inspect

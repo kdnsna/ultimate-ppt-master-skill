@@ -1,123 +1,106 @@
-# Ultimate PPT Master - AI PPT Generator for Editable PowerPoint & Web Decks
+# Ultimate PPT Master Desktop - AI PPT Studio for Editable PowerPoint & Web Decks
 
-> An AI PPT generator and PowerPoint automation skill that turns PDFs, Word/Excel files, old PPTs, URLs, Markdown, and raw notes into editable PPTX decks or cinematic HTML presentations.
+> A local-first AI PPT desktop app and agent workflow that turns real source material into editable PowerPoint decks and high-impact web presentations.
 
 <p align="center">
-  <strong>v2.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a>
+  <strong>v2.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./apps/desktop">Desktop App</a>
 </p>
 
-![Ultimate PPT Master hero](assets/readme/hero.svg)
+![Ultimate PPT Master Desktop hero](assets/readme/hero.svg)
 
 <p align="center">
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill"><img alt="GitHub Repo" src="https://img.shields.io/badge/GitHub-ultimate--ppt--master--skill-111827?style=for-the-badge&logo=github"></a>
+  <a href="#quick-start-desktop"><strong>Run Desktop</strong></a>
+  ·
+  <a href="./README.zh-CN.md"><strong>中文介绍</strong></a>
+  ·
+  <a href="#for-developers--agents"><strong>Agent Setup</strong></a>
+</p>
+
+<p align="center">
   <img alt="Version 2.0.0" src="https://img.shields.io/badge/Version-2.0.0-7C3AED?style=for-the-badge">
-  <img alt="AI PPT Generator" src="https://img.shields.io/badge/AI%20PPT-Generator-F97316?style=for-the-badge">
-  <img alt="PowerPoint Automation" src="https://img.shields.io/badge/PowerPoint-Automation-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
-  <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-C8A24A?style=for-the-badge">
-  <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white">
-  <img alt="PowerPoint" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
-  <img alt="HTML Decks" src="https://img.shields.io/badge/Output-Magazine%20HTML-111827?style=for-the-badge">
-  <img alt="Local first" src="https://img.shields.io/badge/Local--first-Agent%20Workflow-10B981?style=for-the-badge">
+  <img alt="AI PPT Desktop" src="https://img.shields.io/badge/AI%20PPT-Desktop%20Studio-F97316?style=for-the-badge">
+  <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
+  <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-2563EB?style=for-the-badge">
+  <img alt="Local First" src="https://img.shields.io/badge/Local--first-No%20Cloud%20Upload-10B981?style=for-the-badge">
 </p>
 
-If you came to GitHub searching for **PPT**, **AI PPT**, **PowerPoint generator**, **presentation generator**, **PPTX automation**, or **slide deck agent**, this is the opinionated one: it does not stop at pretty slide images. It builds a workflow for PPTs people can actually edit, review, present, and ship.
+If you are searching GitHub for **AI PPT**, **PowerPoint generator**, **PPTX automation**, **presentation desktop app**, **editable PPTX**, or **slide deck agent**, this project is built for the practical part of presentation work: importing real documents, choosing a delivery scene, generating a useful deck, and handing it off without losing editability.
 
-Most AI presentation tools can make slides look plausible. The problem starts five minutes later: the deck is a screenshot, the layout is locked, the brand system is gone, and the user still has to rebuild the parts that matter. **Ultimate PPT Master is built for the part after the first draft.**
+Most AI slide tools stop at a beautiful screenshot. Ultimate PPT Master Desktop is designed around a different promise:
 
-It is a portable agent skill for Codex, Claude Code, OpenClaw, Hermes, Cursor-style IDEs, and other coding agents. Drop in real source material, choose the delivery scene, and generate one of two production-grade outputs:
-
-| What you need | What it creates |
-|---|---|
-| Business report, consulting deck, training material, investor update | **Editable PowerPoint (`.pptx`)** with native text boxes, shapes, charts, speaker notes, animations, and optional narration |
-| Product launch, demo day, keynote, internal showcase, visual story | **Magazine-style web deck (`index.html`)** with horizontal navigation, motion, WebGL ambience, and high-design layouts |
-
-The goal is not "one prompt to random slides." The goal is a repeatable AI PPT workflow that respects source material, locks a design spec, generates page by page, previews visually, verifies output, and exports something people can actually use.
-
-**In one sentence:** Ultimate PPT Master turns messy real-world material into editable PowerPoint decks and premium web presentations, without locking your files inside a SaaS product.
-
----
-
-## What's New in v2.0.0
-
-Version 2.0.0 is the fusion release: it syncs the latest upstream work from the two projects this package builds on, then adapts that work into one coherent agent workflow.
-
-| Update | What changed |
-|---|---|
-| **Fresh upstream sync** | Synced `hugohe3/ppt-master` and `op7418/guizang-ppt-skill` implementation updates, while preserving this repository's cross-agent adaptation layer. |
-| **Two-mode output chooser** | Generic "make a PPT" requests now route into either editable PowerPoint or magazine-style web deck generation before work begins. |
-| **Expanded source handling** | Added stronger support for PDF, DOCX, XLSX, PPTX, URL, Markdown, and pasted-text workflows. |
-| **Editable PPTX upgrades** | Brought in newer conversion, SVG-to-PPTX, quality-check, chart, template, animation, narration, and live-preview tooling. |
-| **Magazine web deck upgrades** | Kept the original Editorial Magazine x E-ink style as the default, and added an optional Swiss Style engine for data, product, and engineering presentations. |
-| **Image workflow expansion** | Added image search references, multi-provider image-generation guidance, prompt templates, palette references, rendering references, and layout patterns. |
-| **README and growth package** | Rebuilt the GitHub homepage with product positioning, visual diagrams, bilingual entry points, and a clearer explanation of why the project is useful. |
-| **Multi-agent install guide** | Added setup paths for Codex, Claude Code, OpenClaw, Hermes, generic agent tools, and prompt-only environments. |
-
-See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for the exact upstream baselines and adaptation policy.
-
----
-
-## Why This Gets Stars
-
-GitHub users tend to reward presentation tools that solve a real workflow problem, not just a pretty demo. Recent open-source presentation projects show the same demand pattern:
-
-| What users want | Why it matters | How Ultimate PPT Master answers |
+| Bring in | Choose | Generate |
 |---|---|---|
-| **Editable output** | Teams must revise decks in PowerPoint after AI generation | Native PPTX export, not flattened slide screenshots |
-| **Source-grounded generation** | Real decks start from reports, docs, spreadsheets, URLs, and old slides | PDF, DOCX, XLSX, PPTX, URL, Markdown, pasted text |
-| **No SaaS lock-in** | Developers want control over files, models, and workflow | Local-first skill package; agent runs scripts on your machine |
-| **Design quality** | A usable deck needs rhythm, hierarchy, whitespace, and a clear visual system | Strategy phase, spec lock, professional templates, chart library |
-| **Iteration after generation** | First drafts need visual corrections | Live preview, annotations, quality checks, chart calibration |
-| **Multiple presentation surfaces** | A client handoff and a keynote are different products | Editable PPTX plus editorial and Swiss Style web decks |
+| PDF, DOCX, XLSX, PPTX, URL, Markdown, pasted text | Editable PPTX or cinematic Web Deck | Local project, preview, outputs, logs, Agent handoff |
 
-Reference landscape: [ppt-master](https://github.com/hugohe3/ppt-master), [Presenton](https://github.com/presenton/presenton), [Slidev](https://github.com/slidevjs/slidev), [Marp](https://github.com/marp-team/marp), [reveal.js](https://github.com/hakimel/reveal.js), and [banana-slides](https://github.com/Anionex/banana-slides) all point to the same market: people want faster presentation creation, but they still need control, editability, and taste.
+The desktop app is the front door. The underlying agent workflow keeps the power: Codex, Claude Code, OpenClaw, Hermes, or another coding agent can read the generated project, run the production pipeline, and refine the deck page by page.
 
 ---
 
-## Two Engines, One Workflow
+## Why Desktop
 
-![Ultimate PPT Master workflow](assets/readme/workflow.svg)
+![Ultimate PPT Master Desktop showcase](assets/readme/desktop-showcase.svg)
 
-### 1. Editable PowerPoint Engine
+Ultimate PPT Master Desktop is for people who want the speed of AI but still need a file they can trust.
 
-Use this when the deck needs to be delivered, reviewed, or modified by other people.
+| Desktop promise | Why it matters |
+|---|---|
+| **3-step creator flow** | Import sources, choose output, generate. Ordinary creators can start without reading a script manual. |
+| **Editable PPTX path** | Formal decks must be revised by teams, clients, teachers, and managers in PowerPoint. |
+| **Premium Web Deck path** | Launches, demo days, talks, and internal showcases need a more visual presentation surface. |
+| **Local-first projects** | Source files, outputs, previews, manifests, and logs stay in local project folders by default. |
+| **Agent-compatible depth** | The desktop shell stays simple while advanced generation remains available through `SKILL.md`. |
+| **Bilingual UI** | Settings include Chinese / English switching for international users. |
 
-- Real PowerPoint elements: text boxes, shapes, tables, charts, and media.
-- Source conversion from PDF, DOCX, XLSX, PPTX, URL, Markdown, and pasted text.
-- Strategy phase that locks audience, page count, style, color, typography, image policy, and page rhythm.
-- Sequential SVG authoring with `spec_lock.md` re-read before each page.
-- Live browser preview with element-level annotations.
-- Quality checker before export.
-- Optional transitions, per-element animations, speaker notes, recorded narration, and chart coordinate verification.
-
-### 2. Magazine Web Deck Engine
-
-Use this when the presentation itself is the experience: demo day, keynote, private sharing, product launch, industry talk, or a visually memorable internal readout.
-
-- Single-file `index.html` deck.
-- Horizontal navigation with keyboard, wheel, and touch support.
-- WebGL visual runtime and local motion fallback.
-- Style A: **Editorial Magazine x E-ink** for narrative, culture, industry, and human-centered talks.
-- Style B: **Swiss Style** for product, engineering, data, system diagrams, and information design.
-- Built-in screenshot framing, image prompt references, theme rules, layout skeletons, and QA checklist.
-
-![Ultimate PPT Master style matrix](assets/readme/style-matrix.svg)
+This is not a full PowerPoint editor and does not claim to replace PowerPoint. It is a focused desktop studio for import, preview, orchestration, export, and agent handoff.
 
 ---
 
-## Desktop App MVP
+## What It Generates
 
-The new desktop shell lives in `apps/desktop`. It keeps the first screen intentionally small: import source material, choose the delivery format, generate, then open the local project folder.
+![Ultimate PPT Master desktop workflow](assets/readme/desktop-workflow.svg)
 
-| Layer | Choice | Why |
-|---|---|---|
-| Desktop shell | Tauri | Small native wrapper for macOS first, Windows/Linux later |
-| Frontend | React + TypeScript + Vite | Fast UI iteration with a compact app structure |
-| Worker | Local Python worker | Reuses the existing repository and scripts instead of rewriting the PPT engine |
+### Editable PowerPoint (`.pptx`)
+
+Use this when the deck must be reviewed, changed, delivered, or archived.
+
+- Native PowerPoint-style output for formal handoff.
+- Designed for business reports, consulting decks, training material, academic decks, and investor updates.
+- Keeps the "real file" mindset: text, shapes, charts, notes, and export checks matter more than flattened screenshots.
+- Production-grade generation is handled by the full agent workflow, where the agent can read source material, lock a design spec, generate pages, preview, verify, and export.
+
+### Magazine Web Deck (`index.html`)
+
+Use this when the presentation itself is the experience.
+
+- Single-file HTML presentation for launches, keynotes, demo days, product stories, and high-visual internal sharing.
+- Includes editorial magazine and Swiss Style directions.
+- Built for horizontal navigation, strong visual rhythm, and shareable local output.
+- Works as the expressive counterpart to editable PPTX.
+
+---
+
+## How It Works
+
+Ultimate PPT Master Desktop keeps the product surface simple and leaves the deep work to the local worker and agent pipeline.
+
+| Layer | Role |
+|---|---|
+| **Tauri desktop shell** | Lightweight native app wrapper, macOS first, Windows/Linux later. |
+| **React + TypeScript UI** | Projects, Create, Workbench, Settings, language switch, provider status, model setup guide. |
+| **Python worker** | Creates local projects, writes previews, manifests, logs, and handoff files. |
+| **Agent workflow** | Codex / Claude Code / OpenClaw / Hermes reads `SKILL.md`, runs scripts, handles full generation and refinement. |
+
+The app currently focuses on the user-facing experience loop: import, recommend, preview, inspect, open outputs, and continue through an agent. Direct LLM API driving is documented as a future worker adapter, not as a complete replacement for the current `SKILL.md` workflow.
+
+---
+
+## Quick Start Desktop
 
 Run the desktop web shell:
 
 ```bash
-cd apps/desktop
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
+cd ultimate-ppt-master-skill/apps/desktop
 npm install
 npm run dev
 ```
@@ -134,7 +117,7 @@ Run as a native Tauri app after installing Rust:
 npm run tauri:dev
 ```
 
-Build the native macOS app bundle:
+Build the native macOS `.app` bundle:
 
 ```bash
 npm run tauri:build
@@ -146,32 +129,21 @@ Create a DMG release package when Finder automation is available:
 npm run tauri:build:dmg
 ```
 
-The current MVP creates local project folders, environment checks, Web Deck previews, and lightweight editable PPTX previews. Production-quality deck generation remains grounded in the full `SKILL.md` workflow.
-
-The desktop settings also include a **Language** switch for Chinese and English users. The choice is saved locally and updates the core creator flow, workbench, environment checks, and model setup guide.
+The default native build produces a stable `.app` bundle. DMG creation depends on macOS Finder automation and may require local desktop permissions.
 
 ---
 
-## Model and Provider Setup
+## Model Setup
 
-Yes, production-grade generation needs a model. Ultimate PPT Master does not bundle or resell a cloud model. The recommended path is **Agent-driven generation**: the reasoning and page-by-page authoring are driven by the agent you already use, such as Codex, Claude Code, OpenClaw, Hermes, Cursor-style IDEs, or another local coding agent.
-
-The desktop app is the local product layer: it imports files, recommends output settings, creates project folders, checks dependencies, shows previews, and hands the project to the full agent workflow. It does not upload your files or display secret keys.
+Production-quality decks need a model, but this project does not bundle or resell a cloud model. The recommended path is **Agent-driven generation**.
 
 | Driver mode | Current status | Best for |
 |---|---|---|
-| **Codex / Claude Code / OpenClaw / Hermes Agent** | Recommended and supported | Full workflow: source reading, strategy, design lock, page writing, script execution, preview, correction, export |
-| **Agent + provider keys** | Supported | Main workflow still runs in the Agent; provider keys unlock image generation, image search, narration, and other media capabilities |
-| **Direct LLM API driver** | Adapter convention reserved | Future desktop worker mode for users who want an OpenAI-compatible, Gemini, Qwen, or self-hosted API to drive the whole generation loop directly |
+| **Codex / Claude Code / OpenClaw / Hermes** | Recommended and supported | Source reading, strategy, design lock, page writing, script execution, preview, correction, export. |
+| **Agent + provider keys** | Supported | The agent runs the main workflow; provider keys unlock image generation, image search, narration, and media capabilities. |
+| **Direct LLM API driver** | Reserved convention | Future desktop worker adapter for OpenAI-compatible, Gemini, Qwen, or self-hosted APIs. |
 
-| Capability | Who provides it | Where to configure it |
-|---|---|---|
-| Content strategy, outline, slide writing, layout decisions | Your Agent's model | Configure inside Codex, Claude Code, Hermes, OpenClaw, or your IDE agent |
-| AI image generation | OpenAI, Gemini, Qwen/DashScope, Zhipu, Volcengine, MiniMax, OpenRouter, etc. | `.env` or process environment |
-| Stock image search | Pexels / Pixabay, with Openverse and Wikimedia fallback | `.env` or process environment |
-| Narration / TTS | edge-tts by default; optional ElevenLabs, MiniMax, Qwen, CosyVoice | `.env` or process environment |
-
-Recommended local config:
+Recommended local provider config:
 
 ```bash
 mkdir -p ~/.ppt-master
@@ -189,50 +161,22 @@ OPENAI_MODEL=gpt-image-2
 PEXELS_API_KEY=your-pexels-key
 PIXABAY_API_KEY=your-pixabay-key
 
-# Optional direct API driver convention for future worker adapters
+# Reserved for future direct API worker adapters
 LLM_PROVIDER=openai-compatible
 LLM_BASE_URL=https://api.openai.com/v1
 LLM_API_KEY=sk-xxx
 LLM_MODEL=gpt-4.1
 ```
 
-The desktop **Settings** page now includes a Model Setup guide. It detects whether provider keys and reserved direct-API fields are available from the current process environment, the repository `.env`, or `~/.ppt-master/.env`, while only showing status flags and never exposing the secret values.
-
-For v2.0.0, use Agent-driven mode for serious PPT generation. Direct API driver mode is documented as a forward-compatible configuration shape, not a replacement for the full `SKILL.md` workflow yet.
+The desktop Settings page detects process environment variables, repository `.env`, and `~/.ppt-master/.env`. It only shows status flags and never exposes secret values.
 
 ---
 
-## What Makes It Different
+## For Developers / Agents
 
-| Category | Typical result | Ultimate PPT Master |
-|---|---|---|
-| Image-based AI slide tools | Pretty but hard to edit | Native editable PPTX path |
-| Template-only generators | Fast but rigid | Free design plus reusable template workflows |
-| Markdown slide tools | Great for developers, less natural for business handoff | PPTX for handoff, HTML for performance |
-| SaaS presentation tools | Convenient but locked into a platform | Local-first scripts and portable skill files |
-| One-shot prompt generators | Fast first draft, weak control | Strategy, spec lock, live preview, verification |
+Ultimate PPT Master is also a portable agent skill. Use this path when you want Codex, Claude Code, OpenClaw, Hermes, or another coding agent to run the full production workflow.
 
-This project combines the proven editable PPTX workflow of [Hugo He's ppt-master](https://github.com/hugohe3/ppt-master) with the polished HTML deck aesthetics of [op7418's guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill), then wraps them into a cross-agent package that is easier to install, reuse, and extend.
-
----
-
-## Visual Directions Included
-
-Ultimate PPT Master is opinionated about taste. It tries to protect the deck from the two common AI failure modes: random decoration and monotonous corporate templates.
-
-| Direction | Best for | Design language |
-|---|---|---|
-| **Consulting / executive PPTX** | board updates, strategy, business analysis | clean hierarchy, action titles, charts, restrained color |
-| **Academic / institutional PPTX** | defense, research, technical teaching | clear sections, formal typography, evidence-first structure |
-| **Data and AI ops PPTX** | architecture, metrics, systems, workflows | dense but organized charts, diagrams, grids |
-| **Editorial web deck** | talks, product stories, industry essays | serif headlines, e-ink texture, magazine rhythm |
-| **Swiss web deck** | product launches, engineering, data reports | modular grid, sharp contrast, Helvetica-like discipline |
-
----
-
-## Quick Start
-
-### 1. Install for Codex
+### Install for Codex
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
@@ -248,19 +192,7 @@ Then ask Codex:
 Use $ultimate-ppt-master to turn reports/q3-review.pdf into a 12-slide editable PPTX for an executive meeting.
 ```
 
-### 2. Install for Claude Code, OpenClaw, Hermes, and Generic Agents
-
-Ultimate PPT Master is designed to be portable. It works best with agents that can read local files, run shell commands, and write output files. The repository includes multiple entry files so different tools can load the same workflow without needing a custom plugin.
-
-| Agent / Tool | Recommended setup | How to invoke it |
-|---|---|---|
-| **Codex** | Clone to `~/.codex/skills/ultimate-ppt-master` | `Use $ultimate-ppt-master ...` |
-| **Claude Code** | Clone to `~/.claude/skills/ultimate-ppt-master` or any project-readable path | Ask Claude to read `CLAUDE.md` before generating slides |
-| **OpenClaw** | Clone to a stable local path such as `~/agent-skills/ultimate-ppt-master` | Ask the agent to read `AGENTS.md` and follow the `ultimate-ppt-master` workflow |
-| **Hermes** | Clone to a stable local path such as `~/agent-skills/ultimate-ppt-master` | Ask Hermes to read `AGENTS.md`; set the skill directory as `SKILL_DIR` when running scripts |
-| **Any prompt-only agent** | No native skill directory needed | Paste or attach `PROMPT.md`, then provide your source material |
-
-Generic install path:
+### Install for Claude Code, OpenClaw, Hermes, and Generic Agents
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/agent-skills/ultimate-ppt-master
@@ -270,143 +202,52 @@ python3.10 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
-Generic agent prompt:
+Agent prompt:
 
 ```text
 Read ~/agent-skills/ultimate-ppt-master/AGENTS.md and follow the ultimate-ppt-master workflow.
 Use the repository path as SKILL_DIR. Turn reports/q3-review.pdf into a 12-slide editable PPTX.
 ```
 
-Prompt-only fallback:
-
-```text
-Use the instructions in PROMPT.md from this repository as your presentation-generation workflow.
-If a script path is needed, treat the repository root as SKILL_DIR.
-```
-
-For robust PPTX compatibility on macOS, install Cairo:
-
-```bash
-brew install cairo pkg-config
-```
-
-Node.js is only needed for Swiss Style web deck validation:
-
-```bash
-node scripts/validate-swiss-deck.mjs path/to/index.html
-```
-
-### 3. Ask Your Agent
-
-```text
-使用 $ultimate-ppt-master 把这个 Markdown 做成一份杂志风网页 PPT，用于 20 分钟线下分享。
-```
-
-```text
-Use $ultimate-ppt-master to create a Swiss Style web deck from this product launch outline.
-```
-
-For generic requests like "make a PPT", the skill first asks you to choose:
-
-1. **Editable PowerPoint (`.pptx`)** for formal reports, consulting decks, training, and handoff.
-2. **Magazine Web Deck (`index.html`)** for talks, launches, demo days, and highly visual presentations.
-
----
-
-## Supported Inputs and Outputs
-
-| Input | Editable PPTX | Web Deck |
-|---|---:|---:|
-| PDF | yes | use converted Markdown |
-| DOCX / Word | yes | use converted Markdown |
-| XLSX / Excel | yes | use converted Markdown |
-| Existing PPTX | yes | use converted Markdown / template reference |
-| URL / web page | yes | use converted Markdown |
-| Markdown | yes | yes |
-| Pasted notes or outline | yes | yes |
-
-| Output | Use when | Notes |
+| Agent / Tool | Recommended setup | Invocation |
 |---|---|---|
-| `.pptx` | business handoff, formal reporting, client review | native PowerPoint elements where supported |
-| `.pptx` with animations | presenter-paced or self-running deck | transitions and object entrance effects |
-| `.pptx` with narration | video export or asynchronous delivery | generated from speaker notes |
-| `index.html` | keynote, demo day, visual storytelling | single-file web deck |
+| **Codex** | `~/.codex/skills/ultimate-ppt-master` | `Use $ultimate-ppt-master ...` |
+| **Claude Code** | `~/.claude/skills/ultimate-ppt-master` or a project-readable path | Ask Claude to read `CLAUDE.md`. |
+| **OpenClaw** | Stable local path such as `~/agent-skills/ultimate-ppt-master` | Ask it to read `AGENTS.md`. |
+| **Hermes** | Stable local path such as `~/agent-skills/ultimate-ppt-master` | Ask Hermes to read `AGENTS.md`; use the repo as `SKILL_DIR`. |
+| **Prompt-only agent** | No native skill directory required | Paste or attach `PROMPT.md`. |
 
 ---
 
-## Repository Map
+## Roadmap
 
-| Path | Purpose |
+Desktop improvements planned after v2.0.0:
+
+- Natural-language edits for a selected slide.
+- Single-slide regeneration from the project workbench.
+- Template import wizard.
+- Image search / image generation panel.
+- Poster and cover generation for sharing the deck.
+- Direct API worker adapter for OpenAI-compatible, Gemini, Qwen, and self-hosted models.
+- Gallery automation for GitHub README examples.
+
+---
+
+## What Changed in v2.0.0
+
+| Update | What changed |
 |---|---|
-| `apps/desktop/` | Tauri + React desktop MVP and local Python worker |
-| `README.zh-CN.md` | Optional Chinese README for Chinese users |
-| `SKILL.md` | Main workflow entry for Codex and compatible agents |
-| `AGENTS.md` | Portable entry for agentic coding tools |
-| `CLAUDE.md` | Claude Code entry |
-| `PROMPT.md` | Copy-paste prompt for tools without native skill directories |
-| `scripts/` | Source conversion, project setup, preview, validation, PPTX export, image/audio helpers |
-| `templates/` | PPTX layout templates, chart templates, icon library, spec references |
-| `assets/magazine-web/` | Editorial and Swiss HTML deck templates, motion runtime, screenshot backgrounds |
-| `references/` | Strategy, execution, image generation, shared standards, magazine web references |
-| `workflows/` | Optional workflows: create template, live preview, chart verification, animation, narration |
-| `UPSTREAM_SYNC.md` | Current upstream baseline and fusion adaptation policy |
+| **Desktop MVP** | Added Tauri + React/TypeScript + local Python worker app under `apps/desktop`. |
+| **Desktop UX upgrade** | Added Projects, Create, Workbench, Settings, real manifests, trust checks, language switching, and model setup guidance. |
+| **Native build hardening** | Added Tauri icon assets, `Cargo.lock`, stable `.app` build command, and explicit DMG command. |
+| **Fresh upstream sync** | Synced `hugohe3/ppt-master` and `op7418/guizang-ppt-skill` updates while preserving this repository's adaptation layer. |
+| **Two output routes** | Editable PPTX and magazine-style HTML decks are both kept as first-class outputs. |
+| **Multi-agent guide** | Added setup paths for Codex, Claude Code, OpenClaw, Hermes, generic agents, and prompt-only environments. |
 
----
-
-## Built On Proven Open Source
-
-Ultimate PPT Master is a fusion package built on two MIT-licensed foundations:
-
-- [ppt-master](https://github.com/hugohe3/ppt-master) by Hugo He: editable PPTX workflow, SVG-to-PPTX export, templates, charts, role references, live preview, animation, narration, and quality tooling.
-- [guizang-ppt-skill](https://github.com/op7418/guizang-ppt-skill) by op7418: magazine-style HTML deck workflow, editorial and Swiss templates, themes, layouts, screenshot treatment, and web deck QA.
-
-This repository keeps the upstream copyright and license notices in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) and records sync baselines in [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md).
-
----
-
-## 中文简介
-
-终极融合PPT大师是一个跨 Agent 的演示文稿生成技能包。它不是简单的“一句话生成 PPT”，而是把真实材料转成可交付演示文稿的完整工作流。
-
-它支持两种输出：
-
-1. **可编辑 PowerPoint (`.pptx`)**
-   适合正式汇报、咨询报告、培训课件、客户交付和需要继续修改的材料。重点是可编辑、可验证、可交付。
-
-2. **杂志风网页 PPT (`index.html`)**
-   适合线下分享、发布会、demo day、个人演讲和强视觉展示。默认是“电子杂志 × 电子墨水”风格，也可以选择“瑞士国际主义 / Swiss Style”信息设计风格。
-
-为什么值得用：
-
-- 支持 PDF、DOCX、XLSX、PPTX、URL、Markdown 和直接粘贴文本。
-- 先做策略和设计锁定，再逐页生成，避免 AI 随机发挥。
-- PPTX 路线输出真实 PowerPoint 元素，不是整页截图。
-- Web 路线输出单文件 HTML，适合演讲和传播。
-- 本地优先，适配 Codex、Claude Code、OpenClaw、Hermes、Cursor 类 IDE 和通用 Agent 工具。
-
-快速安装：
-
-```bash
-git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
-cd ~/.codex/skills/ultimate-ppt-master
-python3.10 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-```
-
-然后在 Codex 里说：
-
-```text
-使用 $ultimate-ppt-master 帮我把 reports/q3-review.pdf 做成 12 页可编辑 PPTX。
-```
-
-或者：
-
-```text
-使用 $ultimate-ppt-master 做一份 Swiss Style 网页 PPT，用于产品发布演讲。
-```
+See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for upstream baselines and adaptation policy.
 
 ---
 
 ## License
 
-MIT. See [LICENSE](./LICENSE) and [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+MIT. See [LICENSE](./LICENSE).

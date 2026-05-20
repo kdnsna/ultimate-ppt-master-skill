@@ -1,171 +1,156 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master colorful bilingual hero diagram</title>
-  <desc id="desc">A premium colorful bilingual product illustration showing source documents flowing through an AI presentation studio into editable PPTX and magazine web deck outputs.</desc>
+  <title id="title">Ultimate PPT Master Desktop hero</title>
+  <desc id="desc">A colorful premium desktop product hero showing an AI PPT studio that imports source files and generates editable PPTX or web decks.</desc>
   <defs>
-    <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#FFF8EC"/>
-      <stop offset="0.35" stop-color="#F4F8FF"/>
-      <stop offset="0.72" stop-color="#F8F1FF"/>
+      <stop offset="0.38" stop-color="#F4F8FF"/>
+      <stop offset="0.7" stop-color="#F7F0FF"/>
       <stop offset="1" stop-color="#FFF3E8"/>
     </linearGradient>
-    <linearGradient id="studio" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.94"/>
-      <stop offset="1" stop-color="#F3F6FF" stop-opacity="0.86"/>
-    </linearGradient>
     <linearGradient id="ribbonA" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#FF7A59"/>
-      <stop offset="0.34" stop-color="#FFC857"/>
-      <stop offset="0.66" stop-color="#45D1A6"/>
-      <stop offset="1" stop-color="#4F8CFF"/>
+      <stop offset="0" stop-color="#F97316"/>
+      <stop offset="0.34" stop-color="#FACC15"/>
+      <stop offset="0.68" stop-color="#10B981"/>
+      <stop offset="1" stop-color="#2563EB"/>
     </linearGradient>
     <linearGradient id="ribbonB" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#7C3AED"/>
-      <stop offset="0.52" stop-color="#18B6F6"/>
+      <stop offset="0.54" stop-color="#06B6D4"/>
       <stop offset="1" stop-color="#F97316"/>
     </linearGradient>
-    <linearGradient id="ppt" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="appChrome" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.96"/>
+      <stop offset="1" stop-color="#F7FBFF" stop-opacity="0.88"/>
+    </linearGradient>
+    <linearGradient id="hot" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#FF8A4C"/>
-      <stop offset="1" stop-color="#E23B6C"/>
+      <stop offset="1" stop-color="#E11D48"/>
     </linearGradient>
-    <linearGradient id="web" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="cool" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#10B981"/>
-      <stop offset="0.52" stop-color="#24C6DC"/>
-      <stop offset="1" stop-color="#5B7CFA"/>
+      <stop offset="0.52" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#2563EB"/>
     </linearGradient>
-    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#182033"/>
-      <stop offset="1" stop-color="#35405B"/>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A855F7"/>
+      <stop offset="1" stop-color="#2563EB"/>
     </linearGradient>
-    <filter id="shadow" x="-18%" y="-18%" width="136%" height="140%">
-      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#51607A" flood-opacity="0.22"/>
+    <filter id="shadow" x="-15%" y="-18%" width="130%" height="142%">
+      <feDropShadow dx="0" dy="26" stdDeviation="30" flood-color="#42526E" flood-opacity="0.22"/>
     </filter>
-    <filter id="soft" x="-18%" y="-18%" width="136%" height="136%">
-      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#48607A" flood-opacity="0.13"/>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#334155" flood-opacity="0.14"/>
     </filter>
-    <pattern id="dotGrid" width="36" height="36" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1.6" fill="#50607A" opacity="0.11"/>
+    <pattern id="dots" width="34" height="34" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.4" fill="#475569" opacity="0.10"/>
     </pattern>
   </defs>
 
-  <rect width="1600" height="900" fill="url(#pageBg)"/>
-  <rect width="1600" height="900" fill="url(#dotGrid)" opacity="0.9"/>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#dots)" opacity="0.75"/>
+  <path d="M-80 184C210 38 384 96 560 196C770 316 948 286 1136 164C1314 48 1478 58 1690 150" fill="none" stroke="url(#ribbonA)" stroke-width="42" stroke-linecap="round" opacity="0.18"/>
+  <path d="M-70 752C170 626 392 610 610 718C826 824 1030 818 1228 696C1394 594 1518 596 1670 670" fill="none" stroke="url(#ribbonB)" stroke-width="48" stroke-linecap="round" opacity="0.15"/>
 
-  <path d="M-60 186C198 56 344 96 534 190C742 294 890 292 1084 178C1255 77 1411 63 1660 132" fill="none" stroke="url(#ribbonA)" stroke-width="38" stroke-linecap="round" opacity="0.17"/>
-  <path d="M-70 724C190 600 409 625 587 710C791 807 979 812 1169 698C1342 595 1488 591 1665 672" fill="none" stroke="url(#ribbonB)" stroke-width="42" stroke-linecap="round" opacity="0.14"/>
-  <path d="M160 118L247 78L314 135L224 178Z" fill="#FFB84D" opacity="0.28"/>
-  <path d="M1298 92L1404 132L1349 223L1246 167Z" fill="#7C3AED" opacity="0.14"/>
-  <path d="M110 760L214 720L270 800L158 838Z" fill="#10B981" opacity="0.14"/>
-  <path d="M1392 715L1494 672L1542 762L1448 812Z" fill="#FF6B6B" opacity="0.14"/>
+  <g transform="translate(100 66)">
+    <rect width="360" height="44" rx="22" fill="#FFFFFF" opacity="0.78" filter="url(#softShadow)"/>
+    <circle cx="28" cy="22" r="8" fill="#F97316"/>
+    <circle cx="54" cy="22" r="8" fill="#FACC15"/>
+    <circle cx="80" cy="22" r="8" fill="#10B981"/>
+    <text x="108" y="28" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" font-size="15" font-weight="800" fill="#526173">v2.0.0 Desktop Release</text>
 
-  <g transform="translate(110 92)">
-    <rect x="0" y="0" width="344" height="42" rx="21" fill="#FFFFFF" opacity="0.76" filter="url(#soft)"/>
-    <circle cx="26" cy="21" r="8" fill="#FF7A59"/>
-    <circle cx="51" cy="21" r="8" fill="#FFC857"/>
-    <circle cx="76" cy="21" r="8" fill="#45D1A6"/>
-    <text x="100" y="27" fill="#536078" font-family="Inter, Helvetica, Arial, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="14" font-weight="700">v2.0.0 fusion release / 融合大版本</text>
-
-    <text x="0" y="112" fill="#172033" font-family="Inter, Helvetica, Arial, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="52" font-weight="850">Ultimate PPT Master</text>
-    <text x="0" y="158" fill="#7C3AED" font-family="Inter, Helvetica, Arial, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="34" font-weight="850">终极融合 PPT 大师</text>
-    <text x="0" y="200" fill="#536078" font-family="Inter, Helvetica, Arial, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="22">Editable PowerPoint + cinematic web decks / 可编辑 PPT + 高质感网页演示</text>
+    <text x="0" y="112" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" font-size="58" font-weight="900" fill="#172033">Ultimate PPT Master Desktop</text>
+    <text x="0" y="160" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" font-size="35" font-weight="900" fill="#7C3AED">终极融合 PPT 大师桌面端</text>
+    <text x="0" y="208" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" font-size="23" font-weight="650" fill="#596579">Drag real files in. Generate editable PPTX or cinematic Web Decks.</text>
+    <text x="0" y="244" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" font-size="21" font-weight="650" fill="#6B7280">拖入真实资料，生成可编辑 PowerPoint 或高质感网页演示。</text>
   </g>
 
-  <g filter="url(#shadow)">
-    <rect x="116" y="312" width="286" height="352" rx="32" fill="#FFFFFF" opacity="0.9"/>
-    <rect x="116" y="312" width="286" height="86" rx="32" fill="#FFF1DC"/>
-    <text x="150" y="354" fill="#172033" font-family="Inter, Helvetica, Arial, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="23" font-weight="800">Source Stack</text>
-    <text x="150" y="382" fill="#C2410C" font-family="Inter, Helvetica, Arial, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="18" font-weight="800">资料输入</text>
+  <g transform="translate(1010 86)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" filter="url(#softShadow)">
+    <rect width="442" height="76" rx="30" fill="#FFFFFF" opacity="0.82"/>
+    <text x="32" y="31" font-size="16" font-weight="900" fill="#F97316">LOCAL-FIRST AI PPT STUDIO</text>
+    <text x="32" y="56" font-size="17" font-weight="750" fill="#172033">No cloud upload by default · Agent-ready</text>
+  </g>
 
-    <g font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" font-weight="800">
-      <rect x="150" y="430" width="92" height="54" rx="17" fill="#FFE2D2"/>
-      <text x="177" y="464" fill="#C2410C">PDF</text>
-      <rect x="262" y="430" width="92" height="54" rx="17" fill="#E4F1FF"/>
-      <text x="288" y="464" fill="#2563EB">DOCX</text>
-      <rect x="150" y="504" width="92" height="54" rx="17" fill="#DCFCE7"/>
-      <text x="175" y="538" fill="#15803D">XLSX</text>
-      <rect x="262" y="504" width="92" height="54" rx="17" fill="#F3E8FF"/>
-      <text x="288" y="538" fill="#7E22CE">PPTX</text>
-      <rect x="150" y="578" width="92" height="54" rx="17" fill="#FEF3C7"/>
-      <text x="177" y="612" fill="#B45309">URL</text>
-      <rect x="262" y="578" width="92" height="54" rx="17" fill="#E0F2FE"/>
-      <text x="294" y="612" fill="#0369A1">MD</text>
+  <g transform="translate(128 338)" filter="url(#shadow)">
+    <rect width="1344" height="478" rx="44" fill="url(#appChrome)" stroke="#FFFFFF" stroke-width="2"/>
+    <rect width="1344" height="58" rx="44" fill="#FFFFFF" opacity="0.72"/>
+    <circle cx="36" cy="30" r="9" fill="#FF6B57"/>
+    <circle cx="64" cy="30" r="9" fill="#FFCA3A"/>
+    <circle cx="92" cy="30" r="9" fill="#25C27A"/>
+    <text x="124" y="37" font-family="Inter, Helvetica, Arial, sans-serif" font-size="15" font-weight="800" fill="#6B7280">Ultimate PPT Master Desktop</text>
+
+    <g transform="translate(30 82)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
+      <rect width="238" height="360" rx="28" fill="#FFFFFF" opacity="0.82" stroke="#E6ECF5"/>
+      <rect x="26" y="26" width="58" height="58" rx="18" fill="url(#ribbonB)"/>
+      <text x="104" y="50" font-size="18" font-weight="900" fill="#172033">Creator</text>
+      <text x="104" y="76" font-size="14" font-weight="700" fill="#667085">Desktop shell</text>
+
+      <g transform="translate(24 118)">
+        <rect width="188" height="44" rx="16" fill="#FFF7ED"/>
+        <text x="16" y="28" font-size="15" font-weight="850" fill="#C2410C">Projects</text>
+        <rect y="58" width="188" height="44" rx="16" fill="#FFFFFF"/>
+        <text x="16" y="86" font-size="15" font-weight="850" fill="#667085">Create</text>
+        <rect y="116" width="188" height="44" rx="16" fill="#FFFFFF"/>
+        <text x="16" y="144" font-size="15" font-weight="850" fill="#667085">Workbench</text>
+        <rect y="174" width="188" height="44" rx="16" fill="#FFFFFF"/>
+        <text x="16" y="202" font-size="15" font-weight="850" fill="#667085">Settings</text>
+      </g>
+
+      <rect x="24" y="300" width="188" height="38" rx="16" fill="#ECFDF5"/>
+      <text x="42" y="324" font-size="14" font-weight="850" fill="#047857">Provider ready</text>
+    </g>
+
+    <g transform="translate(300 82)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
+      <text x="0" y="26" font-size="16" font-weight="900" fill="#F97316">STEP 1</text>
+      <text x="0" y="64" font-size="34" font-weight="900" fill="#172033">Import real sources</text>
+      <text x="0" y="96" font-size="20" font-weight="750" fill="#667085">导入真实资料</text>
+
+      <rect y="132" width="310" height="228" rx="30" fill="#FFF8EC" stroke="#FED7AA"/>
+      <path d="M52 180h206M52 216h154M52 252h190M52 288h122" stroke="#F97316" stroke-width="13" stroke-linecap="round" opacity="0.72"/>
+      <g transform="translate(36 36)" font-size="16" font-weight="900">
+        <rect x="0" y="278" width="68" height="40" rx="14" fill="#FFFFFF"/>
+        <text x="18" y="304" fill="#C2410C">PDF</text>
+        <rect x="82" y="278" width="76" height="40" rx="14" fill="#FFFFFF"/>
+        <text x="99" y="304" fill="#2563EB">DOCX</text>
+        <rect x="172" y="278" width="74" height="40" rx="14" fill="#FFFFFF"/>
+        <text x="190" y="304" fill="#047857">URL</text>
+      </g>
+    </g>
+
+    <g transform="translate(652 82)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
+      <text x="0" y="26" font-size="16" font-weight="900" fill="#7C3AED">STEP 2</text>
+      <text x="0" y="64" font-size="34" font-weight="900" fill="#172033">Choose delivery</text>
+      <text x="0" y="96" font-size="20" font-weight="750" fill="#667085">选择交付场景</text>
+
+      <rect y="132" width="318" height="96" rx="28" fill="#FFF7ED" stroke="#FDBA74"/>
+      <rect x="26" y="158" width="48" height="48" rx="16" fill="url(#hot)"/>
+      <text x="94" y="170" font-size="19" font-weight="900" fill="#172033">Editable PPTX</text>
+      <text x="94" y="198" font-size="15" font-weight="750" fill="#667085">Formal handoff · 可继续修改</text>
+
+      <rect y="264" width="318" height="96" rx="28" fill="#EEF6FF" stroke="#93C5FD"/>
+      <rect x="26" y="290" width="48" height="48" rx="16" fill="url(#cool)"/>
+      <text x="94" y="302" font-size="19" font-weight="900" fill="#172033">Web Deck</text>
+      <text x="94" y="330" font-size="15" font-weight="750" fill="#667085">Keynote sharing · 高质感演示</text>
+    </g>
+
+    <g transform="translate(1010 82)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
+      <text x="0" y="26" font-size="16" font-weight="900" fill="#10B981">STEP 3</text>
+      <text x="0" y="64" font-size="34" font-weight="900" fill="#172033">Generate &amp; export</text>
+      <text x="0" y="96" font-size="20" font-weight="750" fill="#667085">生成、预览、导出</text>
+
+      <rect y="132" width="284" height="228" rx="30" fill="#FFFFFF" stroke="#D9E3F0"/>
+      <rect x="28" y="154" width="228" height="84" rx="24" fill="#172033"/>
+      <rect x="50" y="180" width="92" height="12" rx="6" fill="#FACC15"/>
+      <rect x="50" y="204" width="160" height="12" rx="6" fill="#94A3B8"/>
+      <rect x="28" y="260" width="102" height="42" rx="16" fill="#ECFDF5"/>
+      <text x="48" y="287" font-size="14" font-weight="900" fill="#047857">Preview</text>
+      <rect x="146" y="260" width="110" height="42" rx="16" fill="#EFF6FF"/>
+      <text x="166" y="287" font-size="14" font-weight="900" fill="#2563EB">Export</text>
     </g>
   </g>
 
-  <g opacity="0.82">
-    <path d="M404 470C464 438 501 432 566 451" fill="none" stroke="url(#ribbonA)" stroke-width="10" stroke-linecap="round"/>
-    <path d="M406 512C462 548 502 556 568 539" fill="none" stroke="url(#ribbonB)" stroke-width="10" stroke-linecap="round"/>
-  </g>
-
-  <g filter="url(#shadow)">
-    <rect x="552" y="246" width="520" height="468" rx="40" fill="url(#studio)" stroke="#FFFFFF" stroke-width="2"/>
-    <rect x="596" y="286" width="432" height="68" rx="22" fill="#172033"/>
-    <text x="628" y="318" fill="#FFFFFF" font-family="Inter, Helvetica, Arial, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="24" font-weight="800">AI Presentation Studio</text>
-    <text x="628" y="343" fill="#CAD7FF" font-family="Inter, Helvetica, Arial, PingFang SC, Noto Sans CJK SC, Microsoft YaHei, sans-serif" font-size="16" font-weight="700">AI 演示工作台</text>
-
-    <g transform="translate(612 392)" font-family="Inter, Helvetica, Arial, sans-serif">
-      <rect x="0" y="0" width="156" height="86" rx="24" fill="#FFF7ED" stroke="#FED7AA"/>
-      <text x="27" y="36" fill="#C2410C" font-size="17" font-weight="800">Strategy</text>
-      <text x="40" y="64" fill="#8A5B3D" font-size="15" font-weight="700">策略</text>
-
-      <rect x="200" y="0" width="156" height="86" rx="24" fill="#EEF2FF" stroke="#C7D2FE"/>
-      <text x="242" y="36" fill="#4338CA" font-size="17" font-weight="800">Design</text>
-      <text x="255" y="64" fill="#5B6280" font-size="15" font-weight="700">设计</text>
-
-      <rect x="0" y="128" width="156" height="86" rx="24" fill="#ECFDF5" stroke="#A7F3D0"/>
-      <text x="38" y="164" fill="#047857" font-size="17" font-weight="800">Render</text>
-      <text x="55" y="192" fill="#4E7265" font-size="15" font-weight="700">生成</text>
-
-      <rect x="200" y="128" width="156" height="86" rx="24" fill="#FDF2F8" stroke="#FBCFE8"/>
-      <text x="244" y="164" fill="#BE185D" font-size="17" font-weight="800">Verify</text>
-      <text x="255" y="192" fill="#7E5264" font-size="15" font-weight="700">验证</text>
-
-      <path d="M156 43H200M278 86V128M200 171H156M78 128V86" fill="none" stroke="url(#ribbonA)" stroke-width="5" stroke-linecap="round"/>
-    </g>
-
-    <g transform="translate(632 646)">
-      <rect x="0" y="0" width="360" height="46" rx="23" fill="#FFFFFF" stroke="#D6DCEA"/>
-      <rect x="16" y="13" width="92" height="20" rx="10" fill="#FFE7D6"/>
-      <rect x="122" y="13" width="98" height="20" rx="10" fill="#DDF7EF"/>
-      <rect x="234" y="13" width="108" height="20" rx="10" fill="#E9E6FF"/>
-    </g>
-  </g>
-
-  <g opacity="0.86">
-    <path d="M1070 396C1132 350 1176 337 1234 348" fill="none" stroke="url(#ppt)" stroke-width="10" stroke-linecap="round"/>
-    <path d="M1070 566C1131 615 1178 628 1236 612" fill="none" stroke="url(#web)" stroke-width="10" stroke-linecap="round"/>
-  </g>
-
-  <g filter="url(#shadow)" font-family="Inter, Helvetica, Arial, sans-serif">
-    <rect x="1218" y="246" width="292" height="216" rx="34" fill="#FFFFFF" opacity="0.92"/>
-    <rect x="1244" y="274" width="240" height="118" rx="22" fill="#FFF0E7"/>
-    <rect x="1266" y="298" width="92" height="16" rx="8" fill="url(#ppt)"/>
-    <rect x="1266" y="326" width="162" height="12" rx="6" fill="#F9B8A4"/>
-    <rect x="1266" y="352" width="118" height="12" rx="6" fill="#F9B8A4"/>
-    <rect x="1402" y="300" width="48" height="66" rx="12" fill="#FFFFFF" opacity="0.78"/>
-    <text x="1248" y="424" fill="#172033" font-size="23" font-weight="850">Editable PPTX</text>
-    <text x="1248" y="452" fill="#C2410C" font-size="17" font-weight="800">可编辑 PowerPoint</text>
-
-    <rect x="1218" y="532" width="292" height="216" rx="34" fill="#FFFFFF" opacity="0.92"/>
-    <rect x="1244" y="560" width="240" height="118" rx="22" fill="#EAF7FF"/>
-    <path d="M1268 642C1306 594 1344 642 1382 596C1412 561 1448 584 1460 614" fill="none" stroke="url(#web)" stroke-width="10" stroke-linecap="round"/>
-    <rect x="1266" y="586" width="76" height="13" rx="6.5" fill="#10B981"/>
-    <rect x="1266" y="610" width="128" height="10" rx="5" fill="#9BE7D0"/>
-    <text x="1248" y="710" fill="#172033" font-size="23" font-weight="850">Web Decks</text>
-    <text x="1248" y="738" fill="#047857" font-size="17" font-weight="800">杂志风网页 PPT</text>
-  </g>
-
-  <g filter="url(#soft)" font-family="Inter, Helvetica, Arial, sans-serif">
-    <rect x="560" y="760" width="132" height="54" rx="18" fill="#FFFFFF" opacity="0.84"/>
-    <text x="590" y="783" fill="#6D28D9" font-size="14" font-weight="800">Preview</text>
-    <text x="596" y="803" fill="#6D28D9" font-size="14" font-weight="800">预览</text>
-    <rect x="716" y="760" width="132" height="54" rx="18" fill="#FFFFFF" opacity="0.84"/>
-    <text x="744" y="783" fill="#047857" font-size="14" font-weight="800">Images</text>
-    <text x="750" y="803" fill="#047857" font-size="14" font-weight="800">配图</text>
-    <rect x="872" y="760" width="132" height="54" rx="18" fill="#FFFFFF" opacity="0.84"/>
-    <text x="904" y="783" fill="#C2410C" font-size="14" font-weight="800">Audio</text>
-    <text x="908" y="803" fill="#C2410C" font-size="14" font-weight="800">旁白</text>
-    <rect x="1028" y="760" width="132" height="54" rx="18" fill="#FFFFFF" opacity="0.84"/>
-    <text x="1050" y="783" fill="#2563EB" font-size="14" font-weight="800">Validate</text>
-    <text x="1062" y="803" fill="#2563EB" font-size="14" font-weight="800">校验</text>
+  <g transform="translate(210 824)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
+    <rect width="1180" height="50" rx="25" fill="#FFFFFF" opacity="0.72" filter="url(#softShadow)"/>
+    <text x="40" y="32" font-size="17" font-weight="850" fill="#172033">Desktop-first · Editable PPTX · Magazine Web Deck · Local projects · Codex / Claude Code / OpenClaw / Hermes ready</text>
   </g>
 </svg>

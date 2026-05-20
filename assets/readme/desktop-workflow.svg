@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 640" role="img" aria-labelledby="title desc">
+  <title id="title">Ultimate PPT Master Desktop workflow</title>
+  <desc id="desc">A premium three-step desktop workflow: import sources, choose delivery, generate and export.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF8EC"/>
+      <stop offset="0.55" stop-color="#F4F8FF"/>
+      <stop offset="1" stop-color="#F7F0FF"/>
+    </linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F97316"/>
+      <stop offset="1" stop-color="#E11D48"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10B981"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+    <filter id="shadow" x="-16%" y="-18%" width="132%" height="142%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#475569" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="1600" height="640" fill="url(#bg)"/>
+  <g font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
+    <text x="90" y="86" font-size="42" font-weight="900" fill="#172033">A desktop flow people understand in 30 seconds</text>
+    <text x="90" y="126" font-size="22" font-weight="700" fill="#667085">Import source material, choose the delivery format, generate local outputs and hand off to your Agent.</text>
+  </g>
+
+  <g transform="translate(92 208)" filter="url(#shadow)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
+    <g>
+      <rect width="390" height="304" rx="34" fill="#FFFFFF" opacity="0.92"/>
+      <circle cx="58" cy="58" r="26" fill="url(#orange)"/>
+      <text x="104" y="54" font-size="18" font-weight="900" fill="#F97316">STEP 1</text>
+      <text x="104" y="88" font-size="30" font-weight="900" fill="#172033">Import sources</text>
+      <text x="38" y="132" font-size="18" font-weight="750" fill="#667085">PDF / DOCX / XLSX / PPTX / URL</text>
+      <text x="38" y="160" font-size="18" font-weight="750" fill="#667085">Markdown / pasted text</text>
+      <rect x="38" y="178" width="314" height="76" rx="24" fill="#FFF7ED" stroke="#FED7AA"/>
+      <text x="66" y="224" font-size="22" font-weight="900" fill="#C2410C">Drag files or paste content</text>
+    </g>
+
+    <path d="M430 150h88" stroke="#CBD5E1" stroke-width="10" stroke-linecap="round"/>
+    <path d="M504 124l36 26-36 26" fill="none" stroke="#CBD5E1" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <g transform="translate(560 0)">
+      <rect width="390" height="304" rx="34" fill="#FFFFFF" opacity="0.92"/>
+      <circle cx="58" cy="58" r="26" fill="url(#blue)"/>
+      <text x="104" y="54" font-size="18" font-weight="900" fill="#7C3AED">STEP 2</text>
+      <text x="104" y="88" font-size="30" font-weight="900" fill="#172033">Choose delivery</text>
+      <text x="38" y="132" font-size="18" font-weight="750" fill="#667085">Smart defaults recommend mode,</text>
+      <text x="38" y="160" font-size="18" font-weight="750" fill="#667085">style preset, and page range.</text>
+      <rect x="38" y="176" width="144" height="70" rx="22" fill="#FFF7ED" stroke="#FDBA74"/>
+      <text x="66" y="218" font-size="19" font-weight="900" fill="#C2410C">PPTX</text>
+      <rect x="204" y="176" width="148" height="70" rx="22" fill="#EFF6FF" stroke="#93C5FD"/>
+      <text x="236" y="218" font-size="19" font-weight="900" fill="#2563EB">Web Deck</text>
+    </g>
+
+    <path d="M990 150h88" stroke="#CBD5E1" stroke-width="10" stroke-linecap="round"/>
+    <path d="M1064 124l36 26-36 26" fill="none" stroke="#CBD5E1" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <g transform="translate(1120 0)">
+      <rect width="390" height="304" rx="34" fill="#FFFFFF" opacity="0.92"/>
+      <circle cx="58" cy="58" r="26" fill="url(#green)"/>
+      <text x="104" y="54" font-size="18" font-weight="900" fill="#10B981">STEP 3</text>
+      <text x="104" y="88" font-size="30" font-weight="900" fill="#172033">Generate &amp; export</text>
+      <text x="38" y="132" font-size="18" font-weight="750" fill="#667085">Preview, trust checks, logs,</text>
+      <text x="38" y="160" font-size="18" font-weight="750" fill="#667085">project folder, and Agent handoff.</text>
+      <rect x="38" y="178" width="314" height="76" rx="24" fill="#ECFDF5" stroke="#A7F3D0"/>
+      <text x="70" y="224" font-size="22" font-weight="900" fill="#047857">Local files, ready to inspect</text>
+    </g>
+  </g>
+</svg>
