@@ -140,7 +140,7 @@ What the setup command does:
 | Command | Purpose |
 |---|---|
 | `npm run setup` | Creates `.venv`, installs Python dependencies, installs desktop npm dependencies, and creates `~/.ppt-master/.env` from the template. |
-| `npm run desktop` | Launches the desktop web shell without requiring you to enter `apps/desktop`. |
+| `npm run desktop` | Starts the native Tauri desktop app when Rust/Cargo are available; otherwise falls back to a UI-only browser shell. |
 | `npm run doctor` | Checks Python, Node/npm, Rust/Cargo, Cairo, provider keys, and reserved model config without printing secrets. |
 | `npm run app:desktop` | Runs the native Tauri app after Rust/Cargo are installed. |
 | `npm run package:desktop` | Builds the stable macOS `.app` bundle. |
@@ -176,7 +176,7 @@ Create a DMG release package when Finder automation is available:
 npm run package:desktop:dmg
 ```
 
-The bootstrap script intentionally does not install system packages such as Rust, Homebrew, or Cairo for you. `npm run doctor` tells you exactly which optional native pieces are missing. Without Rust, `npm run desktop` still gives you the browser-backed desktop shell; Rust is only required for native Tauri mode and packaging.
+The bootstrap script intentionally does not install system packages such as Rust, Homebrew, or Cairo for you. `npm run doctor` tells you exactly which optional native pieces are missing. Without Rust, `npm run desktop` still opens the browser UI shell for inspection, but real PPTX/Web generation requires the native Tauri app because the Python worker must write local project files.
 
 ---
 

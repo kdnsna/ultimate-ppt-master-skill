@@ -384,8 +384,8 @@ export function App() {
     setSourceValue(nativePath || file.name);
     if (!nativePath) {
       setError(language === "en"
-        ? "Browser preview cannot read absolute paths for PDF/DOCX/PPTX. Use the native Tauri shell, or paste the absolute file path here."
-        : "浏览器预览无法读取 PDF/DOCX/PPTX 的绝对路径；原生 Tauri 壳可直接拖入，或在这里粘贴文件绝对路径。");
+        ? "Browser preview cannot run the local worker or read binary paths. Use the native Tauri app for real PPTX/Web generation."
+        : "浏览器预览不能运行本地 worker，也不能读取二进制路径。真实 PPTX/Web 生成请使用原生 Tauri 应用。");
     }
   }
 
@@ -729,7 +729,7 @@ function CreateView(props: {
           <label className="drop-zone" onDrop={props.onDrop} onDragOver={(event) => event.preventDefault()}>
             <Upload size={26} />
             <strong>{en ? "Drop a file, or paste a URL / Markdown / text" : "拖入文件，或粘贴 URL / Markdown / 文本"}</strong>
-            <span>{en ? "Native desktop mode reads real file paths; browser preview reads Markdown/TXT directly." : "原生桌面壳可读取真实路径；浏览器预览可直接读取 Markdown/TXT。"}</span>
+            <span>{en ? "Native desktop mode reads real files and writes outputs; browser preview is UI-only." : "原生桌面壳会读取真实文件并写出产物；浏览器预览只用于查看界面。"}</span>
           </label>
           <div className="segmented">
             {(["markdown", "text", "url", "file"] as SourceKind[]).map((kind) => (
@@ -1313,6 +1313,10 @@ function humanizeError(error: unknown, language: AppLanguage = "zh") {
   if (text.includes("No JSON job")) {
     if (language === "en") return "No generation job was received. Return to Create and submit again.";
     return "没有收到生成任务，请回到创建页重新提交。";
+  }
+  if (text.includes("Browser diagnostic mode")) {
+    if (language === "en") return "Browser preview is UI-only and cannot run the Python worker or write PPTX/HTML files. Start the native desktop app with `npm run desktop` or `npm run app:desktop`.";
+    return "浏览器预览只用于查看界面，不能运行 Python worker 或写出 PPTX/HTML。请用 `npm run desktop` 或 `npm run app:desktop` 启动原生桌面端。";
   }
   return text;
 }

@@ -140,7 +140,7 @@ npm run desktop
 | 命令 | 用途 |
 |---|---|
 | `npm run setup` | 创建 `.venv`，安装 Python 依赖，安装桌面端 npm 依赖，并从模板创建 `~/.ppt-master/.env`。 |
-| `npm run desktop` | 不用进入 `apps/desktop`，直接启动桌面 Web 壳。 |
+| `npm run desktop` | 如果已安装 Rust/Cargo，会启动原生 Tauri 桌面端；否则退回只看界面的浏览器壳。 |
 | `npm run doctor` | 检查 Python、Node/npm、Rust/Cargo、Cairo、provider key 和预留模型配置，不会打印密钥明文。 |
 | `npm run app:desktop` | 安装 Rust/Cargo 后运行原生 Tauri 应用。 |
 | `npm run package:desktop` | 构建稳定的 macOS `.app`。 |
@@ -176,7 +176,7 @@ npm run package:desktop
 npm run package:desktop:dmg
 ```
 
-初始化脚本不会自动安装 Rust、Homebrew、Cairo 这类系统组件。`npm run doctor` 会明确告诉你哪些可选原生依赖缺失。没有 Rust 也可以用 `npm run desktop` 跑浏览器承载的桌面壳；Rust 只影响原生 Tauri 模式和打包。
+初始化脚本不会自动安装 Rust、Homebrew、Cairo 这类系统组件。`npm run doctor` 会明确告诉你哪些可选原生依赖缺失。没有 Rust 也可以用 `npm run desktop` 打开浏览器界面壳做 UI 查看，但真实 PPTX/Web 生成需要原生 Tauri 应用，因为 Python worker 必须写入本地项目文件。
 
 ---
 

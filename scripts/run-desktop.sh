@@ -25,9 +25,18 @@ if [[ ! -d "$DESKTOP_DIR/node_modules" ]]; then
 fi
 
 if [[ ! -x "$ROOT_DIR/.venv/bin/python" ]]; then
-  warn "Python .venv is missing. The UI can start, but worker generation needs: npm run setup"
+  warn "Python .venv is missing. Native worker generation needs: npm run setup"
 fi
 
-info "Launching desktop web shell at http://127.0.0.1:5173"
 cd "$DESKTOP_DIR"
+
+if command -v cargo >/dev/null 2>&1 && command -v rustc >/dev/null 2>&1; then
+  info "Launching native Tauri desktop app"
+  exec npm run tauri:dev -- "$@"
+fi
+
+warn "Rust/Cargo was not found. Launching browser UI shell only."
+warn "Browser UI shell cannot run the Python worker or write PPTX/HTML outputs."
+warn "Install Rust/Cargo and run npm run desktop again for real local generation."
+info "Launching browser UI shell at http://127.0.0.1:5173"
 exec npm run dev -- "$@"

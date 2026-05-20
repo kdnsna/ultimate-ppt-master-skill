@@ -17,7 +17,8 @@ What happens:
 - Python dependencies are installed.
 - desktop npm dependencies are installed.
 - `~/.ppt-master/.env` is created from `.env.example` if missing.
-- the desktop web shell starts without requiring Rust.
+- the native Tauri desktop app starts when Rust/Cargo are available;
+- without Rust/Cargo, the browser UI shell starts for inspection only.
 
 ## Environment Check
 
@@ -59,11 +60,12 @@ npm run package:desktop:dmg
 ## First Useful Smoke Test
 
 1. Start the app with `npm run desktop`.
-2. Open Create.
-3. Paste a short Markdown brief or provide a `.docx` path.
-4. Choose `PPTX` or `Web Deck`.
-5. Generate.
-6. Open the Workbench and check:
+2. Confirm the console says `Launching native Tauri desktop app`. If it says browser UI shell, install Rust/Cargo before testing generation.
+3. Open Create.
+4. Paste a short Markdown brief or provide a `.docx` path.
+5. Choose `PPTX` or `Web Deck`.
+6. Generate.
+7. Open the Workbench and check:
    - `sourceExtraction.status`;
    - preview content;
    - output buttons;
@@ -84,4 +86,3 @@ projects/
 ```
 
 Do not commit private source files or raw generated business outputs.
-

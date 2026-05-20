@@ -73,7 +73,7 @@ else
 fi
 
 if ! command -v cargo >/dev/null 2>&1 || ! command -v rustc >/dev/null 2>&1; then
-  warn "Rust/Cargo not found. Browser preview still works; native Tauri packaging needs Rust. macOS: brew install rust"
+  warn "Rust/Cargo not found. Browser UI shell still opens for inspection, but real local generation and native packaging need Rust. macOS: brew install rust"
 fi
 
 if ! pkg-config --exists cairo >/dev/null 2>&1; then
@@ -83,5 +83,5 @@ fi
 info "Setup complete"
 printf "\nNext commands:\n"
 printf "  npm run doctor   # check local environment\n"
-printf "  npm run desktop  # launch the desktop web shell\n"
-printf "  npm run app:desktop  # launch native Tauri mode when Rust is ready\n"
+printf "  npm run desktop  # launch native desktop when Rust is ready; otherwise UI-only browser shell\n"
+printf "  npm run app:desktop  # force native Tauri mode\n"

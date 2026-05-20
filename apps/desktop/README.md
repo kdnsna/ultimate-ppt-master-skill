@@ -49,6 +49,8 @@ npm run setup
 npm run desktop
 ```
 
+`npm run desktop` starts the native Tauri app when Rust/Cargo are available. If Rust/Cargo are missing, it falls back to the browser UI shell; that shell is for interface inspection only and cannot run the Python worker or write PPTX/HTML outputs.
+
 Use `npm run doctor` when the app cannot launch or a worker/provider check fails. It checks Python, Node/npm, Rust/Cargo, Cairo, provider keys, and reserved model config without printing secret values.
 
 ## Run the Web Shell Directly
@@ -58,6 +60,8 @@ cd apps/desktop
 npm install
 npm run dev
 ```
+
+This direct Vite web shell is UI-only. Use `npm run app:desktop` or root `npm run desktop` with Rust/Cargo installed for real local generation.
 
 ## Build the Frontend
 
