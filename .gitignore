@@ -1,4 +1,5 @@
 .DS_Store
+node_modules/
 __pycache__/
 *.py[cod]
 *.pyo
@@ -13,6 +14,7 @@ env/
 .ruff_cache/
 dist/
 build/
+target/
 *.egg-info/
 projects/
 exports/

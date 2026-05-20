@@ -95,6 +95,40 @@ Use this when the presentation itself is the experience: demo day, keynote, priv
 
 ---
 
+## Desktop App MVP
+
+The new desktop shell lives in `apps/desktop`. It keeps the first screen intentionally small: import source material, choose the delivery format, generate, then open the local project folder.
+
+| Layer | Choice | Why |
+|---|---|---|
+| Desktop shell | Tauri | Small native wrapper for macOS first, Windows/Linux later |
+| Frontend | React + TypeScript + Vite | Fast UI iteration with a compact app structure |
+| Worker | Local Python worker | Reuses the existing repository and scripts instead of rewriting the PPT engine |
+
+Run the desktop web shell:
+
+```bash
+cd apps/desktop
+npm install
+npm run dev
+```
+
+Build the frontend:
+
+```bash
+npm run build
+```
+
+Run as a native Tauri app after installing Rust:
+
+```bash
+npm run tauri:dev
+```
+
+The current MVP creates local project folders, environment checks, Web Deck previews, and lightweight editable PPTX previews. Production-quality deck generation remains grounded in the full `SKILL.md` workflow.
+
+---
+
 ## What Makes It Different
 
 | Category | Typical result | Ultimate PPT Master |
@@ -231,6 +265,7 @@ For generic requests like "make a PPT", the skill first asks you to choose:
 
 | Path | Purpose |
 |---|---|
+| `apps/desktop/` | Tauri + React desktop MVP and local Python worker |
 | `README.zh-CN.md` | Optional Chinese README for Chinese users |
 | `SKILL.md` | Main workflow entry for Codex and compatible agents |
 | `AGENTS.md` | Portable entry for agentic coding tools |

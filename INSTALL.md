@@ -112,6 +112,32 @@ macOS 上如果要保证 PPTX 兼容导出，建议安装 Cairo：
 brew install cairo pkg-config
 ```
 
+## 桌面应用 MVP
+
+桌面应用位于 `apps/desktop`，第一版使用 Tauri + React/TypeScript + 本地 Python worker。
+
+只运行前端预览：
+
+```bash
+cd apps/desktop
+npm install
+npm run dev
+```
+
+构建前端：
+
+```bash
+npm run build
+```
+
+运行原生 Tauri 应用需要安装 Rust：
+
+```bash
+npm run tauri:dev
+```
+
+如果没有 Rust，仍然可以使用 `npm run dev` 验证桌面 UI 和浏览器 fallback 流程。
+
 ## 更新
 
 ```bash
@@ -251,6 +277,32 @@ For robust PPTX compatibility output on macOS:
 ```bash
 brew install cairo pkg-config
 ```
+
+## Desktop App MVP
+
+The desktop app lives in `apps/desktop` and uses Tauri + React/TypeScript + a local Python worker.
+
+Run the frontend shell:
+
+```bash
+cd apps/desktop
+npm install
+npm run dev
+```
+
+Build the frontend:
+
+```bash
+npm run build
+```
+
+Native Tauri mode requires Rust:
+
+```bash
+npm run tauri:dev
+```
+
+Without Rust, `npm run dev` still validates the desktop UI and browser fallback flow.
 
 ## Update
 

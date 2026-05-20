@@ -1,0 +1,23 @@
+[package]
+name = "ultimate-ppt-master-desktop"
+version = "0.1.0"
+description = "A lightweight desktop shell for Ultimate PPT Master"
+authors = ["kdnsna"]
+license = "MIT"
+repository = "https://github.com/kdnsna/ultimate-ppt-master-skill"
+edition = "2021"
+
+[lib]
+name = "ultimate_ppt_master_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = [] }
+
+[features]
+custom-protocol = ["tauri/custom-protocol"]
