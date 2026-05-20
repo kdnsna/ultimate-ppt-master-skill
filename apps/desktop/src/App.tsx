@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   ChevronRight,
   CircleAlert,
+  Copy,
   FileText,
   FolderOpen,
   Gauge,
@@ -37,6 +38,7 @@ import type {
   ProjectCheck,
   RecentProject,
   Recommendation,
+  SourceExtraction,
   SourceKind,
   StylePreset,
   ViewKey,
@@ -692,7 +694,7 @@ function CreateView(props: {
   onGenerate: () => void;
 }) {
   const en = props.language === "en";
-  const isDocumentShell = props.sourceKind === "file" && /\.(pdf|docx|xlsx|xlsm|pptx)$/i.test(props.sourceValue || props.sourceName);
+  const sourceReadiness = describeSourceReadiness(props.sourceKind, props.sourceValue, props.sourceName, props.language);
   const styles = localizedStyleOptions(props.language);
   return (
     <section className="screen create-screen">
@@ -738,10 +740,13 @@ function CreateView(props: {
           </div>
           <input className="field" value={props.sourceName} onChange={(event) => props.onSourceNameChange(event.target.value)} placeholder={en ? "Project or source file name" : "项目或源文件名称"} />
           <textarea className="source-editor" value={props.sourceValue} onChange={(event) => props.onSourceValueChange(event.target.value)} placeholder={en ? "Paste Markdown, text, URL, or a local absolute file path" : "粘贴 Markdown、文本、URL，或填写本地文件绝对路径"} />
-          {isDocumentShell && (
-            <div className="notice-box">
-              <CircleAlert size={18} />
-              <span>{en ? "PDF / DOCX / XLSX / PPTX files create a local project shell first; full parsing and production generation are handed to the Agent workflow." : "PDF / DOCX / XLSX / PPTX 会先创建本地项目壳；生产级全文解析和高质量生成由 Agent 工作流接管。"}</span>
+          {sourceReadiness && (
+            <div className={`notice-box ${sourceReadiness.status}`}>
+              {sourceReadiness.status === "extracted" ? <CheckCircle2 size={18} /> : <CircleAlert size={18} />}
+              <div>
+                <strong>{sourceReadiness.title}</strong>
+                <span>{sourceReadiness.detail}</span>
+              </div>
             </div>
           )}
           {props.error && <ActionError text={props.error} language={props.language} />}
@@ -862,6 +867,9 @@ function PreviewView(props: {
             <FolderOpen size={18} />
             <span>{en ? "Export and trust checks" : "导出与信任检查"}</span>
           </div>
+          {props.result?.sourceExtraction && (
+            <SourceExtractionCard extraction={props.result.sourceExtraction} language={props.language} />
+          )}
           {props.result ? (
             <>
               <button className="primary-action full" onClick={() => openPath(props.result?.projectPath || "")}>
@@ -897,6 +905,18 @@ function PreviewView(props: {
                 <button className="file-row" onClick={() => openProjectLog(props.result?.logsPath || "")}>
                   <Activity size={16} />
                   <span>{en ? "Open log" : "打开日志"}</span>
+                </button>
+              )}
+              {props.result?.sourceExtraction?.generatedMarkdownPath && (
+                <button className="file-row" onClick={() => openPath(props.result?.sourceExtraction?.generatedMarkdownPath || "")}>
+                  <FileText size={16} />
+                  <span>{en ? "Open source.md" : "打开 source.md"}</span>
+                </button>
+              )}
+              {props.result && (
+                <button className="file-row" onClick={() => { if (props.result) copyHandoffPrompt(props.result, props.language); }}>
+                  <Copy size={16} />
+                  <span>{en ? "Copy Agent handoff prompt" : "复制 Agent handoff prompt"}</span>
                 </button>
               )}
             </div>
@@ -1067,6 +1087,24 @@ function CheckItem({ check }: { check: ProjectCheck }) {
   );
 }
 
+function SourceExtractionCard({ extraction, language }: { extraction: SourceExtraction; language: AppLanguage }) {
+  const en = language === "en";
+  const status = extraction.status === "extracted" ? "ok" : extraction.status === "copied" ? "warning" : "missing";
+  const label = en
+    ? extraction.status === "extracted" ? "Source text extracted" : extraction.status === "copied" ? "Source copied" : "Agent handoff required"
+    : extraction.status === "extracted" ? "已读取正文" : extraction.status === "copied" ? "已复制文件" : "需 Agent 接管";
+  const detail = localizedExtractionDetail(extraction, language);
+  return (
+    <article className={`check-item source-card ${status}`}>
+      {status === "ok" ? <CheckCircle2 size={17} /> : <CircleAlert size={17} />}
+      <div>
+        <strong>{label}</strong>
+        <span>{detail}</span>
+      </div>
+    </article>
+  );
+}
+
 function ActionButton({ action, language }: { action: NextAction; language: AppLanguage }) {
   const label = actionLabel(action, language);
   return (
@@ -1139,11 +1177,59 @@ function localizedCheck(check: ProjectCheck, language: AppLanguage, providerCoun
     "local-first": { label: "Local-first", detail: "Sources and outputs stay in the local project folder. No cloud upload by default." },
     "editable-output": { label: "Editable output", detail: mode === "pptx" ? "The PPTX path outputs real text and shapes." : "The Web Deck path prioritizes presentation experience." },
     provider: { label: "Model provider", detail: providerCount > 0 ? `${providerCount} providers configured.` : "Preview works; production generation should configure providers." },
-    "document-parser": { label: "Document parsing", detail: "PDF/DOCX/XLSX/PPTX files are staged locally; full parsing is handled by the Agent workflow." },
+    "document-parser": { label: "Document parsing", detail: check.status === "ok" ? "DOCX and text inputs are converted into source.md for immediate preview." : "PDF/XLSX/PPTX files are staged locally; full parsing is handled by the Agent workflow." },
     venv: { label: "Python venv", detail: "Repository .venv was not found. Initialize dependencies from INSTALL.md." },
     rust: { label: "Tauri packaging", detail: "Rust/Cargo was not detected. Web shell works; native .app/.dmg packaging needs Rust." }
   };
   return byKey[check.key] ? { ...check, ...byKey[check.key] } : check;
+}
+
+function localizedExtractionDetail(extraction: SourceExtraction, language: AppLanguage) {
+  if (language === "zh") return extraction.detail;
+  if (extraction.status === "extracted") return "The source was converted into source.md and used for this PPTX/Web preview.";
+  if (extraction.status === "copied") return "The source file was copied into the local project; use Agent handoff for deeper parsing.";
+  return "The file was staged locally; continue with the Agent workflow for complete parsing and production output.";
+}
+
+function describeSourceReadiness(kind: SourceKind, value: string, name: string, language: AppLanguage) {
+  const en = language === "en";
+  const suffix = (name || value).split(".").pop()?.toLowerCase() || "";
+  if (kind === "markdown" || kind === "text") {
+    return {
+      status: "extracted",
+      title: en ? "Ready for immediate preview" : "可直接生成预览",
+      detail: en ? "Pasted Markdown/text is written into source.md and used right away." : "粘贴的 Markdown/文本会写入 source.md，并立即参与 PPTX/Web 生成。"
+    };
+  }
+  if (kind === "url") {
+    return {
+      status: "handoffRequired",
+      title: en ? "URL staged for Agent handoff" : "URL 已准备交给 Agent",
+      detail: en ? "The desktop app stores the URL; fetching and grounding happen in the Agent workflow." : "桌面端会保存 URL；网页抓取和事实校验由 Agent 工作流完成。"
+    };
+  }
+  if (suffix === "docx") {
+    return {
+      status: "extracted",
+      title: en ? "DOCX text will be extracted" : "DOCX 会读取正文",
+      detail: en ? "Native desktop generation converts DOCX into source.md before creating PPTX/Web previews." : "原生桌面生成会先把 DOCX 转成 source.md，再生成 PPTX/Web 预览。"
+    };
+  }
+  if (["pdf", "xlsx", "xlsm", "pptx"].includes(suffix)) {
+    return {
+      status: "handoffRequired",
+      title: en ? "File will be staged locally" : "文件会先进入本地项目",
+      detail: en ? "This format is copied into the project; complete parsing is handled by the Agent workflow." : "该格式会复制进项目目录；完整解析由 Agent 工作流接管。"
+    };
+  }
+  if (kind === "file") {
+    return {
+      status: "copied",
+      title: en ? "File path mode" : "文件路径模式",
+      detail: en ? "Use an absolute path in native desktop mode. Browser preview cannot read binary local files." : "原生桌面壳请填写绝对路径；浏览器预览无法读取本地二进制文件。"
+    };
+  }
+  return null;
 }
 
 function actionLabel(action: NextAction, language: AppLanguage) {
@@ -1168,6 +1254,14 @@ function fileNameFromPath(path: string): string {
 
 function wait(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function copyHandoffPrompt(result: WorkerResult, language: AppLanguage) {
+  const sourcePath = result.sourceExtraction?.generatedMarkdownPath || `${result.projectPath}/sources/source.md`;
+  const prompt = language === "en"
+    ? `Read ${result.projectPath}/README.md and follow the ultimate-ppt-master workflow. Use ${sourcePath} as the source material. Continue from the desktop preview and produce a production-quality ${modeLabel(result.outputMode || "pptx", language)}.`
+    : `请读取 ${result.projectPath}/README.md，并按 ultimate-ppt-master 工作流继续。使用 ${sourcePath} 作为源材料，在桌面预览基础上生成生产级 ${modeLabel(result.outputMode || "pptx", language)}。`;
+  navigator.clipboard?.writeText(prompt).catch(() => console.info("Clipboard write is not available in this environment."));
 }
 
 function shortenPath(value: string) {
@@ -1207,6 +1301,10 @@ function humanizeError(error: unknown, language: AppLanguage = "zh") {
   if (text.includes("python-pptx")) {
     if (language === "en") return "python-pptx is missing. Run `.venv/bin/python -m pip install -r requirements.txt` from the repository root.";
     return "缺少 python-pptx。请在仓库根目录执行 `.venv/bin/python -m pip install -r requirements.txt`。";
+  }
+  if (text.includes("DOCX parsing failed") || text.includes("mammoth")) {
+    if (language === "en") return "DOCX parsing failed. Run `npm run setup` from the repository root, then retry with the native desktop shell.";
+    return "DOCX 解析失败。请在仓库根目录执行 `npm run setup`，然后用原生桌面壳重试。";
   }
   if (text.includes("Source file not found")) {
     if (language === "en") return "Source file not found. Provide a full path, or paste Markdown / text directly.";

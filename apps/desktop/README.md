@@ -11,11 +11,27 @@ The app keeps the first workflow intentionally simple:
 ## What the Desktop App Does
 
 - Projects: reads real `desktop-manifest.json` files instead of static examples.
-- Create: supports drag/drop, Markdown/text/URL/file paths, smart recommendations, and style presets.
-- Workbench: shows generation progress, preview, outputs, logs, trust checks, and Agent handoff.
+- Create: supports drag/drop, Markdown/text/URL/file paths, DOCX text extraction status, smart recommendations, and style presets.
+- Workbench: shows generation progress, source extraction state, preview, outputs, logs, trust checks, source.md access, and Agent handoff prompt copy.
 - Settings: checks Python, Node, Rust/Cargo, Cairo, provider keys, model setup, output directory, and Chinese / English UI language.
 
 The desktop app does not upload user files and does not expose secret key values. Production-grade deck generation still uses the full repository workflow in `SKILL.md`.
+
+## Real DOCX Input
+
+Native desktop mode now extracts `.docx` sources into `sources/source.md` before generating PPTX/Web previews. Other binary office formats are copied into the project and clearly marked for Agent handoff until their full parsers are wired into the desktop worker.
+
+Each `desktop-manifest.json` includes:
+
+```json
+{
+  "sourceExtraction": {
+    "status": "extracted",
+    "detail": "已解析 DOCX 正文并生成可用于 PPTX/Web 的 source.md。",
+    "generatedMarkdownPath": "projects/desktop/.../sources/source.md"
+  }
+}
+```
 
 ## Fast Start from Repository Root
 

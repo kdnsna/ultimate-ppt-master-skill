@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Sanitized cultural tourism demo cover">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#fff8ec"/>
+      <stop offset="0.55" stop-color="#f4f8ff"/>
+      <stop offset="1" stop-color="#fff3e8"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" x2="1">
+      <stop offset="0" stop-color="#f97316"/>
+      <stop offset="0.5" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <path d="M-70 190C180 40 430 170 690 118C960 64 1120 200 1680 96" fill="none" stroke="url(#accent)" stroke-width="56" opacity="0.22"/>
+  <rect x="76" y="82" width="1448" height="730" rx="42" fill="#ffffff" opacity="0.78"/>
+  <text x="118" y="170" fill="#f97316" font-family="Avenir Next, PingFang SC, sans-serif" font-size="30" font-weight="800">ULTIMATE PPT MASTER DESKTOP DEMO</text>
+  <text x="118" y="300" fill="#172033" font-family="Avenir Next, PingFang SC, sans-serif" font-size="74" font-weight="850">文旅消费活动行办会材料</text>
+  <text x="118" y="382" fill="#172033" font-family="Avenir Next, PingFang SC, sans-serif" font-size="44" font-weight="700">Sanitized DOCX to Editable PPTX + Web Deck</text>
+  <g transform="translate(118 472)" font-family="Avenir Next, PingFang SC, sans-serif" font-size="30" fill="#667085">
+    <text y="0">真实办公材料结构，脱敏公开展示</text>
+    <text y="58">本地解析 source.md，生成 PPTX 与 HTML 双路线</text>
+    <text y="116">原始文件与原样生成件不进入公开仓库</text>
+  </g>
+  <g transform="translate(1020 470)">
+    <rect width="320" height="190" rx="26" fill="#fff7ed" stroke="#fed7aa"/>
+    <text x="32" y="70" fill="#f97316" font-family="Avenir Next, sans-serif" font-size="24" font-weight="850">Editable PPTX</text>
+    <text x="32" y="122" fill="#172033" font-family="Avenir Next, PingFang SC, sans-serif" font-size="30" font-weight="850">正式汇报</text>
+    <rect x="80" y="148" width="162" height="12" rx="6" fill="#f97316"/>
+  </g>
+  <g transform="translate(1130 612)">
+    <rect width="320" height="190" rx="26" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="32" y="70" fill="#2563eb" font-family="Avenir Next, sans-serif" font-size="24" font-weight="850">Web Deck</text>
+    <text x="32" y="122" fill="#172033" font-family="Avenir Next, PingFang SC, sans-serif" font-size="30" font-weight="850">展示传播</text>
+    <rect x="80" y="148" width="162" height="12" rx="6" fill="#2563eb"/>
+  </g>
+</svg>

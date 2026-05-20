@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  desktop-and-worker:
+    name: Desktop build and worker tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config
+
+      - name: Install Python dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements.txt
+
+      - name: Install desktop dependencies
+        run: npm --prefix apps/desktop ci
+
+      - name: Build desktop frontend
+        run: npm run build:desktop
+
+      - name: Audit desktop dependencies
+        run: npm --prefix apps/desktop audit --audit-level=high
+
+      - name: Run worker tests
+        run: npm run test:worker
+
+      - name: Check whitespace
+        run: git diff --check

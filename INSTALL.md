@@ -195,6 +195,18 @@ npm run doctor
 python ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py .
 ```
 
+发布前本地检查：
+
+```bash
+npm run doctor
+npm run build:desktop
+npm --prefix apps/desktop audit
+npm run test:worker
+git diff --check
+```
+
+公开脱敏样例见 `examples/desktop-cultural-tourism-demo`。真实业务 DOCX 和原样生成件默认只保留在本地 `projects/` 目录，不应提交到公开仓库。
+
 ---
 
 ## English
@@ -376,3 +388,14 @@ ls SKILL.md AGENTS.md CLAUDE.md PROMPT.md README.md
 .venv/bin/python --version
 npm run doctor
 ```
+
+Release candidate checks:
+
+```bash
+npm run build:desktop
+npm --prefix apps/desktop audit
+npm run test:worker
+git diff --check
+```
+
+The public sanitized demo lives in `examples/desktop-cultural-tourism-demo`. Raw business DOCX files and raw generated outputs should stay under local ignored project folders.

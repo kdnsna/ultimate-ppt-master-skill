@@ -22,6 +22,7 @@
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-2563EB?style=for-the-badge">
   <img alt="Local First" src="https://img.shields.io/badge/Local--first-No%20Cloud%20Upload-10B981?style=for-the-badge">
+  <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/kdnsna/ultimate-ppt-master-skill/ci.yml?branch=main&style=for-the-badge&label=CI">
 </p>
 
 If you are searching GitHub for **AI PPT**, **PowerPoint generator**, **PPTX automation**, **presentation desktop app**, **editable PPTX**, or **slide deck agent**, this project is built for the practical part of presentation work: importing real documents, choosing a delivery scene, generating a useful deck, and handing it off without losing editability.
@@ -47,6 +48,7 @@ Ultimate PPT Master Desktop is for people who want the speed of AI but still nee
 | **3-step creator flow** | Import sources, choose output, generate. Ordinary creators can start without reading a script manual. |
 | **Editable PPTX path** | Formal decks must be revised by teams, clients, teachers, and managers in PowerPoint. |
 | **Premium Web Deck path** | Launches, demo days, talks, and internal showcases need a more visual presentation surface. |
+| **Real DOCX extraction** | Word meeting material is converted into `source.md` before preview generation, instead of becoming a placeholder shell. |
 | **Local-first projects** | Source files, outputs, previews, manifests, and logs stay in local project folders by default. |
 | **Agent-compatible depth** | The desktop shell stays simple while advanced generation remains available through `SKILL.md`. |
 | **Bilingual UI** | Settings include Chinese / English switching for international users. |
@@ -65,6 +67,7 @@ Use this when the deck must be reviewed, changed, delivered, or archived.
 
 - Native PowerPoint-style output for formal handoff.
 - Designed for business reports, consulting decks, training material, academic decks, and investor updates.
+- DOCX sources are extracted locally into `sources/source.md`, then used for immediate PPTX preview generation.
 - Keeps the "real file" mindset: text, shapes, charts, notes, and export checks matter more than flattened screenshots.
 - Production-grade generation is handled by the full agent workflow, where the agent can read source material, lock a design spec, generate pages, preview, verify, and export.
 
@@ -74,8 +77,20 @@ Use this when the presentation itself is the experience.
 
 - Single-file HTML presentation for launches, keynotes, demo days, product stories, and high-visual internal sharing.
 - Includes editorial magazine and Swiss Style directions.
+- Uses the same extracted `source.md` as the PPTX path, so one source can validate both delivery modes.
 - Built for horizontal navigation, strong visual rhythm, and shareable local output.
 - Works as the expressive counterpart to editable PPTX.
+
+---
+
+## Real-World Sanitized Demo
+
+The release candidate was locally validated with a real DOCX meeting brief and generated both:
+
+- a 10-slide editable PPTX preview for formal meeting review;
+- an 8-slide Web Deck preview for visual sharing.
+
+The raw DOCX and raw generated outputs are not committed because they may contain sensitive business context. A sanitized public demo is available at [examples/desktop-cultural-tourism-demo](./examples/desktop-cultural-tourism-demo), with generalized organization names, locations, budget wording, and approval details.
 
 ---
 
@@ -260,6 +275,9 @@ Desktop improvements planned after v2.0.0:
 |---|---|
 | **Desktop MVP** | Added Tauri + React/TypeScript + local Python worker app under `apps/desktop`. |
 | **Desktop UX upgrade** | Added Projects, Create, Workbench, Settings, real manifests, trust checks, language switching, and model setup guidance. |
+| **DOCX input loop** | Desktop worker now extracts DOCX text into `source.md` and records `sourceExtraction` status in the manifest. |
+| **Release checks** | Added CI for desktop build, worker tests, dependency audit, and whitespace checks. |
+| **Sanitized demo** | Added a public cultural-tourism meeting-material demo without committing raw private source files. |
 | **Native build hardening** | Added Tauri icon assets, `Cargo.lock`, stable `.app` build command, and explicit DMG command. |
 | **Fresh upstream sync** | Synced `hugohe3/ppt-master` and `op7418/guizang-ppt-skill` updates while preserving this repository's adaptation layer. |
 | **Two output routes** | Editable PPTX and magazine-style HTML decks are both kept as first-class outputs. |

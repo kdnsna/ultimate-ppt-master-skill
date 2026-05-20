@@ -22,6 +22,7 @@
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-2563EB?style=for-the-badge">
   <img alt="Local First" src="https://img.shields.io/badge/Local--first-No%20Cloud%20Upload-10B981?style=for-the-badge">
+  <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/kdnsna/ultimate-ppt-master-skill/ci.yml?branch=main&style=for-the-badge&label=CI">
 </p>
 
 如果你在 GitHub 搜 **AI PPT**、**PPT 生成器**、**PowerPoint 自动化**、**PPTX 生成**、**演示文稿桌面应用** 或 **slide deck agent**，这个项目主打的是更实用的那一步：导入真实资料，选择交付场景，生成能继续编辑、能检查、能交付的演示文稿。
@@ -47,6 +48,7 @@
 | **三步创作流** | 导入资料、选择输出、生成导出。普通创作者不用先读脚本说明。 |
 | **可编辑 PPTX 路线** | 正式材料需要在 PowerPoint 里被团队、客户、老师、领导继续修改。 |
 | **高质感 Web Deck 路线** | 发布会、demo day、分享会和内部展示需要更强视觉表达。 |
+| **真实 DOCX 解析** | Word 行办会/汇报材料会先转成 `source.md`，再参与预览生成，不再只是占位项目壳。 |
 | **本地优先项目** | 源文件、输出、预览、manifest 和日志默认留在本地项目目录。 |
 | **Agent 兼容深水区** | 首页保持简单，专业生成能力通过 `SKILL.md` 保留。 |
 | **中英双语界面** | Settings 已支持中文 / English 切换，方便国际用户。 |
@@ -65,6 +67,7 @@
 
 - 面向真实 PowerPoint 交付，不是整页截图思路。
 - 适合商务汇报、咨询方案、培训课件、学术答辩、投资人更新。
+- DOCX 源文件会在本地解析成 `sources/source.md`，并立即用于 PPTX 预览生成。
 - 关注真实文件价值：文本、形状、图表、备注和导出检查比表面截图更重要。
 - 生产级生成由完整 Agent 工作流接管：读取资料、锁定设计规范、逐页生成、预览、校验、导出。
 
@@ -74,8 +77,20 @@
 
 - 单文件 HTML 演示，适合发布会、keynote、demo day、产品故事和强视觉内部分享。
 - 内置电子杂志和 Swiss Style 两条视觉方向。
+- 与 PPTX 路线共用同一份解析后的 `source.md`，一份资料可以验证双路线交付。
 - 适合横向翻页、强视觉节奏和本地可分享输出。
 - 是可编辑 PPTX 的视觉表达补充。
+
+---
+
+## 真实场景脱敏 Demo
+
+本次发布前已用一份真实 DOCX 行办会材料在本地验证，并生成了：
+
+- 10 页可编辑 PPTX 预览，用于正式会议审阅；
+- 8 页 Web Deck 预览，用于视觉展示传播。
+
+原始 DOCX 和原样生成件可能包含业务上下文，因此不会提交到公开仓库。公开版本只保留脱敏样例：[examples/desktop-cultural-tourism-demo](./examples/desktop-cultural-tourism-demo)，其中机构、地点、预算和审批细节均已泛化。
 
 ---
 
@@ -260,6 +275,9 @@ v2.0.0 之后的桌面端方向：
 |---|---|
 | **桌面端 MVP** | 新增 `apps/desktop`，采用 Tauri + React/TypeScript + 本地 Python worker。 |
 | **桌面 UX 增强** | 新增 Projects、Create、Workbench、Settings、真实 manifest、信任检查、语言切换和模型配置引导。 |
+| **DOCX 输入闭环** | 桌面 worker 现在会把 DOCX 正文解析为 `source.md`，并在 manifest 中记录 `sourceExtraction` 状态。 |
+| **发布检查** | 新增 CI，覆盖桌面构建、worker 单测、依赖审计和空白检查。 |
+| **脱敏 Demo** | 新增文旅行办会材料脱敏样例，不提交原始私有文件。 |
 | **原生构建加固** | 补齐 Tauri 图标、`Cargo.lock`、稳定 `.app` 构建命令和显式 DMG 命令。 |
 | **同步上游** | 同步 `hugohe3/ppt-master` 与 `op7418/guizang-ppt-skill` 更新，并保留本仓库适配层。 |
 | **双输出路线** | 可编辑 PPTX 与杂志风 HTML Deck 都作为一等输出。 |

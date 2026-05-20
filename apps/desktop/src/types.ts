@@ -45,6 +45,12 @@ export interface NextAction {
   path?: string;
 }
 
+export interface SourceExtraction {
+  status: "extracted" | "copied" | "handoffRequired";
+  detail: string;
+  generatedMarkdownPath?: string;
+}
+
 export interface WorkerResult {
   status: "complete" | "error";
   projectPath: string;
@@ -62,6 +68,7 @@ export interface WorkerResult {
   previewSvg?: string;
   previewHtml?: string;
   sourceName?: string;
+  sourceExtraction?: SourceExtraction;
   error?: string;
 }
 

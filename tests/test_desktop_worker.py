@@ -2,8 +2,10 @@ import json
 import os
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 from unittest.mock import patch
+from xml.sax.saxutils import escape
 
 from apps.desktop.worker.desktop_worker import (
     inspect_environment,
@@ -15,6 +17,42 @@ from apps.desktop.worker.desktop_worker import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def write_minimal_docx(path: Path, paragraphs: list[str]) -> None:
+    body = "".join(
+        f"<w:p><w:r><w:t>{escape(paragraph)}</w:t></w:r></w:p>"
+        for paragraph in paragraphs
+    )
+    with zipfile.ZipFile(path, "w") as docx:
+        docx.writestr(
+            "[Content_Types].xml",
+            """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>""",
+        )
+        docx.writestr(
+            "_rels/.rels",
+            """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>""",
+        )
+        docx.writestr(
+            "word/_rels/document.xml.rels",
+            """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>""",
+        )
+        docx.writestr(
+            "word/document.xml",
+            f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>{body}<w:sectPr/></w:body>
+</w:document>""",
+        )
 
 
 class DesktopWorkerTest(unittest.TestCase):
@@ -142,6 +180,60 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertIn("Editable Deck", result["previewSvg"])
             self.assertEqual(result["outputMode"], "pptx")
             self.assertTrue(result["thumbnailSvg"].startswith("<svg"))
+
+    def test_run_job_extracts_docx_text_for_pptx_preview(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "brief.docx"
+            write_minimal_docx(
+                source,
+                [
+                    "文旅消费活动行办会材料",
+                    "活动目标是联动城市文旅资源和金融服务。",
+                    "本次汇报需要形成可编辑 PPTX。",
+                ],
+            )
+
+            result = run_job(
+                {
+                    "source": {"kind": "file", "value": str(source), "name": "brief.docx"},
+                    "outputMode": "pptx",
+                    "stylePreset": "business",
+                    "projectDir": tmp,
+                },
+                ROOT,
+            )
+
+            source_md = Path(result["projectPath"]) / "sources" / "source.md"
+            self.assertEqual(result["sourceExtraction"]["status"], "extracted")
+            self.assertEqual(result["sourceExtraction"]["generatedMarkdownPath"], str(source_md))
+            self.assertIn("文旅消费活动行办会材料", source_md.read_text(encoding="utf-8"))
+            self.assertIn("文旅消费活动行办会材料", result["previewSvg"])
+            self.assertNotIn("Imported file:", source_md.read_text(encoding="utf-8"))
+
+    def test_run_job_extracts_docx_text_for_web_preview(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "web-brief.docx"
+            write_minimal_docx(
+                source,
+                [
+                    "城市文旅消费展示方案",
+                    "展示重点包括主题活动、消费权益和线上传播。",
+                ],
+            )
+
+            result = run_job(
+                {
+                    "source": {"kind": "file", "value": str(source), "name": "web-brief.docx"},
+                    "outputMode": "web",
+                    "stylePreset": "editorial",
+                    "projectDir": tmp,
+                },
+                ROOT,
+            )
+
+            self.assertEqual(result["sourceExtraction"]["status"], "extracted")
+            self.assertIn("城市文旅消费展示方案", result["previewHtml"])
+            self.assertNotIn("Imported file:", result["previewHtml"])
 
     def test_list_recent_projects_reads_real_manifests(self):
         with tempfile.TemporaryDirectory() as tmp:

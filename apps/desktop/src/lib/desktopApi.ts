@@ -92,6 +92,13 @@ export async function runDesktopJob(job: DesktopJob): Promise<WorkerResult> {
       { key: "open-folder", label: "打开项目文件夹", detail: "查看 outputs、preview 和日志。", path: "~/UltimatePPTMasterProjects/browser-preview" },
       { key: "agent-handoff", label: "交给 Agent 深加工", detail: "使用 SKILL.md 进入生产级生成流程。", path: "~/UltimatePPTMasterProjects/browser-preview/README.md" }
     ],
+    sourceExtraction: {
+      status: job.source.kind === "file" ? "handoffRequired" : "extracted",
+      detail: job.source.kind === "file"
+        ? "浏览器预览无法读取二进制文件绝对路径；请使用原生桌面壳或粘贴 Markdown。"
+        : "浏览器预览已读取粘贴内容。",
+      generatedMarkdownPath: "~/UltimatePPTMasterProjects/browser-preview/sources/source.md"
+    },
     previewSvg: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900"><rect width="1600" height="900" fill="#fff8ec"/><path d="M-40 190C260 40 480 180 720 120C980 56 1120 194 1640 104" fill="none" stroke="#f97316" stroke-width="44" opacity=".16"/><text x="100" y="230" fill="#172033" font-family="Avenir Next, PingFang SC, sans-serif" font-size="78" font-weight="850">终极融合 PPT 大师</text><text x="100" y="330" fill="#667085" font-family="Avenir Next, PingFang SC, sans-serif" font-size="38">Desktop MVP Preview</text><text x="100" y="470" fill="#172033" font-family="Avenir Next, PingFang SC, sans-serif" font-size="36">${job.outputMode === "pptx" ? "可编辑 PPTX" : "杂志风网页 PPT"}</text></svg>`,
     previewHtml: isWeb
       ? `<!doctype html><html><body style="margin:0;font-family:PingFang SC, sans-serif;background:#fff8ec;color:#172033"><main style="height:100vh;display:grid;place-items:center"><section><p style="color:#f97316;font-weight:800">Ultimate PPT Master</p><h1 style="font-size:64px;margin:0">杂志风网页 PPT</h1><p style="font-size:24px;color:#667085">Browser preview mode</p></section></main></body></html>`

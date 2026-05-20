@@ -10,7 +10,10 @@ SKILL.md and scripts/.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import html
+import importlib.util
+import io
 import json
 import os
 import platform
@@ -328,8 +331,8 @@ def build_project_checks(env: dict[str, Any], job: dict[str, Any], source_name: 
         {
             "key": "document-parser",
             "label": "资料解析",
-            "status": "warning" if suffix in DOCUMENT_SUFFIXES else "ok",
-            "detail": "PDF/DOCX/XLSX/PPTX 已进入项目目录；生产级全文解析由 Agent 工作流接管。",
+            "status": "warning" if suffix in (DOCUMENT_SUFFIXES - {".docx"}) else "ok",
+            "detail": "DOCX 已读取正文；PDF/XLSX/PPTX 已进入项目目录，完整解析由 Agent 工作流接管。" if suffix == ".docx" else "PDF/XLSX/PPTX 已进入项目目录；生产级全文解析由 Agent 工作流接管。" if suffix in DOCUMENT_SUFFIXES else "源资料已写入 source.md。",
         },
     ]
     if not env["python"]["bundledVenv"]:
@@ -414,22 +417,82 @@ def create_project_dir(job: dict[str, Any], repo_root: Path) -> Path:
     return project_path
 
 
-def source_to_text(job: dict[str, Any], project_path: Path) -> tuple[str, str]:
+def build_source_extraction(
+    status: str,
+    detail: str,
+    generated_markdown_path: Path | None = None,
+) -> dict[str, str]:
+    payload = {
+        "status": status,
+        "detail": detail,
+    }
+    if generated_markdown_path is not None:
+        payload["generatedMarkdownPath"] = str(generated_markdown_path)
+    return payload
+
+
+def convert_docx_to_markdown(repo_root: Path, input_path: Path, output_path: Path) -> str:
+    converter_path = repo_root / "scripts" / "source_to_md" / "doc_to_md.py"
+    if not converter_path.exists():
+        raise RuntimeError("DOCX converter is missing at scripts/source_to_md/doc_to_md.py")
+
+    spec = importlib.util.spec_from_file_location("ultimate_ppt_doc_to_md", converter_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Unable to load DOCX converter.")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    convert_to_markdown = getattr(module, "convert_to_markdown", None)
+    if not callable(convert_to_markdown):
+        raise RuntimeError("DOCX converter does not expose convert_to_markdown().")
+
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+    with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+        markdown = convert_to_markdown(str(input_path), str(output_path))
+
+    if not markdown or not output_path.exists():
+        converter_output = "\n".join(part for part in (stdout.getvalue().strip(), stderr.getvalue().strip()) if part)
+        detail = converter_output or "DOCX converter returned no Markdown."
+        raise RuntimeError(f"DOCX parsing failed: {detail}")
+    return markdown
+
+
+def source_to_text(job: dict[str, Any], project_path: Path, repo_root: Path) -> tuple[str, str, dict[str, str]]:
     source = job["source"]
     kind = source["kind"]
     value = source["value"]
     sources_dir = project_path / "sources"
+    generated_markdown_path = sources_dir / "source.md"
 
     if kind in {"text", "markdown"}:
         filename = "source.md" if kind == "markdown" else "source.txt"
         (sources_dir / filename).write_text(value, encoding="utf-8")
-        return value, filename
+        if filename != "source.md":
+            generated_markdown_path.write_text(value, encoding="utf-8")
+        return (
+            value,
+            filename,
+            build_source_extraction(
+                "extracted",
+                "已读取粘贴内容并写入本地项目。",
+                generated_markdown_path,
+            ),
+        )
 
     if kind == "url":
         (sources_dir / "source.url").write_text(value + "\n", encoding="utf-8")
         text = f"URL source: {value}\n\nUse the full agent workflow to fetch and ground this page before production export."
-        (sources_dir / "source.md").write_text(text, encoding="utf-8")
-        return text, "source.url"
+        generated_markdown_path.write_text(text, encoding="utf-8")
+        return (
+            text,
+            "source.url",
+            build_source_extraction(
+                "handoffRequired",
+                "已保存 URL；网页抓取和事实校验由 Agent 工作流接管。",
+                generated_markdown_path,
+            ),
+        )
 
     source_path = Path(value).expanduser()
     if not source_path.exists():
@@ -440,14 +503,30 @@ def source_to_text(job: dict[str, Any], project_path: Path) -> tuple[str, str]:
 
     if source_path.suffix.lower() in TEXT_SUFFIXES:
         text = source_path.read_text(encoding="utf-8", errors="replace")
+        generated_markdown_path.write_text(text, encoding="utf-8")
+        extraction = build_source_extraction(
+            "extracted",
+            "已读取文本类文件内容并写入 source.md。",
+            generated_markdown_path,
+        )
+    elif source_path.suffix.lower() == ".docx":
+        text = convert_docx_to_markdown(repo_root, copied_path, generated_markdown_path)
+        extraction = build_source_extraction(
+            "extracted",
+            "已解析 DOCX 正文并生成可用于 PPTX/Web 的 source.md。",
+            generated_markdown_path,
+        )
     else:
         text = (
             f"Imported file: {source_path.name}\n\n"
             "This desktop MVP created a local project shell. For full document extraction, "
             "run the full ultimate-ppt-master workflow from SKILL.md."
         )
-    (sources_dir / "source.md").write_text(text, encoding="utf-8")
-    return text, source_path.name
+        generated_markdown_path.write_text(text, encoding="utf-8")
+        status = "handoffRequired" if source_path.suffix.lower() in DOCUMENT_SUFFIXES else "copied"
+        detail = "已复制源文件；该格式的完整解析由 Agent 工作流接管。" if status == "handoffRequired" else "已复制源文件并创建项目壳。"
+        extraction = build_source_extraction(status, detail, generated_markdown_path)
+    return text, source_path.name, extraction
 
 
 def looks_chinese(text: str) -> bool:
@@ -465,7 +544,32 @@ def extract_lines(text: str) -> list[str]:
             cleaned.append(line)
     if not cleaned:
         cleaned = ["Untitled presentation", "Add source material to generate a richer deck."]
-    return cleaned[:18]
+    return cleaned[:60]
+
+
+def is_section_heading(line: str) -> bool:
+    return bool(re.match(r"^([一二三四五六七八九十]+、|\d+[、.．])", line))
+
+
+def clip_text(value: Any, limit: int = 88) -> str:
+    text = str(value).strip()
+    return text if len(text) <= limit else f"{text[:limit - 1]}…"
+
+
+def build_sections(lines: list[str]) -> list[dict[str, Any]]:
+    sections: list[dict[str, Any]] = []
+    current: dict[str, Any] | None = None
+    for line in lines[1:]:
+        if is_section_heading(line):
+            current = {"title": clip_text(line, 56), "bullets": []}
+            sections.append(current)
+            continue
+        if current is None:
+            current = {"title": "核心信息", "bullets": []}
+            sections.append(current)
+        if len(current["bullets"]) < 5:
+            current["bullets"].append(clip_text(line))
+    return [section for section in sections if section["bullets"]]
 
 
 def build_outline(text: str, style: str, mode: str) -> list[dict[str, Any]]:
@@ -480,6 +584,9 @@ def build_outline(text: str, style: str, mode: str) -> list[dict[str, Any]]:
             "next": "下一步",
         }
         mode_label = "可编辑 PPTX" if mode == "pptx" else "杂志风网页 PPT"
+        workflow_bullets = ["导入资料", "解析 source.md", "锁定结构与风格", "生成预览", "校验并导出"]
+        output_bullets = [mode_label, "本地项目文件夹", "预览产物", "Agent 生产级工作流说明"]
+        next_bullets = ["打开生成文件", "检查页面节奏", "使用完整 skill 继续生产级打磨"]
     else:
         headings = {
             "context": "Core Signal",
@@ -488,15 +595,47 @@ def build_outline(text: str, style: str, mode: str) -> list[dict[str, Any]]:
             "next": "Next Step",
         }
         mode_label = "Editable PPTX" if mode == "pptx" else "Magazine Web Deck"
+        workflow_bullets = ["Import source", "Extract source.md", "Lock structure and style", "Generate preview", "Verify and export"]
+        output_bullets = [mode_label, "Local project folder", "Preview artifact", "Runbook for full agent workflow"]
+        next_bullets = ["Open the generated files", "Review page rhythm", "Continue with the full skill for production quality"]
 
     body = lines[1:] or lines
-    return [
+    outline = [
         {"title": title, "eyebrow": "Ultimate PPT Master", "bullets": [mode_label, f"Style preset: {style}"]},
-        {"title": headings["context"], "eyebrow": "01", "bullets": body[:4]},
-        {"title": headings["workflow"], "eyebrow": "02", "bullets": ["Import source", "Lock structure and style", "Generate preview", "Verify and export"]},
-        {"title": headings["output"], "eyebrow": "03", "bullets": [mode_label, "Local project folder", "Preview artifact", "Runbook for full agent workflow"]},
-        {"title": headings["next"], "eyebrow": "04", "bullets": ["Open the generated files", "Review page rhythm", "Continue with the full skill for production quality"]},
+        {"title": headings["context"], "eyebrow": "01", "bullets": [clip_text(item) for item in body[:4]]},
     ]
+    target = 10 if mode == "pptx" and len(lines) >= 14 else 8 if mode == "web" and len(lines) >= 14 else 6
+    content_limit = max(2, target - 3)
+    used_titles = {slide["title"] for slide in outline}
+
+    for section in build_sections(lines):
+        if len(outline) >= content_limit:
+            break
+        if section["title"] in used_titles:
+            continue
+        outline.append(
+            {
+                "title": section["title"],
+                "eyebrow": f"{len(outline):02d}",
+                "bullets": section["bullets"][:5],
+            }
+        )
+        used_titles.add(section["title"])
+
+    body_index = 0
+    fallback_titles = ["关键安排", "资源协同", "执行重点", "预算与保障", "风险与下一步"] if chinese else ["Key Moves", "Resource Fit", "Execution Focus", "Budget and Support", "Risks and Next"]
+    while len(outline) < content_limit and body_index < len(body):
+        chunk = [clip_text(item) for item in body[body_index:body_index + 4]]
+        body_index += 4
+        if not chunk:
+            break
+        fallback_title = fallback_titles[(len(outline) - 2) % len(fallback_titles)]
+        outline.append({"title": fallback_title, "eyebrow": f"{len(outline):02d}", "bullets": chunk})
+
+    outline.append({"title": headings["workflow"], "eyebrow": f"{len(outline):02d}", "bullets": workflow_bullets})
+    outline.append({"title": headings["output"], "eyebrow": f"{len(outline):02d}", "bullets": output_bullets})
+    outline.append({"title": headings["next"], "eyebrow": f"{len(outline):02d}", "bullets": next_bullets})
+    return outline
 
 
 def write_preview_svg(outline: list[dict[str, Any]], project_path: Path, style: str) -> str:
@@ -666,7 +805,7 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     valid = validate_job(job)
     env = inspect_environment(repo_root)
     project_path = create_project_dir(valid, repo_root)
-    text, source_name = source_to_text(valid, project_path)
+    text, source_name, source_extraction = source_to_text(valid, project_path, repo_root)
     outline = build_outline(text, valid["stylePreset"], valid["outputMode"])
     preview_svg = write_preview_svg(outline, project_path, valid["stylePreset"])
     generated_files: list[str] = []
@@ -710,6 +849,7 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
         "previewHtml": preview_html,
         "outline": outline,
         "sourceName": source_name,
+        "sourceExtraction": source_extraction,
     }
     (project_path / "desktop-manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2),

@@ -707,6 +707,30 @@ h2 {
   margin-top: 2px;
 }
 
+.notice-box.extracted {
+  border-color: rgba(16, 185, 129, 0.28);
+  background: rgba(236, 253, 245, 0.62);
+}
+
+.notice-box.extracted svg {
+  color: var(--green);
+}
+
+.notice-box.copied svg,
+.notice-box.handoffRequired svg {
+  color: var(--orange);
+}
+
+.notice-box strong,
+.notice-box span {
+  display: block;
+}
+
+.notice-box span {
+  margin-top: 4px;
+  line-height: 1.45;
+}
+
 .advanced-box {
   margin-top: 18px;
   border: 1px solid var(--line);
@@ -1130,6 +1154,10 @@ h2 {
   margin-top: 3px;
   font-size: 12px;
   line-height: 1.4;
+}
+
+.source-card {
+  margin-bottom: 14px;
 }
 
 .next-actions {
