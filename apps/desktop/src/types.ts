@@ -2,6 +2,9 @@ export type ViewKey = "projects" | "create" | "preview" | "settings";
 export type OutputMode = "pptx" | "web";
 export type StylePreset = "business" | "consulting" | "academic" | "editorial" | "swiss";
 export type SourceKind = "file" | "text" | "url" | "markdown";
+export type ModelProvider = "auto" | "openai" | "gemini" | "qwen" | "deepseek" | "custom";
+export type ImageProvider = "auto" | "openai" | "gemini" | "qwen" | "pexels" | "pixabay" | "none";
+export type VoiceProvider = "edge" | "elevenlabs" | "minimax" | "qwen" | "cosyvoice" | "none";
 
 export interface SourceInput {
   kind: SourceKind;
@@ -14,7 +17,18 @@ export interface DesktopJob {
   outputMode: OutputMode;
   stylePreset: StylePreset;
   projectDir?: string;
-  providerConfig?: Record<string, unknown>;
+  providerConfig?: ProviderConfig;
+}
+
+export interface ProviderConfig {
+  modelProvider: ModelProvider;
+  textModelId?: string;
+  imageProvider: ImageProvider;
+  imageModelId?: string;
+  narrationEnabled: boolean;
+  voiceProvider: VoiceProvider;
+  voiceId?: string;
+  voiceRate?: string;
 }
 
 export interface WorkerStep {
@@ -69,6 +83,7 @@ export interface WorkerResult {
   previewHtml?: string;
   sourceName?: string;
   sourceExtraction?: SourceExtraction;
+  providerConfig?: ProviderConfig;
   error?: string;
 }
 
@@ -97,13 +112,18 @@ export interface EnvironmentStatus {
   optional: {
     cairo: boolean;
     rust: boolean;
+    edgeTts?: boolean;
   };
   providers: {
     openai: boolean;
     gemini: boolean;
     qwen: boolean;
+    deepseek: boolean;
     pexels: boolean;
     pixabay: boolean;
+    elevenlabs: boolean;
+    minimax: boolean;
+    cosyvoice: boolean;
   };
   config?: {
     envFile?: string | null;

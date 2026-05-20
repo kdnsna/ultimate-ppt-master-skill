@@ -40,6 +40,16 @@ Each `desktop-manifest.json` includes:
 }
 ```
 
+## Codex One-line Install Expectation
+
+For a user asking Codex to clone, set up, and open the desktop app in one instruction, the current source-based path should be treated as a developer install:
+
+- Warm macOS machine with Node, Python, Rust, and Homebrew dependencies already present: about 3-6 minutes, usually 0 clicks after sending the prompt.
+- Normal macOS machine where setup installs or fixes missing dependencies: about 8-15 minutes, usually 0-2 approval clicks depending on the Codex shell policy and macOS prompts.
+- Fresh machine missing Command Line Tools, Homebrew, or Rust: 15-30+ minutes and at least one manual system step. This is too much friction for broad promotion.
+
+For public distribution, the target should be a signed and notarized DMG: download, open, drag to Applications, first launch; roughly 1 minute and 3-4 clicks.
+
 ## Fast Start from Repository Root
 
 The easiest path is to stay at the repository root:

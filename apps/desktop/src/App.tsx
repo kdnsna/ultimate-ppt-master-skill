@@ -1,6 +1,7 @@
 import {
   Activity,
   Archive,
+  Bot,
   CheckCircle2,
   ChevronRight,
   CircleAlert,
@@ -11,6 +12,7 @@ import {
   Image,
   KeyRound,
   Layers3,
+  Mic2,
   MonitorPlay,
   PanelRight,
   Play,
@@ -18,6 +20,7 @@ import {
   ShieldCheck,
   Sparkles,
   Upload,
+  Volume2,
   Wand2
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -33,14 +36,18 @@ import {
 import type {
   DesktopJob,
   EnvironmentStatus,
+  ImageProvider,
+  ModelProvider,
   NextAction,
   OutputMode,
   ProjectCheck,
+  ProviderConfig,
   RecentProject,
   Recommendation,
   SourceExtraction,
   SourceKind,
   StylePreset,
+  VoiceProvider,
   ViewKey,
   WorkerResult,
   WorkerStep
@@ -66,6 +73,46 @@ const styleOptionsEn: Record<StylePreset, { title: string; detail: string; scene
   editorial: { title: "Editorial", detail: "Narrative and visual, suited for talks and launches", scene: "Keynote" },
   swiss: { title: "Swiss Style", detail: "Grid-driven and crisp, suited for product and engineering", scene: "Product" }
 };
+
+const modelProviderOptions: Array<{ key: ModelProvider; title: string; titleEn: string; detail: string; detailEn: string }> = [
+  { key: "auto", title: "自动", titleEn: "Auto", detail: "按环境变量选择", detailEn: "Use detected environment" },
+  { key: "openai", title: "OpenAI", titleEn: "OpenAI", detail: "OPENAI_API_KEY", detailEn: "OPENAI_API_KEY" },
+  { key: "gemini", title: "Gemini", titleEn: "Gemini", detail: "GEMINI_API_KEY", detailEn: "GEMINI_API_KEY" },
+  { key: "qwen", title: "Qwen", titleEn: "Qwen", detail: "QWEN / DASHSCOPE", detailEn: "QWEN / DASHSCOPE" },
+  { key: "deepseek", title: "DeepSeek", titleEn: "DeepSeek", detail: "DEEPSEEK_API_KEY", detailEn: "DEEPSEEK_API_KEY" },
+  { key: "custom", title: "自定义兼容", titleEn: "Custom-compatible", detail: "Base URL + 模型 ID", detailEn: "Base URL + model ID" }
+];
+
+const imageProviderOptions: Array<{ key: ImageProvider; title: string; titleEn: string }> = [
+  { key: "auto", title: "自动", titleEn: "Auto" },
+  { key: "openai", title: "OpenAI", titleEn: "OpenAI" },
+  { key: "gemini", title: "Gemini", titleEn: "Gemini" },
+  { key: "qwen", title: "Qwen", titleEn: "Qwen" },
+  { key: "pexels", title: "Pexels", titleEn: "Pexels" },
+  { key: "pixabay", title: "Pixabay", titleEn: "Pixabay" },
+  { key: "none", title: "不用图像", titleEn: "No images" }
+];
+
+const voiceProviderOptions: Array<{ key: VoiceProvider; title: string; titleEn: string }> = [
+  { key: "edge", title: "Edge TTS", titleEn: "Edge TTS" },
+  { key: "elevenlabs", title: "ElevenLabs", titleEn: "ElevenLabs" },
+  { key: "minimax", title: "MiniMax", titleEn: "MiniMax" },
+  { key: "qwen", title: "Qwen TTS", titleEn: "Qwen TTS" },
+  { key: "cosyvoice", title: "CosyVoice", titleEn: "CosyVoice" },
+  { key: "none", title: "不生成旁白", titleEn: "No narration" }
+];
+
+const edgeVoiceOptions = [
+  { key: "zh-CN-XiaoxiaoNeural", title: "晓晓 · 女声普通话", titleEn: "Xiaoxiao · Mandarin female" },
+  { key: "zh-CN-XiaoyiNeural", title: "晓伊 · 女声普通话", titleEn: "Xiaoyi · Mandarin female" },
+  { key: "zh-CN-YunjianNeural", title: "云健 · 男声稳重", titleEn: "Yunjian · Mandarin male" },
+  { key: "zh-CN-YunxiNeural", title: "云希 · 男声年轻", titleEn: "Yunxi · Mandarin male" },
+  { key: "zh-CN-YunyangNeural", title: "云扬 · 男声播报", titleEn: "Yunyang · Mandarin presenter" },
+  { key: "zh-HK-HiuGaaiNeural", title: "粤语 · 女声", titleEn: "Cantonese · female" },
+  { key: "zh-HK-WanLungNeural", title: "粤语 · 男声", titleEn: "Cantonese · male" },
+  { key: "en-US-JennyNeural", title: "Jenny · English", titleEn: "Jenny · English" },
+  { key: "en-US-GuyNeural", title: "Guy · English", titleEn: "Guy · English" }
+];
 
 const navItems: Array<{ key: ViewKey; label: string; icon: typeof Sparkles }> = [
   { key: "projects", label: "Projects", icon: Sparkles },
@@ -186,7 +233,11 @@ const providerGuides: Array<{
     bestFor: "免费图库补充和通用素材搜索",
     bestForEn: "Free stock fallback and general image search",
     setup: "PIXABAY_API_KEY"
-  }
+  },
+  { key: "deepseek", title: "DeepSeek", bestFor: "文本结构生成和中文长材料推理", bestForEn: "Text structure and Chinese long-context reasoning", setup: "DEEPSEEK_API_KEY · LLM_PROVIDER=deepseek" },
+  { key: "elevenlabs", title: "ElevenLabs", bestFor: "英文或多语种高质量旁白", bestForEn: "High-quality multilingual narration", setup: "ELEVENLABS_API_KEY" },
+  { key: "minimax", title: "MiniMax Voice", bestFor: "中文旁白和商业配音工作流", bestForEn: "Chinese narration and commercial voice workflows", setup: "MINIMAX_API_KEY" },
+  { key: "cosyvoice", title: "CosyVoice", bestFor: "通义 / DashScope 语音能力", bestForEn: "Qwen / DashScope speech capabilities", setup: "COSYVOICE_API_KEY / DASHSCOPE_API_KEY" }
 ];
 
 const driverModes = [
@@ -225,6 +276,14 @@ export function App() {
   const [outputMode, setOutputMode] = useState<OutputMode>("pptx");
   const [stylePreset, setStylePreset] = useState<StylePreset>("business");
   const [projectDir, setProjectDir] = useState("");
+  const [modelProvider, setModelProvider] = useState<ModelProvider>("auto");
+  const [textModelId, setTextModelId] = useState("");
+  const [imageProvider, setImageProvider] = useState<ImageProvider>("auto");
+  const [imageModelId, setImageModelId] = useState("");
+  const [narrationEnabled, setNarrationEnabled] = useState(false);
+  const [voiceProvider, setVoiceProvider] = useState<VoiceProvider>("edge");
+  const [voiceId, setVoiceId] = useState("zh-CN-XiaoxiaoNeural");
+  const [voiceRate, setVoiceRate] = useState("+0%");
   const [isGenerating, setIsGenerating] = useState(false);
   const [steps, setSteps] = useState<WorkerStep[]>(progressSeed);
   const [result, setResult] = useState<WorkerResult | null>(null);
@@ -291,6 +350,16 @@ export function App() {
 
   const progress = useMemo(() => Math.max(...steps.map((step) => step.progress), 0), [steps]);
   const providerCount = environment ? Object.values(environment.providers).filter(Boolean).length : 0;
+  const providerConfig = useMemo<ProviderConfig>(() => ({
+    modelProvider,
+    textModelId: textModelId.trim() || undefined,
+    imageProvider,
+    imageModelId: imageModelId.trim() || undefined,
+    narrationEnabled,
+    voiceProvider: narrationEnabled ? voiceProvider : "none",
+    voiceId: narrationEnabled ? voiceId.trim() || undefined : undefined,
+    voiceRate: narrationEnabled ? voiceRate.trim() || "+0%" : undefined
+  }), [modelProvider, textModelId, imageProvider, imageModelId, narrationEnabled, voiceProvider, voiceId, voiceRate]);
 
   function refreshRecent(next?: WorkerResult) {
     if (next) {
@@ -329,7 +398,7 @@ export function App() {
       outputMode,
       stylePreset,
       projectDir: projectDir || undefined,
-      providerConfig: {}
+      providerConfig
     };
 
     const stagedSteps = progressSeed.map((step, index) => ({
@@ -428,7 +497,9 @@ export function App() {
     <div className="app-shell" lang={language === "en" ? "en" : "zh-CN"}>
       <aside className="sidebar">
         <div className="brand-mark">
-          <div className="brand-sigil">UP</div>
+          <div className="brand-sigil" aria-hidden="true">
+            <BrandGlyph />
+          </div>
           <div>
             <strong>{language === "en" ? "Ultimate PPT Master" : "终极融合 PPT 大师"}</strong>
             <span>Creator Desktop</span>
@@ -486,6 +557,7 @@ export function App() {
             outputMode={outputMode}
             stylePreset={stylePreset}
             projectDir={projectDir}
+            providerConfig={providerConfig}
             isGenerating={isGenerating}
             recommendation={recommendation}
             error={error}
@@ -507,6 +579,24 @@ export function App() {
               setStylePreset(value);
             }}
             onProjectDirChange={setProjectDir}
+            onModelProviderChange={setModelProvider}
+            onTextModelIdChange={setTextModelId}
+            onImageProviderChange={setImageProvider}
+            onImageModelIdChange={setImageModelId}
+            onNarrationEnabledChange={(value) => {
+              setNarrationEnabled(value);
+              if (value && voiceProvider === "none") {
+                setVoiceProvider("edge");
+                setVoiceId("zh-CN-XiaoxiaoNeural");
+              }
+            }}
+            onVoiceProviderChange={(value) => {
+              setVoiceProvider(value);
+              if (value === "edge" && !voiceId) setVoiceId("zh-CN-XiaoxiaoNeural");
+              if (value === "none") setNarrationEnabled(false);
+            }}
+            onVoiceIdChange={setVoiceId}
+            onVoiceRateChange={setVoiceRate}
             onDrop={handleDrop}
             onApplyRecommendation={applyRecommendation}
             onGenerate={handleGenerate}
@@ -522,6 +612,7 @@ export function App() {
             isGenerating={isGenerating}
             outputMode={outputMode}
             providerCount={providerCount}
+            providerConfig={providerConfig}
             onGenerate={handleGenerate}
             onSettings={() => setView("settings")}
           />
@@ -532,12 +623,44 @@ export function App() {
             onLanguageChange={setLanguage}
             environment={environment}
             projectDir={projectDir}
+            providerConfig={providerConfig}
             onProjectDirChange={setProjectDir}
             onRefreshRecent={() => refreshRecent()}
           />
         )}
       </main>
     </div>
+  );
+}
+
+function BrandGlyph() {
+  return (
+    <svg className="brand-glyph" viewBox="0 0 128 128" role="img" aria-label="Ultimate PPT Master">
+      <defs>
+        <linearGradient id="brand-bg" x1="18" y1="16" x2="111" y2="111" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FF7A18" />
+          <stop offset="0.48" stopColor="#E11D48" />
+          <stop offset="1" stopColor="#2563EB" />
+        </linearGradient>
+        <linearGradient id="brand-page" x1="32" y1="30" x2="93" y2="96" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FFFFFF" />
+          <stop offset="1" stopColor="#EAF2FF" />
+        </linearGradient>
+        <linearGradient id="brand-accent" x1="40" y1="84" x2="89" y2="84" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#FF7A18" />
+          <stop offset="1" stopColor="#10B981" />
+        </linearGradient>
+      </defs>
+      <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#brand-bg)" />
+      <path d="M23 38C36 18 57 16 73 26C89 37 99 30 108 22V107H23V38Z" fill="#FFFFFF" opacity="0.13" />
+      <rect x="35" y="32" width="62" height="54" rx="10" fill="#B9C9EA" opacity="0.42" transform="rotate(7 66 59)" />
+      <rect x="30" y="38" width="65" height="55" rx="10" fill="url(#brand-page)" />
+      <rect x="40" y="49" width="40" height="5" rx="2.5" fill="#172033" />
+      <rect x="40" y="58" width="49" height="4" rx="2" fill="#45546B" opacity="0.66" />
+      <rect x="40" y="66" width="34" height="4" rx="2" fill="#45546B" opacity="0.42" />
+      <rect x="40" y="80" width="49" height="8" rx="4" fill="url(#brand-accent)" />
+      <path d="M94 32l3 8 8 3-8 3-3 8-3-8-8-3 8-3 3-8Z" fill="#fff" />
+    </svg>
   );
 }
 
@@ -680,6 +803,7 @@ function CreateView(props: {
   outputMode: OutputMode;
   stylePreset: StylePreset;
   projectDir: string;
+  providerConfig: ProviderConfig;
   isGenerating: boolean;
   recommendation: Recommendation | null;
   error: string;
@@ -689,6 +813,14 @@ function CreateView(props: {
   onOutputModeChange: (value: OutputMode) => void;
   onStylePresetChange: (value: StylePreset) => void;
   onProjectDirChange: (value: string) => void;
+  onModelProviderChange: (value: ModelProvider) => void;
+  onTextModelIdChange: (value: string) => void;
+  onImageProviderChange: (value: ImageProvider) => void;
+  onImageModelIdChange: (value: string) => void;
+  onNarrationEnabledChange: (value: boolean) => void;
+  onVoiceProviderChange: (value: VoiceProvider) => void;
+  onVoiceIdChange: (value: string) => void;
+  onVoiceRateChange: (value: string) => void;
   onDrop: (event: React.DragEvent<HTMLLabelElement>) => void;
   onApplyRecommendation: () => void;
   onGenerate: () => void;
@@ -696,6 +828,9 @@ function CreateView(props: {
   const en = props.language === "en";
   const sourceReadiness = describeSourceReadiness(props.sourceKind, props.sourceValue, props.sourceName, props.language);
   const styles = localizedStyleOptions(props.language);
+  const modelOptions = localizedModelOptions(props.language);
+  const imageOptions = localizedImageOptions(props.language);
+  const voiceOptions = localizedVoiceOptions(props.language);
   return (
     <section className="screen create-screen">
       <div className="section-heading">
@@ -784,6 +919,72 @@ function CreateView(props: {
             ))}
           </div>
 
+          <div className="panel-title spaced">
+            <Bot size={18} />
+            <span>{en ? "4. Choose models" : "4. 选择模型"}</span>
+          </div>
+          <div className="config-card">
+            <label>
+              {en ? "Text model" : "文本模型"}
+              <select className="field select-field" value={props.providerConfig.modelProvider} onChange={(event) => props.onModelProviderChange(event.target.value as ModelProvider)}>
+                {modelOptions.map((option) => (<option key={option.key} value={option.key}>{option.label}</option>))}
+              </select>
+            </label>
+            <label>
+              {en ? "Model ID" : "模型 ID"}
+              <input className="field" value={props.providerConfig.textModelId || ""} onChange={(event) => props.onTextModelIdChange(event.target.value)} placeholder={en ? "Optional; leave blank for environment default" : "留空使用环境默认；也可填写自定义模型名"} />
+            </label>
+            <div className="two-field-grid">
+              <label>
+                {en ? "Image source" : "图像来源"}
+                <select className="field select-field" value={props.providerConfig.imageProvider} onChange={(event) => props.onImageProviderChange(event.target.value as ImageProvider)}>
+                  {imageOptions.map((option) => (<option key={option.key} value={option.key}>{option.label}</option>))}
+                </select>
+              </label>
+              <label>
+                {en ? "Image model" : "图像模型"}
+                <input className="field" value={props.providerConfig.imageModelId || ""} onChange={(event) => props.onImageModelIdChange(event.target.value)} placeholder={en ? "Optional" : "可选"} />
+              </label>
+            </div>
+          </div>
+
+          <div className="panel-title spaced">
+            <Mic2 size={18} />
+            <span>{en ? "5. Choose narration voice" : "5. 选择语音"}</span>
+          </div>
+          <div className="config-card">
+            <label className="toggle-row">
+              <input type="checkbox" checked={props.providerConfig.narrationEnabled} onChange={(event) => props.onNarrationEnabledChange(event.target.checked)} />
+              <span>{en ? "Enable narration handoff" : "启用旁白工作流"}</span>
+            </label>
+            <div className="two-field-grid">
+              <label>
+                {en ? "Voice service" : "语音服务"}
+                <select className="field select-field" value={props.providerConfig.voiceProvider} onChange={(event) => props.onVoiceProviderChange(event.target.value as VoiceProvider)} disabled={!props.providerConfig.narrationEnabled}>
+                  {voiceOptions.map((option) => (<option key={option.key} value={option.key}>{option.label}</option>))}
+                </select>
+              </label>
+              <label>
+                {en ? "Rate" : "语速"}
+                <input className="field" value={props.providerConfig.voiceRate || "+0%"} onChange={(event) => props.onVoiceRateChange(event.target.value)} placeholder="+0%" disabled={!props.providerConfig.narrationEnabled} />
+              </label>
+            </div>
+            {props.providerConfig.voiceProvider === "edge" ? (
+              <label>
+                {en ? "Voice" : "音色"}
+                <select className="field select-field" value={props.providerConfig.voiceId || "zh-CN-XiaoxiaoNeural"} onChange={(event) => props.onVoiceIdChange(event.target.value)} disabled={!props.providerConfig.narrationEnabled}>
+                  {edgeVoiceOptions.map((option) => (<option key={option.key} value={option.key}>{en ? option.titleEn : option.title}</option>))}
+                </select>
+              </label>
+            ) : (
+              <label>
+                {en ? "voice_id / voice name" : "voice_id / 音色名"}
+                <input className="field" value={props.providerConfig.voiceId || ""} onChange={(event) => props.onVoiceIdChange(event.target.value)} placeholder={en ? "Cloud TTS voice_id or voice name" : "云端 TTS 的 voice_id 或音色名"} disabled={!props.providerConfig.narrationEnabled || props.providerConfig.voiceProvider === "none"} />
+              </label>
+            )}
+            <div className="config-summary"><Volume2 size={17} /><span>{providerSummary(props.providerConfig, props.language)}</span></div>
+          </div>
+
           <details className="advanced-box">
             <summary>{en ? "Advanced settings" : "高级设置"}</summary>
             <label>
@@ -806,6 +1007,7 @@ function PreviewView(props: {
   isGenerating: boolean;
   outputMode: OutputMode;
   providerCount: number;
+  providerConfig: ProviderConfig;
   onGenerate: () => void;
   onSettings: () => void;
 }) {
@@ -867,6 +1069,7 @@ function PreviewView(props: {
             <FolderOpen size={18} />
             <span>{en ? "Export and trust checks" : "导出与信任检查"}</span>
           </div>
+          <div className="config-summary export-summary"><Bot size={17} /><span>{providerSummary(props.providerConfig, props.language)}</span></div>
           {props.result?.sourceExtraction && (
             <SourceExtractionCard extraction={props.result.sourceExtraction} language={props.language} />
           )}
@@ -933,6 +1136,7 @@ function SettingsView({
   onLanguageChange,
   environment,
   projectDir,
+  providerConfig,
   onProjectDirChange,
   onRefreshRecent
 }: {
@@ -940,6 +1144,7 @@ function SettingsView({
   onLanguageChange: (value: AppLanguage) => void;
   environment: EnvironmentStatus | null;
   projectDir: string;
+  providerConfig: ProviderConfig;
   onProjectDirChange: (value: string) => void;
   onRefreshRecent: () => void;
 }) {
@@ -1012,6 +1217,12 @@ function SettingsView({
             </span>
           </div>
         </div>
+        <div className="config-paths provider-choice-strip">
+          <div>
+            <strong>{en ? "Current desktop choices" : "当前桌面端选择"}</strong>
+            <span>{providerSummary(providerConfig, language)}</span>
+          </div>
+        </div>
         <div className="driver-list">
           {driverModes.map((mode) => (
             <div key={mode.title} className="driver-row">
@@ -1049,6 +1260,44 @@ function SettingsView({
       </details>
     </section>
   );
+}
+
+function localizedModelOptions(language: AppLanguage) {
+  return modelProviderOptions.map((option) => ({ key: option.key, label: language === "en" ? option.titleEn + " · " + option.detailEn : option.title + " · " + option.detail }));
+}
+
+function localizedImageOptions(language: AppLanguage) {
+  return imageProviderOptions.map((option) => ({ key: option.key, label: language === "en" ? option.titleEn : option.title }));
+}
+
+function localizedVoiceOptions(language: AppLanguage) {
+  return voiceProviderOptions.map((option) => ({ key: option.key, label: language === "en" ? option.titleEn : option.title }));
+}
+
+function modelProviderLabel(provider: ModelProvider, language: AppLanguage) {
+  const option = modelProviderOptions.find((item) => item.key === provider);
+  return option ? (language === "en" ? option.titleEn : option.title) : provider;
+}
+
+function imageProviderLabel(provider: ImageProvider, language: AppLanguage) {
+  const option = imageProviderOptions.find((item) => item.key === provider);
+  return option ? (language === "en" ? option.titleEn : option.title) : provider;
+}
+
+function voiceProviderLabel(provider: VoiceProvider, language: AppLanguage) {
+  const option = voiceProviderOptions.find((item) => item.key === provider);
+  return option ? (language === "en" ? option.titleEn : option.title) : provider;
+}
+
+function providerSummary(config: ProviderConfig, language: AppLanguage) {
+  const model = modelProviderLabel(config.modelProvider, language);
+  const image = imageProviderLabel(config.imageProvider, language);
+  const voice = config.narrationEnabled ? voiceProviderLabel(config.voiceProvider, language) + " / " + (config.voiceId || (language === "en" ? "default voice" : "默认音色")) : language === "en" ? "Narration off" : "不生成旁白";
+  const textModel = config.textModelId ? " (" + config.textModelId + ")" : "";
+  const imageModel = config.imageModelId ? " (" + config.imageModelId + ")" : "";
+  return language === "en"
+    ? "Text: " + model + textModel + " · Image: " + image + imageModel + " · Voice: " + voice
+    : "文本：" + model + textModel + " · 图像：" + image + imageModel + " · 语音：" + voice;
 }
 
 function TrustBadge({ icon: Icon, title, detail }: { icon: typeof Sparkles; title: string; detail: string }) {
@@ -1177,6 +1426,8 @@ function localizedCheck(check: ProjectCheck, language: AppLanguage, providerCoun
     "local-first": { label: "Local-first", detail: "Sources and outputs stay in the local project folder. No cloud upload by default." },
     "editable-output": { label: "Editable output", detail: mode === "pptx" ? "The PPTX path outputs real text and shapes." : "The Web Deck path prioritizes presentation experience." },
     provider: { label: "Model provider", detail: providerCount > 0 ? `${providerCount} providers configured.` : "Preview works; production generation should configure providers." },
+    "image-provider": { label: "Image provider", detail: check.detail },
+    "voice-provider": { label: "Narration voice", detail: check.detail },
     "document-parser": { label: "Document parsing", detail: check.status === "ok" ? "DOCX and text inputs are converted into source.md for immediate preview." : "PDF/XLSX/PPTX files are staged locally; full parsing is handled by the Agent workflow." },
     venv: { label: "Python venv", detail: "Repository .venv was not found. Initialize dependencies from INSTALL.md." },
     rust: { label: "Tauri packaging", detail: "Rust/Cargo was not detected. Web shell works; native .app/.dmg packaging needs Rust." }

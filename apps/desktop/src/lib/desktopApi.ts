@@ -48,8 +48,12 @@ export async function inspectEnvironment(): Promise<EnvironmentStatus> {
       openai: false,
       gemini: false,
       qwen: false,
+      deepseek: false,
       pexels: false,
-      pixabay: false
+      pixabay: false,
+      elevenlabs: false,
+      minimax: false,
+      cosyvoice: false
     }
   };
 }

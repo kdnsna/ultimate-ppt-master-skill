@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
+use tauri::path::BaseDirectory;
+use tauri::{AppHandle, Manager};
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -27,34 +29,96 @@ struct CommandResult {
     data: serde_json::Value,
 }
 
-fn repo_root() -> Result<PathBuf, String> {
+fn source_repo_root() -> Option<PathBuf> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    manifest_dir
+    let root = manifest_dir
         .parent()
         .and_then(|desktop| desktop.parent())
         .and_then(|apps| apps.parent())
-        .map(PathBuf::from)
-        .ok_or_else(|| "Unable to resolve repository root from Tauri manifest directory".to_string())
+        .map(PathBuf::from)?;
+    if root
+        .join("apps")
+        .join("desktop")
+        .join("worker")
+        .join("desktop_worker.py")
+        .exists()
+    {
+        Some(root)
+    } else {
+        None
+    }
+}
+
+fn repo_root(app: &AppHandle) -> Result<PathBuf, String> {
+    if let Ok(value) = std::env::var("UPM_REPO_ROOT") {
+        let root = PathBuf::from(value);
+        if root.exists() {
+            return Ok(root);
+        }
+    }
+    if let Some(root) = source_repo_root() {
+        return Ok(root);
+    }
+    let root = app
+        .path()
+        .app_data_dir()
+        .map_err(|err| format!("Unable to resolve app data directory: {err}"))?;
+    std::fs::create_dir_all(&root)
+        .map_err(|err| format!("Unable to create app data directory: {err}"))?;
+    Ok(root)
 }
 
 fn python_executable(root: &PathBuf) -> String {
-    let bundled = root.join(".venv").join("bin").join("python");
-    if bundled.exists() {
-        bundled.to_string_lossy().to_string()
+    let unix_venv = root.join(".venv").join("bin").join("python");
+    let windows_venv = root.join(".venv").join("Scripts").join("python.exe");
+    if unix_venv.exists() {
+        unix_venv.to_string_lossy().to_string()
+    } else if windows_venv.exists() {
+        windows_venv.to_string_lossy().to_string()
     } else {
         "python3".to_string()
     }
 }
 
-fn worker_path(root: &PathBuf) -> PathBuf {
-    root.join("apps").join("desktop").join("worker").join("desktop_worker.py")
+fn resource_path(app: &AppHandle, value: &str) -> Option<PathBuf> {
+    app.path()
+        .resolve(value, BaseDirectory::Resource)
+        .ok()
+        .filter(|path| path.exists())
 }
 
-fn run_worker(args: &[&str], stdin_json: Option<String>) -> Result<serde_json::Value, String> {
-    let root = repo_root()?;
+fn worker_path(app: &AppHandle, root: &PathBuf) -> Result<PathBuf, String> {
+    if let Ok(value) = std::env::var("UPM_WORKER_PATH") {
+        let path = PathBuf::from(value);
+        if path.exists() {
+            return Ok(path);
+        }
+    }
+    let source_worker = root
+        .join("apps")
+        .join("desktop")
+        .join("worker")
+        .join("desktop_worker.py");
+    if source_worker.exists() {
+        return Ok(source_worker);
+    }
+    for resource in ["desktop_worker.py", "resources/desktop_worker.py"] {
+        if let Some(path) = resource_path(app, resource) {
+            return Ok(path);
+        }
+    }
+    Err("Unable to locate desktop worker. Reinstall the app or run npm run setup from the source checkout.".to_string())
+}
+
+fn run_worker(
+    app: &AppHandle,
+    args: &[&str],
+    stdin_json: Option<String>,
+) -> Result<serde_json::Value, String> {
+    let root = repo_root(app)?;
     let python = python_executable(&root);
     let mut command = Command::new(python);
-    command.arg(worker_path(&root));
+    command.arg(worker_path(app, &root)?);
     command.args(args);
     command.arg("--repo-root");
     command.arg(root.to_string_lossy().to_string());
@@ -91,21 +155,24 @@ fn run_worker(args: &[&str], stdin_json: Option<String>) -> Result<serde_json::V
 }
 
 #[tauri::command]
-fn inspect_environment() -> Result<CommandResult, String> {
-    let data = run_worker(&["inspect"], None)?;
+fn inspect_environment(app: AppHandle) -> Result<CommandResult, String> {
+    let data = run_worker(&app, &["inspect"], None)?;
     Ok(CommandResult { ok: true, data })
 }
 
 #[tauri::command]
-fn run_desktop_job(job: DesktopJob) -> Result<CommandResult, String> {
+fn run_desktop_job(app: AppHandle, job: DesktopJob) -> Result<CommandResult, String> {
     let payload = serde_json::to_string(&job)
         .map_err(|err| format!("Failed to encode desktop job: {err}"))?;
-    let data = run_worker(&["run", "--stdin"], Some(payload))?;
+    let data = run_worker(&app, &["run", "--stdin"], Some(payload))?;
     Ok(CommandResult { ok: true, data })
 }
 
 #[tauri::command]
-fn list_recent_projects(project_dir: Option<String>) -> Result<CommandResult, String> {
+fn list_recent_projects(
+    app: AppHandle,
+    project_dir: Option<String>,
+) -> Result<CommandResult, String> {
     let mut args = vec!["list-projects"];
     let mut owned: Vec<String> = Vec::new();
     if let Some(dir) = project_dir {
@@ -114,15 +181,15 @@ fn list_recent_projects(project_dir: Option<String>) -> Result<CommandResult, St
     }
     let extra: Vec<&str> = owned.iter().map(String::as_str).collect();
     args.extend(extra);
-    let data = run_worker(&args, None)?;
+    let data = run_worker(&app, &args, None)?;
     Ok(CommandResult { ok: true, data })
 }
 
 #[tauri::command]
-fn recommend_job_settings(source: SourceInput) -> Result<CommandResult, String> {
+fn recommend_job_settings(app: AppHandle, source: SourceInput) -> Result<CommandResult, String> {
     let payload = serde_json::to_string(&serde_json::json!({ "source": source }))
         .map_err(|err| format!("Failed to encode recommendation source: {err}"))?;
-    let data = run_worker(&["recommend", "--stdin"], Some(payload))?;
+    let data = run_worker(&app, &["recommend", "--stdin"], Some(payload))?;
     Ok(CommandResult { ok: true, data })
 }
 

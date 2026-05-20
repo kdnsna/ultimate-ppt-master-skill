@@ -34,6 +34,7 @@ body {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
@@ -69,13 +70,15 @@ button {
 .brand-sigil {
   width: 54px;
   height: 54px;
-  border-radius: 18px;
-  display: grid;
-  place-items: center;
-  color: white;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--orange), var(--blue));
-  box-shadow: 0 14px 36px rgba(249, 115, 22, 0.28);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 14px 36px rgba(249, 115, 22, 0.2), 0 8px 20px rgba(37, 99, 235, 0.14);
+}
+
+.brand-glyph {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .brand-mark strong,
@@ -621,6 +624,7 @@ h2 {
 }
 
 .field,
+.select-field,
 .source-editor {
   width: 100%;
   border: 1px solid var(--line);
@@ -634,6 +638,15 @@ h2 {
   height: 44px;
   padding: 0 14px;
   margin-bottom: 12px;
+}
+
+.select-field {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 18px, calc(100% - 12px) 18px;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
 }
 
 .source-editor {
@@ -689,6 +702,71 @@ h2 {
 .style-option span {
   margin-top: 5px;
   font-size: 13px;
+}
+
+.config-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.config-card label {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.config-card .field {
+  margin-bottom: 0;
+}
+
+.two-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.toggle-row {
+  min-height: 42px;
+  grid-template-columns: 20px 1fr;
+  align-items: center;
+  color: var(--ink);
+}
+
+.toggle-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--orange);
+}
+
+.config-summary {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 16px;
+  background: rgba(234, 242, 255, 0.5);
+}
+
+.config-summary svg {
+  color: var(--blue);
+  margin-top: 2px;
+}
+
+.config-summary span {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.export-summary {
+  margin-bottom: 14px;
 }
 
 .notice-box {
@@ -967,7 +1045,7 @@ h2 {
 
 .config-paths {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin-top: 18px;
 }
