@@ -19,7 +19,7 @@ import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -41,6 +41,7 @@ OUTPUT_MODES = {"pptx", "web"}
 STYLE_PRESETS = {"business", "consulting", "academic", "editorial", "swiss"}
 SOURCE_KINDS = {"file", "text", "url", "markdown"}
 TEXT_SUFFIXES = {".md", ".markdown", ".txt", ".csv", ".tsv", ".json"}
+DOCUMENT_SUFFIXES = {".pdf", ".docx", ".xlsx", ".xlsm", ".pptx"}
 DEFAULT_PROJECT_ROOT = "projects/desktop"
 
 
@@ -122,6 +123,74 @@ def validate_job(job: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def utc_now() -> str:
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+
+
+def source_suffix(source: dict[str, Any]) -> str:
+    name = source.get("name") or source.get("value") or ""
+    if source.get("kind") == "url":
+        return ".url"
+    return Path(str(name)).suffix.lower()
+
+
+def recommend_settings(source: dict[str, Any]) -> dict[str, Any]:
+    kind = str(source.get("kind", "")).lower()
+    value = str(source.get("value", ""))
+    name = str(source.get("name", ""))
+    suffix = source_suffix(source)
+    text = f"{name}\n{value}".lower()
+
+    if kind == "url":
+        return {
+            "outputMode": "web",
+            "stylePreset": "editorial",
+            "pageRange": "6-10",
+            "reason": "URL 内容通常更适合先做成可浏览的网页演示，便于快速预览和分享。",
+        }
+    if suffix in {".pptx", ".docx", ".xlsx", ".xlsm", ".pdf"}:
+        return {
+            "outputMode": "pptx",
+            "stylePreset": "business",
+            "pageRange": "8-14",
+            "reason": "正式资料优先生成真实可编辑 PPTX，便于交付后继续修改。",
+        }
+    if "swiss" in text or "工程" in text or "product" in text or "架构" in text:
+        return {
+            "outputMode": "web",
+            "stylePreset": "swiss",
+            "pageRange": "7-12",
+            "reason": "产品、工程和系统表达适合 Swiss Style 的网格、秩序和信息密度。",
+        }
+    if "演讲" in text or "发布" in text or "分享" in text or "keynote" in text:
+        return {
+            "outputMode": "web",
+            "stylePreset": "editorial",
+            "pageRange": "8-12",
+            "reason": "演讲和发布场景更需要视觉记忆点，网页演示更有现场感。",
+        }
+    if "咨询" in text or "方案" in text or "strategy" in text:
+        return {
+            "outputMode": "pptx",
+            "stylePreset": "consulting",
+            "pageRange": "10-16",
+            "reason": "方案材料适合结论先行的咨询风，并保留 PPTX 可编辑交付。",
+        }
+    if "课程" in text or "培训" in text or "学术" in text or "论文" in text:
+        return {
+            "outputMode": "pptx",
+            "stylePreset": "academic",
+            "pageRange": "12-20",
+            "reason": "培训和学术内容需要章节清楚、证据稳定，PPTX 更适合二次讲授。",
+        }
+    return {
+        "outputMode": "pptx",
+        "stylePreset": "business",
+        "pageRange": "8-12",
+        "reason": "默认走可编辑 PPTX，覆盖多数正式汇报和团队交付场景。",
+    }
+
+
 def command_exists(name: str) -> bool:
     return shutil.which(name) is not None
 
@@ -167,6 +236,87 @@ def inspect_environment(repo_root: Path) -> dict[str, Any]:
             "pixabay": bool(os.environ.get("PIXABAY_API_KEY")),
         },
     }
+
+
+def build_project_checks(env: dict[str, Any], job: dict[str, Any], source_name: str) -> list[dict[str, str]]:
+    suffix = Path(source_name).suffix.lower()
+    checks = [
+        {
+            "key": "local-first",
+            "label": "本地处理",
+            "status": "ok",
+            "detail": "源文件和输出都保存在本地项目目录，不上传云端。",
+        },
+        {
+            "key": "editable-output",
+            "label": "真实可编辑",
+            "status": "ok" if job["outputMode"] == "pptx" else "warning",
+            "detail": "PPTX 路线输出真实文字和形状；Web Deck 路线优先展示体验。",
+        },
+        {
+            "key": "provider",
+            "label": "模型 Provider",
+            "status": "ok" if any(env["providers"].values()) else "warning",
+            "detail": "未检测到 provider key。本轮预览可运行，生产级生成需要配置模型。",
+        },
+        {
+            "key": "document-parser",
+            "label": "资料解析",
+            "status": "warning" if suffix in DOCUMENT_SUFFIXES else "ok",
+            "detail": "PDF/DOCX/XLSX/PPTX 已进入项目目录；生产级全文解析由 Agent 工作流接管。",
+        },
+    ]
+    if not env["python"]["bundledVenv"]:
+        checks.append(
+            {
+                "key": "venv",
+                "label": "Python venv",
+                "status": "missing",
+                "detail": "未找到仓库 .venv；请先按 INSTALL.md 初始化依赖。",
+            }
+        )
+    if not env["optional"]["rust"]:
+        checks.append(
+            {
+                "key": "rust",
+                "label": "Tauri 打包",
+                "status": "warning",
+                "detail": "未检测到 Rust/Cargo。Web 壳可用，原生 .app/.dmg 打包前需要安装 Rust。",
+            }
+        )
+    return checks
+
+
+def build_next_actions(project_path: Path, log_path: Path, generated_files: list[str], mode: str) -> list[dict[str, str]]:
+    actions = [
+        {
+            "key": "open-result",
+            "label": "打开结果文件",
+            "detail": "先检查封面、结构和风格是否符合交付场景。",
+            "path": generated_files[0] if generated_files else str(project_path),
+        },
+        {
+            "key": "open-folder",
+            "label": "打开项目文件夹",
+            "detail": "查看 sources、outputs、preview、logs 和 manifest。",
+            "path": str(project_path),
+        },
+        {
+            "key": "agent-handoff",
+            "label": "交给 Agent 深加工",
+            "detail": "使用 sources/source.md 和 SKILL.md 进入生产级生成流程。",
+            "path": str(project_path / "README.md"),
+        },
+        {
+            "key": "open-log",
+            "label": "查看生成日志",
+            "detail": "排查依赖、路径和导出问题。",
+            "path": str(log_path),
+        },
+    ]
+    if mode == "web":
+        actions[0]["detail"] = "在浏览器中检查横向翻页、视觉节奏和分享效果。"
+    return actions
 
 
 def default_project_root(repo_root: Path) -> Path:
@@ -414,8 +564,41 @@ def write_runbook(project_path: Path, job: dict[str, Any], source_name: str) -> 
     return runbook
 
 
+def manifest_to_recent(manifest: dict[str, Any], manifest_path: Path) -> dict[str, Any]:
+    source_name = str(manifest.get("sourceName") or manifest_path.parent.name)
+    output_mode = str(manifest.get("outputMode") or ("web" if manifest.get("previewHtml") else "pptx"))
+    updated_at = str(manifest.get("updatedAt") or datetime.fromtimestamp(manifest_path.stat().st_mtime, timezone.utc).isoformat().replace("+00:00", "Z"))
+    return {
+        "name": source_name,
+        "mode": output_mode,
+        "path": str(manifest.get("projectPath") or manifest_path.parent),
+        "status": str(manifest.get("status") or "draft"),
+        "createdAt": str(manifest.get("createdAt") or updated_at),
+        "updatedAt": updated_at,
+        "generatedFiles": manifest.get("generatedFiles") or [],
+        "thumbnail": manifest.get("thumbnailSvg") or manifest.get("previewSvg") or "",
+        "logsPath": manifest.get("logsPath") or "",
+    }
+
+
+def list_recent_projects(repo_root: Path, project_dir: str | None = None) -> list[dict[str, Any]]:
+    root = Path(project_dir).expanduser() if project_dir else default_project_root(repo_root)
+    if not root.exists():
+        return []
+    items: list[dict[str, Any]] = []
+    for manifest_path in root.glob("*/desktop-manifest.json"):
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            items.append(manifest_to_recent(manifest, manifest_path))
+        except Exception:
+            continue
+    items.sort(key=lambda item: item["updatedAt"], reverse=True)
+    return items[:12]
+
+
 def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     valid = validate_job(job)
+    env = inspect_environment(repo_root)
     project_path = create_project_dir(valid, repo_root)
     text, source_name = source_to_text(valid, project_path)
     outline = build_outline(text, valid["stylePreset"], valid["outputMode"])
@@ -439,12 +622,24 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
         encoding="utf-8",
     )
 
+    now = utc_now()
+    recommendations = [recommend_settings(valid["source"])]
+    checks = build_project_checks(env, valid, source_name)
+    next_actions = build_next_actions(project_path, log_path, generated_files, valid["outputMode"])
     manifest = {
         "status": "complete",
         "projectPath": str(project_path),
         "logsPath": str(log_path),
         "generatedFiles": generated_files,
         "steps": [step.__dict__ for step in STEPS],
+        "outputMode": valid["outputMode"],
+        "stylePreset": valid["stylePreset"],
+        "createdAt": now,
+        "updatedAt": now,
+        "recommendations": recommendations,
+        "checks": checks,
+        "nextActions": next_actions,
+        "thumbnailSvg": preview_svg,
         "previewSvg": preview_svg,
         "previewHtml": preview_html,
         "outline": outline,
@@ -459,16 +654,19 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Ultimate PPT Master desktop worker")
-    parser.add_argument("command", choices=["inspect", "run", "validate-job"])
+    parser.add_argument("command", choices=["inspect", "run", "validate-job", "recommend", "list-projects"])
     parser.add_argument("--repo-root")
     parser.add_argument("--stdin", action="store_true", help="Read job JSON from stdin")
     parser.add_argument("--job", help="Path to a job JSON file")
+    parser.add_argument("--project-dir", help="Project root for list-projects")
     args = parser.parse_args()
 
     repo_root = repo_root_from_args(args.repo_root)
     try:
         if args.command == "inspect":
             result = inspect_environment(repo_root)
+        elif args.command == "list-projects":
+            result = list_recent_projects(repo_root, args.project_dir)
         else:
             if args.stdin:
                 job = read_json_from_stdin()
@@ -476,7 +674,15 @@ def main() -> int:
                 job = json.loads(Path(args.job).read_text(encoding="utf-8"))
             else:
                 raise ValueError("Use --stdin or --job for job commands.")
-            result = validate_job(job) if args.command == "validate-job" else run_job(job, repo_root)
+            if args.command == "validate-job":
+                result = validate_job(job)
+            elif args.command == "recommend":
+                source = job.get("source", job)
+                if not isinstance(source, dict):
+                    raise ValueError("recommend requires a source object.")
+                result = recommend_settings(source)
+            else:
+                result = run_job(job, repo_root)
         print(json.dumps(result, ensure_ascii=False))
         return 0
     except Exception as exc:

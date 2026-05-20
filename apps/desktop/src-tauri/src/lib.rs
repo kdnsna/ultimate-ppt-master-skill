@@ -105,6 +105,28 @@ fn run_desktop_job(job: DesktopJob) -> Result<CommandResult, String> {
 }
 
 #[tauri::command]
+fn list_recent_projects(project_dir: Option<String>) -> Result<CommandResult, String> {
+    let mut args = vec!["list-projects"];
+    let mut owned: Vec<String> = Vec::new();
+    if let Some(dir) = project_dir {
+        owned.push("--project-dir".to_string());
+        owned.push(dir);
+    }
+    let extra: Vec<&str> = owned.iter().map(String::as_str).collect();
+    args.extend(extra);
+    let data = run_worker(&args, None)?;
+    Ok(CommandResult { ok: true, data })
+}
+
+#[tauri::command]
+fn recommend_job_settings(source: SourceInput) -> Result<CommandResult, String> {
+    let payload = serde_json::to_string(&serde_json::json!({ "source": source }))
+        .map_err(|err| format!("Failed to encode recommendation source: {err}"))?;
+    let data = run_worker(&["recommend", "--stdin"], Some(payload))?;
+    Ok(CommandResult { ok: true, data })
+}
+
+#[tauri::command]
 fn open_path(path: String) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     let mut command = Command::new("open");
@@ -131,6 +153,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             inspect_environment,
             run_desktop_job,
+            list_recent_projects,
+            recommend_job_settings,
             open_path
         ])
         .run(tauri::generate_context!())

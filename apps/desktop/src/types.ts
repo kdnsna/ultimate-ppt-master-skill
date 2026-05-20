@@ -24,16 +24,53 @@ export interface WorkerStep {
   progress: number;
 }
 
+export interface Recommendation {
+  outputMode: OutputMode;
+  stylePreset: StylePreset;
+  pageRange: string;
+  reason: string;
+}
+
+export interface ProjectCheck {
+  key: string;
+  label: string;
+  status: "ok" | "warning" | "missing";
+  detail: string;
+}
+
+export interface NextAction {
+  key: string;
+  label: string;
+  detail: string;
+  path?: string;
+}
+
 export interface WorkerResult {
   status: "complete" | "error";
   projectPath: string;
   logsPath: string;
   generatedFiles: string[];
   steps: WorkerStep[];
+  outputMode?: OutputMode;
+  stylePreset?: StylePreset;
+  createdAt?: string;
+  updatedAt?: string;
+  recommendations?: Recommendation[];
+  checks?: ProjectCheck[];
+  nextActions?: NextAction[];
+  thumbnailSvg?: string;
   previewSvg?: string;
   previewHtml?: string;
   sourceName?: string;
   error?: string;
+}
+
+export interface DesktopProjectManifest extends WorkerResult {
+  projectPath: string;
+  sourceName: string;
+  outputMode: OutputMode;
+  stylePreset: StylePreset;
+  updatedAt: string;
 }
 
 export interface EnvironmentStatus {
@@ -67,5 +104,10 @@ export interface RecentProject {
   name: string;
   mode: OutputMode;
   path: string;
+  status: "complete" | "error" | "draft";
+  createdAt: string;
   updatedAt: string;
+  generatedFiles: string[];
+  thumbnail?: string;
+  logsPath?: string;
 }
