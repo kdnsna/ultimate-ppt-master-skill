@@ -12,7 +12,7 @@ Ultimate PPT Master separates three things that many tools mix together:
 |---|---|---|
 | Best deck quality | Your agent's model/login | Recommended. Let the agent read files, run scripts, preview, and repair. |
 | Better visual assets | Provider keys in `~/.ppt-master/.env` | Recommended when using AI images or stock image search. |
-| One-shot API integration | `LLM_*` direct variables | Use the v2.2 local Bridge/provider dashboard for local checks; full deck production still belongs to Agent/Skill. |
+| One-shot API integration | `LLM_*` direct variables | Use the v2.3 local Bridge/provider dashboard for local checks; full deck production still belongs to Agent/Skill. |
 | Ordinary first trial | No model key required for the Web Experience | Start with the static web app; hand off to an agent for production. |
 | Desktop preview | No model key required for basic local preview | Use desktop only when you need the advanced local mode. |
 
@@ -84,7 +84,7 @@ QWEN_API_KEY=your-dashscope-key
 
 ## Direct API / Bridge Convention
 
-The v2.2 Agent Bridge reads these variables locally and reports provider readiness to the web page without exposing key values:
+The v2.3 Agent Bridge reads these variables locally and reports provider readiness to the web page without exposing key values:
 
 ```dotenv
 LLM_PROVIDER=openai-compatible
@@ -103,7 +103,7 @@ QWEN_API_KEY=your-dashscope-key
 DEEPSEEK_API_KEY=your-deepseek-key
 ```
 
-Important: v2.2.1 does not turn the static web page into a hosted model product. Bridge can test provider connectivity locally, but final deck production still runs through the Agent Skill workflow.
+Important: v2.3.0 does not turn the static web page into a hosted model product. Bridge can test provider connectivity locally, but final deck production still runs through the Agent Skill workflow.
 
 ## Check With Bridge
 

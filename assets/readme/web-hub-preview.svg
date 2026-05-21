@@ -1,5 +1,5 @@
 <svg width="1200" height="640" viewBox="0 0 1200 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Agent Connect Hub interface preview</title>
+  <title id="title">Agent Connect Studio interface preview</title>
   <desc id="desc">A browser-style preview of the three-column web experience: source intake, agent connect, and API/model status.</desc>
   <rect width="1200" height="640" rx="28" fill="#F4F7FB"/>
   <rect x="44" y="44" width="1112" height="552" rx="24" fill="#FFFFFF" stroke="#D9E3EE"/>
@@ -8,8 +8,8 @@
   <circle cx="104" cy="75" r="8" fill="#FFD166"/>
   <circle cx="130" cy="75" r="8" fill="#06D6A0"/>
   <rect x="178" y="60" width="444" height="30" rx="15" fill="#27344A"/>
-  <text x="198" y="80" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="14">ultimate-ppt-master / agent-connect-hub</text>
-  <text x="72" y="152" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="800">Agent Connect Hub</text>
+  <text x="198" y="80" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="14">ultimate-ppt-master / agent-connect-studio</text>
+  <text x="72" y="152" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="800">Agent Connect Studio</text>
   <text x="72" y="184" fill="#5D6B82" font-family="Inter, Arial, sans-serif" font-size="16">A friendly web front door that prepares a serious local Agent handoff.</text>
 
   <g transform="translate(72 220)">

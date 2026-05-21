@@ -108,4 +108,4 @@ LLM_API_KEY=sk-xxx
 LLM_MODEL=gpt-4.1
 ```
 
-These variables are read by the v2.2 Bridge provider dashboard and can be used by custom adapters. They do not replace the agent workflow.
+These variables are read by the v2.3 Bridge provider dashboard and can be used by custom adapters. They do not replace the agent workflow.

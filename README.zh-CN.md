@@ -3,7 +3,7 @@
 > 把 PDF、Word、PPTX、Excel、URL 和零散笔记整理成 Agent 能直接接手的演示项目，再在本地生成可编辑 PowerPoint 或杂志风 Web Deck。
 
 <p align="center">
-  <strong>v2.2.1</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.3.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.2.1" src="https://img.shields.io/badge/Version-2.2.1-172033?style=for-the-badge">
+  <img alt="Version 2.3.0" src="https://img.shields.io/badge/Version-2.3.0-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -39,6 +39,18 @@ Ultimate PPT Master 是一个 **本地优先的 AI 演示生产中枢**。它不
 一句话：**网页负责让普通用户一眼看懂、一键开始；Skill 负责让本地 Agent 做深度、高质量生产。**
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
+
+## v2.3 发布重点
+
+v2.3 的统一方向是：**输入看得懂，产出看得见，本地 Agent 接得住。**
+
+这次不是继续堆安装入口，而是把产品从“能生成 prompt 的网页”打磨成更像正式产品的 Agent 交接台：
+
+- README 首屏后直接展示 `source.md`、Agent prompt 和生成后的 Web Deck；
+- 已安装用户有一键更新命令，适合跟上频繁迭代；
+- Web Experience 文案统一为 Agent Connect Studio，强调输入、产出、检查和本地交接；
+- Bridge / handoff kit 继续保留 `manifest`、`engine-plan`、`quality-checklist`，让 Agent 有明确验收标准；
+- 示例产物按公开科技主题打磨，作为用户理解“给什么、出什么”的样板。
 
 ## 为什么不直接让 Codex 安装 Skill？
 
@@ -119,7 +131,7 @@ bash -lc 'set -e; dir="$HOME/agent-skills/ultimate-ppt-master"; if [ -d "$dir/.g
 主题：Agentic Developer Stack 2026
 目标：用一个非敏感科技热点解释“网页负责入口，Skill 负责生产”的产品方向。
 资料：Google I/O 2026 developer highlights、Google Developers Blog、公开技术报道。
-输出：10 页杂志风 Web Deck；同时保留可交给 Agent 继续生成 PPTX 的 handoff 路线。
+输出：11 页杂志风 Web Deck；同时保留可交给 Agent 继续生成 PPTX 的 handoff 路线。
 ```
 
 示例 Agent prompt：
@@ -138,7 +150,7 @@ Verify layout, mobile readability, source references, and final exported files b
 
 ## Web Experience
 
-![Agent Connect Hub preview](assets/readme/web-hub-preview.svg)
+![Agent Connect Studio preview](assets/readme/web-hub-preview.svg)
 
 Web Experience 是项目的主推广入口。它可以直接跑在 GitHub Pages 上，不需要后端、不需要账号、不托管模型，也不会在浏览器保存 API key。
 
@@ -313,17 +325,18 @@ npm run desktop
 | 选择 Web / Skill / Desktop Later | [Choosing a Workflow](./docs/choosing-a-workflow.md) |
 | 本地配置 provider key | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | 理解它为什么不只是“多装一个 Skill” | [产品定位反思](./docs/zh-CN/product-positioning.md) |
+| 查看 v2.3.0 发布重点 | [发布说明 - v2.3.0](./docs/zh-CN/release-notes-v2.3.0.md) |
 | 查看本机上游基准测试 | [上游基准测试 - 2026 年 5 月](./docs/zh-CN/upstream-benchmark-2026-05.md) |
 | 排查安装、解析、输出、provider、Tauri 或 Agent 加载问题 | [Troubleshooting](./docs/troubleshooting.md) |
 | 发布、Pages、Homebrew、签名、公证、隐私和维护 | [Release and Maintenance](./docs/release-maintenance.md) |
 
-## v2.2.1 重点变化
+## v2.3.0 重点变化
 
-- Web Experience 升级为三栏 Agent Connect Hub。
-- 新增 `npm run bridge`，提供 localhost-only 的 health、provider、handoff 和可选 Agent launch 接口。
-- handoff kit 新增解析正文、附件、manifest、prompt、engine plan、checklist 和预览 deck。
-- 保留并强化 Agent Skill，明确它是高质量生产路线。
-- 桌面端签名、公证和 Homebrew 分发移入发布维护文档。
+- README 新增“一键更新”和“输入到产出示例”，降低已安装用户和新用户的理解成本。
+- Web Experience 统一为 Agent Connect Studio，首屏直接解释 v2.3 最大提升。
+- 公开样板加入真实截图、输入材料、Agent prompt 和生成 Web Deck 链接。
+- Bridge / handoff kit 继续负责本地资料打包、provider 状态、Agent 命令和质量检查。
+- Skill 仍然是高质量生产路线，负责最终 PPTX / Web Deck 的深度生成、预览和修复。
 
 上游同步与本地适配策略见 [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md)。
 

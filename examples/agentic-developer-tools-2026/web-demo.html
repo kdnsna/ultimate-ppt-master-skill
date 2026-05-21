@@ -14,6 +14,7 @@
       --green:#10b981;
       --coral:#ef5b3f;
       --gold:#f2c94c;
+      --cyan:#06b6d4;
       --shadow:0 16px 46px rgba(23,32,51,.12);
       font-family:"Avenir Next","SF Pro Display","PingFang SC","Microsoft YaHei",Arial,sans-serif;
       color:var(--ink);
@@ -26,13 +27,15 @@
     .slide{position:relative;min-width:100vw;height:100vh;scroll-snap-align:start;padding:52px 58px;display:grid;grid-template-rows:auto 1fr auto;gap:24px;background:var(--paper);border-right:1px solid var(--line)}
     .slide.dark{background:var(--ink);color:#fff}
     .slide.blue{background:#eef5ff}
-    .chrome,.foot{display:flex;align-items:center;justify-content:space-between;gap:18px;font-family:"SFMono-Regular",Consolas,monospace;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+    .slide.warm{background:#fff7ed}
+    .chrome,.foot{display:flex;align-items:center;justify-content:space-between;gap:18px;font-family:"SFMono-Regular",Consolas,monospace;font-size:13px;letter-spacing:0;text-transform:uppercase;color:var(--muted)}
     .dark .chrome,.dark .foot{color:rgba(255,255,255,.66)}
     .brand{display:inline-flex;align-items:center;gap:10px;font-weight:900;letter-spacing:0;text-transform:none}
     .brand-mark{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--coral),var(--blue));display:grid;place-items:center;color:#fff}
-    .brand-mark svg{width:18px;height:18px}
+    .brand-mark i{width:15px;height:12px;border-radius:3px;background:#fff;display:grid;gap:2px;padding:3px}
+    .brand-mark i b{display:block;height:2px;border-radius:2px;background:var(--ink)}
     .stage{align-self:center;display:grid;gap:24px;min-height:0}
-    .kicker{margin:0;color:var(--coral);font-family:"SFMono-Regular",Consolas,monospace;font-size:14px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+    .kicker{margin:0;color:var(--coral);font-family:"SFMono-Regular",Consolas,monospace;font-size:14px;font-weight:900;letter-spacing:0;text-transform:uppercase}
     .dark .kicker{color:#ff7259}
     h1,h2,h3,p{margin:0;letter-spacing:0}
     h1{max-width:980px;font-size:68px;line-height:.98;font-weight:950}
@@ -54,7 +57,7 @@
     .panel{min-height:210px;padding:20px;border:1px solid var(--line);border-radius:8px;background:#fff;display:grid;align-content:space-between;gap:14px;box-shadow:var(--shadow)}
     .panel strong{display:block;font-size:15px;color:var(--coral);font-family:"SFMono-Regular",Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}
     .panel p,.compact{color:var(--muted);font-size:16px;line-height:1.5}
-    .metric{font-size:62px;line-height:.9;font-weight:950;letter-spacing:-.02em;color:var(--ink)}
+    .metric{font-size:62px;line-height:.9;font-weight:950;letter-spacing:0;color:var(--ink)}
     .metric small{font-size:18px;color:var(--muted)}
     .pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch}
     .step{min-height:170px;padding:16px;border:1px solid var(--line);background:#fff;border-radius:8px;display:grid;align-content:space-between}
@@ -76,6 +79,21 @@
     .trace .item:nth-child(2){border-color:rgba(37,99,235,.3);background:#eff6ff}
     .trace .item:nth-child(3){border-color:rgba(16,185,129,.35);background:#ecfdf5}
     .trace .item:nth-child(4){border-color:rgba(239,91,63,.3);background:#fff1ee}
+    .proof-grid{display:grid;grid-template-columns:1.05fr .82fr 1.05fr;gap:16px;align-items:stretch}
+    .proof-card{min-height:360px;padding:24px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:var(--shadow);display:grid;align-content:space-between;gap:20px}
+    .proof-card strong{color:var(--coral);font-family:"SFMono-Regular",Consolas,monospace;font-size:13px;text-transform:uppercase}
+    .proof-card h3{font-size:30px}
+    .proof-card ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+    .proof-card li{padding:12px 14px;border-left:4px solid var(--blue);background:#f8fafc;color:var(--muted);font-size:15px;line-height:1.4}
+    .handoff-rail{display:grid;place-items:center;gap:14px;color:#fff;background:var(--ink)}
+    .handoff-rail .arrow{width:68px;height:68px;border:1px solid rgba(255,255,255,.26);display:grid;place-items:center;font-size:28px;color:var(--green)}
+    .product-frame{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);padding:18px;display:grid;gap:12px}
+    .product-bar{height:34px;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;gap:8px;padding:0 10px;color:rgba(255,255,255,.72);font-size:12px;font-weight:850}
+    .product-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+    .product-body{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .product-body div{min-height:86px;padding:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);display:grid;align-content:space-between}
+    .product-body b{color:#fff}
+    .product-body span{color:rgba(255,255,255,.65);font-size:12px;line-height:1.35}
     .source-list{display:grid;gap:10px;margin:0;padding:0;list-style:none}
     .source-list li{padding:14px 16px;border-left:4px solid var(--blue);background:#fff;color:var(--muted);line-height:1.45}
     .bigline{font-size:44px;line-height:1.18;font-weight:930;max-width:960px}
@@ -89,7 +107,7 @@
       h1{font-size:42px}
       h2{font-size:34px}
       .lead{font-size:18px}
-      .hero-grid,.grid-3,.grid-2,.pipeline,.trace{grid-template-columns:1fr}
+      .hero-grid,.grid-3,.grid-2,.pipeline,.trace,.proof-grid,.product-body{grid-template-columns:1fr}
       .agent-map{width:100%;height:320px}
       .matrix{grid-template-columns:1fr}
       .cell,.cell:nth-child(4n){border-right:0}
@@ -98,16 +116,17 @@
       .half:last-child{border-bottom:0}
       .metric{font-size:44px}
       .bigline{font-size:30px}
+      .proof-card{min-height:260px}
     }
   </style>
 </head>
 <body>
   <main class="deck" id="deck" aria-label="Agentic Developer Stack 2026">
     <section class="slide dark">
-      <div class="chrome"><span class="brand"><span class="brand-mark">UP</span>Ultimate PPT Master</span><span>Demo · 2026.05</span></div>
+      <div class="chrome"><span class="brand"><span class="brand-mark"><i><b></b><b></b><b></b></i></span>Ultimate PPT Master</span><span>v2.3 Demo · 2026.05</span></div>
       <div class="stage hero-grid">
         <div>
-          <p class="kicker">Recent Tech Signal</p>
+          <p class="kicker">Input visible · Output proven</p>
           <h1>Agentic Developer Stack 2026</h1>
           <p class="lead">从“模型回答问题”到“Agent 执行工作”：开发工具正在变成可计划、可运行、可检查的生产工作台。</p>
           <div class="meta-row">
@@ -116,15 +135,51 @@
             <span class="pill">Antigravity 2.0</span>
           </div>
         </div>
-        <div class="agent-map" aria-hidden="true">
-          <div class="node n1">Brief</div>
-          <div class="node n2">Plan</div>
-          <div class="node n3">Run</div>
-          <div class="node n4">Verify</div>
-          <div class="node n5">Agent</div>
+        <div class="product-frame" aria-hidden="true">
+          <div class="product-bar"><span class="product-dot"></span>Agent Connect Studio</div>
+          <div class="product-body">
+            <div><b>source.md</b><span>topic, links, narrative, outline</span></div>
+            <div><b>agent-prompt.md</b><span>task, route, quality checks</span></div>
+            <div><b>engine-plan.md</b><span>PPTX + Web Deck split</span></div>
+            <div><b>web-demo.html</b><span>shareable output sample</span></div>
+          </div>
         </div>
       </div>
       <div class="foot"><span>Web Deck sample</span><span>Use arrow keys / scroll</span></div>
+    </section>
+
+    <section class="slide warm">
+      <div class="chrome"><span>00 / v2.3 Proof</span><span>Input → handoff → output</span></div>
+      <div class="stage">
+        <p class="kicker">Release focus</p>
+        <h2>用户不需要猜：给什么、怎么交、产出长什么样。</h2>
+        <div class="proof-grid">
+          <article class="proof-card">
+            <strong>Input</strong>
+            <h3>干净 source brief</h3>
+            <ul>
+              <li>主题、公开资料来源和限制条件</li>
+              <li>页纲、叙事判断和目标受众</li>
+              <li>可复制给 Agent 的生产 prompt</li>
+            </ul>
+          </article>
+          <article class="proof-card handoff-rail">
+            <strong>Local handoff</strong>
+            <div class="arrow">→</div>
+            <p class="compact">Bridge 负责本地打包；Skill 负责生产、预览、修复和导出。</p>
+          </article>
+          <article class="proof-card">
+            <strong>Output</strong>
+            <h3>可打开的 Web Deck</h3>
+            <ul>
+              <li>单文件 HTML，可放到 GitHub Pages</li>
+              <li>保留 PPTX 路线，适合 Agent 继续生产</li>
+              <li>带质量清单，不把结果当黑盒</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+      <div class="foot"><span>v2.3 release proof</span><span>Visible workflow</span></div>
     </section>
 
     <section class="slide">

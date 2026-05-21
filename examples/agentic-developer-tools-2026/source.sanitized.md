@@ -32,15 +32,16 @@ Links:
 ## Slide Outline
 
 1. Cover: Agentic Developer Stack 2026.
-2. Hook: From prompt boxes to execution loops.
-3. News signal: Google I/O 2026 put agent tooling into the developer stack.
-4. Stack shift: model, harness, workspace, managed runtime, QA trace.
-5. What users actually need: less setup, more confidence.
-6. Why this matters for Ultimate PPT Master.
-7. Demo flow: Web intake to Skill production.
-8. Fusion architecture: Hugo PPTX route + Guizang Web Deck route.
-9. Quality bar: preview, trace, checklist, local files.
-10. Takeaway: presentation tools become agent workspaces.
+2. v2.3 proof: source brief to handoff to output.
+3. Hook: From prompt boxes to execution loops.
+4. News signal: Google I/O 2026 put agent tooling into the developer stack.
+5. Stack shift: model, harness, workspace, managed runtime, QA trace.
+6. What users actually need: less setup, more confidence.
+7. Why this matters for Ultimate PPT Master.
+8. Demo flow: Web intake to Skill production.
+9. Fusion architecture: Hugo PPTX route + Guizang Web Deck route.
+10. Quality bar: preview, trace, checklist, local files.
+11. Takeaway: presentation tools become agent workspaces.
 
 ## Constraints
 

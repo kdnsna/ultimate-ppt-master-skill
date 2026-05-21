@@ -149,6 +149,8 @@ h2 {
   font-size: 44px;
   line-height: 1.05;
   font-weight: 950;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .studio-header p:not(.eyebrow) {
@@ -1117,7 +1119,8 @@ pre {
   }
 
   .studio-header h1 {
-    font-size: 34px;
+    font-size: 30px;
+    line-height: 1.1;
   }
 
   .studio-header p:not(.eyebrow) {

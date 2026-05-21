@@ -1,6 +1,6 @@
 # Web Experience
 
-Web Experience 是终极融合 PPT 大师当前的主推广入口。它是部署到 GitHub Pages 的静态 React/Vite **Agent Connect Hub**，同时承担资料导入、本地 Bridge handoff、PPTX 路线和 Web Deck 路线的融合前台。
+Web Experience 是终极融合 PPT 大师当前的主推广入口。它是部署到 GitHub Pages 的静态 React/Vite **Agent Connect Studio**，同时承担资料导入、本地 Bridge handoff、PPTX 路线和 Web Deck 路线的融合前台。
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/

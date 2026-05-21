@@ -11,7 +11,7 @@ import os from "node:os";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_PORT = 43188;
 const DEFAULT_HOST = "127.0.0.1";
-const BRIDGE_VERSION = "2.2.1";
+const BRIDGE_VERSION = "2.3.0";
 const DEFAULT_MAX_BODY_MB = 60;
 
 const AGENT_COMMANDS = {

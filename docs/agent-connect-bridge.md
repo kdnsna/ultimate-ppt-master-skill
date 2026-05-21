@@ -1,6 +1,6 @@
 # Agent Connect Bridge
 
-Agent Connect Bridge is the v2.2 local companion for the static Web Experience. It lets the GitHub Pages app talk to a local service on `127.0.0.1`, stage real source files, run local source converters, inspect provider readiness, and hand a project folder to Codex or another Agent.
+Agent Connect Bridge is the v2.3 local companion for the static Web Experience. It lets the GitHub Pages app talk to a local service on `127.0.0.1`, stage real source files, run local source converters, inspect provider readiness, and hand a project folder to Codex or another Agent.
 
 ## Quick Start
 
@@ -63,7 +63,7 @@ The web page never stores API keys. Bridge checks these local sources:
 
 It returns provider status only: configured or missing, model name, base URL, and key source label. It never returns secret values.
 
-Supported status checks in v2.2:
+Supported status checks in v2.3:
 
 - OpenAI / OpenAI-compatible: `OPENAI_API_KEY` or `LLM_API_KEY`
 - Gemini: `GEMINI_API_KEY` or `GOOGLE_API_KEY`

@@ -21,7 +21,7 @@
 |---|---:|---|
 | PPT Master | `668131f` | 浅克隆后工作区约 1.2GB；Python 依赖安装约 187 秒。 |
 | Guizang PPT Skill | `6bfa520` | 浅克隆后工作区约 4.8MB；Swiss HTML validator 不需要重型依赖安装。 |
-| Ultimate PPT Master | 本地 v2.2.1 | Bridge 使用同一份素材生成本地 handoff 项目。 |
+| Ultimate PPT Master | 本地 v2.3.0 | Bridge 使用同一份素材生成本地 handoff 项目。 |
 
 ## 生成结果
 

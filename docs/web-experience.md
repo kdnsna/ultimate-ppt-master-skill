@@ -1,6 +1,6 @@
 # Web Experience
 
-The Web Experience is the primary public entry point for Ultimate PPT Master. It is a static React/Vite **Agent Connect Hub** deployed to GitHub Pages, and it now acts as the fusion front door for source intake, local Bridge handoff, PPTX production, and Web Deck production.
+The Web Experience is the primary public entry point for Ultimate PPT Master. It is a static React/Vite **Agent Connect Studio** deployed to GitHub Pages, and it now acts as the fusion front door for source intake, local Bridge handoff, PPTX production, and Web Deck production.
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/

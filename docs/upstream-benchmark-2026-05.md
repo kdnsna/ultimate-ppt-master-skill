@@ -21,7 +21,7 @@ Local source file:
 |---|---:|---|
 | PPT Master | `668131f` | Shallow clone produced a roughly 1.2GB working tree. Python dependency install completed in about 187 seconds on this machine. |
 | Guizang PPT Skill | `6bfa520` | Shallow clone produced a roughly 4.8MB working tree. No heavy dependency install was needed for the Swiss HTML validator. |
-| Ultimate PPT Master | local v2.2.1 | Bridge generated a local handoff project from the same source material. |
+| Ultimate PPT Master | local v2.3.0 | Bridge generated a local handoff project from the same source material. |
 
 ## Outputs Generated
 

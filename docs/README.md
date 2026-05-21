@@ -17,6 +17,7 @@ The desktop app remains available as an advanced local preview and future distri
 | I want Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf to generate decks. | Agent Skill | [Agent Setup](./agent-setup.md) |
 | I want to know which workflow gives better results. | Decision guide | [Choosing a Workflow](./choosing-a-workflow.md) |
 | I want to know why this exists beside direct Skill install. | Product positioning | [Product Positioning](./product-positioning.md) |
+| I want to know what changed in v2.3.0. | Release notes | [Release Notes - v2.3.0](./release-notes-v2.3.0.md) |
 | I want to see the local upstream comparison. | Benchmark | [Upstream Benchmark - May 2026](./upstream-benchmark-2026-05.md) |
 | I need model/API/provider keys. | Provider setup | [Model and Provider Setup](./model-provider-setup.md) |
 | I want the local desktop preview. | Desktop Later | [Quickstart Desktop](./quickstart-desktop.md) |
@@ -41,7 +42,7 @@ Every public support path should point to an inspectable artifact:
 | Question | First check | Evidence to keep |
 |---|---|---|
 | Does the web app build? | `npm run build:web` | `apps/web/dist`, Pages workflow logs. |
-| Does the Agent Connect Hub work? | Web Experience file intake, Bridge status, outline, live Web Deck preview, preview tabs, and handoff buttons | Generated Agent prompt, `source.md`, `extracted-source.md`, `manifest.json`, `attachments/`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `handoff-kit.zip`. |
+| Does the Agent Connect Studio work? | Web Experience file intake, Bridge status, outline, live Web Deck preview, preview tabs, and handoff buttons | Generated Agent prompt, `source.md`, `extracted-source.md`, `manifest.json`, `attachments/`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `handoff-kit.zip`. |
 | Did source extraction work in a local project? | Bridge `manifest.json` | `attachments[].parseStatus`, `extracted-source.md`, original files in `attachments/`. |
 | Where did the output go? | Workbench export panel or manifest | `generatedFiles`, `outputs/`, `previews/`. |
 | Why does a deck look wrong? | Project log and source markdown | `logs/desktop-worker.log`, redacted source excerpt. |

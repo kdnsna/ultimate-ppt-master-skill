@@ -134,21 +134,21 @@ const demoUrl = `${baseUrl}examples/agentic-developer-tools-2026/web-demo.html`;
 const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
-const storageKey = "ultimate-ppt-master-web-brief-v2.2";
+const storageKey = "ultimate-ppt-master-web-brief-v2.3";
 
 const labels = {
   zh: {
     product: "Ultimate PPT Master",
-    studio: "Agent Connect Hub",
-    route: "Web 负责入口，本地 Bridge + Skill 负责生产",
-    subtitle: "导入资料，检测本地 Agent 和模型配置，生成可落地的 handoff 项目，再交给 Codex 或其他 Agent 深度生产。",
-    whyTitle: "为什么不直接装 Skill？",
-    whySubtitle: "专家当然可以一句话让 Codex 安装 Skill；这个 Hub 解决的是普通用户第一分钟的混乱：资料在哪、走哪条路线、模型能不能用、怎么交给 Agent 检查。",
+    studio: "Agent Connect Studio",
+    route: "v2.3 · 输入可见，产出可验，本地 Agent 可接手",
+    subtitle: "导入资料，检测本地 Agent 和模型配置，生成可落地的 handoff 项目，并用示例化输入输出把生产路线讲清楚。",
+    whyTitle: "v2.3 最大提升是什么？",
+    whySubtitle: "不再只解释“能做什么”，而是把资料、路线、命令、示例产物和质量检查放到同一个工作台里，让用户知道该给什么、会得到什么、怎么交给 Agent 验收。",
     whyCards: [
-      { title: "少做选择题", text: "先把 PPTX / Web Deck / 双路线的取舍讲清楚。" },
-      { title: "资料变项目", text: "文件、URL、粘贴文本会进入同一个本地 handoff 包。" },
-      { title: "配置可见", text: "Bridge、Agent、provider 状态先检查，再交给生产流程。" },
-      { title: "不降质量上限", text: "最终仍走 PPT Master 与歸藏路线，而不是弱网页生成器。" }
+      { title: "输入更清楚", text: "README 和示例直接展示 source.md、Agent prompt 和真实生成结果。" },
+      { title: "更新更容易", text: "已经安装的用户可以用一条命令更新本地仓库或 Skill。" },
+      { title: "交付更可验", text: "handoff kit 保留 engine plan、manifest、checklist 和预览文件。" },
+      { title: "质量不降级", text: "最终仍走 PPT Master 与歸藏路线，网页负责整理和交接。" }
     ],
     openDemo: "打开 Web Deck 示例",
     copyPrompt: "复制 Agent prompt",
@@ -202,7 +202,7 @@ const labels = {
     activeRoute: "启用",
     optionalRoute: "备用",
     demoTitle: "Web Deck 示例",
-    demoText: "脱敏科技主题样板，展示网页 PPT 的节奏。",
+    demoText: "v2.3 脱敏样板，展示输入材料到 Web Deck 成品的路径。",
     skillTitle: "Agent Skill 路线",
     skillText: "高质量生产路线，负责真实文件解析、生成、检查和导出。",
     desktopTitle: "Desktop Later",
@@ -231,16 +231,16 @@ const labels = {
   },
   en: {
     product: "Ultimate PPT Master",
-    studio: "Agent Connect Hub",
-    route: "Web is the front door; local Bridge + Skill produce",
-    subtitle: "Import sources, detect local agents and model setup, create a real handoff project, then let Codex or another Agent produce deeply.",
-    whyTitle: "Why not just install a Skill?",
-    whySubtitle: "Experts can absolutely ask Codex to install a Skill directly. This Hub solves the first-minute mess for everyone else: where the files are, which route to use, whether models are ready, and how the Agent should verify the result.",
+    studio: "Agent Connect Studio",
+    route: "v2.3 · visible input, proven output, local Agent handoff",
+    subtitle: "Import sources, detect local agents and model setup, create a real handoff project, and make the production route obvious through input-to-output examples.",
+    whyTitle: "What is new in v2.3?",
+    whySubtitle: "The product no longer only explains what it can do. It puts source material, route choices, update commands, demo outputs, and quality checks into one workspace so users know what to provide, what they get, and how an Agent should verify it.",
     whyCards: [
-      { title: "Fewer choices", text: "Explain PPTX, Web Deck, and combined routes before production." },
-      { title: "Files become a project", text: "Files, URLs, and pasted notes land in one local handoff kit." },
-      { title: "Setup is visible", text: "Check Bridge, Agent, and provider status before asking the Agent to work." },
-      { title: "Quality ceiling stays high", text: "Final production still uses PPT Master and Guizang routes, not a weaker web-only generator." }
+      { title: "Input is clearer", text: "README and examples show source.md, Agent prompt, and real generated output." },
+      { title: "Updates are easier", text: "Existing users can update a local clone or Skill install with one command." },
+      { title: "Delivery is checkable", text: "Handoff kits preserve engine plan, manifest, checklist, and preview files." },
+      { title: "Quality stays upstream", text: "Final production still uses PPT Master and Guizang routes; web handles staging." }
     ],
     openDemo: "Open Web Deck demo",
     copyPrompt: "Copy Agent prompt",
@@ -294,7 +294,7 @@ const labels = {
     activeRoute: "Active",
     optionalRoute: "Optional",
     demoTitle: "Web Deck demo",
-    demoText: "A sanitized tech sample showing Web Deck rhythm.",
+    demoText: "A v2.3 sanitized sample showing source material turning into a Web Deck.",
     skillTitle: "Agent Skill path",
     skillText: "Production-grade route for real file parsing, generation, QA, and export.",
     desktopTitle: "Desktop Later",
@@ -1475,7 +1475,7 @@ function buildBriefObject(
   sources: UploadedSource[]
 ) {
   return {
-    version: "2.2.1",
+    version: "2.3.0",
     title: form.title,
     audience: form.audience,
     coreMessage: form.coreMessage,
@@ -1504,9 +1504,9 @@ function buildManifest(
   bridge: BridgeHealth | null
 ) {
   return {
-    version: "2.2.1",
+    version: "2.3.0",
     createdAt: new Date().toISOString(),
-    app: "Ultimate PPT Master Agent Connect Hub",
+    app: "Ultimate PPT Master Agent Connect Studio",
     privacy: {
       hostedBackend: false,
       browserStoresApiKeys: false,
@@ -1618,7 +1618,7 @@ function buildBridgePayload({
   sources: UploadedSource[];
 }) {
   return {
-    version: "2.2.1",
+    version: "2.3.0",
     form,
     sourceMarkdown: sourceTemplate,
     agentPrompt: prompt,

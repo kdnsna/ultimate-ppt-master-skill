@@ -1,6 +1,6 @@
 # Agent Connect Bridge
 
-Agent Connect Bridge 是 v2.2 给静态 Web Experience 配套的本地服务。它让 GitHub Pages 页面连接用户本机 `127.0.0.1`，把真实源文件落盘、本地调用转换脚本、检查 provider 状态，并把项目目录交给 Codex 或其他 Agent。
+Agent Connect Bridge 是 v2.3 给静态 Web Experience 配套的本地服务。它让 GitHub Pages 页面连接用户本机 `127.0.0.1`，把真实源文件落盘、本地调用转换脚本、检查 provider 状态，并把项目目录交给 Codex 或其他 Agent。
 
 ## 快速开始
 
@@ -63,7 +63,7 @@ Bridge 复用已有本地转换脚本：
 
 Bridge 只返回 provider 是否配置、模型名、base URL 和 key 来源标签，不返回真实密钥。
 
-v2.2 支持检测：
+v2.3 支持检测：
 
 - OpenAI / OpenAI-compatible：`OPENAI_API_KEY` 或 `LLM_API_KEY`
 - Gemini：`GEMINI_API_KEY` 或 `GOOGLE_API_KEY`

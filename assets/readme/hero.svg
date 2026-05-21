@@ -38,7 +38,7 @@
     <circle cx="28" cy="23" r="8" fill="#2563EB"/>
     <circle cx="54" cy="23" r="8" fill="#10B981"/>
     <circle cx="80" cy="23" r="8" fill="#EF5B3F"/>
-    <text x="110" y="29" fill="#526173" font-size="15" font-weight="850">v2.1.0 Web-first Release</text>
+    <text x="110" y="29" fill="#526173" font-size="15" font-weight="850">v2.3.0 Agent Connect Studio</text>
 
     <text x="0" y="120" fill="#172033" font-size="64" font-weight="920">Ultimate PPT Master</text>
     <text x="0" y="171" fill="#2563EB" font-size="36" font-weight="900">Web Experience + Agent Skill</text>
