@@ -104,6 +104,7 @@ Selection rules:
 | `${SKILL_DIR}/scripts/animation_config.py` | Optional object-level PPTX animation sidecar scaffolding |
 | `${SKILL_DIR}/scripts/notes_to_audio.py` | Optional recorded narration audio generation |
 | `${SKILL_DIR}/scripts/update_spec.py` | Propagate a `spec_lock.md` color / font_family change across all generated SVGs |
+| `${SKILL_DIR}/scripts/visual_review.py` | Optional rubric-based visual review pass for generated SVG pages |
 
 For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 
@@ -112,6 +113,7 @@ For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 | Index | Path | Purpose |
 |-------|------|---------|
 | Layout templates | `${SKILL_DIR}/templates/layouts/layouts_index.json` | Query available page layout templates |
+| Brand presets | `${SKILL_DIR}/templates/brands/brands_index.json` | Query available brand identity presets (color / typography / logo / voice) |
 | Visualization templates | `${SKILL_DIR}/templates/charts/charts_index.json` | Query available visualization SVG templates (charts, infographics, diagrams, frameworks) |
 | Icon library | `${SKILL_DIR}/templates/icons/` | See `${SKILL_DIR}/templates/icons/README.md`; search icons on demand with `ls templates/icons/<library>/ \| grep <keyword>` |
 | Magazine Web Style A template | `${SKILL_DIR}/assets/magazine-web/template.html` | Single-file editorial/e-ink web deck seed |
@@ -124,11 +126,13 @@ For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 |----------|------|---------|
 | `topic-research` | `workflows/topic-research.md` | Pre-pipeline research when the user supplies only a topic with no source files |
 | `create-template` | `workflows/create-template.md` | Standalone template creation workflow |
+| `create-brand` | `workflows/create-brand.md` | Standalone brand-only template creation workflow |
 | `resume-execute` | `workflows/resume-execute.md` | Resume SVG execution in a fresh chat after Step 1-5 |
 | `verify-charts` | `workflows/verify-charts.md` | Chart coordinate calibration before export |
 | `customize-animations` | `workflows/customize-animations.md` | Optional object-level PPTX animation customization |
 | `generate-audio` | `workflows/generate-audio.md` | Optional recorded narration/audio workflow |
 | `live-preview` | `workflows/live-preview.md` | Browser-based live preview and annotation workflow |
+| `visual-review` | `workflows/visual-review.md` | Optional per-page visual review pass after SVG generation and before post-processing |
 
 ---
 

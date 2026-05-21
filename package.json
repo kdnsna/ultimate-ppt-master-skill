@@ -1,7 +1,7 @@
 {
   "name": "ultimate-ppt-master",
   "private": true,
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Local-first AI presentation hub for Web Experience, Agent Bridge, editable PowerPoint, and Web Deck workflows.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",

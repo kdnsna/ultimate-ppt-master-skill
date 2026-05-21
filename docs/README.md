@@ -16,6 +16,8 @@ The desktop app remains available as an advanced local preview and future distri
 | I want the web page to parse local PDF/Word/PPTX/Excel sources without uploading them. | Agent Connect Bridge | [Agent Connect Bridge](./agent-connect-bridge.md) |
 | I want Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf to generate decks. | Agent Skill | [Agent Setup](./agent-setup.md) |
 | I want to know which workflow gives better results. | Decision guide | [Choosing a Workflow](./choosing-a-workflow.md) |
+| I want to know why this exists beside direct Skill install. | Product positioning | [Product Positioning](./product-positioning.md) |
+| I want to see the local upstream comparison. | Benchmark | [Upstream Benchmark - May 2026](./upstream-benchmark-2026-05.md) |
 | I need model/API/provider keys. | Provider setup | [Model and Provider Setup](./model-provider-setup.md) |
 | I want the local desktop preview. | Desktop Later | [Quickstart Desktop](./quickstart-desktop.md) |
 | I maintain release packaging, signing, notarization, or Homebrew. | Distribution | [Release and Maintenance](./release-maintenance.md) |

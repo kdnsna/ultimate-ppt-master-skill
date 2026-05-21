@@ -3,7 +3,7 @@
 > Turn PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into Agent-ready presentation projects, then produce editable PowerPoint decks or magazine-style Web Decks locally.
 
 <p align="center">
-  <strong>v2.2.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.2.1</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.2.0" src="https://img.shields.io/badge/Version-2.2.0-172033?style=for-the-badge">
+  <img alt="Version 2.2.1" src="https://img.shields.io/badge/Version-2.2.1-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -39,6 +39,22 @@ It is designed as a practical fusion layer around two strong routes:
 The goal is simple: **the web page should make the workflow easy to understand; the local Skill should keep the production quality high.**
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
+
+## Why Not Just Use Codex To Install A Skill?
+
+You can. For expert users, direct Skill install is still the fastest path.
+
+Ultimate PPT Master exists for the moment before that: when the user has files, a rough goal, uncertain model setup, and no clear idea whether the job should become editable PPTX, a Web Deck, or both.
+
+The product adds value by:
+
+- turning a vague request into a structured brief;
+- packaging real source files into a local handoff folder;
+- showing Bridge, Agent, and provider readiness before production;
+- generating an engine plan and quality checklist;
+- preserving the original upstream quality routes instead of replacing them with a weaker web-only generator.
+
+Read the deeper positioning note: [Product Positioning](./docs/product-positioning.md).
 
 ## Use It In Three Moves
 
@@ -233,10 +249,12 @@ Maintenance references:
 | Install and invoke the Skill | [Agent Setup](./docs/agent-setup.md) |
 | Pick Web vs Skill vs Desktop Later | [Choosing a Workflow](./docs/choosing-a-workflow.md) |
 | Configure provider keys locally | [Model and Provider Setup](./docs/model-provider-setup.md) |
+| Understand why this exists beside direct Skill install | [Product Positioning](./docs/product-positioning.md) |
+| Review the local upstream benchmark | [Upstream Benchmark - May 2026](./docs/upstream-benchmark-2026-05.md) |
 | Debug setup, extraction, output, provider, Tauri, or agent loading issues | [Troubleshooting](./docs/troubleshooting.md) |
 | Release, Pages, Homebrew, signing, privacy, and maintenance | [Release and Maintenance](./docs/release-maintenance.md) |
 
-## v2.2.0 Highlights
+## v2.2.1 Highlights
 
 - Upgraded the Web Experience into a three-column Agent Connect Hub.
 - Added `npm run bridge` with localhost-only health, provider, handoff, and optional Agent launch endpoints.

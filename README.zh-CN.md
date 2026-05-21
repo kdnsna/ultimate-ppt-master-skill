@@ -3,7 +3,7 @@
 > 把 PDF、Word、PPTX、Excel、URL 和零散笔记整理成 Agent 能直接接手的演示项目，再在本地生成可编辑 PowerPoint 或杂志风 Web Deck。
 
 <p align="center">
-  <strong>v2.2.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.2.1</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.2.0" src="https://img.shields.io/badge/Version-2.2.0-172033?style=for-the-badge">
+  <img alt="Version 2.2.1" src="https://img.shields.io/badge/Version-2.2.1-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -39,6 +39,22 @@ Ultimate PPT Master 是一个 **本地优先的 AI 演示生产中枢**。它不
 一句话：**网页负责让普通用户一眼看懂、一键开始；Skill 负责让本地 Agent 做深度、高质量生产。**
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
+
+## 为什么不直接让 Codex 安装 Skill？
+
+可以。对专家用户来说，直接安装 Skill 仍然是最快路径。
+
+Ultimate PPT Master 解决的是这之前的一分钟：用户有文件、有粗略目标、模型配置不确定，也不知道应该输出可编辑 PPTX、Web Deck，还是两者都要。
+
+这个产品的价值是：
+
+- 把模糊需求变成结构化 brief；
+- 把真实资料整理成本地 handoff 文件夹；
+- 在生产前显示 Bridge、Agent、provider 是否可用；
+- 自动生成 engine plan 和质量检查清单；
+- 保留原作者路线的质量上限，而不是替换成弱网页生成器。
+
+更完整的反思见：[产品定位反思](./docs/zh-CN/product-positioning.md)。
 
 ## 三步用起来
 
@@ -233,10 +249,12 @@ npm run desktop
 | 安装和调用 Skill | [Agent Setup](./docs/agent-setup.md) |
 | 选择 Web / Skill / Desktop Later | [Choosing a Workflow](./docs/choosing-a-workflow.md) |
 | 本地配置 provider key | [Model and Provider Setup](./docs/model-provider-setup.md) |
+| 理解它为什么不只是“多装一个 Skill” | [产品定位反思](./docs/zh-CN/product-positioning.md) |
+| 查看本机上游基准测试 | [上游基准测试 - 2026 年 5 月](./docs/zh-CN/upstream-benchmark-2026-05.md) |
 | 排查安装、解析、输出、provider、Tauri 或 Agent 加载问题 | [Troubleshooting](./docs/troubleshooting.md) |
 | 发布、Pages、Homebrew、签名、公证、隐私和维护 | [Release and Maintenance](./docs/release-maintenance.md) |
 
-## v2.2.0 重点变化
+## v2.2.1 重点变化
 
 - Web Experience 升级为三栏 Agent Connect Hub。
 - 新增 `npm run bridge`，提供 localhost-only 的 health、provider、handoff 和可选 Agent launch 接口。

@@ -28,7 +28,7 @@ Then keep the relevant local evidence. Do not paste private documents or real AP
 | Native app cannot build | `cargo --version`, `rustc --version` | Install Rust/Cargo, then run `npm run app:desktop`. |
 | DMG build fails | Tauri bundle output | Use `npm run package:desktop` for `.app`; DMG may require Finder automation permission. |
 | Agent ignores this skill | Agent transcript | Tell it to read absolute `AGENTS.md` and set `SKILL_DIR` to the repo path. |
-| Direct API vars do not generate a deck by themselves | `.env`, Bridge provider dashboard | Expected in v2.2.0; Bridge checks provider readiness, while production still runs through Agent/Skill. |
+| Direct API vars do not generate a deck by themselves | `.env`, Bridge provider dashboard | Expected in v2.2.1; Bridge checks provider readiness, while production still runs through Agent/Skill. |
 
 ## Evidence to Attach to Issues
 

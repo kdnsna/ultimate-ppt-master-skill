@@ -142,6 +142,14 @@ const labels = {
     studio: "Agent Connect Hub",
     route: "Web 负责入口，本地 Bridge + Skill 负责生产",
     subtitle: "导入资料，检测本地 Agent 和模型配置，生成可落地的 handoff 项目，再交给 Codex 或其他 Agent 深度生产。",
+    whyTitle: "为什么不直接装 Skill？",
+    whySubtitle: "专家当然可以一句话让 Codex 安装 Skill；这个 Hub 解决的是普通用户第一分钟的混乱：资料在哪、走哪条路线、模型能不能用、怎么交给 Agent 检查。",
+    whyCards: [
+      { title: "少做选择题", text: "先把 PPTX / Web Deck / 双路线的取舍讲清楚。" },
+      { title: "资料变项目", text: "文件、URL、粘贴文本会进入同一个本地 handoff 包。" },
+      { title: "配置可见", text: "Bridge、Agent、provider 状态先检查，再交给生产流程。" },
+      { title: "不降质量上限", text: "最终仍走 PPT Master 与歸藏路线，而不是弱网页生成器。" }
+    ],
     openDemo: "打开 Web Deck 示例",
     copyPrompt: "复制 Agent prompt",
     copySource: "复制 source.md",
@@ -226,6 +234,14 @@ const labels = {
     studio: "Agent Connect Hub",
     route: "Web is the front door; local Bridge + Skill produce",
     subtitle: "Import sources, detect local agents and model setup, create a real handoff project, then let Codex or another Agent produce deeply.",
+    whyTitle: "Why not just install a Skill?",
+    whySubtitle: "Experts can absolutely ask Codex to install a Skill directly. This Hub solves the first-minute mess for everyone else: where the files are, which route to use, whether models are ready, and how the Agent should verify the result.",
+    whyCards: [
+      { title: "Fewer choices", text: "Explain PPTX, Web Deck, and combined routes before production." },
+      { title: "Files become a project", text: "Files, URLs, and pasted notes land in one local handoff kit." },
+      { title: "Setup is visible", text: "Check Bridge, Agent, and provider status before asking the Agent to work." },
+      { title: "Quality ceiling stays high", text: "Final production still uses PPT Master and Guizang routes, not a weaker web-only generator." }
+    ],
     openDemo: "Open Web Deck demo",
     copyPrompt: "Copy Agent prompt",
     copySource: "Copy source.md",
@@ -678,6 +694,23 @@ export function App() {
           <span><ShieldCheck size={15} />{t.pagesOnly}</span>
           <span><Server size={15} />{t.bridgeLocal}</span>
           <span><KeyRound size={15} />{t.keySafe}</span>
+        </section>
+
+        <section className="value-strip" aria-label={t.whyTitle}>
+          <div className="value-intro">
+            <p className="eyebrow">{form.language === "zh" ? "Product edge" : "Product edge"}</p>
+            <h2>{t.whyTitle}</h2>
+            <p>{t.whySubtitle}</p>
+          </div>
+          <div className="value-grid">
+            {t.whyCards.map((item, index) => (
+              <article key={item.title}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{item.title}</strong>
+                <p>{item.text}</p>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="studio-grid">
@@ -1442,7 +1475,7 @@ function buildBriefObject(
   sources: UploadedSource[]
 ) {
   return {
-    version: "2.2.0",
+    version: "2.2.1",
     title: form.title,
     audience: form.audience,
     coreMessage: form.coreMessage,
@@ -1471,7 +1504,7 @@ function buildManifest(
   bridge: BridgeHealth | null
 ) {
   return {
-    version: "2.2.0",
+    version: "2.2.1",
     createdAt: new Date().toISOString(),
     app: "Ultimate PPT Master Agent Connect Hub",
     privacy: {
@@ -1585,7 +1618,7 @@ function buildBridgePayload({
   sources: UploadedSource[];
 }) {
   return {
-    version: "2.2.0",
+    version: "2.2.1",
     form,
     sourceMarkdown: sourceTemplate,
     agentPrompt: prompt,

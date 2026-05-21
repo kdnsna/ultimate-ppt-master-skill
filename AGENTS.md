@@ -8,7 +8,7 @@ Use this repository as a portable presentation-generation skill package for agen
 2. Resolve this repository root as `SKILL_DIR`.
 3. Follow `SKILL.md` before generating any presentation files.
 4. Use `assets/`, `references/`, `templates/`, `workflows/`, and `scripts/` only when the selected workflow needs them.
-5. Keep both public entry points discoverable: Desktop App for guided local use, Agent Skill for production workflow use.
+5. Keep both public entry points discoverable: Web Experience / Agent Bridge for guided local handoff, Agent Skill for production workflow use.
 
 ## Invocation
 

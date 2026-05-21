@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 import re
 from pathlib import Path
+from typing import Any
 from xml.etree import ElementTree as ET
 
 from .drawingml_context import ConvertContext, ShapeResult
@@ -347,44 +348,49 @@ def collect_defs(root: ET.Element) -> dict[str, ET.Element]:
 def convert_element(elem: ET.Element, ctx: ConvertContext) -> ShapeResult | None:
     """Dispatch an SVG element to the appropriate converter."""
     tag = elem.tag.replace(f'{{{SVG_NS}}}', '')
+    elem_id = elem.get('id')
+
+    def trace(decision: str, **metadata: Any) -> None:
+        if ctx.trace_events is None:
+            return
+        event: dict[str, Any] = {
+            'tag': tag,
+            'decision': decision,
+        }
+        if elem_id:
+            event['id'] = elem_id
+        event.update(metadata)
+        ctx.trace_events.append(event)
 
     converter = _CONVERTERS.get(tag)
     if converter:
         try:
-            return converter(elem, ctx)
+            result = converter(elem, ctx)
         except Exception as e:
+            trace('error', error=str(e))
             raise SvgNativeConversionError(f'Failed to convert <{tag}>: {e}') from e
+        if result:
+            shape_match = re.search(r'<p:cNvPr id="(\d+)"', result.xml)
+            metadata: dict[str, Any] = {}
+            if shape_match:
+                metadata['shape_id'] = int(shape_match.group(1))
+            if result.bounds_emu is not None:
+                metadata['bounds_emu'] = list(result.bounds_emu)
+            trace('native', **metadata)
+        else:
+            trace('skip', reason='empty-or-non-rendering')
+        return result
 
     if tag in _NON_VISUAL_TAGS:
+        trace('skip', reason='non-visual')
         return None
 
+    trace('unsupported')
     raise SvgNativeConversionError(f'Unsupported visual SVG element <{tag}>')
 
 
 def _local_tag(elem: ET.Element) -> str:
     return elem.tag.split('}', 1)[-1] if isinstance(elem.tag, str) and '}' in elem.tag else str(elem.tag)
-
-
-def _trace_conversion(
-    ctx: ConvertContext,
-    elem: ET.Element,
-    status: str,
-    message: str | None = None,
-    bounds_emu: tuple[int, int, int, int] | None = None,
-) -> None:
-    if ctx.conversion_trace is None:
-        return
-    record: dict[str, object] = {
-        'tag': _local_tag(elem),
-        'id': elem.get('id') or '',
-        'status': status,
-        'depth': ctx.depth,
-    }
-    if message:
-        record['message'] = message
-    if bounds_emu is not None:
-        record['bounds_emu'] = list(bounds_emu)
-    ctx.conversion_trace.append(record)
 
 
 def _collect_unsupported_visuals(root: ET.Element) -> list[str]:
@@ -413,17 +419,23 @@ def convert_svg_to_slide_shapes(
     svg_path: Path,
     slide_num: int = 1,
     verbose: bool = False,
-    trace_conversion: bool = False,
-) -> tuple[str, dict[str, bytes], list[dict[str, str]], list, list[dict[str, object]] | None]:
+    merge_paragraphs: bool = False,
+    trace_out: list[dict[str, Any]] | None = None,
+) -> tuple[str, dict[str, bytes], list[dict[str, str]], list]:
     """Convert an SVG file to a complete DrawingML slide XML.
 
     Args:
         svg_path: Path to the SVG file.
         slide_num: Slide number (for naming).
         verbose: Print progress info.
+        merge_paragraphs: Opt-in. When True, mergeable paragraph blocks
+            (same x, dy clustered around one base line-height) become a
+            single editable text frame with multiple <a:p>. Default False
+            preserves the SVG's exact line layout (one textbox per line).
+        trace_out: Optional list populated with one per-slide trace dictionary.
 
     Returns:
-        (slide_xml, media_files, rel_entries, anim_targets, conversion_trace) where:
+        (slide_xml, media_files, rel_entries, anim_targets) where:
         - slide_xml: Complete slide XML string.
         - media_files: Dict of {filename: bytes} for media to write.
         - rel_entries: List of relationship entries to add.
@@ -433,6 +445,8 @@ def convert_svg_to_slide_shapes(
     """
     tree = ET.parse(str(svg_path))
     root = tree.getroot()
+    trace_events: list[dict[str, Any]] | None = [] if trace_out is not None else None
+    trace_steps: list[dict[str, Any]] = []
 
     # Expand <use data-icon="..."/> placeholders in-memory so this dispatcher
     # can consume svg_output/ directly. Standard renderers and this converter
@@ -443,6 +457,8 @@ def convert_svg_to_slide_shapes(
     if icons_dir.exists():
         from .use_expander import expand_use_data_icons
         expanded = expand_use_data_icons(root, icons_dir)
+        if expanded:
+            trace_steps.append({'action': 'expand-use-data-icons', 'count': expanded})
         if verbose and expanded:
             print(f'  Expanded {expanded} <use data-icon="..."/> placeholder(s)')
 
@@ -452,9 +468,17 @@ def convert_svg_to_slide_shapes(
     # and an x-anchored tspan would render in the wrong column. finalize_svg
     # does the same flattening on disk; doing it here keeps native pptx output
     # correct when reading raw svg_output/.
+    # merge_paragraphs (opt-in) additionally folds mergeable paragraph blocks
+    # into a single annotated <text> for downstream multi-<a:p> conversion.
     from .tspan_flattener import flatten_positional_tspans
-    if flatten_positional_tspans(tree) and verbose:
-        print('  Flattened positional <tspan> into independent <text>')
+    flattened = flatten_positional_tspans(tree, merge_paragraphs=merge_paragraphs)
+    if flattened:
+        trace_steps.append({
+            'action': 'flatten-positional-tspans',
+            'merge_paragraphs': merge_paragraphs,
+        })
+        if verbose:
+            print('  Flattened positional <tspan> into independent <text>')
 
     unsupported = _collect_unsupported_visuals(root)
     if unsupported:
@@ -465,12 +489,12 @@ def convert_svg_to_slide_shapes(
         )
 
     defs = collect_defs(root)
-    conversion_trace: list[dict[str, object]] | None = [] if trace_conversion else None
     ctx = ConvertContext(
         defs=defs,
         slide_num=slide_num,
         svg_dir=Path(svg_path).parent,
-        conversion_trace=conversion_trace,
+        merge_paragraphs=merge_paragraphs,
+        trace_events=trace_events,
     )
 
     shapes: list[str] = []
@@ -483,24 +507,17 @@ def convert_svg_to_slide_shapes(
     for child in root:
         tag = child.tag.replace(f'{{{SVG_NS}}}', '')
         if tag == 'defs':
-            _trace_conversion(ctx, child, 'skipped', 'defs')
             continue
-        try:
-            result = convert_element(child, ctx)
-        except Exception as exc:
-            _trace_conversion(ctx, child, 'failed', str(exc))
-            raise
+        result = convert_element(child, ctx)
         if result:
             shapes.append(result.xml)
             converted += 1
-            _trace_conversion(ctx, child, 'converted', bounds_emu=result.bounds_emu)
             m = re.search(r'<p:cNvPr id="(\d+)"', result.xml)
             if m:
                 fallback_targets.append((int(m.group(1)), tag))
         else:
             if tag not in _NON_VISUAL_TAGS:
                 skipped += 1
-            _trace_conversion(ctx, child, 'skipped')
 
     # Animation target fallback. Semantic <g id="..."> groups are the
     # preferred anchors (set inside convert_g). When the SVG has none
@@ -514,6 +531,21 @@ def convert_svg_to_slide_shapes(
 
     if verbose:
         print(f'  Converted {converted} elements, skipped {skipped}')
+
+    if trace_out is not None:
+        trace_out.append({
+            'slide_num': slide_num,
+            'svg': str(svg_path),
+            'summary': {
+                'converted': converted,
+                'skipped': skipped,
+                'media_files': len(ctx.media_files),
+                'relationships': len(ctx.rel_entries),
+                'animation_targets': len(ctx.anim_targets),
+            },
+            'preprocess': trace_steps,
+            'events': trace_events or [],
+        })
 
     shapes_xml = '\n'.join(shapes)
 
@@ -537,4 +569,4 @@ def convert_svg_to_slide_shapes(
 <p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>
 </p:sld>'''
 
-    return slide_xml, ctx.media_files, ctx.rel_entries, ctx.anim_targets, conversion_trace
+    return slide_xml, ctx.media_files, ctx.rel_entries, ctx.anim_targets

@@ -24,6 +24,8 @@
 - Agent Connect Bridge：[Agent Connect Bridge](./agent-connect-bridge.md)
 - Agent 配置：[Agent Setup](../agent-setup.md)
 - 工作流选择：[Choosing a Workflow](../choosing-a-workflow.md)
+- 产品定位反思：[产品定位反思](./product-positioning.md)
+- 上游基准测试：[上游基准测试 - 2026 年 5 月](./upstream-benchmark-2026-05.md)
 - 桌面端源码预览：[Quickstart Desktop](../quickstart-desktop.md)
 - Homebrew 分发方案：[Homebrew Distribution Plan](../homebrew-distribution.md)
 - 模型和 Provider 配置：[Model and Provider Setup](../model-provider-setup.md)

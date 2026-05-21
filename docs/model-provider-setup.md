@@ -103,7 +103,7 @@ QWEN_API_KEY=your-dashscope-key
 DEEPSEEK_API_KEY=your-deepseek-key
 ```
 
-Important: v2.2.0 does not turn the static web page into a hosted model product. Bridge can test provider connectivity locally, but final deck production still runs through the Agent Skill workflow.
+Important: v2.2.1 does not turn the static web page into a hosted model product. Bridge can test provider connectivity locally, but final deck production still runs through the Agent Skill workflow.
 
 ## Check With Bridge
 
