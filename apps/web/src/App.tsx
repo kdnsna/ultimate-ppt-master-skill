@@ -183,9 +183,9 @@ const labels = {
     firstStepFiles: "放资料",
     firstStepFilesText: "拖入 PDF / Word / PPTX / Excel，或先用粘贴摘要试跑。",
     firstStepBridge: "连接本机",
-    bridgeOfflineHelp: "本机连接器（Bridge）还没启动，网页暂时不能查看你电脑上装了哪些 AI 助手。先在这个仓库终端运行：",
+    bridgeOfflineHelp: "本机连接器（Bridge）还没启动，网页暂时不能查看你电脑上装了哪些 AI 助手。复制下面的启动命令即可，它会先寻找本机项目目录再启动。",
     bridgeOnlineHelp: "本机连接器（Bridge）已启动，网页可以识别本机 AI 助手并写入本地项目包（handoff）。",
-    copyBridgeCommand: "复制 npm run bridge",
+    copyBridgeCommand: "复制 Bridge 启动命令",
     refreshBridge: "重新检测",
     firstStepHandoff: "生成本地项目包",
     firstStepHandoffText: "点“发送到本机连接器（Bridge）”，再点“启动 / 复制 AI 助手命令”。",
@@ -355,9 +355,9 @@ const labels = {
     firstStepFiles: "Add sources",
     firstStepFilesText: "Drop PDF / Word / PPTX / Excel files, or test with pasted notes first.",
     firstStepBridge: "Connect this Mac",
-    bridgeOfflineHelp: "The local connector (Bridge) is not running yet, so the page cannot see which AI helpers are installed. Run this in the repo terminal:",
+    bridgeOfflineHelp: "The local connector (Bridge) is not running yet, so the page cannot see installed AI helpers. Copy the startup command below; it finds the local repo before starting Bridge.",
     bridgeOnlineHelp: "The local connector (Bridge) is running. The page can detect local AI helpers and write a local project folder (handoff).",
-    copyBridgeCommand: "Copy npm run bridge",
+    copyBridgeCommand: "Copy Bridge startup command",
     refreshBridge: "Check again",
     firstStepHandoff: "Create local project",
     firstStepHandoffText: "Click Send to local connector, then Launch / copy AI-helper command.",
@@ -597,6 +597,7 @@ export function App() {
   const providers = useMemo(() => mergeProviderTests(bridge?.providers || fallbackProviders(form.language), providerTests), [bridge, form.language, providerTests]);
   const agents = bridge?.agents || fallbackAgents();
   const skillTargets = bridge?.skillTargets?.length ? bridge.skillTargets : fallbackSkillTargets(form.language);
+  const bridgeCommand = bridgeStartCommand(bridge);
   const selectedAgent = agents.find((agent) => agent.id === form.agentTool);
   const availableAgents = agents.filter((agent) => agent.available);
   const recommendedAgent = selectedAgent?.available ? selectedAgent : availableAgents[0];
@@ -896,7 +897,7 @@ export function App() {
     const nextAgent = currentAgent || localAgents.find((agent) => agent.available);
     if (!nextAgent) {
       setBridgeMessage(t.autoSelectAgentMissing);
-      if (!health) await copyText("npm run bridge");
+      if (!health) await copyText(bridgeStartCommand(null));
       return;
     }
 
@@ -997,7 +998,7 @@ export function App() {
           recommendedAgent={recommendedAgent}
           labels={t}
           onCheckBridge={() => void checkBridge(false)}
-          onCopyBridgeCommand={() => void copyText("npm run bridge")}
+          onCopyBridgeCommand={() => void copyText(bridgeCommand)}
           onUseRecommendedAgent={() => void autoSelectAgent()}
           onSendBridge={() => void sendToBridge()}
           onLaunchAgent={() => void launchOrCopyAgent()}
@@ -1027,13 +1028,14 @@ export function App() {
           agents={agents}
           providers={providers}
           skillTargets={skillTargets}
+          bridgeCommand={bridgeCommand}
           selectedAgent={selectedAgent}
           labels={t}
           testingProvider={testingProvider}
           installingSkill={installingSkill}
           bridgeMessage={bridgeMessage}
           onCheckBridge={() => void checkBridge(false)}
-          onCopyBridgeCommand={() => void copyText("npm run bridge")}
+          onCopyBridgeCommand={() => void copyText(bridgeCommand)}
           onAutoSelectAgent={() => void autoSelectAgent()}
           onTestAllProviders={() => void testAllProviders()}
           onSelectAgent={(agentId) => update("agentTool", agentId)}
@@ -1177,12 +1179,13 @@ export function App() {
           <section className="panel handoff-panel" aria-labelledby="handoff-title">
             <PanelTitle icon={PlugZap} id="handoff-title" title={t.handoffPanel} />
             <BridgeStatusCard
-              bridge={bridge}
-              checking={bridgeChecking}
-              error={bridgeError}
-              labels={t}
-              onRefresh={() => void checkBridge(false)}
-            />
+          bridge={bridge}
+          checking={bridgeChecking}
+          error={bridgeError}
+          labels={t}
+          bridgeCommand={bridgeCommand}
+          onRefresh={() => void checkBridge(false)}
+        />
             <div className="action-stack">
               <button className="primary-action full" onClick={sendToBridge}>
                 <FolderOpen size={18} />
@@ -1405,6 +1408,7 @@ function ConfigurationPage({
   agents,
   providers,
   skillTargets,
+  bridgeCommand,
   selectedAgent,
   labels: t,
   testingProvider,
@@ -1422,6 +1426,7 @@ function ConfigurationPage({
   agents: AgentStatus[];
   providers: ProviderStatus[];
   skillTargets: SkillTargetStatus[];
+  bridgeCommand: string;
   selectedAgent?: AgentStatus;
   labels: typeof labels.zh;
   testingProvider: string;
@@ -1464,7 +1469,7 @@ function ConfigurationPage({
           <strong>{t.bridgeStartTitle}</strong>
           <p>{t.bridgeStartText}</p>
           <StatusPill ok={Boolean(bridge)} okText={t.bridgeOnline} failText={t.bridgeOffline} />
-          <code>npm run bridge</code>
+          <code>{bridgeCommand}</code>
           <div className="setup-actions">
             <button className="secondary-action" onClick={onCheckBridge}>{t.refreshBridge}</button>
             <button className="secondary-action" onClick={onCopyBridgeCommand}>{t.copyBridgeCommand}</button>
@@ -1592,7 +1597,7 @@ function BeginnerGuide({
           <span>03</span>
           <strong>{t.firstStepBridge}</strong>
           <p>{bridgeReady ? t.bridgeOnlineHelp : t.bridgeOfflineHelp}</p>
-          {!bridgeReady && <code>npm run bridge</code>}
+          {!bridgeReady && <code>{bridgeStartCommand(bridge)}</code>}
         </article>
         <article className={agentReady ? "ready" : "waiting"}>
           <span>04</span>
@@ -1701,12 +1706,14 @@ function BridgeStatusCard({
   checking,
   error,
   labels: t,
+  bridgeCommand,
   onRefresh
 }: {
   bridge: BridgeHealth | null;
   checking: boolean;
   error: string;
   labels: typeof labels.zh;
+  bridgeCommand: string;
   onRefresh: () => void;
 }) {
   return (
@@ -1718,7 +1725,7 @@ function BridgeStatusCard({
           <RefreshCw size={16} />
         </button>
       </div>
-      <code>{t.bridgeCommand}: npm run bridge</code>
+      <code>{t.bridgeCommand}: {bridgeCommand}</code>
       <p>{bridge ? `${bridge.outputDir} · v${bridge.version}` : error || t.allowLaunchOff}</p>
       <span>{bridge?.allowLaunch ? t.allowLaunchOn : t.allowLaunchOff}</span>
     </div>
@@ -1844,6 +1851,28 @@ function readOption<T extends string>(items: Record<T, Record<Language, string>>
 
 function formatLabel(template: string, value: string) {
   return template.replace("{agent}", value).replace("{target}", value);
+}
+
+function bridgeStartCommand(bridge: BridgeHealth | null) {
+  if (bridge?.repoRoot) {
+    return `cd ${shellQuote(bridge.repoRoot)} && npm run bridge`;
+  }
+
+  return [
+    'PACKAGE_JSON="$(find "$HOME" -maxdepth 5 -path "*/ultimate-ppt-master-skill/package.json" -print -quit 2>/dev/null)"',
+    'if [ -n "$PACKAGE_JSON" ]; then',
+    '  REPO="$(dirname "$PACKAGE_JSON")"',
+    "else",
+    '  REPO="$HOME/UltimatePPTMaster/ultimate-ppt-master-skill"',
+    '  mkdir -p "$(dirname "$REPO")"',
+    `  git clone "${repoUrl}" "$REPO"`,
+    "fi",
+    'cd "$REPO" && npm run bridge'
+  ].join("\n");
+}
+
+function shellQuote(value: string) {
+  return `'${value.replace(/'/g, "'\\''")}'`;
 }
 
 function loadSavedForm() {

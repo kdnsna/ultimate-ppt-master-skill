@@ -60,7 +60,7 @@ GITHUB_PAGES=true npm run build:web
 | 检查 | 期望结果 |
 |---|---|
 | 打开 Web Experience | 工作台、资料导入、页纲、完整度检查、Bridge 状态、provider 卡片、预览 tabs 和 CTA 按钮正常显示。 |
-| Bridge 离线状态 | 页面显示 `npm run bridge`，且仍可下载 zip。 |
+| Bridge 离线状态 | 页面显示可复制的 Bridge 启动命令：先寻找或拉取本地仓库，再运行 `npm run bridge`；同时仍可下载 zip。 |
 | Bridge 在线状态 | `GET /health` 填充本地 Agent 和 provider 状态。 |
 | 拖入文本资料 | 文件显示为浏览器已预读，并进入 `extracted-source.md`。 |
 | 拖入二进制资料 | 文件显示为等待本地 Bridge 解析，并进入 `attachments/`。 |

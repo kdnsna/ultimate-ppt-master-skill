@@ -17,6 +17,7 @@ Then keep the relevant local evidence. Do not paste private documents or real AP
 | Copy prompt fails | browser clipboard permission | Select the prompt preview manually and copy it. |
 | Handoff zip does not download | browser download permission | Allow downloads for the site, or use copy/download `source.md` as fallback. |
 | Web page shows Bridge offline | `npm run bridge`, `curl http://127.0.0.1:43188/health` | Start Bridge from the repo root; confirm no other process is using port `43188`. |
+| `npm run bridge` says `/Users/<name>/package.json` is missing | `pwd` | You ran npm outside the repo. Use the Web Experience's copied Bridge startup command, or run `cd path/to/ultimate-ppt-master-skill && npm run bridge`. |
 | Send to Bridge fails | Bridge terminal output, request size | Keep files below `UPM_BRIDGE_MAX_MB` or raise the limit locally. |
 | Bridge parsed file as `attachedOnly` | `manifest.json`, `extracted-source.md` | Run `npm run setup`, then try the matching `scripts/source_to_md/*` converter manually. |
 | `npm run desktop` fails | `node --version`, `npm --version`, `npm run doctor` | Run `npm run setup`; install Node/npm if missing. |

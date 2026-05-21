@@ -32,6 +32,15 @@ test("web experience uses menu pages and generic agent setup actions", async () 
   assert.match(appSource, /openclaw/);
 });
 
+test("bridge startup copy command is safe outside the repo root", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+
+  assert.match(appSource, /bridgeStartCommand/);
+  assert.match(appSource, /find "\$HOME" -maxdepth 5/);
+  assert.match(appSource, /cd "\$REPO" && npm run bridge/);
+  assert.doesNotMatch(appSource, /copyText\("npm run bridge"\)/);
+});
+
 test("home page explains technical terms in plain language", async () => {
   const appSource = await readFile("apps/web/src/App.tsx", "utf8");
 

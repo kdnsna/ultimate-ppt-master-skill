@@ -64,7 +64,7 @@ Use these checks before promoting a release:
 | Check | Expected result |
 |---|---|
 | Open Web Experience | The studio, source intake, outline, readiness check, Bridge status, provider cards, preview tabs, and CTA buttons render. |
-| Bridge offline state | The page shows `npm run bridge` and still allows zip download. |
+| Bridge offline state | The page shows a copyable Bridge startup command that finds or clones the local repo before running `npm run bridge`, and still allows zip download. |
 | Bridge online state | `GET /health` populates local Agent and provider status. |
 | Drop text source | The file appears as browser pre-read and is included in `extracted-source.md`. |
 | Drop binary source | The file appears as pending local Bridge parsing and is included in `attachments/`. |
