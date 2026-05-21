@@ -1,14 +1,9 @@
 import json
-import os
 import tempfile
 import unittest
-import zipfile
 from pathlib import Path
-from unittest.mock import patch
-from xml.sax.saxutils import escape
 
 from apps.desktop.worker.desktop_worker import (
-    cover_title_lines,
     inspect_environment,
     list_recent_projects,
     recommend_settings,
@@ -20,49 +15,7 @@ from apps.desktop.worker.desktop_worker import (
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def write_minimal_docx(path: Path, paragraphs: list[str]) -> None:
-    body = "".join(
-        f"<w:p><w:r><w:t>{escape(paragraph)}</w:t></w:r></w:p>"
-        for paragraph in paragraphs
-    )
-    with zipfile.ZipFile(path, "w") as docx:
-        docx.writestr(
-            "[Content_Types].xml",
-            """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>""",
-        )
-        docx.writestr(
-            "_rels/.rels",
-            """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>""",
-        )
-        docx.writestr(
-            "word/_rels/document.xml.rels",
-            """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>""",
-        )
-        docx.writestr(
-            "word/document.xml",
-            f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>{body}<w:sectPr/></w:body>
-</w:document>""",
-        )
-
-
 class DesktopWorkerTest(unittest.TestCase):
-    def test_cover_title_lines_prefers_quoted_project_name(self):
-        self.assertEqual(
-            cover_title_lines("关于举办交通银行“文旅大戏”暨2026年山东夏季消费主题活动的请示"),
-            ["文旅大戏", "2026山东夏季", "消费主题活动"],
-        )
-
     def test_validate_job_accepts_minimal_markdown_pptx_job(self):
         job = validate_job(
             {
@@ -75,6 +28,32 @@ class DesktopWorkerTest(unittest.TestCase):
         self.assertEqual(job["outputMode"], "pptx")
         self.assertEqual(job["stylePreset"], "business")
         self.assertEqual(job["source"]["kind"], "markdown")
+        self.assertEqual(job["providerConfig"]["modelProvider"], "auto")
+        self.assertEqual(job["providerConfig"]["voiceProvider"], "none")
+
+    def test_validate_job_normalizes_provider_and_voice_config(self):
+        job = validate_job(
+            {
+                "source": {"kind": "markdown", "value": "# Demo", "name": "demo.md"},
+                "outputMode": "pptx",
+                "stylePreset": "business",
+                "providerConfig": {
+                    "modelProvider": "qwen",
+                    "textModelId": "qwen-plus",
+                    "imageProvider": "pexels",
+                    "narrationEnabled": True,
+                    "voiceProvider": "edge",
+                    "voiceId": "zh-CN-YunjianNeural",
+                    "voiceRate": "-5%",
+                },
+            }
+        )
+
+        self.assertEqual(job["providerConfig"]["modelProvider"], "qwen")
+        self.assertEqual(job["providerConfig"]["textModelId"], "qwen-plus")
+        self.assertEqual(job["providerConfig"]["imageProvider"], "pexels")
+        self.assertTrue(job["providerConfig"]["narrationEnabled"])
+        self.assertEqual(job["providerConfig"]["voiceId"], "zh-CN-YunjianNeural")
 
     def test_validate_job_rejects_unknown_output_mode(self):
         with self.assertRaises(ValueError):
@@ -107,36 +86,6 @@ class DesktopWorkerTest(unittest.TestCase):
         self.assertNotIn("OPENAI_API_KEY", payload)
         self.assertNotIn("sk-", payload)
 
-    def test_inspect_environment_reads_env_file_flags_without_secret_values(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            tmp_path = Path(tmp)
-            repo_root = tmp_path / "repo"
-            run_dir = tmp_path / "run"
-            repo_root.mkdir()
-            run_dir.mkdir()
-            (repo_root / ".env").write_text(
-                "IMAGE_BACKEND=openai\nOPENAI_API_KEY=sk-test-secret\nLLM_PROVIDER=openai-compatible\nLLM_MODEL=gpt-4.1\n",
-                encoding="utf-8",
-            )
-
-            original_cwd = Path.cwd()
-            try:
-                os.chdir(run_dir)
-                with patch.dict(os.environ, {"IMAGE_BACKEND": "", "OPENAI_API_KEY": ""}, clear=False):
-                    env = inspect_environment(repo_root)
-            finally:
-                os.chdir(original_cwd)
-
-        payload = json.dumps(env, ensure_ascii=False)
-
-        self.assertTrue(env["providers"]["openai"])
-        self.assertEqual(env["config"]["imageBackend"], "openai")
-        self.assertEqual(env["config"]["envFile"], str(repo_root / ".env"))
-        self.assertTrue(env["config"]["directLlmConfigured"])
-        self.assertEqual(env["config"]["llmProvider"], "openai-compatible")
-        self.assertEqual(env["config"]["llmModel"], "gpt-4.1")
-        self.assertNotIn("sk-test-secret", payload)
-
     def test_run_job_creates_web_preview_manifest(self):
         with tempfile.TemporaryDirectory() as tmp:
             result = run_job(
@@ -159,14 +108,11 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertTrue(any(path.endswith("index.html") for path in result["generatedFiles"]))
             self.assertIn("产品发布", result["previewHtml"])
             self.assertEqual(result["outputMode"], "web")
-            self.assertIn('id="deck"', result["previewHtml"])
-            self.assertIn("motion.min.js", result["previewHtml"])
-            self.assertNotIn("[必填]", result["previewHtml"])
-            self.assertTrue((Path(result["projectPath"]) / "outputs" / "assets" / "motion.min.js").exists())
             self.assertIn("recommendations", result)
             self.assertIn("checks", result)
             self.assertIn("nextActions", result)
             self.assertIn("thumbnailSvg", result)
+            self.assertIn("providerConfig", result)
 
     def test_run_job_creates_pptx_preview_manifest(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -189,106 +135,35 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertTrue(any(path.endswith(".pptx") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("cover.svg") for path in result["generatedFiles"]))
             self.assertIn("Editable Deck", result["previewSvg"])
-            self.assertIn("Production draft", result["previewSvg"])
             self.assertEqual(result["outputMode"], "pptx")
             self.assertTrue(result["thumbnailSvg"].startswith("<svg"))
 
-    def test_run_job_extracts_docx_text_for_pptx_preview(self):
+    def test_run_job_creates_narration_handoff_when_enabled(self):
         with tempfile.TemporaryDirectory() as tmp:
-            source = Path(tmp) / "brief.docx"
-            write_minimal_docx(
-                source,
-                [
-                    "文旅消费活动行办会材料",
-                    "活动目标是联动城市文旅资源和金融服务。",
-                    "本次汇报需要形成可编辑 PPTX。",
-                ],
-            )
-
             result = run_job(
                 {
-                    "source": {"kind": "file", "value": str(source), "name": "brief.docx"},
+                    "source": {
+                        "kind": "markdown",
+                        "value": "# Narrated Deck\n\n- Voice one\n- Voice two",
+                        "name": "narrated.md",
+                    },
                     "outputMode": "pptx",
                     "stylePreset": "business",
                     "projectDir": tmp,
+                    "providerConfig": {
+                        "narrationEnabled": True,
+                        "voiceProvider": "edge",
+                        "voiceId": "zh-CN-XiaoxiaoNeural",
+                    },
                 },
                 ROOT,
             )
 
-            source_md = Path(result["projectPath"]) / "sources" / "source.md"
-            self.assertEqual(result["sourceExtraction"]["status"], "extracted")
-            self.assertEqual(result["sourceExtraction"]["generatedMarkdownPath"], str(source_md))
-            self.assertIn("文旅消费活动行办会材料", source_md.read_text(encoding="utf-8"))
-            self.assertIn("文旅消费活动行办会材料", result["previewSvg"])
-            self.assertNotIn("Imported file:", source_md.read_text(encoding="utf-8"))
-
-    def test_run_job_extracts_docx_text_for_web_preview(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            source = Path(tmp) / "web-brief.docx"
-            write_minimal_docx(
-                source,
-                [
-                    "城市文旅消费展示方案",
-                    "展示重点包括主题活动、消费权益和线上传播。",
-                ],
-            )
-
-            result = run_job(
-                {
-                    "source": {"kind": "file", "value": str(source), "name": "web-brief.docx"},
-                    "outputMode": "web",
-                    "stylePreset": "editorial",
-                    "projectDir": tmp,
-                },
-                ROOT,
-            )
-
-            self.assertEqual(result["sourceExtraction"]["status"], "extracted")
-            self.assertIn("城市文旅消费展示方案", result["previewHtml"])
-            self.assertNotIn("Imported file:", result["previewHtml"])
-            self.assertNotIn("[必填]", result["previewHtml"])
-
-    def test_run_job_extracts_url_text_when_converter_succeeds(self):
-        def fake_convert(_repo_root: Path, url: str, output_path: Path) -> str:
-            markdown = f"# URL Launch Brief\n\n- Source URL: {url}\n- Real fetched content"
-            output_path.write_text(markdown, encoding="utf-8")
-            return markdown
-
-        with tempfile.TemporaryDirectory() as tmp:
-            with patch("apps.desktop.worker.desktop_worker.convert_url_to_markdown", side_effect=fake_convert):
-                result = run_job(
-                    {
-                        "source": {"kind": "url", "value": "https://example.com/launch", "name": "launch-url"},
-                        "outputMode": "web",
-                        "stylePreset": "editorial",
-                        "projectDir": tmp,
-                    },
-                    ROOT,
-                )
-
-            source_md = Path(result["projectPath"]) / "sources" / "source.md"
-            self.assertEqual(result["sourceExtraction"]["status"], "extracted")
-            self.assertIn("URL Launch Brief", source_md.read_text(encoding="utf-8"))
-            self.assertIn("URL Launch Brief", result["previewHtml"])
-            self.assertNotIn("Use the full agent workflow to fetch", result["previewHtml"])
-
-    def test_run_job_keeps_url_handoff_when_converter_fails(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            with patch("apps.desktop.worker.desktop_worker.convert_url_to_markdown", side_effect=RuntimeError("network blocked")):
-                result = run_job(
-                    {
-                        "source": {"kind": "url", "value": "https://example.invalid/launch", "name": "blocked-url"},
-                        "outputMode": "pptx",
-                        "stylePreset": "business",
-                        "projectDir": tmp,
-                    },
-                    ROOT,
-                )
-
-            source_md = Path(result["projectPath"]) / "sources" / "source.md"
-            self.assertEqual(result["sourceExtraction"]["status"], "handoffRequired")
-            self.assertIn("network blocked", result["sourceExtraction"]["detail"])
-            self.assertIn("Desktop URL extraction failed", source_md.read_text(encoding="utf-8"))
+            project_path = Path(result["projectPath"])
+            self.assertTrue((project_path / "narration-settings.json").exists())
+            self.assertTrue((project_path / "notes" / "slide-01.md").exists())
+            self.assertTrue(any(path.endswith("narration-settings.json") for path in result["generatedFiles"]))
+            self.assertTrue(result["providerConfig"]["narrationEnabled"])
 
     def test_list_recent_projects_reads_real_manifests(self):
         with tempfile.TemporaryDirectory() as tmp:

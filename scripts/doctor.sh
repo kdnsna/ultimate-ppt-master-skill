@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+WEB_DIR="$ROOT_DIR/apps/web"
 DESKTOP_DIR="$ROOT_DIR/apps/desktop"
 CRITICAL_FAILURES=0
 WARNINGS=0
@@ -76,14 +77,14 @@ env_has_key() {
   return 1
 }
 
-printf "Ultimate PPT Master Desktop doctor\n"
+printf "Ultimate PPT Master doctor\n"
 printf "Root: %s\n\n" "$ROOT_DIR"
 
 PYTHON_BIN="$(find_python || true)"
 if [[ -n "$PYTHON_BIN" ]]; then
   ok "Python 3.10+: $("$PYTHON_BIN" --version 2>&1)"
 else
-  missing "Python 3.10+ is required for the worker and agent workflow"
+  missing "Python 3.10+ is required for source conversion and agent workflows"
 fi
 
 if [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then
@@ -100,37 +101,24 @@ fi
 if has_cmd node; then
   ok "Node: $(node --version)"
 else
-  missing "Node.js 18+ is required for the desktop UI"
+  missing "Node.js 18+ is required for the Web Experience and Bridge"
 fi
 
 if has_cmd npm; then
   ok "npm: $(npm --version)"
 else
-  missing "npm is required for desktop scripts"
+  missing "npm is required for project scripts"
 fi
 
-if [[ -f "$DESKTOP_DIR/package.json" ]]; then
-  ok "Desktop package found"
-else
-  missing "Desktop package is missing at apps/desktop/package.json"
-fi
-
-if [[ -d "$DESKTOP_DIR/node_modules" ]]; then
-  ok "Desktop npm dependencies installed"
-else
-  warn "Desktop npm dependencies are missing. Run: npm run setup"
-fi
+[[ -f "$WEB_DIR/package.json" ]] && ok "Web package found" || missing "Web package is missing at apps/web/package.json"
+[[ -d "$WEB_DIR/node_modules" ]] && ok "Web npm dependencies installed" || warn "Web npm dependencies are missing. Run: npm run setup"
+[[ -f "$ROOT_DIR/apps/bridge/server.mjs" ]] && ok "Agent Bridge server found" || missing "Bridge server is missing at apps/bridge/server.mjs"
+[[ -f "$DESKTOP_DIR/package.json" ]] && ok "Desktop package found" || warn "Desktop package is missing at apps/desktop/package.json"
 
 if has_cmd rustc && has_cmd cargo; then
   ok "Rust/Cargo: $(rustc --version 2>/dev/null), $(cargo --version 2>/dev/null)"
 else
-  warn "Rust/Cargo not found. Browser preview works; native Tauri packaging needs Rust"
-fi
-
-if has_cmd pkg-config && pkg-config --exists cairo >/dev/null 2>&1; then
-  ok "Cairo detected through pkg-config"
-else
-  warn "Cairo not detected. Install cairo pkg-config for stronger SVG/PPTX compatibility"
+  warn "Rust/Cargo not found. Web Experience and Bridge work; native Tauri packaging needs Rust"
 fi
 
 ENV_FILE="$(find_env_file || true)"
@@ -140,13 +128,13 @@ else
   warn "No provider .env file found. Run: npm run setup, then edit ~/.ppt-master/.env"
 fi
 
-if env_has_key OPENAI_API_KEY "$ENV_FILE"; then
-  ok "OpenAI provider key configured"
+if env_has_key OPENAI_API_KEY "$ENV_FILE" || env_has_key LLM_API_KEY "$ENV_FILE"; then
+  ok "OpenAI-compatible provider key configured"
 else
-  warn "OpenAI provider key not configured"
+  warn "OpenAI-compatible provider key not configured"
 fi
 
-if env_has_key GEMINI_API_KEY "$ENV_FILE"; then
+if env_has_key GEMINI_API_KEY "$ENV_FILE" || env_has_key GOOGLE_API_KEY "$ENV_FILE"; then
   ok "Gemini provider key configured"
 else
   warn "Gemini provider key not configured"
@@ -158,18 +146,10 @@ else
   warn "Qwen/DashScope provider key not configured"
 fi
 
-if env_has_key PEXELS_API_KEY "$ENV_FILE" || env_has_key PIXABAY_API_KEY "$ENV_FILE"; then
-  ok "Image search provider configured"
+if env_has_key DEEPSEEK_API_KEY "$ENV_FILE"; then
+  ok "DeepSeek provider key configured"
 else
-  warn "Image search provider not configured"
-fi
-
-if env_has_key LLM_PROVIDER "$ENV_FILE" && env_has_key LLM_MODEL "$ENV_FILE" && {
-  env_has_key LLM_API_KEY "$ENV_FILE" || env_has_key OPENAI_API_KEY "$ENV_FILE" || env_has_key GEMINI_API_KEY "$ENV_FILE" || env_has_key QWEN_API_KEY "$ENV_FILE" || env_has_key DASHSCOPE_API_KEY "$ENV_FILE"
-}; then
-  ok "Reserved direct LLM adapter config is present"
-else
-  warn "Reserved direct LLM adapter config is incomplete. Agent-driven generation is still the recommended path"
+  warn "DeepSeek provider key not configured"
 fi
 
 printf "\nSummary: %s critical issue(s), %s warning(s)\n" "$CRITICAL_FAILURES" "$WARNINGS"

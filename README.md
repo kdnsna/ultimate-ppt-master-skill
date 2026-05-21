@@ -1,15 +1,17 @@
-# Ultimate PPT Master - Web Experience + Agent Skill for PPTX and Web Decks
+# Ultimate PPT Master - Web Experience + Local Agent Bridge + Agent Skill
 
-> A web-first fusion workflow for AI presentations: assemble a structured deck brief, live Web Deck preview, engine plan, and local handoff kit in the browser, then hand it to Codex, Claude Code, Hermes, OpenClaw, or another agent for production-grade editable PPTX and Web Deck generation.
+> A web-first fusion workflow for AI presentations: import source files, assemble a structured deck brief, connect to a local Agent Bridge, stage a real handoff project, then let Codex, Claude Code, Hermes, OpenClaw, or another local agent produce editable PPTX and Web Decks.
 
 <p align="center">
-  <strong>v2.1.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.2.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
 
 <p align="center">
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Open Web Experience</strong></a>
+  ·
+  <a href="#connect-local-agent"><strong>Connect Local Agent</strong></a>
   ·
   <a href="#use-as-agent-skill"><strong>Install / Use as Agent Skill</strong></a>
   ·
@@ -19,19 +21,21 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.1.0" src="https://img.shields.io/badge/Version-2.1.0-7C3AED?style=for-the-badge">
+  <img alt="Version 2.2.0" src="https://img.shields.io/badge/Version-2.2.0-7C3AED?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
+  <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Second%20Core-Agent%20Skill-10B981?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
   <img alt="CI" src="https://img.shields.io/github/actions/workflow/status/kdnsna/ultimate-ppt-master-skill/ci.yml?branch=main&style=for-the-badge&label=CI">
 </p>
 
-Ultimate PPT Master is now positioned around two practical entry points:
+Ultimate PPT Master is now positioned around three practical entry points:
 
 | Entry | Role |
 |---|---|
-| **Open Web Experience** | The low-friction public front door. Build a structured deck brief, preview a local Web Deck, generate a dual-engine plan, copy Agent instructions, and download a complete `handoff-kit.zip`. |
+| **Open Web Experience** | The low-friction public front door. Import files, build a structured deck brief, preview a local Web Deck, inspect model/Agent status, and export `handoff-kit.zip`. |
+| **Connect Local Agent** | The v2.2 bridge route. Run one local command, let the page talk to `127.0.0.1`, parse PDF/Word/PPTX/Excel/URL sources locally, and create a ready-to-open handoff project. |
 | **Install / Use as Agent Skill** | The high-quality production route. Let a local agent read real files, run scripts, preview output, fix layout issues, and export editable PPTX or single-file Web Decks. |
 
 The desktop app remains in the repository, but it is no longer the first promotion path. Signing, notarization, Homebrew distribution, and native packaging are treated as release-maintenance work for later.
@@ -46,19 +50,20 @@ Open the static web app:
 https://kdnsna.github.io/ultimate-ppt-master-skill/
 ```
 
-The web experience is now a browser-side **Deck Brief Studio**:
+The web experience is now an **Agent Connect Hub**:
 
 - choose source type, target scenario, output mode, visual style, language, agent tool, and model preference;
-- paste source notes or a rough brief directly into the page;
+- drag in `.md`, `.txt`, `.pdf`, `.docx`, `.pptx`, `.xlsx`, or add URLs;
+- pre-read text sources in the browser and mark binary sources for local Bridge parsing;
 - generate a slide outline and brief-readiness check;
 - see the Hugo He / ppt-master PPTX route and op7418 / Guizang Web Deck route side by side;
+- detect whether the local Bridge, Codex, Claude Code, Hermes, OpenClaw, and provider keys are available;
 - preview and download `preview-web-deck.html` as a browser-local rough deck;
-- copy Agent instructions or `source.md`;
-- download a complete `handoff-kit.zip` containing `source.md`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md`;
+- send the task to the local Bridge or download a complete `handoff-kit.zip` containing `source.md`, `extracted-source.md`, `attachments/`, `manifest.json`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md`;
 - open the sanitized Web Deck demo;
 - jump directly to Skill installation instructions.
 
-MVP boundaries are explicit: no backend, no hosted model, no account system, and no source-material upload. Brief assembly happens in the browser, and downloaded files stay local.
+Boundaries are explicit: there is no hosted backend, no hosted model, no account system, and no browser-side API key storage. The static page can export files by itself; when Bridge is running, source files are sent only to your own `127.0.0.1` service.
 
 For local development:
 
@@ -74,6 +79,43 @@ Build the static Pages artifact:
 ```bash
 npm run build:web
 ```
+
+---
+
+## Connect Local Agent
+
+Start the local Bridge from a clone:
+
+```bash
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
+cd ultimate-ppt-master-skill
+npm run setup
+npm run bridge
+```
+
+Then open the Web Experience and click **Send to local Bridge**. The page will create a local project under `~/UltimatePPTMaster/handoffs/...` with:
+
+- `source.md` and `extracted-source.md`;
+- original files in `attachments/`;
+- `manifest.json` with parse status and suggested commands;
+- `agent-prompt.md`, `project-brief.json`, `engine-plan.md`, `quality-checklist.md`;
+- `preview-web-deck.html`.
+
+Bridge safety defaults:
+
+- binds to `127.0.0.1`;
+- reads provider config from environment, repo `.env`, or `~/.ppt-master/.env`;
+- reports only whether keys exist, never key values;
+- parses PDF/Word/PPTX/Excel/URL locally through `scripts/source_to_md/*`;
+- does not launch an Agent unless explicitly enabled.
+
+Optional auto-launch mode:
+
+```bash
+npm run bridge -- --allow-launch
+```
+
+Full guide: [Agent Connect Bridge](./docs/agent-connect-bridge.md).
 
 ---
 
@@ -129,8 +171,9 @@ Full guide: [Agent Setup](./docs/agent-setup.md).
 | Path | Best for | Start |
 |---|---|---|
 | **Web Experience** | New users, GitHub visitors, demos, social sharing, lightweight trial. | [Open Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/) |
+| **Web Experience + Bridge** | Users who want real file intake without uploading anything to a hosted service. | Run `npm run bridge`, then click **Send to local Bridge**. |
 | **Agent Skill** | Users who already use Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf. | [Agent Setup](./docs/agent-setup.md) |
-| **Web Experience + Skill** | Recommended production flow: assemble the handoff kit online, then give the kit to an agent. | Open the web app, download `handoff-kit.zip`, provide real source files locally when needed. |
+| **Web Experience + Skill** | Recommended production flow: assemble or stage the handoff kit, then give the folder to an agent. | Open the web app, download `handoff-kit.zip` or send it through Bridge. |
 | **Desktop Later / Local Preview** | Advanced local mode and future signed desktop distribution. | See [Quickstart Desktop](./docs/quickstart-desktop.md). |
 
 If you are deciding which route to use, read [Choosing a Workflow](./docs/choosing-a-workflow.md).
@@ -166,7 +209,8 @@ Use this when the presentation itself is the experience.
 
 | Layer | Role |
 |---|---|
-| **Static Web Experience** | Builds a structured deck brief, generates an outline, previews `preview-web-deck.html`, and exports `handoff-kit.zip` for local Agent production. |
+| **Static Web Experience** | Imports files, builds a structured deck brief, previews `preview-web-deck.html`, checks Bridge/provider status, and exports `handoff-kit.zip`. |
+| **Local Agent Bridge** | Runs on `127.0.0.1`, parses source files locally, writes handoff projects, checks provider readiness, and returns suggested Agent commands. |
 | **Fusion engine plan** | Makes the PPTX route, Web Deck route, visual style route, quality checklist, and copyright/notice expectations explicit before handoff. |
 | **Agent Skill** | Lets Codex / Claude Code / Hermes / OpenClaw read `AGENTS.md` and `SKILL.md`, then run the production workflow locally. |
 | **Python + templates** | Create project folders, normalize sources, generate PPTX/Web outputs, and keep logs/artifacts inspectable. |
@@ -200,6 +244,7 @@ Release-maintenance references:
 | Need | Guide |
 |---|---|
 | Use the static online front door | [Web Experience](./docs/web-experience.md) |
+| Connect the web page to local files and Agents | [Agent Connect Bridge](./docs/agent-connect-bridge.md) |
 | Install and invoke the Skill | [Agent Setup](./docs/agent-setup.md) |
 | Pick Web vs Skill vs Desktop Later | [Choosing a Workflow](./docs/choosing-a-workflow.md) |
 | Run the desktop app from source | [Quickstart Desktop](./docs/quickstart-desktop.md) |
@@ -211,7 +256,7 @@ Release-maintenance references:
 
 ## Roadmap
 
-- Validate GitHub Pages as the main public experience.
+- Validate GitHub Pages + Local Bridge as the main public experience.
 - Expand Web Experience examples for Chinese reporting, English pitch decks, consulting workflows, and training courseware.
 - Keep Skill installation lightweight and memorable across Codex, Claude Code, Hermes, OpenClaw, and generic agents.
 - Add gallery automation for public demo decks.
@@ -219,16 +264,16 @@ Release-maintenance references:
 
 ---
 
-## What Changed in v2.1.0
+## What Changed in v2.2.0
 
 | Update | What changed |
 |---|---|
-| **Web-first direction** | Added a static Vite Deck Brief Studio for outline generation, live Web Deck preview, dual-engine planning, `source.md`, `project-brief.json`, handoff zip download, Skill routing, and Web Deck demo access. |
-| **Skill as second core** | README and docs now keep Agent Skill visible as the production-quality route, not buried in developer notes. |
+| **Agent Connect Hub** | Upgraded the Web Experience from brief-only flow to source intake, Bridge detection, provider dashboard, Agent status, richer previews, and upgraded handoff kit. |
+| **Local Agent Bridge** | Added `npm run bridge` with localhost-only health, provider, handoff, and optional Agent launch endpoints. |
+| **Real source intake** | Handoff kits now include `extracted-source.md`, `attachments/`, `manifest.json`, and local parse status for PDF/Word/PPTX/Excel/URL sources. |
+| **Skill as production route** | README and docs keep Agent Skill visible as the production-quality route, not buried in developer notes. |
 | **Desktop repositioned** | Tauri desktop remains available, but Homebrew/signing/notarization now live in release-maintenance documentation. |
-| **Higher-quality desktop drafts** | Desktop PPTX output uses styled editable layouts instead of plain bullet smoke-test pages. |
-| **Original web deck assets restored** | Web Deck output uses the magazine/Swiss HTML templates, local `motion.min.js`, and the original paging system. |
-| **Regression checks** | Worker tests cover template assets, placeholder removal, DOCX extraction, and production-draft preview markers. |
+| **Regression checks** | Bridge tests cover secret masking, handoff writes, browser text extraction, and safe default command-only Agent launch. |
 
 See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for upstream baselines and adaptation policy.
 

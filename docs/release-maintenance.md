@@ -123,11 +123,12 @@ When syncing upstream:
 
 ## Version Notes
 
-v2.1.0 positions this repository as:
+v2.2.0 positions this repository as:
 
-- a web-first static experience for public discovery, brief assembly, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing;
+- a web-first static experience for public discovery, source intake, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing;
+- a localhost-only Agent Bridge for local source parsing, provider readiness checks, and handoff project creation;
 - a portable agent skill for production-grade deck generation;
 - a retained desktop preview for future signed native distribution;
-- a documented foundation for future direct API adapters.
+- a documented provider convention that keeps API keys local.
 
-Do not claim the direct API driver is complete until a worker adapter and tests exist.
+Do not claim the hosted/direct API deck generator is complete until a worker adapter and tests exist. Bridge can test provider readiness, but production remains Agent/Skill-led.

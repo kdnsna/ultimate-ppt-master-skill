@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+WEB_DIR="$ROOT_DIR/apps/web"
 DESKTOP_DIR="$ROOT_DIR/apps/desktop"
 USER_CONFIG_DIR="$HOME/.ppt-master"
 USER_ENV_FILE="$USER_CONFIG_DIR/.env"
@@ -66,22 +67,29 @@ else
 fi
 
 if command -v npm >/dev/null 2>&1; then
-  info "Installing desktop npm dependencies"
-  npm --prefix "$DESKTOP_DIR" install
+  if [[ -f "$WEB_DIR/package.json" ]]; then
+    info "Installing Web Experience npm dependencies"
+    npm --prefix "$WEB_DIR" install
+  fi
+  if [[ -f "$DESKTOP_DIR/package.json" ]]; then
+    info "Installing desktop npm dependencies"
+    npm --prefix "$DESKTOP_DIR" install
+  fi
 else
-  warn "npm was not found. Install Node.js 18+ to use the desktop UI, then rerun: npm run setup"
+  warn "npm was not found. Install Node.js 18+ to use the Web Experience and desktop UI, then rerun: npm run setup"
 fi
 
 if ! command -v cargo >/dev/null 2>&1 || ! command -v rustc >/dev/null 2>&1; then
-  warn "Rust/Cargo not found. Browser UI shell still opens for inspection, but real local generation and native packaging need Rust. macOS: brew install rust"
+  warn "Rust/Cargo not found. Web Experience and Bridge still work; native desktop packaging needs Rust. macOS: brew install rust"
 fi
 
-if ! pkg-config --exists cairo >/dev/null 2>&1; then
+if command -v pkg-config >/dev/null 2>&1 && ! pkg-config --exists cairo >/dev/null 2>&1; then
   warn "Cairo was not detected. PPTX/SVG compatibility checks may need it. macOS: brew install cairo pkg-config"
 fi
 
 info "Setup complete"
 printf "\nNext commands:\n"
+printf "  npm run bridge   # connect the Web Experience to local Agents\n"
+printf "  npm run dev:web  # run the Web Experience locally\n"
 printf "  npm run doctor   # check local environment\n"
-printf "  npm run desktop  # launch native desktop when Rust is ready; otherwise UI-only browser shell\n"
-printf "  npm run app:desktop  # force native Tauri mode\n"
+printf "  npm run desktop  # launch native desktop when Rust is ready; otherwise browser shell\n"

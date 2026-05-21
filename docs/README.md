@@ -1,9 +1,10 @@
 # Documentation Map
 
-Ultimate PPT Master now has a web-first public direction and two important user routes:
+Ultimate PPT Master now has a web-first public direction and three important user routes:
 
-1. **Web Experience** is the main front door for discovery, lightweight trial, browser-side brief assembly, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing.
-2. **Agent Skill** is the second core route for high-quality local production with Codex, Claude Code, Hermes, OpenClaw, Cursor-style IDEs, and other agents.
+1. **Web Experience** is the main front door for discovery, lightweight trial, source intake, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing.
+2. **Agent Connect Bridge** is the local connector for real source parsing, provider status checks, and one-folder handoff to Codex or another Agent.
+3. **Agent Skill** is the high-quality local production route with Codex, Claude Code, Hermes, OpenClaw, Cursor-style IDEs, and other agents.
 
 The desktop app remains available as an advanced local preview and future distribution path, but it is not the near-term acquisition path.
 
@@ -12,6 +13,7 @@ The desktop app remains available as an advanced local preview and future distri
 | Need | Best entry | Read |
 |---|---|---|
 | I want to understand and try the product quickly. | Web Experience | [Web Experience](./web-experience.md) |
+| I want the web page to parse local PDF/Word/PPTX/Excel sources without uploading them. | Agent Connect Bridge | [Agent Connect Bridge](./agent-connect-bridge.md) |
 | I want Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf to generate decks. | Agent Skill | [Agent Setup](./agent-setup.md) |
 | I want to know which workflow gives better results. | Decision guide | [Choosing a Workflow](./choosing-a-workflow.md) |
 | I need model/API/provider keys. | Provider setup | [Model and Provider Setup](./model-provider-setup.md) |
@@ -25,10 +27,10 @@ The desktop app remains available as an advanced local preview and future distri
 | User type | Recommended path | Why |
 |---|---|---|
 | Curious visitor | Open the Web Experience | Fastest path: no install, no backend account, no model key, no local environment setup. |
-| GitHub/agent user | Install as a Skill and ask the agent to read `AGENTS.md` / `SKILL.md` | Best quality today because the agent can inspect source files, run the pipeline, preview, fix, and export. |
-| Team maintaining polished decks | Web Experience for intake + Agent Skill for production | Keeps the front door simple while preserving deep local control. |
+| GitHub/agent user | Run Bridge, then hand the folder to Codex or install as a Skill | Best quality today because the agent can inspect source files, run the pipeline, preview, fix, and export. |
+| Team maintaining polished decks | Web Experience + Bridge for intake + Agent Skill for production | Keeps the front door simple while preserving deep local control. |
 | Desktop user or maintainer | Use desktop as an advanced local preview | Native distribution still depends on signing, notarization, and packaging maturity. |
-| API integrator | Use the documented direct API variables only as a reserved convention | The complete direct API worker adapter is not shipped in v2.1.0. |
+| API integrator | Use Bridge/provider dashboard for local key checks | The browser never stores keys; Bridge can test configured providers locally. |
 
 ## Trace Map
 
@@ -37,8 +39,8 @@ Every public support path should point to an inspectable artifact:
 | Question | First check | Evidence to keep |
 |---|---|---|
 | Does the web app build? | `npm run build:web` | `apps/web/dist`, Pages workflow logs. |
-| Does the Web Brief Studio work? | Web Experience form, outline, live Web Deck preview, preview tabs, and handoff buttons | Generated Agent prompt, `source.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `handoff-kit.zip`. |
-| Did source extraction work in a local project? | `projects/.../desktop-manifest.json` | `sourceExtraction.status`, `sources/source.md`. |
+| Does the Agent Connect Hub work? | Web Experience file intake, Bridge status, outline, live Web Deck preview, preview tabs, and handoff buttons | Generated Agent prompt, `source.md`, `extracted-source.md`, `manifest.json`, `attachments/`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `handoff-kit.zip`. |
+| Did source extraction work in a local project? | Bridge `manifest.json` | `attachments[].parseStatus`, `extracted-source.md`, original files in `attachments/`. |
 | Where did the output go? | Workbench export panel or manifest | `generatedFiles`, `outputs/`, `previews/`. |
 | Why does a deck look wrong? | Project log and source markdown | `logs/desktop-worker.log`, redacted source excerpt. |
 | Which agent instructions are active? | `AGENTS.md`, `CLAUDE.md`, `PROMPT.md` | Agent prompt and local skill path. |

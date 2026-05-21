@@ -1,6 +1,6 @@
 # Web Experience
 
-The Web Experience is the primary public entry point for Ultimate PPT Master. It is a static React/Vite **Deck Brief Studio** deployed to GitHub Pages, and it now acts as the fusion front door for the PPTX and Web Deck routes.
+The Web Experience is the primary public entry point for Ultimate PPT Master. It is a static React/Vite **Agent Connect Hub** deployed to GitHub Pages, and it now acts as the fusion front door for source intake, local Bridge handoff, PPTX production, and Web Deck production.
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/
@@ -9,13 +9,15 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 ## What It Does
 
 - lets users choose source type, scenario, output mode, visual style, language, agent tool, and model preference;
-- accepts pasted source notes or rough material;
+- accepts pasted source notes, source URLs, and dropped `.md`, `.txt`, `.pdf`, `.docx`, `.pptx`, `.xlsx`, and related files;
+- pre-reads browser-safe text files and marks binary files for local Bridge parsing;
 - generates a slide outline and brief-readiness check;
 - shows the Hugo He / ppt-master PPTX route and the op7418 / Guizang Web Deck route side by side;
+- detects the local Agent Bridge, local Agent commands, and provider readiness when Bridge is running;
 - generates a browser-local `preview-web-deck.html` and live iframe preview;
-- generates copy-ready Agent instructions and `source.md`;
-- downloads `source.md` or a full `handoff-kit.zip`;
-- includes `source.md`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md` in the handoff kit;
+- generates copy-ready Agent instructions, `source.md`, `extracted-source.md`, `manifest.json`, and `project-brief.json`;
+- downloads a full `handoff-kit.zip` or sends the task to the local Bridge;
+- includes `source.md`, `extracted-source.md`, `attachments/`, `manifest.json`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md` in the handoff kit;
 - opens the sanitized Agentic Developer Stack 2026 Web Deck demo;
 - keeps Skill installation visible as a second core path.
 
@@ -24,10 +26,11 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - no backend;
 - no hosted model API;
 - no account system;
-- no source-material upload or server storage;
+- no hosted source-material upload or server storage;
+- no browser-side API key storage;
 - no analytics requirement for MVP.
 
-Brief assembly is handled in the browser. Users keep private material local and provide the downloaded handoff kit directly to their chosen agent.
+Brief assembly is handled in the browser. If users run `npm run bridge`, source files are sent only to `127.0.0.1` for local parsing and project staging.
 
 ## Local Development
 
@@ -56,13 +59,18 @@ Use these checks before promoting a release:
 
 | Check | Expected result |
 |---|---|
-| Open Web Experience | The studio, source inputs, outline, readiness check, preview tabs, and CTA buttons render. |
+| Open Web Experience | The studio, source intake, outline, readiness check, Bridge status, provider cards, preview tabs, and CTA buttons render. |
+| Bridge offline state | The page shows `npm run bridge` and still allows zip download. |
+| Bridge online state | `GET /health` populates local Agent and provider status. |
+| Drop text source | The file appears as browser pre-read and is included in `extracted-source.md`. |
+| Drop binary source | The file appears as pending local Bridge parsing and is included in `attachments/`. |
 | Live Web Deck preview | The preview frame renders `preview-web-deck.html` without backend calls or script dependencies. |
 | Copy Agent prompt | Clipboard receives the generated prompt with outline and kit context. |
 | Copy `source.md` | Clipboard receives the generated source markdown. |
 | Download `source.md` | Browser downloads a Markdown brief with current form values and outline. |
 | Download `preview-web-deck.html` | Browser downloads a standalone HTML preview with the current brief and storyboard. |
-| Download `handoff-kit.zip` | Browser downloads a zip containing `source.md`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md`. |
+| Download `handoff-kit.zip` | Browser downloads a zip containing source files, manifest, attachments, prompt, preview, engine plan, checklist, and README. |
+| Send to Bridge | Bridge writes a local handoff folder and returns suggested Agent commands. |
 | Open Web Deck demo | `examples/agentic-developer-tools-2026/web-demo.html` opens from the static build. |
 | Skill setup link | Opens the README Skill section or `docs/agent-setup.md`. |
 | Mobile viewport | CTA buttons wrap cleanly and the Skill route remains visible. |
