@@ -17,6 +17,7 @@ v2.3.3 是一次 Web Experience 新手上手优化发布，同时继续守住真
 
 - 把密集的 Web Experience 拆成开始、资料与目标、配置检测、交给 AI 助手、预览与文件等菜单页。
 - 新增一键 Bridge / Agent / provider 检测，并能自动选择可用本地 Agent。
+- 新增由 Bridge 执行的 Skill 安装 / 更新动作，可写入 Codex 或通用本地 Agent 目录；Bridge 离线时复制终端命令。
 - Codex、Hermes、OpenClaw、Claude Code 检测改为通用逻辑，不再假设用户只安装某一个工具。
 - 内容预设包已经在网页端露出，可以看到资料要求、模板候选、推荐路线和质量检查。
 - handoff 产物继续可检查：`source.md`、`extracted-source.md`、`manifest.json`、`agent-prompt.md`、`project-brief.json`、`preview-web-deck.html`、`engine-plan.md`、`quality-checklist.md` 和 `README.md`。

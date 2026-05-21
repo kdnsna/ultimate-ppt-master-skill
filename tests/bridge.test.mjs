@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { lstat, mkdtemp, readFile, readlink, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
 import { createBridgeServer } from "../apps/bridge/server.mjs";
 
@@ -90,4 +90,65 @@ test("agent launch is command-only unless allow launch is enabled", async () => 
     assert.ok(payload.command.includes("codex"));
     assert.ok(payload.message.includes("--allow-launch"));
   });
+});
+
+test("health reports skill install targets without mutating the real home directory", async () => {
+  const homeDir = await mkdtemp(join(tmpdir(), "upm-home-"));
+  try {
+    await withServer({ homeDir }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/health`);
+      assert.equal(response.status, 200);
+      const payload = await response.json();
+      const codexTarget = payload.skillTargets.find((target) => target.id === "codex");
+      assert.equal(codexTarget.installed, false);
+      assert.equal(codexTarget.targetPath, join(homeDir, ".codex", "skills", "ultimate-ppt-master"));
+      assert.ok(codexTarget.installCommand.includes("ln -s"));
+    });
+  } finally {
+    await rm(homeDir, { recursive: true, force: true });
+  }
+});
+
+test("skill install links the current checkout into an allowlisted agent target", async () => {
+  const homeDir = await mkdtemp(join(tmpdir(), "upm-home-"));
+  try {
+    await withServer({ homeDir }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/skill/install`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target: "codex" })
+      });
+      assert.equal(response.status, 200);
+      const payload = await response.json();
+      assert.equal(payload.ok, true);
+      assert.equal(payload.installed, true);
+      assert.equal(payload.managed, true);
+      const targetPath = join(homeDir, ".codex", "skills", "ultimate-ppt-master");
+      const stats = await lstat(targetPath);
+      assert.equal(stats.isSymbolicLink(), true);
+      const linkValue = await readlink(targetPath);
+      assert.equal(resolve(dirname(targetPath), linkValue), process.cwd());
+    });
+  } finally {
+    await rm(homeDir, { recursive: true, force: true });
+  }
+});
+
+test("skill install rejects unsupported targets", async () => {
+  const homeDir = await mkdtemp(join(tmpdir(), "upm-home-"));
+  try {
+    await withServer({ homeDir }, async (baseUrl) => {
+      const response = await fetch(`${baseUrl}/skill/install`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target: "../elsewhere" })
+      });
+      assert.equal(response.status, 400);
+      const payload = await response.json();
+      assert.equal(payload.ok, false);
+      assert.match(payload.message, /Unsupported Skill target/);
+    });
+  } finally {
+    await rm(homeDir, { recursive: true, force: true });
+  }
 });

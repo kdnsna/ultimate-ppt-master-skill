@@ -61,11 +61,12 @@ Ultimate PPT Master 是一个 **本地优先的 AI 演示生产中枢**。它不
 
 v2.3.3 继续守住产品承诺，同时把第一次使用变得更容易理解：**输入看得懂，产出看得见，本地 Agent 接得住。**
 
-这次重点不是堆更多安装入口，而是把 Web Experience 打磨成新手也能顺着走的本地交接台：
+这次重点不是把功能挤在一个页面，而是把 Web Experience 打磨成新手也能顺着走的本地交接台：
 
 - 首页先用通俗话解释 Bridge、Agent、API key、handoff，再让用户配置；
 - Web Experience 拆成开始、资料与目标、配置检测、交付给 AI 助手、预览与文件等菜单页，不再把所有功能挤在一起；
 - 一键检测可以检查本机 Bridge、Codex / Hermes / OpenClaw / Claude Code 等 Agent，以及已配置模型 provider，且不泄露密钥；
+- 配置页可以通过 Bridge 一键把 Skill 安装或更新到 Codex / 通用本地 Agent 目录；Bridge 离线时会复制终端命令；
 - 内容预设包已经在网页端露出，包含资料要求、模板候选和质量检查；
 - Bridge / handoff kit 继续保留 `manifest`、`engine-plan`、`quality-checklist`，让 Agent 有明确验收标准。
 

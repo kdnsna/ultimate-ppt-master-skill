@@ -42,3 +42,14 @@ test("home page explains technical terms in plain language", async () => {
   assert.match(appSource, /本地项目包（handoff）/);
   assert.doesNotMatch(appSource, /网页还不能识别 Hermes/);
 });
+
+test("web experience exposes one-click skill install actions", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+
+  assert.match(appSource, /SkillTargetStatus/);
+  assert.match(appSource, /skillInstallTitle/);
+  assert.match(appSource, /installSkill/);
+  assert.match(appSource, /\/skill\/install/);
+  assert.match(appSource, /installCodexSkill/);
+  assert.match(appSource, /fallbackSkillInstallCommand/);
+});

@@ -19,6 +19,8 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 
 Drop source files into the page, fill the brief, then click **Send to local Bridge**.
 
+The Configuration page can also install or update the Skill for local helpers. With Bridge running, **Install to Codex** links this checkout into `~/.codex/skills/ultimate-ppt-master`; **Install to generic Agent** links it into `~/agent-skills/ultimate-ppt-master`. If Bridge is offline, the page copies a terminal command instead.
+
 ## What It Creates
 
 Bridge writes a local handoff project under:
@@ -82,6 +84,7 @@ Bridge listens on `http://127.0.0.1:43188`.
 | `POST /providers/test` | Test a configured provider through Bridge. |
 | `POST /handoff` | Create a local handoff project. |
 | `POST /agent/launch` | Return an Agent command, or launch only when explicitly allowed. |
+| `POST /skill/install` | Install or update the Skill into an allowlisted local Agent target (`codex` or `generic`). |
 
 CORS is limited to GitHub Pages and local development origins.
 
@@ -92,6 +95,7 @@ CORS is limited to GitHub Pages and local development origins.
 - Output directory defaults to `~/UltimatePPTMaster/handoffs`. Override with `UPM_BRIDGE_OUTPUT_DIR`.
 - Automatic Agent launch is disabled by default.
 - API key values are never returned to the browser.
+- Skill installation only writes fixed allowlisted targets and never accepts arbitrary browser-provided filesystem paths.
 
 Enable optional Agent auto-launch:
 

@@ -19,6 +19,8 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 
 拖入源文件，填写 brief，然后点击 **发送到本地 Bridge**。
 
+配置页也可以帮本地助手安装或更新 Skill。Bridge 启动后，**安装到 Codex** 会把当前 checkout 链接到 `~/.codex/skills/ultimate-ppt-master`；**安装到通用 Agent** 会链接到 `~/agent-skills/ultimate-ppt-master`。如果 Bridge 没启动，网页会复制一条终端命令。
+
 ## 会生成什么
 
 Bridge 会在本地写入项目：
@@ -82,6 +84,7 @@ Bridge 默认监听 `http://127.0.0.1:43188`。
 | `POST /providers/test` | 通过 Bridge 测试已配置 provider。 |
 | `POST /handoff` | 创建本地 handoff 项目。 |
 | `POST /agent/launch` | 返回 Agent 命令；只有显式允许时才自动启动。 |
+| `POST /skill/install` | 把 Skill 安装或更新到固定白名单本地 Agent 目标（`codex` 或 `generic`）。 |
 
 CORS 只允许 GitHub Pages 和本地开发源。
 
@@ -92,6 +95,7 @@ CORS 只允许 GitHub Pages 和本地开发源。
 - 输出目录默认 `~/UltimatePPTMaster/handoffs`，可用 `UPM_BRIDGE_OUTPUT_DIR` 调整。
 - 默认不自动启动 Agent。
 - API key 值永远不返回给浏览器。
+- Skill 安装只写入固定白名单目录，不接受浏览器传入的任意文件路径。
 
 开启可选自动启动：
 

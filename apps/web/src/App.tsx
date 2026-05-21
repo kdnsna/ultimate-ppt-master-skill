@@ -36,6 +36,7 @@ type Scenario = "executive" | "consulting" | "training" | "launch" | "investor";
 type OutputMode = "pptx" | "web" | "both";
 type StylePreset = "business" | "consulting" | "editorial" | "swiss" | "academic";
 type AgentTool = "codex" | "claude" | "hermes" | "openclaw" | "generic";
+type SkillTarget = "codex" | "generic";
 type ModelPreference = "auto" | "openai" | "gemini" | "qwen" | "deepseek" | "custom";
 type PreviewMode = "prompt" | "source" | "extracted" | "manifest" | "brief" | "webdeck" | "checklist";
 type WorkspaceView = "start" | "sources" | "configuration" | "handoff" | "preview";
@@ -112,6 +113,17 @@ interface AgentStatus {
   path?: string;
 }
 
+interface SkillTargetStatus {
+  id: SkillTarget;
+  label: string;
+  targetPath: string;
+  installCommand: string;
+  installed: boolean;
+  managed: boolean;
+  mode: string;
+  message: string;
+}
+
 interface BridgeHealth {
   ok: boolean;
   version: string;
@@ -120,6 +132,7 @@ interface BridgeHealth {
   allowLaunch: boolean;
   agents: AgentStatus[];
   providers: ProviderStatus[];
+  skillTargets?: SkillTargetStatus[];
 }
 
 interface HandoffResult {
@@ -196,13 +209,13 @@ const labels = {
     sourceGuideTitle: "准备资料和目标",
     sourceGuideText: "这一页只处理输入、预设、页数和叙事目标。先让任务说明达到 80% 以上，再交给 AI 助手。",
     configGuideTitle: "配置和检测",
-    configGuideText: "这一页只看本机连接器（Bridge）、AI 助手命令和模型账号（API key）。可以一键检测，也可以自动选择已安装的 AI 助手。",
+    configGuideText: "这一页只看本机连接器（Bridge）、AI 助手命令、Skill 安装和模型账号（API key）。可以一键检测，也可以自动选择已安装的 AI 助手。",
     handoffGuideTitle: "生成本地项目",
     handoffGuideText: "这一页负责把网页里的任务说明、附件和执行要求写入本地项目包（handoff），再复制 AI 助手命令。",
     previewGuideTitle: "检查预览和交接文件",
     previewGuideText: "这里看浏览器预览、AI 助手任务说明、资料文件、文件清单和质量检查清单。",
     setupTitle: "一键配置 / 检测",
-    setupSubtitle: "网页不能替你安装私有 AI 助手，但能检测本机命令、复制启动命令、选择可用 AI 助手，并测试已配置模型账号。",
+    setupSubtitle: "网页不能绕过你的电脑权限直接动系统；Bridge 在线时可以一键把本仓库登记到 Codex / 通用 Agent Skill 目录，离线时会复制可执行命令。",
     oneClickDetect: "一键检测",
     oneClickConfig: "一键选择可用 AI 助手",
     autoSelectAgentOk: "已选择可用 AI 助手：{agent}",
@@ -214,6 +227,20 @@ const labels = {
     agentSetupText: "支持 Codex、Hermes、OpenClaw、Claude Code。谁装在电脑上，本机连接器（Bridge）就会显示谁可用。",
     modelSetupTitle: "模型账号（API key）",
     modelSetupText: "本机连接器（Bridge）会从 .env / 环境变量读取 API key，只显示是否配置，不泄露密钥。",
+    skillInstallTitle: "Skill 安装 / 更新",
+    skillInstallText: "让 Codex 等本地 AI 助手能直接找到 Ultimate PPT Master。Bridge 在线时会安全登记固定目录；离线时复制安装命令。",
+    installCodexSkill: "安装到 Codex",
+    installGenericSkill: "安装到通用 Agent",
+    copyCodexSkillCommand: "复制 Codex 命令",
+    copyGenericSkillCommand: "复制通用命令",
+    skillInstallOk: "已处理 Skill 目标：{target}",
+    skillInstallFail: "Skill 安装失败",
+    skillInstallNeedsBridge: "Bridge 未连接，已复制安装命令。先在终端运行它，再回到网页重新检测。",
+    skillInstalled: "已安装",
+    skillMissing: "未安装",
+    skillManaged: "Bridge 可管理",
+    skillManual: "需手动处理",
+    installingSkill: "正在安装",
     openDemo: "打开 Web Deck 示例",
     copyPrompt: "复制 AI 助手任务说明",
     copySource: "复制资料文件",
@@ -354,13 +381,13 @@ const labels = {
     sourceGuideTitle: "Prepare sources and goal",
     sourceGuideText: "This page is only for input, preset, slide count, and narrative target. Aim for 80% task readiness before sending it to the AI helper.",
     configGuideTitle: "Configure and detect",
-    configGuideText: "This page is only for the local connector (Bridge), AI-helper commands, and model accounts (API keys). Run one-click detection or auto-select an installed helper.",
+    configGuideText: "This page is only for the local connector (Bridge), AI-helper commands, Skill installation, and model accounts (API keys). Run one-click detection or auto-select an installed helper.",
     handoffGuideTitle: "Create the local project",
     handoffGuideText: "This page writes the brief, attachments, and execution contract to a local project folder (handoff), then copies the AI-helper command.",
     previewGuideTitle: "Check preview and files",
     previewGuideText: "Review the browser preview, AI-helper task, source file, manifest, and quality checklist.",
     setupTitle: "One-click setup / checks",
-    setupSubtitle: "The web page cannot install private AI helpers for you, but it can detect local commands, copy startup commands, choose an available helper, and test configured model accounts.",
+    setupSubtitle: "The page cannot bypass your computer permissions. When Bridge is online, it can register this repo in Codex / generic Agent Skill folders; offline, it copies an executable command.",
     oneClickDetect: "One-click check",
     oneClickConfig: "Choose available AI helper",
     autoSelectAgentOk: "Selected available AI helper: {agent}",
@@ -372,6 +399,20 @@ const labels = {
     agentSetupText: "Supports Codex, Hermes, OpenClaw, and Claude Code. If it is installed on the computer, the local connector (Bridge) marks it available.",
     modelSetupTitle: "Model account (API key)",
     modelSetupText: "The local connector (Bridge) reads API keys from .env / environment variables and only shows configuration status, never the secret.",
+    skillInstallTitle: "Skill install / update",
+    skillInstallText: "Let Codex and other local AI helpers find Ultimate PPT Master directly. Bridge writes only fixed safe targets; offline, copy the install command.",
+    installCodexSkill: "Install to Codex",
+    installGenericSkill: "Install to generic Agent",
+    copyCodexSkillCommand: "Copy Codex command",
+    copyGenericSkillCommand: "Copy generic command",
+    skillInstallOk: "Skill target handled: {target}",
+    skillInstallFail: "Skill install failed",
+    skillInstallNeedsBridge: "Bridge is offline, so the install command was copied. Run it in Terminal, then check again.",
+    skillInstalled: "Installed",
+    skillMissing: "Not installed",
+    skillManaged: "Bridge-managed",
+    skillManual: "Manual action",
+    installingSkill: "Installing",
     openDemo: "Open Web Deck demo",
     copyPrompt: "Copy AI-helper task",
     copySource: "Copy source file",
@@ -537,6 +578,7 @@ export function App() {
   const [providerTests, setProviderTests] = useState<Record<string, ProviderStatus["lastTest"]>>({});
   const [testingProvider, setTestingProvider] = useState("");
   const [agentCommand, setAgentCommand] = useState("");
+  const [installingSkill, setInstallingSkill] = useState("");
 
   const activePreset = useMemo(() => findPreset(form.presetId), [form.presetId]);
   const t = labels[form.language];
@@ -554,6 +596,7 @@ export function App() {
   const manifestJson = useMemo(() => JSON.stringify(manifest, null, 2), [manifest]);
   const providers = useMemo(() => mergeProviderTests(bridge?.providers || fallbackProviders(form.language), providerTests), [bridge, form.language, providerTests]);
   const agents = bridge?.agents || fallbackAgents();
+  const skillTargets = bridge?.skillTargets?.length ? bridge.skillTargets : fallbackSkillTargets(form.language);
   const selectedAgent = agents.find((agent) => agent.id === form.agentTool);
   const availableAgents = agents.filter((agent) => agent.available);
   const recommendedAgent = selectedAgent?.available ? selectedAgent : availableAgents[0];
@@ -861,6 +904,37 @@ export function App() {
     setBridgeMessage(formatLabel(t.autoSelectAgentOk, nextAgent.label));
   }
 
+  async function copySkillInstallCommand(targetId: SkillTarget) {
+    const target = skillTargets.find((item) => item.id === targetId) || fallbackSkillTargets(form.language).find((item) => item.id === targetId);
+    await copyText(target?.installCommand || "");
+  }
+
+  async function installSkill(targetId: SkillTarget) {
+    setInstallingSkill(targetId);
+    try {
+      const health = bridge || await checkBridge(false);
+      if (!health) {
+        await copySkillInstallCommand(targetId);
+        setBridgeMessage(t.skillInstallNeedsBridge);
+        return;
+      }
+
+      const response = await fetch(`${bridgeUrl}/skill/install`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target: targetId })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || `HTTP ${response.status}`);
+      setBridgeMessage(formatLabel(t.skillInstallOk, result.label || result.targetPath || targetId));
+      await checkBridge(true);
+    } catch (error) {
+      setBridgeMessage(`${t.skillInstallFail}: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setInstallingSkill("");
+    }
+  }
+
   return (
     <div className="app" data-view={activeView} lang={form.language === "zh" ? "zh-CN" : "en"}>
       <header className="topbar">
@@ -952,15 +1026,19 @@ export function App() {
           bridge={bridge}
           agents={agents}
           providers={providers}
+          skillTargets={skillTargets}
           selectedAgent={selectedAgent}
           labels={t}
           testingProvider={testingProvider}
+          installingSkill={installingSkill}
           bridgeMessage={bridgeMessage}
           onCheckBridge={() => void checkBridge(false)}
           onCopyBridgeCommand={() => void copyText("npm run bridge")}
           onAutoSelectAgent={() => void autoSelectAgent()}
           onTestAllProviders={() => void testAllProviders()}
           onSelectAgent={(agentId) => update("agentTool", agentId)}
+          onInstallSkill={(targetId) => void installSkill(targetId)}
+          onCopySkillCommand={(targetId) => void copySkillInstallCommand(targetId)}
         />
 
         <section className="studio-grid">
@@ -1326,31 +1404,40 @@ function ConfigurationPage({
   bridge,
   agents,
   providers,
+  skillTargets,
   selectedAgent,
   labels: t,
   testingProvider,
+  installingSkill,
   bridgeMessage,
   onCheckBridge,
   onCopyBridgeCommand,
   onAutoSelectAgent,
   onTestAllProviders,
-  onSelectAgent
+  onSelectAgent,
+  onInstallSkill,
+  onCopySkillCommand
 }: {
   bridge: BridgeHealth | null;
   agents: AgentStatus[];
   providers: ProviderStatus[];
+  skillTargets: SkillTargetStatus[];
   selectedAgent?: AgentStatus;
   labels: typeof labels.zh;
   testingProvider: string;
+  installingSkill: string;
   bridgeMessage: string;
   onCheckBridge: () => void;
   onCopyBridgeCommand: () => void;
   onAutoSelectAgent: () => void;
   onTestAllProviders: () => void;
   onSelectAgent: (agent: AgentTool) => void;
+  onInstallSkill: (target: SkillTarget) => void;
+  onCopySkillCommand: (target: SkillTarget) => void;
 }) {
   const configuredProviders = providers.filter((provider) => provider.configured).length;
   const availableAgents = agents.filter((agent) => agent.available).length;
+  const installedSkills = skillTargets.filter((target) => target.installed).length;
 
   return (
     <section className="configuration-page">
@@ -1406,6 +1493,29 @@ function ConfigurationPage({
             {providers.map((provider) => (
               <span key={provider.id}>{provider.label}: {provider.configured ? t.providerConfigured : t.providerMissing}</span>
             ))}
+          </div>
+        </article>
+        <article className={installedSkills > 0 ? "ready" : "waiting"}>
+          <BookOpen size={19} />
+          <strong>{t.skillInstallTitle}</strong>
+          <p>{t.skillInstallText}</p>
+          <StatusPill ok={installedSkills > 0} okText={`${installedSkills} ${t.skillInstalled}`} failText={t.skillMissing} />
+          <div className="provider-mini-list">
+            {skillTargets.map((target) => (
+              <span key={target.id}>
+                {target.label}: {target.installed ? t.skillInstalled : t.skillMissing} · {target.managed ? t.skillManaged : t.skillManual}
+              </span>
+            ))}
+          </div>
+          <div className="setup-actions">
+            <button className="secondary-action" disabled={Boolean(installingSkill)} onClick={() => onInstallSkill("codex")}>
+              {installingSkill === "codex" ? t.installingSkill : t.installCodexSkill}
+            </button>
+            <button className="secondary-action" disabled={Boolean(installingSkill)} onClick={() => onInstallSkill("generic")}>
+              {installingSkill === "generic" ? t.installingSkill : t.installGenericSkill}
+            </button>
+            <button className="secondary-action" onClick={() => onCopySkillCommand("codex")}>{t.copyCodexSkillCommand}</button>
+            <button className="secondary-action" onClick={() => onCopySkillCommand("generic")}>{t.copyGenericSkillCommand}</button>
           </div>
         </article>
       </div>
@@ -1733,7 +1843,7 @@ function readOption<T extends string>(items: Record<T, Record<Language, string>>
 }
 
 function formatLabel(template: string, value: string) {
-  return template.replace("{agent}", value);
+  return template.replace("{agent}", value).replace("{target}", value);
 }
 
 function loadSavedForm() {
@@ -2302,6 +2412,35 @@ function fallbackAgents(): AgentStatus[] {
     { id: "hermes", label: "Hermes", command: "hermes", available: false },
     { id: "openclaw", label: "OpenClaw", command: "openclaw", available: false }
   ];
+}
+
+function fallbackSkillTargets(language: Language): SkillTargetStatus[] {
+  return [
+    {
+      id: "codex",
+      label: language === "zh" ? "Codex Skill" : "Codex Skill",
+      targetPath: "~/.codex/skills/ultimate-ppt-master",
+      installCommand: fallbackSkillInstallCommand("$HOME/.codex/skills/ultimate-ppt-master"),
+      installed: false,
+      managed: false,
+      mode: "offline",
+      message: language === "zh" ? "启动 Bridge 后可检测真实安装状态。" : "Start Bridge to detect real install status."
+    },
+    {
+      id: "generic",
+      label: language === "zh" ? "通用 Agent Skill" : "Generic Agent Skill",
+      targetPath: "~/agent-skills/ultimate-ppt-master",
+      installCommand: fallbackSkillInstallCommand("$HOME/agent-skills/ultimate-ppt-master"),
+      installed: false,
+      managed: false,
+      mode: "offline",
+      message: language === "zh" ? "适合 OpenClaw、Hermes 或其他自定义 Agent 读取。" : "Use this for OpenClaw, Hermes, or custom Agent setups.",
+    }
+  ];
+}
+
+function fallbackSkillInstallCommand(targetPath: string) {
+  return `TARGET="${targetPath}"; REPO="${repoUrl}"; mkdir -p "$(dirname "$TARGET")"; if [ -d "$TARGET/.git" ]; then git -C "$TARGET" pull --ff-only; elif [ -e "$TARGET" ]; then echo "Existing unmanaged path: $TARGET"; exit 1; else git clone "$REPO" "$TARGET"; fi`;
 }
 
 function mergeProviderTests(providers: ProviderStatus[], tests: Record<string, ProviderStatus["lastTest"]>) {

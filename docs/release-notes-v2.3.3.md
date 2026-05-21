@@ -17,6 +17,7 @@ First-time users no longer have to understand every technical term before taking
 
 - Split the dense Web Experience into guided menu pages: Start, Sources, Configuration, AI helper handoff, and Preview.
 - Added one-click Bridge / agent / provider checks and automatic selection of an available local agent.
+- Added Bridge-backed Skill install / update actions for Codex and a generic local Agent folder, with copied terminal commands as the offline fallback.
 - Made Codex, Hermes, OpenClaw, and Claude Code detection generic so the page does not assume one specific local tool.
 - Exposed content preset packs in the web UI, including source requirements, template candidates, recommended routes, and quality checks.
 - Kept the handoff artifacts inspectable: `source.md`, `extracted-source.md`, `manifest.json`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md`.

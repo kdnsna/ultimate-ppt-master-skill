@@ -66,6 +66,7 @@ This release hardens the Web Experience as a beginner-friendly local handoff stu
 - the home page explains Bridge, Agent, API key, and handoff in plain language before asking users to configure anything;
 - the Web Experience is split into menu pages for starting, sources, configuration, handoff, and preview instead of crowding everything into one surface;
 - one-click checks detect the local Bridge, installed agents such as Codex / Hermes / OpenClaw / Claude Code, and configured model providers without exposing keys;
+- the configuration page can install or update the Skill for Codex / generic local agents through Bridge, or copy a terminal command when Bridge is offline;
 - content preset packs are now visible in the web UI and bundled with source skeletons and quality checks;
 - Bridge / handoff kits still preserve `manifest`, `engine-plan`, and `quality-checklist` so the Agent has a clear acceptance contract.
 

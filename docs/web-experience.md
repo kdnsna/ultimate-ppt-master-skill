@@ -17,6 +17,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - shows the Hugo He / ppt-master PPTX route and the op7418 / Guizang Web Deck route side by side;
 - detects the local Agent Bridge, local Agent commands, and provider readiness when Bridge is running;
 - provides one-click checks for Bridge, installed agents, and configured providers;
+- provides Bridge-backed one-click Skill install / update actions for Codex and a generic Agent folder, with terminal-command fallback when Bridge is offline;
 - generates a browser-local `preview-web-deck.html` and live iframe preview;
 - generates copy-ready Agent instructions, `source.md`, `extracted-source.md`, `manifest.json`, and `project-brief.json`;
 - downloads a full `handoff-kit.zip` or sends the task to the local Bridge;
@@ -74,6 +75,7 @@ Use these checks before promoting a release:
 | Download `preview-web-deck.html` | Browser downloads a standalone HTML preview with the current brief and storyboard. |
 | Download `handoff-kit.zip` | Browser downloads a zip containing source files, manifest, attachments, prompt, preview, engine plan, checklist, and README. |
 | Send to Bridge | Bridge writes a local handoff folder and returns suggested Agent commands. |
+| Install Skill via Bridge | `POST /skill/install` links or updates an allowlisted local Skill target without accepting arbitrary paths. |
 | Open Web Deck demo | `examples/agentic-developer-tools-2026/web-demo.html` opens from the static build. |
 | Skill setup link | Opens the README Skill section or `docs/agent-setup.md`. |
 | Mobile viewport | CTA buttons wrap cleanly and the Skill route remains visible. |

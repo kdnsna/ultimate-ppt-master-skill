@@ -3,7 +3,7 @@ import { createServer } from "node:http";
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
+import { lstat, mkdir, readlink, symlink, writeFile } from "node:fs/promises";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import os from "node:os";
@@ -92,6 +92,7 @@ function readPackageVersion(repoRoot) {
 
 export function createBridgeServer(options = {}) {
   const repoRoot = options.repoRoot ? resolve(options.repoRoot) : resolve(__dirname, "../..");
+  const homeDir = options.homeDir ? resolve(options.homeDir) : os.homedir();
   const outputDir = resolve(options.outputDir || process.env.UPM_BRIDGE_OUTPUT_DIR || join(os.homedir(), "UltimatePPTMaster", "handoffs"));
   const allowLaunch = Boolean(options.allowLaunch);
   const maxBodyBytes = Number(options.maxBodyBytes || process.env.UPM_BRIDGE_MAX_MB || DEFAULT_MAX_BODY_MB) * 1024 * 1024;
@@ -108,7 +109,8 @@ export function createBridgeServer(options = {}) {
 
     try {
       if (request.method === "GET" && request.url === "/health") {
-        writeJson(response, 200, buildHealth({ repoRoot, outputDir, allowLaunch, envSnapshot }), corsHeaders);
+        const health = await buildHealth({ repoRoot, homeDir, outputDir, allowLaunch, envSnapshot });
+        writeJson(response, 200, health, corsHeaders);
         return;
       }
 
@@ -138,6 +140,13 @@ export function createBridgeServer(options = {}) {
         return;
       }
 
+      if (request.method === "POST" && request.url === "/skill/install") {
+        const body = await readJsonBody(request, maxBodyBytes);
+        const result = await installSkillTarget(body, { repoRoot, homeDir });
+        writeJson(response, result.ok ? 200 : result.statusCode || 409, result, corsHeaders);
+        return;
+      }
+
       writeJson(response, 404, { ok: false, message: "Unknown bridge endpoint." }, corsHeaders);
     } catch (error) {
       const status = error?.statusCode || 500;
@@ -163,7 +172,7 @@ export function startBridge(options = {}) {
   return server;
 }
 
-function buildHealth({ repoRoot, outputDir, allowLaunch, envSnapshot }) {
+async function buildHealth({ repoRoot, homeDir, outputDir, allowLaunch, envSnapshot }) {
   return {
     ok: true,
     name: "ultimate-ppt-master-agent-bridge",
@@ -173,6 +182,7 @@ function buildHealth({ repoRoot, outputDir, allowLaunch, envSnapshot }) {
     allowLaunch,
     agents: agentStatuses(),
     providers: providerStatuses(envSnapshot),
+    skillTargets: await skillTargetStatuses({ repoRoot, homeDir }),
     limits: {
       maxBodyMb: Number(process.env.UPM_BRIDGE_MAX_MB || DEFAULT_MAX_BODY_MB)
     }
@@ -305,6 +315,175 @@ function providerStatuses(envSnapshot) {
       modelSource: modelName ? sourceLabel(envSnapshot.sources[modelName]) : ""
     };
   });
+}
+
+function skillTargetDefinitions(homeDir, repoRoot) {
+  return [
+    {
+      id: "codex",
+      label: "Codex Skill",
+      targetPath: join(homeDir, ".codex", "skills", "ultimate-ppt-master"),
+      installCommand: skillInstallCommand(join(homeDir, ".codex", "skills", "ultimate-ppt-master"), repoRoot)
+    },
+    {
+      id: "generic",
+      label: "Generic Agent Skill",
+      targetPath: join(homeDir, "agent-skills", "ultimate-ppt-master"),
+      installCommand: skillInstallCommand(join(homeDir, "agent-skills", "ultimate-ppt-master"), repoRoot)
+    }
+  ];
+}
+
+async function skillTargetStatuses({ repoRoot, homeDir }) {
+  const targets = skillTargetDefinitions(homeDir, repoRoot);
+  const results = [];
+  for (const target of targets) {
+    results.push(await skillTargetStatus(target, repoRoot));
+  }
+  return results;
+}
+
+async function skillTargetStatus(target, repoRoot) {
+  const base = {
+    id: target.id,
+    label: target.label,
+    targetPath: target.targetPath,
+    installCommand: target.installCommand,
+    installed: false,
+    managed: false,
+    mode: "missing",
+    message: "Skill target is not installed yet."
+  };
+
+  try {
+    const stats = await lstat(target.targetPath);
+    if (stats.isSymbolicLink()) {
+      const linkValue = await readlink(target.targetPath);
+      const resolvedLink = resolve(dirname(target.targetPath), linkValue);
+      const pointsToRepo = resolvedLink === resolve(repoRoot);
+      return {
+        ...base,
+        installed: pointsToRepo,
+        managed: pointsToRepo,
+        mode: "symlink",
+        message: pointsToRepo
+          ? "Skill is linked to the current Ultimate PPT Master checkout."
+          : `Existing symlink points to ${linkValue}; Bridge will not replace it automatically.`
+      };
+    }
+
+    if (stats.isDirectory()) {
+      const hasSkillFile = existsSync(join(target.targetPath, "SKILL.md"));
+      const hasGit = existsSync(join(target.targetPath, ".git"));
+      const origin = hasGit ? gitOrigin(target.targetPath) : "";
+      const managed = hasGit && isUltimatePptMasterOrigin(origin);
+      return {
+        ...base,
+        installed: hasSkillFile,
+        managed,
+        mode: hasGit ? "git" : "directory",
+        message: managed
+          ? "Existing Ultimate PPT Master git checkout found; Bridge can update it with git pull --ff-only."
+          : hasSkillFile
+            ? "Existing Skill folder found, but Bridge will not modify unmanaged directories."
+            : "Path already exists and is not an Ultimate PPT Master Skill folder."
+      };
+    }
+
+    return {
+      ...base,
+      mode: "file",
+      message: "Path exists as a file; Bridge will not replace it automatically."
+    };
+  } catch (error) {
+    if (error?.code === "ENOENT") return base;
+    return {
+      ...base,
+      mode: "unknown",
+      message: `Could not inspect Skill target: ${error?.message || error}`
+    };
+  }
+}
+
+async function installSkillTarget(payload, { repoRoot, homeDir }) {
+  const targetId = String(payload?.target || "codex");
+  const target = skillTargetDefinitions(homeDir, repoRoot).find((item) => item.id === targetId);
+  if (!target) {
+    return {
+      ok: false,
+      statusCode: 400,
+      message: "Unsupported Skill target. Use `codex` or `generic`."
+    };
+  }
+
+  const current = await skillTargetStatus(target, repoRoot);
+  if (current.mode === "missing") {
+    await mkdir(dirname(target.targetPath), { recursive: true });
+    await symlink(repoRoot, target.targetPath, "dir");
+    const next = await skillTargetStatus(target, repoRoot);
+    return {
+      ok: true,
+      action: "installed",
+      ...next,
+      message: `Installed ${target.label} by linking it to the current checkout.`
+    };
+  }
+
+  if (current.managed && current.mode === "symlink") {
+    return {
+      ok: true,
+      action: "already-installed",
+      ...current,
+      message: `${target.label} is already linked to the current checkout.`
+    };
+  }
+
+  if (current.managed && current.mode === "git") {
+    const result = spawnSync("git", ["-C", target.targetPath, "pull", "--ff-only"], {
+      encoding: "utf8",
+      timeout: 120000
+    });
+    if (result.status === 0) {
+      return {
+        ok: true,
+        action: "updated",
+        ...(await skillTargetStatus(target, repoRoot)),
+        message: String(result.stdout || "Skill checkout updated.").trim()
+      };
+    }
+    return {
+      ok: false,
+      statusCode: 409,
+      ...current,
+      message: String(result.stderr || result.stdout || "git pull --ff-only failed.").trim()
+    };
+  }
+
+  return {
+    ok: false,
+    statusCode: 409,
+    ...current,
+    message: `${current.message} Copy the command and resolve it manually if you want to replace this path.`
+  };
+}
+
+function gitOrigin(targetPath) {
+  const result = spawnSync("git", ["-C", targetPath, "config", "--get", "remote.origin.url"], {
+    encoding: "utf8",
+    timeout: 10000
+  });
+  if (result.status !== 0) return "";
+  return String(result.stdout || "").trim();
+}
+
+function isUltimatePptMasterOrigin(origin) {
+  return /(?:github\.com[:/])?kdnsna\/ultimate-ppt-master-skill(?:\.git)?$/i.test(String(origin).trim());
+}
+
+function skillInstallCommand(targetPath, repoRoot) {
+  const quotedTarget = shellQuote(targetPath);
+  const quotedRepo = shellQuote(repoRoot);
+  return `TARGET=${quotedTarget}; REPO=${quotedRepo}; mkdir -p "$(dirname "$TARGET")"; if [ -L "$TARGET" ]; then echo "Already linked: $TARGET"; elif [ -d "$TARGET/.git" ]; then git -C "$TARGET" pull --ff-only; elif [ -e "$TARGET" ]; then echo "Existing unmanaged path: $TARGET"; exit 1; else ln -s "$REPO" "$TARGET"; fi`;
 }
 
 async function testProvider(providerId, envSnapshot) {

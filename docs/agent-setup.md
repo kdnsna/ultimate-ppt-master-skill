@@ -2,7 +2,7 @@
 
 Use this guide when you want Ultimate PPT Master to run as a portable agent skill.
 
-For the lowest-friction public entry, start from the [Web Experience](./web-experience.md), download the generated `handoff-kit.zip`, then continue here if you want to install the Skill locally.
+For the lowest-friction public entry, start from the [Web Experience](./web-experience.md). Its Configuration page can install or update the Skill for Codex / generic local agents through Bridge; if Bridge is offline, it copies the same terminal commands shown below. Download the generated `handoff-kit.zip` when you want to continue production from a local project folder.
 
 ## Prerequisites
 
