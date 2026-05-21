@@ -1,6 +1,6 @@
 # Web Experience
 
-The Web Experience is the primary public entry point for Ultimate PPT Master. It is a static React/Vite **Agent Connect Studio** deployed to GitHub Pages, and it now acts as the fusion front door for source intake, local Bridge handoff, PPTX production, and Web Deck production.
+The Web Experience is the primary public entry point for Ultimate PPT Master. It is a static React/Vite guided workspace deployed to GitHub Pages, and it now acts as the fusion front door for source intake, local Bridge handoff, PPTX production, and Web Deck production.
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/
@@ -9,11 +9,14 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 ## What It Does
 
 - lets users choose source type, scenario, output mode, visual style, language, agent tool, and model preference;
+- explains Bridge, Agent, API key, and handoff in plain language before the first configuration step;
+- splits the workspace into Start, Sources, Configuration, Handoff, and Preview pages so first-time users do not face every control at once;
 - accepts pasted source notes, source URLs, and dropped `.md`, `.txt`, `.pdf`, `.docx`, `.pptx`, `.xlsx`, and related files;
 - pre-reads browser-safe text files and marks binary files for local Bridge parsing;
 - generates a slide outline and brief-readiness check;
 - shows the Hugo He / ppt-master PPTX route and the op7418 / Guizang Web Deck route side by side;
 - detects the local Agent Bridge, local Agent commands, and provider readiness when Bridge is running;
+- provides one-click checks for Bridge, installed agents, and configured providers;
 - generates a browser-local `preview-web-deck.html` and live iframe preview;
 - generates copy-ready Agent instructions, `source.md`, `extracted-source.md`, `manifest.json`, and `project-brief.json`;
 - downloads a full `handoff-kit.zip` or sends the task to the local Bridge;

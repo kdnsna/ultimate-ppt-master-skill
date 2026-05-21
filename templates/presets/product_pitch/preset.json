@@ -1,0 +1,73 @@
+{
+  "id": "product_pitch",
+  "status": "draft-pack",
+  "scenario": "Product pitch, launch narrative, investor update, or demo-day story.",
+  "audience": [
+    "investors",
+    "partners",
+    "customers",
+    "product teams"
+  ],
+  "primaryOutput": "web_deck",
+  "secondaryOutput": "pptx",
+  "recommendedSlideCount": 10,
+  "sourceRequirements": [
+    "product one-liner",
+    "target user and high-friction workflow",
+    "problem urgency and market timing",
+    "solution proof or demo flow",
+    "traction, roadmap, or adoption signal",
+    "ask or call to action"
+  ],
+  "narrativeSkeleton": [
+    "Hook with the user pain and why now.",
+    "Show the product wedge in one simple workflow.",
+    "Prove that the solution is real, not just a claim.",
+    "Connect traction or roadmap to a bigger market shift.",
+    "Close with a specific ask."
+  ],
+  "slideRoster": [
+    "cover hook",
+    "problem",
+    "user and market shift",
+    "solution promise",
+    "product workflow",
+    "proof or traction",
+    "business model or adoption path",
+    "roadmap",
+    "ask",
+    "closing visual"
+  ],
+  "templateCandidates": {
+    "layouts": [
+      "google_style",
+      "anthropic"
+    ],
+    "brands": [
+      "google",
+      "anthropic"
+    ],
+    "charts": [
+      "hub_spoke",
+      "pipeline_with_stages",
+      "timeline"
+    ],
+    "webDeckStyle": "editorial"
+  },
+  "qualityChecks": [
+    "First three slides are understandable without narration.",
+    "The product proof is concrete and visible.",
+    "Visuals show workflow, state, or user outcome instead of abstract decoration.",
+    "Claims about traction or market timing are sourced or clearly labeled as assumptions.",
+    "Mobile Web Deck remains readable.",
+    "Optional PPTX handoff keeps summary and appendix editable."
+  ],
+  "sampleProof": {
+    "source": "templates/presets/product_pitch/source.md",
+    "qualityChecklist": "templates/presets/product_pitch/quality-checklist.md",
+    "generatedOutput": "pending",
+    "screenshot": "pending",
+    "publicDemoSafe": true,
+    "notes": "Synthetic product pitch skeleton for public demos and web handoff."
+  }
+}

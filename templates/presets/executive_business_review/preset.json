@@ -1,0 +1,73 @@
+{
+  "id": "executive_business_review",
+  "status": "draft-pack",
+  "scenario": "Quarterly or monthly business review for executives.",
+  "audience": [
+    "executive team",
+    "business owner",
+    "project lead"
+  ],
+  "primaryOutput": "pptx",
+  "secondaryOutput": "web_deck",
+  "recommendedSlideCount": 12,
+  "sourceRequirements": [
+    "review period and business context",
+    "KPI table with baseline, current value, and target",
+    "growth and decline drivers by region, channel, or product",
+    "risks, opportunities, and open management decisions",
+    "next-period action plan with owner and time horizon"
+  ],
+  "narrativeSkeleton": [
+    "Start with the management question and one-line answer.",
+    "Show KPI reality before interpretation.",
+    "Separate performance variance from root causes.",
+    "Translate risks and opportunities into decision points.",
+    "Close with accountable next actions."
+  ],
+  "slideRoster": [
+    "cover and management answer",
+    "executive summary",
+    "KPI dashboard",
+    "performance variance",
+    "driver analysis",
+    "risk and opportunity map",
+    "resource decision page",
+    "priority actions",
+    "timeline and owner plan",
+    "support needed",
+    "appendix data notes",
+    "close"
+  ],
+  "templateCandidates": {
+    "layouts": [
+      "科技蓝商务",
+      "mckinsey",
+      "招商银行"
+    ],
+    "brands": [],
+    "charts": [
+      "kpi_cards",
+      "stacked_bar_chart",
+      "line_chart",
+      "matrix_2x2",
+      "timeline"
+    ],
+    "webDeckStyle": "swiss"
+  },
+  "qualityChecks": [
+    "Every KPI states period, unit, and source.",
+    "Executive summary has no unsupported claims.",
+    "Actions include owner, deadline, and measurable target.",
+    "Risk pages distinguish fact, judgment, and recommendation.",
+    "PPTX text, shapes, charts, and speaker notes remain editable.",
+    "Optional Web Deck is checked on desktop and mobile widths."
+  ],
+  "sampleProof": {
+    "source": "templates/presets/executive_business_review/source.md",
+    "qualityChecklist": "templates/presets/executive_business_review/quality-checklist.md",
+    "generatedOutput": "pending",
+    "screenshot": "pending",
+    "publicDemoSafe": true,
+    "notes": "Synthetic sanitized business review skeleton for public demos."
+  }
+}

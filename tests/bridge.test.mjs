@@ -31,6 +31,8 @@ test("health reports provider status without leaking keys", async () => {
       const text = await response.text();
       assert.ok(!text.includes("sk-test-secret-that-must-not-leak"));
       const payload = JSON.parse(text);
+      const packageJson = JSON.parse(await readFile(join(process.cwd(), "package.json"), "utf8"));
+      assert.equal(payload.version, packageJson.version);
       const openai = payload.providers.find((provider) => provider.id === "openai");
       assert.equal(openai.configured, true);
       assert.equal(openai.model, "gpt-test");

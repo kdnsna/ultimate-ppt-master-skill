@@ -32,6 +32,8 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 
 Brief 组装完全在浏览器本地完成。用户运行 `npm run bridge` 时，资料只发送到本机 `127.0.0.1`，用于本地解析和项目落盘。
 
+v2.3.3 起，首页会先用通俗语言解释 Bridge、Agent、API key 和 handoff，并把工作台拆成开始、资料与目标、配置检测、交给 AI 助手、预览与文件等菜单页。配置页提供一键检测，用于检查本机 Bridge、已安装 Agent 和 provider 状态。
+
 ## 本地开发
 
 ```bash

@@ -3,7 +3,7 @@
 > Turn PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into Agent-ready presentation projects, then produce editable PowerPoint decks or magazine-style Web Decks locally.
 
 <p align="center">
-  <strong>v2.3.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.3.3</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.3.0" src="https://img.shields.io/badge/Version-2.3.0-172033?style=for-the-badge">
+  <img alt="Version 2.3.3" src="https://img.shields.io/badge/Version-2.3.3-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -40,21 +40,21 @@ The goal is simple: **the web page should make the workflow easy to understand; 
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
 
-## v2.3 Release Focus
+## v2.3.3 Release Focus
 
-v2.3 unifies the product around one promise: **visible input, proven output, local Agent handoff.**
+v2.3.3 keeps the product promise intact while making the first run much easier to understand: **visible input, proven output, local Agent handoff.**
 
-This release moves the project from "a web page that can generate a prompt" toward a more product-ready Agent handoff studio:
+This release hardens the Web Experience as a beginner-friendly local handoff studio:
 
-- the README shows `source.md`, an Agent prompt, and the generated Web Deck near the top;
-- existing users get one-line update commands for local clones and Skill installs;
-- the Web Experience is unified as Agent Connect Studio, with copy focused on input, output, checks, and local handoff;
-- Bridge / handoff kits still preserve `manifest`, `engine-plan`, and `quality-checklist` so the Agent has a clear acceptance contract;
-- the public tech demo is polished as a concrete "what to provide / what you get" sample.
+- the home page explains Bridge, Agent, API key, and handoff in plain language before asking users to configure anything;
+- the Web Experience is split into menu pages for starting, sources, configuration, handoff, and preview instead of crowding everything into one surface;
+- one-click checks detect the local Bridge, installed agents such as Codex / Hermes / OpenClaw / Claude Code, and configured model providers without exposing keys;
+- content preset packs are now visible in the web UI and bundled with source skeletons and quality checks;
+- Bridge / handoff kits still preserve `manifest`, `engine-plan`, and `quality-checklist` so the Agent has a clear acceptance contract.
 
 ## Next Direction
 
-The next release direction is **Content & Template Presets**: richer scenario packs that include `source.md` skeletons, narrative structures, recommended slide rosters, template / brand / chart candidates, quality checks, and visible sample outputs.
+v2.3.3 ships the first usable **Content & Template Presets** in the Web Experience. The next direction is to deepen those packs with more sample outputs, brand/template coverage, and scenario-specific quality checks.
 
 Read the plan: [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md). Seed preset catalog: [templates/presets](./templates/presets).
 
@@ -332,17 +332,18 @@ Maintenance references:
 | Configure provider keys locally | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | Understand why this exists beside direct Skill install | [Product Positioning](./docs/product-positioning.md) |
 | See the next content/template direction | [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md) |
-| Review v2.3.0 release focus | [Release Notes - v2.3.0](./docs/release-notes-v2.3.0.md) |
+| Review v2.3.3 release focus | [Release Notes - v2.3.3](./docs/release-notes-v2.3.3.md) |
 | Review the local upstream benchmark | [Upstream Benchmark - May 2026](./docs/upstream-benchmark-2026-05.md) |
 | Debug setup, extraction, output, provider, Tauri, or agent loading issues | [Troubleshooting](./docs/troubleshooting.md) |
 | Release, Pages, Homebrew, signing, privacy, and maintenance | [Release and Maintenance](./docs/release-maintenance.md) |
 
-## v2.3.0 Highlights
+## v2.3.3 Highlights
 
-- Added one-line update commands for local clones, Codex Skill installs, and generic Agent Skill installs.
-- Added an input-to-output README sample with source material, Agent prompt, screenshot, and generated Web Deck.
-- Unified Web Experience copy around Agent Connect Studio and the v2.3 value proposition.
-- Kept Bridge / handoff kit focused on local source staging, provider readiness, Agent commands, and quality checks.
+- Added a beginner glossary for Bridge, Agent, API key, and handoff so first-time users know what to do first.
+- Split the dense Web Experience into guided menu pages with page-level instructions.
+- Added one-click local setup checks and agent selection across Codex, Hermes, OpenClaw, and Claude Code.
+- Exposed content preset packs in the web UI with source requirements, template candidates, and quality checks.
+- Kept Bridge / handoff kit focused on local source staging, provider readiness, Agent commands, previews, and quality checks.
 - Kept the Skill as the high-quality production route for final PPTX / Web Deck generation, preview, and repair.
 
 See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for upstream baselines and adaptation policy.

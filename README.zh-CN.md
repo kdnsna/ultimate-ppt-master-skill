@@ -3,7 +3,7 @@
 > 把 PDF、Word、PPTX、Excel、URL 和零散笔记整理成 Agent 能直接接手的演示项目，再在本地生成可编辑 PowerPoint 或杂志风 Web Deck。
 
 <p align="center">
-  <strong>v2.3.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.3.3</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.3.0" src="https://img.shields.io/badge/Version-2.3.0-172033?style=for-the-badge">
+  <img alt="Version 2.3.3" src="https://img.shields.io/badge/Version-2.3.3-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -40,21 +40,21 @@ Ultimate PPT Master 是一个 **本地优先的 AI 演示生产中枢**。它不
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
 
-## v2.3 发布重点
+## v2.3.3 发布重点
 
-v2.3 的统一方向是：**输入看得懂，产出看得见，本地 Agent 接得住。**
+v2.3.3 继续守住产品承诺，同时把第一次使用变得更容易理解：**输入看得懂，产出看得见，本地 Agent 接得住。**
 
-这次不是继续堆安装入口，而是把产品从“能生成 prompt 的网页”打磨成更像正式产品的 Agent 交接台：
+这次重点不是堆更多安装入口，而是把 Web Experience 打磨成新手也能顺着走的本地交接台：
 
-- README 首屏后直接展示 `source.md`、Agent prompt 和生成后的 Web Deck；
-- 已安装用户有一键更新命令，适合跟上频繁迭代；
-- Web Experience 文案统一为 Agent Connect Studio，强调输入、产出、检查和本地交接；
-- Bridge / handoff kit 继续保留 `manifest`、`engine-plan`、`quality-checklist`，让 Agent 有明确验收标准；
-- 示例产物按公开科技主题打磨，作为用户理解“给什么、出什么”的样板。
+- 首页先用通俗话解释 Bridge、Agent、API key、handoff，再让用户配置；
+- Web Experience 拆成开始、资料与目标、配置检测、交付给 AI 助手、预览与文件等菜单页，不再把所有功能挤在一起；
+- 一键检测可以检查本机 Bridge、Codex / Hermes / OpenClaw / Claude Code 等 Agent，以及已配置模型 provider，且不泄露密钥；
+- 内容预设包已经在网页端露出，包含资料要求、模板候选和质量检查；
+- Bridge / handoff kit 继续保留 `manifest`、`engine-plan`、`quality-checklist`，让 Agent 有明确验收标准。
 
 ## 下一步方向
 
-下一次更新重点建议放在 **内容与模板预设**：为高频场景沉淀 `source.md` 骨架、叙事结构、推荐页型、模板 / 品牌 / 图表候选、质量检查和可见样板产物。
+v2.3.3 已经把第一批可用的 **内容与模板预设** 接入 Web Experience。下一步建议继续加深这些预设包：补更多可见样板、品牌 / 模板覆盖和场景化质量检查。
 
 路线文档：[下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md)。预设种子目录：[templates/presets](./templates/presets)。
 
@@ -332,17 +332,18 @@ npm run desktop
 | 本地配置 provider key | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | 理解它为什么不只是“多装一个 Skill” | [产品定位反思](./docs/zh-CN/product-positioning.md) |
 | 查看下一步内容 / 模板方向 | [下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md) |
-| 查看 v2.3.0 发布重点 | [发布说明 - v2.3.0](./docs/zh-CN/release-notes-v2.3.0.md) |
+| 查看 v2.3.3 发布重点 | [发布说明 - v2.3.3](./docs/zh-CN/release-notes-v2.3.3.md) |
 | 查看本机上游基准测试 | [上游基准测试 - 2026 年 5 月](./docs/zh-CN/upstream-benchmark-2026-05.md) |
 | 排查安装、解析、输出、provider、Tauri 或 Agent 加载问题 | [Troubleshooting](./docs/troubleshooting.md) |
 | 发布、Pages、Homebrew、签名、公证、隐私和维护 | [Release and Maintenance](./docs/release-maintenance.md) |
 
-## v2.3.0 重点变化
+## v2.3.3 重点变化
 
-- README 新增“一键更新”和“输入到产出示例”，降低已安装用户和新用户的理解成本。
-- Web Experience 统一为 Agent Connect Studio，首屏直接解释 v2.3 最大提升。
-- 公开样板加入真实截图、输入材料、Agent prompt 和生成 Web Deck 链接。
-- Bridge / handoff kit 继续负责本地资料打包、provider 状态、Agent 命令和质量检查。
+- 首页新增新手词汇解释，让 Bridge、Agent、API key、handoff 都先有通俗中文含义。
+- Web Experience 拆成分菜单工作流，并在每页加入配置和操作指引。
+- 配置页新增一键检测和一键选择可用 AI 助手，覆盖 Codex、Hermes、OpenClaw、Claude Code。
+- 内容预设包在网页端可选，能看到资料要求、模板候选和质量检查。
+- Bridge / handoff kit 继续负责本地资料打包、provider 状态、Agent 命令、预览文件和质量检查。
 - Skill 仍然是高质量生产路线，负责最终 PPTX / Web Deck 的深度生成、预览和修复。
 
 上游同步与本地适配策略见 [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md)。

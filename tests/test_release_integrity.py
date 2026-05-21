@@ -12,10 +12,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
         version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
         web_version = json.loads((ROOT / "apps/web/package.json").read_text(encoding="utf-8"))["version"]
 
-        self.assertEqual(version, "2.3.0")
+        self.assertEqual(version, "2.3.3")
         self.assertEqual(web_version, version)
         self.assertIn(f"v{version}", (ROOT / "README.md").read_text(encoding="utf-8"))
         self.assertIn(f"v{version}", (ROOT / "README.zh-CN.md").read_text(encoding="utf-8"))
+        self.assertIn(f'appVersion = "{version}"', (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8"))
+        self.assertTrue((ROOT / f"docs/release-notes-v{version}.md").is_file())
+        self.assertTrue((ROOT / f"docs/zh-CN/release-notes-v{version}.md").is_file())
 
     def test_core_entry_scripts_exist(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))

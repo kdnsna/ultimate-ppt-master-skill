@@ -1,6 +1,7 @@
 {
   "executive_business_review": {
-    "status": "seed",
+    "status": "pack",
+    "packPath": "templates/presets/executive_business_review",
     "summary": "Quarterly/monthly business review, executive update, growth diagnosis, and next-action planning.",
     "primaryOutput": "pptx",
     "secondaryOutput": "web_deck",
@@ -85,7 +86,8 @@
     ]
   },
   "product_pitch": {
-    "status": "seed",
+    "status": "pack",
+    "packPath": "templates/presets/product_pitch",
     "summary": "Product pitch, launch narrative, investor update, or demo-day story.",
     "primaryOutput": "web_deck",
     "secondaryOutput": "pptx",
