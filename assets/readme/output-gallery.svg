@@ -1,0 +1,53 @@
+<svg width="1200" height="610" viewBox="0 0 1200 610" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Output gallery</title>
+  <desc id="desc">A gallery of editable PPTX, magazine web deck, and skill workflow outputs.</desc>
+  <rect width="1200" height="610" rx="28" fill="#F4F7FB"/>
+  <rect x="48" y="48" width="1104" height="514" rx="24" fill="#FFFFFF" stroke="#DDE7F0"/>
+  <text x="82" y="108" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800">Choose the output route that matches the job</text>
+  <text x="82" y="140" fill="#5D6B82" font-family="Inter, Arial, sans-serif" font-size="16">Fast public demo, private local intake, or deep Skill production can share the same source brief.</text>
+
+  <g transform="translate(82 188)">
+    <rect width="318" height="302" rx="20" fill="#FFF7ED" stroke="#FDBA74"/>
+    <rect x="24" y="28" width="270" height="152" rx="14" fill="#FFFFFF" stroke="#FED7AA"/>
+    <rect x="44" y="52" width="92" height="12" rx="6" fill="#F97316"/>
+    <rect x="44" y="78" width="210" height="10" rx="5" fill="#CBD5E1"/>
+    <rect x="44" y="102" width="168" height="10" rx="5" fill="#CBD5E1"/>
+    <rect x="44" y="132" width="90" height="26" rx="13" fill="#FB923C"/>
+    <path d="M174 128L260 72V158H174V128Z" fill="#FFE8D2"/>
+    <text x="24" y="220" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="800">Editable PPTX</text>
+    <text x="24" y="248" fill="#7C4A1D" font-family="Inter, Arial, sans-serif" font-size="14">For board decks, reports,</text>
+    <text x="24" y="270" fill="#7C4A1D" font-family="Inter, Arial, sans-serif" font-size="14">consulting, training, and</text>
+    <text x="24" y="292" fill="#7C4A1D" font-family="Inter, Arial, sans-serif" font-size="14">anything people must edit.</text>
+  </g>
+
+  <g transform="translate(441 188)">
+    <rect width="318" height="302" rx="20" fill="#EEF2FF" stroke="#A5B4FC"/>
+    <rect x="24" y="28" width="270" height="152" rx="14" fill="#172033"/>
+    <rect x="44" y="50" width="90" height="12" rx="6" fill="#A5B4FC"/>
+    <text x="44" y="92" fill="#FFFFFF" font-family="Georgia, serif" font-size="28" font-weight="700">Magazine</text>
+    <text x="44" y="124" fill="#FFFFFF" font-family="Georgia, serif" font-size="28" font-weight="700">Web Deck</text>
+    <rect x="194" y="48" width="70" height="88" rx="10" fill="#F8FAFC"/>
+    <rect x="206" y="64" width="46" height="8" rx="4" fill="#6366F1"/>
+    <rect x="206" y="84" width="34" height="8" rx="4" fill="#CBD5E1"/>
+    <rect x="206" y="104" width="44" height="8" rx="4" fill="#CBD5E1"/>
+    <text x="24" y="220" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="800">Single-file Web Deck</text>
+    <text x="24" y="248" fill="#4C4A8A" font-family="Inter, Arial, sans-serif" font-size="14">For launches, demos,</text>
+    <text x="24" y="270" fill="#4C4A8A" font-family="Inter, Arial, sans-serif" font-size="14">visual stories, and public</text>
+    <text x="24" y="292" fill="#4C4A8A" font-family="Inter, Arial, sans-serif" font-size="14">sharing without PowerPoint.</text>
+  </g>
+
+  <g transform="translate(800 188)">
+    <rect width="318" height="302" rx="20" fill="#ECFDF5" stroke="#86EFAC"/>
+    <rect x="24" y="28" width="270" height="152" rx="14" fill="#FFFFFF" stroke="#BBF7D0"/>
+    <rect x="44" y="54" width="58" height="58" rx="16" fill="#10B981"/>
+    <text x="73" y="91" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800">S</text>
+    <rect x="120" y="54" width="132" height="12" rx="6" fill="#10B981"/>
+    <rect x="120" y="82" width="98" height="10" rx="5" fill="#CBD5E1"/>
+    <rect x="120" y="106" width="118" height="10" rx="5" fill="#CBD5E1"/>
+    <rect x="44" y="136" width="208" height="18" rx="9" fill="#DCFCE7"/>
+    <text x="24" y="220" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="800">Agent Skill Workflow</text>
+    <text x="24" y="248" fill="#23684E" font-family="Inter, Arial, sans-serif" font-size="14">For deep production:</text>
+    <text x="24" y="270" fill="#23684E" font-family="Inter, Arial, sans-serif" font-size="14">read files, run scripts,</text>
+    <text x="24" y="292" fill="#23684E" font-family="Inter, Arial, sans-serif" font-size="14">preview, fix, and export.</text>
+  </g>
+</svg>

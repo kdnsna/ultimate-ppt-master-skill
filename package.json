@@ -2,7 +2,7 @@
   "name": "ultimate-ppt-master",
   "private": true,
   "version": "2.2.0",
-  "description": "Local-first AI PPT desktop app and agent workflow for editable PowerPoint and Web Decks.",
+  "description": "Local-first AI presentation hub for Web Experience, Agent Bridge, editable PowerPoint, and Web Deck workflows.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
     "desktop": "bash scripts/run-desktop.sh",

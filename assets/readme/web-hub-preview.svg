@@ -1,0 +1,81 @@
+<svg width="1200" height="640" viewBox="0 0 1200 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Agent Connect Hub interface preview</title>
+  <desc id="desc">A browser-style preview of the three-column web experience: source intake, agent connect, and API/model status.</desc>
+  <rect width="1200" height="640" rx="28" fill="#F4F7FB"/>
+  <rect x="44" y="44" width="1112" height="552" rx="24" fill="#FFFFFF" stroke="#D9E3EE"/>
+  <rect x="44" y="44" width="1112" height="62" rx="24" fill="#172033"/>
+  <circle cx="78" cy="75" r="8" fill="#FF6B6B"/>
+  <circle cx="104" cy="75" r="8" fill="#FFD166"/>
+  <circle cx="130" cy="75" r="8" fill="#06D6A0"/>
+  <rect x="178" y="60" width="444" height="30" rx="15" fill="#27344A"/>
+  <text x="198" y="80" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="14">ultimate-ppt-master / agent-connect-hub</text>
+  <text x="72" y="152" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="800">Agent Connect Hub</text>
+  <text x="72" y="184" fill="#5D6B82" font-family="Inter, Arial, sans-serif" font-size="16">A friendly web front door that prepares a serious local Agent handoff.</text>
+
+  <g transform="translate(72 220)">
+    <rect width="326" height="300" rx="18" fill="#F8FAFC" stroke="#DDE7F0"/>
+    <text x="24" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">Source Intake</text>
+    <text x="24" y="68" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">Drag files, paste text, or add URLs</text>
+    <rect x="24" y="92" width="278" height="76" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-dasharray="8 8"/>
+    <text x="163" y="127" text-anchor="middle" fill="#2563EB" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="800">Drop PDF / DOCX / PPTX / XLSX</text>
+    <text x="163" y="151" text-anchor="middle" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">or keep source.md as the clean fallback</text>
+    <rect x="24" y="190" width="86" height="30" rx="15" fill="#EFF6FF"/>
+    <text x="67" y="210" text-anchor="middle" fill="#2563EB" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">parsed</text>
+    <rect x="122" y="190" width="92" height="30" rx="15" fill="#FEF3C7"/>
+    <text x="168" y="210" text-anchor="middle" fill="#92400E" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">needs bridge</text>
+    <rect x="226" y="190" width="76" height="30" rx="15" fill="#FEE2E2"/>
+    <text x="264" y="210" text-anchor="middle" fill="#991B1B" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">kept</text>
+    <rect x="24" y="244" width="278" height="32" rx="10" fill="#172033"/>
+    <text x="163" y="265" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Build structured deck brief</text>
+  </g>
+
+  <g transform="translate(437 220)">
+    <rect width="326" height="300" rx="18" fill="#F8FAFC" stroke="#DDE7F0"/>
+    <text x="24" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">Agent Connect</text>
+    <text x="24" y="68" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">Bridge, workspace, and launch policy</text>
+    <rect x="24" y="92" width="278" height="58" rx="14" fill="#ECFDF5" stroke="#86EFAC"/>
+    <circle cx="50" cy="121" r="9" fill="#10B981"/>
+    <text x="70" y="118" fill="#14532D" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800">Bridge online</text>
+    <text x="70" y="138" fill="#23684E" font-family="Inter, Arial, sans-serif" font-size="12">127.0.0.1:43188</text>
+    <rect x="24" y="170" width="278" height="74" rx="14" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="44" y="198" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800">Target Agent</text>
+    <rect x="44" y="214" width="66" height="22" rx="11" fill="#DBEAFE"/>
+    <text x="77" y="229" text-anchor="middle" fill="#1D4ED8" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="800">Codex</text>
+    <rect x="118" y="214" width="94" height="22" rx="11" fill="#F1F5F9"/>
+    <text x="165" y="229" text-anchor="middle" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="800">Claude Code</text>
+    <rect x="220" y="214" width="62" height="22" rx="11" fill="#F1F5F9"/>
+    <text x="251" y="229" text-anchor="middle" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="800">Skill</text>
+    <rect x="24" y="264" width="132" height="32" rx="10" fill="#2563EB"/>
+    <text x="90" y="285" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Send to Bridge</text>
+    <rect x="170" y="264" width="132" height="32" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="236" y="285" text-anchor="middle" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Copy command</text>
+  </g>
+
+  <g transform="translate(802 220)">
+    <rect width="326" height="300" rx="18" fill="#F8FAFC" stroke="#DDE7F0"/>
+    <text x="24" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">API / Model Status</text>
+    <text x="24" y="68" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">Key presence only. Never key values.</text>
+    <g transform="translate(24 94)">
+      <rect width="278" height="38" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <circle cx="21" cy="19" r="7" fill="#10B981"/>
+      <text x="40" y="24" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">OpenAI compatible</text>
+      <text x="220" y="24" fill="#10B981" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">ready</text>
+    </g>
+    <g transform="translate(24 144)">
+      <rect width="278" height="38" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <circle cx="21" cy="19" r="7" fill="#F59E0B"/>
+      <text x="40" y="24" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Anthropic</text>
+      <text x="205" y="24" fill="#B45309" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">missing key</text>
+    </g>
+    <g transform="translate(24 194)">
+      <rect width="278" height="38" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <circle cx="21" cy="19" r="7" fill="#64748B"/>
+      <text x="40" y="24" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Local model</text>
+      <text x="205" y="24" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">optional</text>
+    </g>
+    <rect x="24" y="264" width="278" height="32" rx="10" fill="#0F766E"/>
+    <text x="163" y="285" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Test providers locally</text>
+  </g>
+
+  <text x="72" y="566" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">The static GitHub Pages app can work alone, then becomes a local production console when the Bridge is running.</text>
+</svg>

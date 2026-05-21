@@ -1,0 +1,68 @@
+<svg width="1200" height="560" viewBox="0 0 1200 560" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Handoff kit contents</title>
+  <desc id="desc">A visual explanation of the local handoff kit generated for AI agents.</desc>
+  <rect width="1200" height="560" rx="28" fill="#F7FAFC"/>
+  <rect x="48" y="48" width="1104" height="464" rx="24" fill="#FFFFFF" stroke="#DDE7F0"/>
+  <text x="82" y="104" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800">One handoff kit, enough context for a serious Agent run</text>
+  <text x="82" y="136" fill="#5D6B82" font-family="Inter, Arial, sans-serif" font-size="16">The web page does the friendly intake. The kit gives Codex or another local agent the working folder it needs.</text>
+
+  <g transform="translate(82 184)">
+    <rect width="278" height="260" rx="20" fill="#FFF7ED" stroke="#FDBA74"/>
+    <text x="24" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="21" font-weight="800">Raw inputs</text>
+    <text x="24" y="70" fill="#7C4A1D" font-family="Inter, Arial, sans-serif" font-size="14">Original material stays available</text>
+    <g transform="translate(24 102)">
+      <rect width="230" height="30" rx="8" fill="#FFFFFF"/>
+      <text x="14" y="20" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">quarterly-report.pdf</text>
+    </g>
+    <g transform="translate(24 142)">
+      <rect width="230" height="30" rx="8" fill="#FFFFFF"/>
+      <text x="14" y="20" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">product-notes.docx</text>
+    </g>
+    <g transform="translate(24 182)">
+      <rect width="230" height="30" rx="8" fill="#FFFFFF"/>
+      <text x="14" y="20" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700">market-data.xlsx</text>
+    </g>
+  </g>
+
+  <path d="M386 314H456" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round"/>
+  <path d="M444 300L460 314L444 328" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g transform="translate(484 158)">
+    <path d="M36 50C36 38.9543 44.9543 30 56 30H176L206 62H356C367.046 62 376 70.9543 376 82V326C376 337.046 367.046 346 356 346H56C44.9543 346 36 337.046 36 326V50Z" fill="#EFF6FF" stroke="#93C5FD" stroke-width="2"/>
+    <text x="66" y="94" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800">handoff-kit</text>
+    <g transform="translate(66 122)">
+      <rect width="280" height="30" rx="8" fill="#FFFFFF"/>
+      <text x="14" y="20" fill="#1D4ED8" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">source.md</text>
+    </g>
+    <g transform="translate(66 162)">
+      <rect width="280" height="30" rx="8" fill="#FFFFFF"/>
+      <text x="14" y="20" fill="#1D4ED8" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">extracted-source.md</text>
+    </g>
+    <g transform="translate(66 202)">
+      <rect width="280" height="30" rx="8" fill="#FFFFFF"/>
+      <text x="14" y="20" fill="#1D4ED8" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">manifest.json</text>
+    </g>
+    <g transform="translate(66 242)">
+      <rect width="280" height="30" rx="8" fill="#FFFFFF"/>
+      <text x="14" y="20" fill="#1D4ED8" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">agent-prompt.md</text>
+    </g>
+    <g transform="translate(66 282)">
+      <rect width="280" height="30" rx="8" fill="#FFFFFF"/>
+      <text x="14" y="20" fill="#1D4ED8" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">quality-checklist.md</text>
+    </g>
+  </g>
+
+  <path d="M886 314H956" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round"/>
+  <path d="M944 300L960 314L944 328" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g transform="translate(982 184)">
+    <rect width="138" height="260" rx="20" fill="#ECFDF5" stroke="#86EFAC"/>
+    <text x="69" y="44" text-anchor="middle" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">Outputs</text>
+    <rect x="24" y="78" width="90" height="46" rx="12" fill="#FFFFFF"/>
+    <text x="69" y="106" text-anchor="middle" fill="#0F766E" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">PPTX</text>
+    <rect x="24" y="142" width="90" height="46" rx="12" fill="#FFFFFF"/>
+    <text x="69" y="170" text-anchor="middle" fill="#0F766E" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Web Deck</text>
+    <rect x="24" y="206" width="90" height="30" rx="15" fill="#10B981"/>
+    <text x="69" y="226" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">QA ready</text>
+  </g>
+</svg>
