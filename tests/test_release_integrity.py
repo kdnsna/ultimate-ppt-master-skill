@@ -40,6 +40,19 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertTrue((ROOT / "docs/agent-connect-bridge.md").is_file())
         self.assertTrue((ROOT / "docs/zh-CN/agent-connect-bridge.md").is_file())
 
+    def test_readme_images_match_current_product_positioning(self):
+        hero = (ROOT / "assets/readme/hero.svg").read_text(encoding="utf-8")
+        web_preview = (ROOT / "assets/readme/web-hub-preview.svg").read_text(encoding="utf-8")
+        flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
+        combined = "\n".join([hero, web_preview, flow])
+
+        self.assertIn("v2.3.3", hero)
+        self.assertIn("Local connector", hero)
+        self.assertIn("Plain-language glossary", web_preview)
+        self.assertIn("Write handoff", flow)
+        self.assertNotIn("v2.3.0", combined)
+        self.assertNotIn("STATIC MVP", combined)
+
     def test_bridge_source_does_not_embed_secret_values(self):
         bridge = (ROOT / "apps/bridge/server.mjs").read_text(encoding="utf-8")
 

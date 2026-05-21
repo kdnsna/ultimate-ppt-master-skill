@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Open Web Experience</strong></a>
   ·
-  <a href="#connect-local-agent"><strong>Connect Local Agent</strong></a>
+  <a href="#use-it-in-three-moves"><strong>3-Step Quickstart</strong></a>
   ·
   <a href="#use-as-agent-skill"><strong>Use as Agent Skill</strong></a>
   ·
@@ -26,6 +26,23 @@
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
 </p>
+
+## Use It In Three Moves
+
+| Step | What you do | What you get |
+|---|---|---|
+| **1. Open the Web Experience** | Visit [the static web page](https://kdnsna.github.io/ultimate-ppt-master-skill/), pick a preset, and write or paste the deck goal. | A readable brief, preview, source template, and plain-language setup guide. |
+| **2. Connect this computer** | Run `npm run bridge` from a local clone when you want real file parsing and local project output. | The local connector (Bridge) detects Codex / Hermes / OpenClaw / Claude Code and keeps files on `127.0.0.1`. |
+| **3. Send it to an AI helper** | Click **Send to local connector**, then copy or launch the generated command. | A local project folder with source files, manifest, agent prompt, preview, and quality checklist. |
+
+```bash
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
+cd ultimate-ppt-master-skill
+npm run setup
+npm run bridge
+```
+
+Then open the web page and click **Send to local connector**.
 
 ## What It Is
 
@@ -73,23 +90,6 @@ The product adds value by:
 - preserving the original upstream quality routes instead of replacing them with a weaker web-only generator.
 
 Read the deeper positioning note: [Product Positioning](./docs/product-positioning.md).
-
-## Use It In Three Moves
-
-| Step | What you do | What you get |
-|---|---|---|
-| **1. Open the Web Experience** | Visit [the static web page](https://kdnsna.github.io/ultimate-ppt-master-skill/), choose source type, audience, style, language, output, and model preference. | A readable deck brief, prompt, source template, and browser-side preview. |
-| **2. Connect the local Bridge** | Run `npm run bridge` from a local clone when you want real file parsing. | PDF/Word/PPTX/Excel/URL sources are parsed locally on `127.0.0.1`. |
-| **3. Hand it to an Agent** | Send the generated folder to Codex or use this repository as an Agent Skill. | Editable PPTX, single-file Web Deck, quality checklist, and production logs. |
-
-```bash
-git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
-cd ultimate-ppt-master-skill
-npm run setup
-npm run bridge
-```
-
-Then open the web page and click **Send to local Bridge**.
 
 ## One-Line Updates
 
@@ -156,7 +156,7 @@ Open the full sample:
 
 ## Web Experience
 
-![Agent Connect Studio preview](assets/readme/web-hub-preview.svg)
+![Web Experience guided workspace](assets/readme/web-hub-preview.svg)
 
 The Web Experience is the public front door. It can run from GitHub Pages without a backend, account, model host, or API key storage.
 

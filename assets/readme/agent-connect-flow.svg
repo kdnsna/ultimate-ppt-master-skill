@@ -1,75 +1,76 @@
 <svg width="1200" height="520" viewBox="0 0 1200 520" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master agent connect flow</title>
-  <desc id="desc">A four step flow from source files to the web hub, local bridge, agent skill, and final decks.</desc>
+  <title id="title">Ultimate PPT Master local handoff flow</title>
+  <desc id="desc">A four step flow from web preparation to local Bridge, local handoff project, AI helper, and final deck outputs.</desc>
   <rect width="1200" height="520" rx="28" fill="#F7FAFC"/>
   <rect x="36" y="36" width="1128" height="448" rx="24" fill="#FFFFFF" stroke="#DDE7F0"/>
-  <text x="72" y="90" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="800">From messy source material to production-ready decks</text>
-  <text x="72" y="124" fill="#5D6B82" font-family="Inter, Arial, sans-serif" font-size="17">Web-first, local-first, Agent-ready. No hosted backend required.</text>
+  <text x="72" y="90" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="850">From first click to an AI-ready local project</text>
+  <text x="72" y="124" fill="#5D6B82" font-family="Inter, Arial, sans-serif" font-size="17">Web-first, local-first, honest about where production quality happens.</text>
 
-  <g transform="translate(72 176)">
-    <rect width="210" height="220" rx="18" fill="#FFF7ED" stroke="#FDBA74"/>
-    <circle cx="42" cy="44" r="20" fill="#FB923C"/>
-    <text x="42" y="51" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">1</text>
-    <text x="26" y="88" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800">Import</text>
-    <text x="26" y="120" fill="#6B4B28" font-family="Inter, Arial, sans-serif" font-size="15">PDF, Word, PPTX</text>
-    <text x="26" y="145" fill="#6B4B28" font-family="Inter, Arial, sans-serif" font-size="15">Excel, Markdown</text>
-    <text x="26" y="170" fill="#6B4B28" font-family="Inter, Arial, sans-serif" font-size="15">URLs and rough notes</text>
-    <rect x="26" y="192" width="118" height="8" rx="4" fill="#FDBA74"/>
-  </g>
-
-  <path d="M304 286H374" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round"/>
-  <path d="M362 272L378 286L362 300" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-
-  <g transform="translate(398 176)">
-    <rect width="210" height="220" rx="18" fill="#EFF6FF" stroke="#93C5FD"/>
+  <g transform="translate(72 172)" font-family="Inter, Arial, sans-serif">
+    <rect width="214" height="226" rx="18" fill="#EFF6FF" stroke="#93C5FD"/>
     <circle cx="42" cy="44" r="20" fill="#2563EB"/>
-    <text x="42" y="51" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">2</text>
-    <text x="26" y="88" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800">Shape brief</text>
-    <text x="26" y="120" fill="#335C91" font-family="Inter, Arial, sans-serif" font-size="15">Scenario, audience</text>
-    <text x="26" y="145" fill="#335C91" font-family="Inter, Arial, sans-serif" font-size="15">style, language</text>
-    <text x="26" y="170" fill="#335C91" font-family="Inter, Arial, sans-serif" font-size="15">model preference</text>
-    <rect x="26" y="192" width="144" height="8" rx="4" fill="#60A5FA"/>
+    <text x="42" y="51" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="850">1</text>
+    <text x="26" y="88" fill="#172033" font-size="22" font-weight="850">Open web</text>
+    <text x="26" y="120" fill="#335C91" font-size="15">Pick preset</text>
+    <text x="26" y="145" fill="#335C91" font-size="15">Add files or notes</text>
+    <text x="26" y="170" fill="#335C91" font-size="15">Read plain setup tips</text>
+    <rect x="26" y="194" width="146" height="8" rx="4" fill="#60A5FA"/>
   </g>
 
-  <path d="M630 286H700" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round"/>
-  <path d="M688 272L704 286L688 300" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M306 286H370" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round"/>
+  <path d="M358 272L374 286L358 300" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <g transform="translate(724 176)">
-    <rect width="210" height="220" rx="18" fill="#ECFDF5" stroke="#86EFAC"/>
+  <g transform="translate(394 172)" font-family="Inter, Arial, sans-serif">
+    <rect width="214" height="226" rx="18" fill="#ECFDF5" stroke="#86EFAC"/>
     <circle cx="42" cy="44" r="20" fill="#10B981"/>
-    <text x="42" y="51" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">3</text>
-    <text x="26" y="88" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="800">Bridge</text>
-    <text x="26" y="120" fill="#23684E" font-family="Inter, Arial, sans-serif" font-size="15">Parse locally on</text>
-    <text x="26" y="145" fill="#23684E" font-family="Inter, Arial, sans-serif" font-size="15">127.0.0.1</text>
-    <text x="26" y="170" fill="#23684E" font-family="Inter, Arial, sans-serif" font-size="15">write handoff kit</text>
-    <rect x="26" y="192" width="156" height="8" rx="4" fill="#34D399"/>
+    <text x="42" y="51" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="850">2</text>
+    <text x="26" y="88" fill="#172033" font-size="22" font-weight="850">Connect local</text>
+    <text x="26" y="120" fill="#23684E" font-size="15">Bridge on 127.0.0.1</text>
+    <text x="26" y="145" fill="#23684E" font-size="15">Parse sources locally</text>
+    <text x="26" y="170" fill="#23684E" font-size="15">Check agents and keys</text>
+    <rect x="26" y="194" width="156" height="8" rx="4" fill="#34D399"/>
   </g>
 
-  <path d="M956 286H1026" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round"/>
-  <path d="M1014 272L1030 286L1014 300" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M628 286H692" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round"/>
+  <path d="M680 272L696 286L680 300" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <g transform="translate(1050 176)">
-    <rect width="78" height="220" rx="18" fill="#172033"/>
-    <text x="39" y="57" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">4</text>
-    <text x="39" y="100" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800">Agent</text>
-    <text x="39" y="126" text-anchor="middle" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="13">Codex</text>
-    <text x="39" y="150" text-anchor="middle" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="13">Claude</text>
-    <text x="39" y="174" text-anchor="middle" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="13">Skill</text>
+  <g transform="translate(716 172)" font-family="Inter, Arial, sans-serif">
+    <rect width="214" height="226" rx="18" fill="#FFF7ED" stroke="#FDBA74"/>
+    <circle cx="42" cy="44" r="20" fill="#F97316"/>
+    <text x="42" y="51" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="850">3</text>
+    <text x="26" y="88" fill="#172033" font-size="22" font-weight="850">Write handoff</text>
+    <text x="26" y="120" fill="#8A4B17" font-size="15">source.md</text>
+    <text x="26" y="145" fill="#8A4B17" font-size="15">manifest + prompt</text>
+    <text x="26" y="170" fill="#8A4B17" font-size="15">preview + checklist</text>
+    <rect x="26" y="194" width="166" height="8" rx="4" fill="#FB923C"/>
   </g>
 
-  <g transform="translate(72 424)">
-    <rect width="316" height="32" rx="16" fill="#EFF6FF"/>
+  <path d="M950 286H1014" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round"/>
+  <path d="M1002 272L1018 286L1002 300" stroke="#9AA8BA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g transform="translate(1038 172)" font-family="Inter, Arial, sans-serif">
+    <rect width="90" height="226" rx="18" fill="#172033"/>
+    <text x="45" y="58" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="850">4</text>
+    <text x="45" y="101" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="850">AI</text>
+    <text x="45" y="123" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="850">helper</text>
+    <text x="45" y="154" text-anchor="middle" fill="#B9C6D6" font-size="12">Codex</text>
+    <text x="45" y="177" text-anchor="middle" fill="#B9C6D6" font-size="12">Hermes</text>
+    <text x="45" y="200" text-anchor="middle" fill="#B9C6D6" font-size="12">OpenClaw</text>
+  </g>
+
+  <g transform="translate(72 424)" font-family="Inter, Arial, sans-serif">
+    <rect width="296" height="32" rx="16" fill="#EFF6FF"/>
     <circle cx="20" cy="16" r="5" fill="#2563EB"/>
-    <text x="34" y="21" fill="#24476F" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700">Public web page for onboarding</text>
+    <text x="34" y="21" fill="#24476F" font-size="14" font-weight="750">New users know the first action</text>
   </g>
-  <g transform="translate(416 424)">
-    <rect width="326" height="32" rx="16" fill="#ECFDF5"/>
+  <g transform="translate(394 424)" font-family="Inter, Arial, sans-serif">
+    <rect width="334" height="32" rx="16" fill="#ECFDF5"/>
     <circle cx="20" cy="16" r="5" fill="#10B981"/>
-    <text x="34" y="21" fill="#23684E" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700">Local files stay on the user's machine</text>
+    <text x="34" y="21" fill="#23684E" font-size="14" font-weight="750">Private material stays on the machine</text>
   </g>
-  <g transform="translate(770 424)">
-    <rect width="292" height="32" rx="16" fill="#FEF2F2"/>
-    <circle cx="20" cy="16" r="5" fill="#EF4444"/>
-    <text x="34" y="21" fill="#7F2A2A" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700">Editable PPTX and Web Deck output</text>
+  <g transform="translate(754 424)" font-family="Inter, Arial, sans-serif">
+    <rect width="342" height="32" rx="16" fill="#FFF7ED"/>
+    <circle cx="20" cy="16" r="5" fill="#F97316"/>
+    <text x="34" y="21" fill="#8A4B17" font-size="14" font-weight="750">Final quality belongs to the Skill route</text>
   </g>
 </svg>

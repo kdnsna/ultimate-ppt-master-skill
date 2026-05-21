@@ -1,81 +1,91 @@
 <svg width="1200" height="640" viewBox="0 0 1200 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Agent Connect Studio interface preview</title>
-  <desc id="desc">A browser-style preview of the three-column web experience: source intake, agent connect, and API/model status.</desc>
+  <title id="title">Ultimate PPT Master Web Experience v2.3.3 preview</title>
+  <desc id="desc">A preview of the beginner-friendly Web Experience with menu pages, glossary cards, one-click checks, and local project handoff.</desc>
   <rect width="1200" height="640" rx="28" fill="#F4F7FB"/>
-  <rect x="44" y="44" width="1112" height="552" rx="24" fill="#FFFFFF" stroke="#D9E3EE"/>
-  <rect x="44" y="44" width="1112" height="62" rx="24" fill="#172033"/>
-  <circle cx="78" cy="75" r="8" fill="#FF6B6B"/>
-  <circle cx="104" cy="75" r="8" fill="#FFD166"/>
-  <circle cx="130" cy="75" r="8" fill="#06D6A0"/>
-  <rect x="178" y="60" width="444" height="30" rx="15" fill="#27344A"/>
-  <text x="198" y="80" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="14">ultimate-ppt-master / agent-connect-studio</text>
-  <text x="72" y="152" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="800">Agent Connect Studio</text>
-  <text x="72" y="184" fill="#5D6B82" font-family="Inter, Arial, sans-serif" font-size="16">A friendly web front door that prepares a serious local Agent handoff.</text>
+  <rect x="42" y="42" width="1116" height="556" rx="24" fill="#FFFFFF" stroke="#D9E3EE"/>
+  <rect x="42" y="42" width="1116" height="62" rx="24" fill="#172033"/>
+  <circle cx="78" cy="73" r="8" fill="#FF6B6B"/>
+  <circle cx="104" cy="73" r="8" fill="#FFD166"/>
+  <circle cx="130" cy="73" r="8" fill="#06D6A0"/>
+  <rect x="178" y="58" width="468" height="30" rx="15" fill="#27344A"/>
+  <text x="198" y="78" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="14">ultimate-ppt-master / v2.3.3 guided workspace</text>
 
-  <g transform="translate(72 220)">
-    <rect width="326" height="300" rx="18" fill="#F8FAFC" stroke="#DDE7F0"/>
-    <text x="24" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">Source Intake</text>
-    <text x="24" y="68" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">Drag files, paste text, or add URLs</text>
-    <rect x="24" y="92" width="278" height="76" rx="14" fill="#FFFFFF" stroke="#CBD5E1" stroke-dasharray="8 8"/>
-    <text x="163" y="127" text-anchor="middle" fill="#2563EB" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="800">Drop PDF / DOCX / PPTX / XLSX</text>
-    <text x="163" y="151" text-anchor="middle" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">or keep source.md as the clean fallback</text>
-    <rect x="24" y="190" width="86" height="30" rx="15" fill="#EFF6FF"/>
-    <text x="67" y="210" text-anchor="middle" fill="#2563EB" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">parsed</text>
-    <rect x="122" y="190" width="92" height="30" rx="15" fill="#FEF3C7"/>
-    <text x="168" y="210" text-anchor="middle" fill="#92400E" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">needs bridge</text>
-    <rect x="226" y="190" width="76" height="30" rx="15" fill="#FEE2E2"/>
-    <text x="264" y="210" text-anchor="middle" fill="#991B1B" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">kept</text>
-    <rect x="24" y="244" width="278" height="32" rx="10" fill="#172033"/>
-    <text x="163" y="265" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Build structured deck brief</text>
+  <text x="72" y="148" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="850">PPT Project Prep Studio</text>
+  <text x="72" y="180" fill="#5D6B82" font-family="Inter, Arial, sans-serif" font-size="16">Start with plain language, then send a real local project to an AI helper.</text>
+
+  <g transform="translate(72 208)" font-family="Inter, Arial, sans-serif">
+    <rect width="1056" height="58" rx="16" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <g transform="translate(18 12)">
+      <rect width="152" height="34" rx="10" fill="#EFF6FF" stroke="#93C5FD"/>
+      <text x="76" y="23" text-anchor="middle" fill="#1D4ED8" font-size="13" font-weight="850">Start</text>
+    </g>
+    <g transform="translate(184 12)">
+      <rect width="152" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <text x="76" y="23" text-anchor="middle" fill="#475569" font-size="13" font-weight="850">Sources</text>
+    </g>
+    <g transform="translate(350 12)">
+      <rect width="152" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <text x="76" y="23" text-anchor="middle" fill="#475569" font-size="13" font-weight="850">Configuration</text>
+    </g>
+    <g transform="translate(516 12)">
+      <rect width="152" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <text x="76" y="23" text-anchor="middle" fill="#475569" font-size="13" font-weight="850">AI helper</text>
+    </g>
+    <g transform="translate(682 12)">
+      <rect width="152" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <text x="76" y="23" text-anchor="middle" fill="#475569" font-size="13" font-weight="850">Preview</text>
+    </g>
+    <rect x="872" y="12" width="154" height="34" rx="10" fill="#ECFDF5" stroke="#86EFAC"/>
+    <text x="949" y="23" text-anchor="middle" fill="#047857" font-size="12" font-weight="850">Bridge connected</text>
   </g>
 
-  <g transform="translate(437 220)">
-    <rect width="326" height="300" rx="18" fill="#F8FAFC" stroke="#DDE7F0"/>
-    <text x="24" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">Agent Connect</text>
-    <text x="24" y="68" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">Bridge, workspace, and launch policy</text>
-    <rect x="24" y="92" width="278" height="58" rx="14" fill="#ECFDF5" stroke="#86EFAC"/>
-    <circle cx="50" cy="121" r="9" fill="#10B981"/>
-    <text x="70" y="118" fill="#14532D" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800">Bridge online</text>
-    <text x="70" y="138" fill="#23684E" font-family="Inter, Arial, sans-serif" font-size="12">127.0.0.1:43188</text>
-    <rect x="24" y="170" width="278" height="74" rx="14" fill="#FFFFFF" stroke="#CBD5E1"/>
-    <text x="44" y="198" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800">Target Agent</text>
-    <rect x="44" y="214" width="66" height="22" rx="11" fill="#DBEAFE"/>
-    <text x="77" y="229" text-anchor="middle" fill="#1D4ED8" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="800">Codex</text>
-    <rect x="118" y="214" width="94" height="22" rx="11" fill="#F1F5F9"/>
-    <text x="165" y="229" text-anchor="middle" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="800">Claude Code</text>
-    <rect x="220" y="214" width="62" height="22" rx="11" fill="#F1F5F9"/>
-    <text x="251" y="229" text-anchor="middle" fill="#475569" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="800">Skill</text>
-    <rect x="24" y="264" width="132" height="32" rx="10" fill="#2563EB"/>
-    <text x="90" y="285" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Send to Bridge</text>
-    <rect x="170" y="264" width="132" height="32" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
-    <text x="236" y="285" text-anchor="middle" fill="#334155" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Copy command</text>
+  <g transform="translate(72 294)" font-family="Inter, Arial, sans-serif">
+    <rect width="286" height="246" rx="18" fill="#F8FAFC" stroke="#DDE7F0"/>
+    <text x="22" y="38" fill="#172033" font-size="20" font-weight="850">First step guide</text>
+    <text x="22" y="66" fill="#64748B" font-size="13">No need to understand every panel first.</text>
+    <rect x="22" y="92" width="242" height="36" rx="10" fill="#172033"/>
+    <text x="143" y="116" text-anchor="middle" fill="#FFFFFF" font-size="13" font-weight="850">Send to local connector</text>
+    <rect x="22" y="146" width="242" height="70" rx="12" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <text x="42" y="174" fill="#14532D" font-size="13" font-weight="850">Detected AI helpers</text>
+    <text x="42" y="199" fill="#23684E" font-size="12">Codex · Hermes · OpenClaw</text>
   </g>
 
-  <g transform="translate(802 220)">
-    <rect width="326" height="300" rx="18" fill="#F8FAFC" stroke="#DDE7F0"/>
-    <text x="24" y="42" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">API / Model Status</text>
-    <text x="24" y="68" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">Key presence only. Never key values.</text>
-    <g transform="translate(24 94)">
-      <rect width="278" height="38" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
-      <circle cx="21" cy="19" r="7" fill="#10B981"/>
-      <text x="40" y="24" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">OpenAI compatible</text>
-      <text x="220" y="24" fill="#10B981" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">ready</text>
+  <g transform="translate(386 294)" font-family="Inter, Arial, sans-serif">
+    <rect width="362" height="246" rx="18" fill="#F8FAFC" stroke="#DDE7F0"/>
+    <text x="22" y="38" fill="#172033" font-size="20" font-weight="850">Plain-language glossary</text>
+    <text x="22" y="66" fill="#64748B" font-size="13">The technical word stays in parentheses.</text>
+    <g transform="translate(22 92)">
+      <rect width="150" height="54" rx="12" fill="#EFF6FF"/>
+      <text x="14" y="24" fill="#1D4ED8" font-size="12" font-weight="900">Local connector</text>
+      <text x="14" y="42" fill="#335C91" font-size="11">Bridge</text>
+      <rect x="172" width="150" height="54" rx="12" fill="#ECFDF5"/>
+      <text x="186" y="24" fill="#047857" font-size="12" font-weight="900">AI helper</text>
+      <text x="186" y="42" fill="#23684E" font-size="11">Agent</text>
+      <rect y="72" width="150" height="54" rx="12" fill="#FFF7ED"/>
+      <text x="14" y="96" fill="#C2410C" font-size="12" font-weight="900">Model account</text>
+      <text x="14" y="114" fill="#8A4B17" font-size="11">API key</text>
+      <rect x="172" y="72" width="150" height="54" rx="12" fill="#F8FAFC" stroke="#CBD5E1"/>
+      <text x="186" y="96" fill="#172033" font-size="12" font-weight="900">Local project</text>
+      <text x="186" y="114" fill="#64748B" font-size="11">handoff</text>
     </g>
-    <g transform="translate(24 144)">
-      <rect width="278" height="38" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
-      <circle cx="21" cy="19" r="7" fill="#F59E0B"/>
-      <text x="40" y="24" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Anthropic</text>
-      <text x="205" y="24" fill="#B45309" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">missing key</text>
-    </g>
-    <g transform="translate(24 194)">
-      <rect width="278" height="38" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
-      <circle cx="21" cy="19" r="7" fill="#64748B"/>
-      <text x="40" y="24" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Local model</text>
-      <text x="205" y="24" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800">optional</text>
-    </g>
-    <rect x="24" y="264" width="278" height="32" rx="10" fill="#0F766E"/>
-    <text x="163" y="285" text-anchor="middle" fill="#FFFFFF" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800">Test providers locally</text>
   </g>
 
-  <text x="72" y="566" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">The static GitHub Pages app can work alone, then becomes a local production console when the Bridge is running.</text>
+  <g transform="translate(776 294)" font-family="Inter, Arial, sans-serif">
+    <rect width="352" height="246" rx="18" fill="#F8FAFC" stroke="#DDE7F0"/>
+    <text x="22" y="38" fill="#172033" font-size="20" font-weight="850">One-click checks</text>
+    <text x="22" y="66" fill="#64748B" font-size="13">Detect local tools without exposing secrets.</text>
+    <g transform="translate(22 92)">
+      <rect width="308" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <circle cx="18" cy="17" r="7" fill="#10B981"/>
+      <text x="36" y="22" fill="#172033" font-size="12" font-weight="850">Bridge v2.3.3 · 127.0.0.1</text>
+      <rect y="48" width="308" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <circle cx="18" cy="17" r="7" fill="#10B981"/>
+      <text x="36" y="22" fill="#172033" font-size="12" font-weight="850">Codex / Hermes / OpenClaw available</text>
+      <rect y="96" width="308" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
+      <circle cx="18" cy="17" r="7" fill="#F59E0B"/>
+      <text x="36" y="22" fill="#172033" font-size="12" font-weight="850">Provider keys are optional setup</text>
+    </g>
+  </g>
+
+  <text x="72" y="576" fill="#64748B" font-family="Inter, Arial, sans-serif" font-size="13">The page can run as a static GitHub Pages app, then becomes a local project writer when Bridge is running.</text>
 </svg>

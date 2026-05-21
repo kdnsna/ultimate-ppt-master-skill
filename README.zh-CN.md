@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>打开 Web Experience</strong></a>
   ·
-  <a href="#连接本地-agent"><strong>连接本地 Agent</strong></a>
+  <a href="#三步用起来"><strong>三步用起来</strong></a>
   ·
   <a href="#作为-agent-skill-使用"><strong>作为 Agent Skill 使用</strong></a>
   ·
@@ -26,6 +26,23 @@
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
 </p>
+
+## 三步用起来
+
+| 步骤 | 你做什么 | 得到什么 |
+|---|---|---|
+| **1. 打开 Web Experience** | 进入 [静态网页](https://kdnsna.github.io/ultimate-ppt-master-skill/)，选一个内容预设，再写一句任务或粘贴资料摘要。 | 清晰的 brief、网页预览、`source.md` 模板和通俗配置指引。 |
+| **2. 连接这台电脑** | 如果要解析真实 PDF/Word/PPTX/Excel/URL，在本地 clone 后运行 `npm run bridge`。 | 本机连接器（Bridge）会检测 Codex / Hermes / OpenClaw / Claude Code，并把资料留在 `127.0.0.1`。 |
+| **3. 交给 AI 助手** | 点击 **发送到本机连接器**，再复制或启动生成的命令。 | 一个本地项目包，里面有资料、manifest、Agent prompt、预览和质量检查清单。 |
+
+```bash
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
+cd ultimate-ppt-master-skill
+npm run setup
+npm run bridge
+```
+
+然后打开网页，点击 **发送到本机连接器**。
 
 ## 这是个什么项目
 
@@ -73,23 +90,6 @@ Ultimate PPT Master 解决的是这之前的一分钟：用户有文件、有粗
 - 保留原作者路线的质量上限，而不是替换成弱网页生成器。
 
 更完整的反思见：[产品定位反思](./docs/zh-CN/product-positioning.md)。
-
-## 三步用起来
-
-| 步骤 | 你做什么 | 得到什么 |
-|---|---|---|
-| **1. 打开 Web Experience** | 进入 [静态网页](https://kdnsna.github.io/ultimate-ppt-master-skill/)，选择资料类型、目标场景、输出形式、风格、语言和模型偏好。 | 清晰的 deck brief、Agent prompt、`source.md` 模板和网页预览。 |
-| **2. 连接本地 Bridge** | 如果要解析真实 PDF/Word/PPTX/Excel/URL，在本地 clone 后运行 `npm run bridge`。 | 资料在自己的电脑上通过 `127.0.0.1` 解析，不走托管后端。 |
-| **3. 交给本地 Agent** | 把生成的 handoff 项目交给 Codex，或把本仓库作为 Skill 使用。 | 可编辑 PPTX、单文件 Web Deck、质量检查清单和生产日志。 |
-
-```bash
-git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
-cd ultimate-ppt-master-skill
-npm run setup
-npm run bridge
-```
-
-然后打开网页，点击 **发送到本地 Bridge**。
 
 ## 一键更新
 
@@ -156,7 +156,7 @@ Verify layout, mobile readability, source references, and final exported files b
 
 ## Web Experience
 
-![Agent Connect Studio preview](assets/readme/web-hub-preview.svg)
+![Web Experience guided workspace](assets/readme/web-hub-preview.svg)
 
 Web Experience 是项目的主推广入口。它可以直接跑在 GitHub Pages 上，不需要后端、不需要账号、不托管模型，也不会在浏览器保存 API key。
 
