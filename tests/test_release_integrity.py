@@ -12,7 +12,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
         web_version = json.loads((ROOT / "apps/web/package.json").read_text(encoding="utf-8"))["version"]
 
-        self.assertEqual(version, "2.3.3")
+        self.assertEqual(version, "2.3.4")
         self.assertEqual(web_version, version)
         self.assertIn(f"v{version}", (ROOT / "README.md").read_text(encoding="utf-8"))
         self.assertIn(f"v{version}", (ROOT / "README.zh-CN.md").read_text(encoding="utf-8"))
@@ -46,7 +46,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v2.3.3", hero)
+        self.assertIn("v2.3.4", hero)
         self.assertIn("Local connector", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)

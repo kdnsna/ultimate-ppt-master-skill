@@ -151,7 +151,7 @@ const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v2.3";
-const appVersion = "2.3.3";
+const appVersion = "2.3.4";
 
 const labels = {
   zh: {

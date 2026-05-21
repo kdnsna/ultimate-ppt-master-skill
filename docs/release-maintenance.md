@@ -123,7 +123,7 @@ When syncing upstream:
 
 ## Version Notes
 
-v2.3.3 positions this repository as:
+v2.3.4 positions this repository as:
 
 - a web-first static experience for public discovery, source intake, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing;
 - a localhost-only Agent Bridge for local source parsing, provider readiness checks, and handoff project creation;
