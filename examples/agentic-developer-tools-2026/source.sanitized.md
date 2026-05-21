@@ -18,7 +18,7 @@ Agent Skill handles local production, rendering, QA, and repair.
 Links:
 
 - https://blog.google/innovation-and-ai/technology/developers-tools/google-io-2026-developer-highlights/
-- https://developers.googleblog.com/en/io-2026-recap/
+- https://developers.googleblog.com/en/all-the-news-from-the-google-io-2026-developer-keynote/
 
 ## Narrative
 

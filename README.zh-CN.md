@@ -73,6 +73,69 @@ npm run bridge
 
 然后打开网页，点击 **发送到本地 Bridge**。
 
+## 一键更新
+
+最近版本迭代比较快，已经安装过的用户建议先更新再生产正式材料。
+
+本地仓库更新：
+
+```bash
+cd ultimate-ppt-master-skill
+npm run update
+```
+
+Codex Skill 更新：
+
+```bash
+bash -lc 'set -e; dir="$HOME/.codex/skills/ultimate-ppt-master"; if [ -d "$dir/.git" ]; then git -C "$dir" pull --ff-only; else git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git "$dir"; fi; cd "$dir"; npm run setup'
+```
+
+通用 Agent Skill 更新：
+
+```bash
+bash -lc 'set -e; dir="$HOME/agent-skills/ultimate-ppt-master"; if [ -d "$dir/.git" ]; then git -C "$dir" pull --ff-only; else mkdir -p "$HOME/agent-skills"; git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git "$dir"; fi; cd "$dir"; npm run setup'
+```
+
+也可以直接让 Codex 做：
+
+```text
+请把 ~/.codex/skills/ultimate-ppt-master 更新到 GitHub 最新版，运行 npm run setup，然后用 README 里的示例确认它可用。
+```
+
+## 输入到产出示例
+
+![Agentic Developer Stack generated deck](assets/readme/agentic-demo-preview.png)
+
+这个公开样板把“用户应该给什么”和“最终能看到什么”放在一起：
+
+| 你给它 | 它生成 |
+|---|---|
+| 一份脱敏 `source.md`，包含主题、公开资料来源、叙事方向、页纲和约束。 | 一个可打开的单文件 Web Deck，以及给本地 Agent 继续生产 PPTX / Web Deck 的 handoff 结构。 |
+| 一段明确的 Agent prompt，说明目标受众、输出形式和质量检查要求。 | `agent-prompt.md`、`engine-plan.md`、`quality-checklist.md` 这类可复现生产文件。 |
+
+示例输入材料节选：
+
+```text
+主题：Agentic Developer Stack 2026
+目标：用一个非敏感科技热点解释“网页负责入口，Skill 负责生产”的产品方向。
+资料：Google I/O 2026 developer highlights、Google Developers Blog、公开技术报道。
+输出：10 页杂志风 Web Deck；同时保留可交给 Agent 继续生成 PPTX 的 handoff 路线。
+```
+
+示例 Agent prompt：
+
+```text
+Use $ultimate-ppt-master with examples/agentic-developer-tools-2026/source.sanitized.md.
+Create a polished magazine-style Web Deck for GitHub Pages and keep the handoff ready for an editable PPTX route.
+Verify layout, mobile readability, source references, and final exported files before delivery.
+```
+
+查看完整样板：
+
+- [输入材料 source.sanitized.md](./examples/agentic-developer-tools-2026/source.sanitized.md)
+- [生成产品 Web Deck](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/agentic-developer-tools-2026/web-demo.html)
+- [示例说明](./examples/agentic-developer-tools-2026)
+
 ## Web Experience
 
 ![Agent Connect Hub preview](assets/readme/web-hub-preview.svg)

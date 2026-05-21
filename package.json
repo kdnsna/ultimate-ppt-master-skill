@@ -5,6 +5,7 @@
   "description": "Local-first AI presentation hub for Web Experience, Agent Bridge, editable PowerPoint, and Web Deck workflows.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
+    "update": "git pull --ff-only && npm run setup",
     "desktop": "bash scripts/run-desktop.sh",
     "doctor": "bash scripts/doctor.sh",
     "bridge": "node apps/bridge/server.mjs",

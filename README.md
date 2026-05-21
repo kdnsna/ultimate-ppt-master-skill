@@ -73,6 +73,69 @@ npm run bridge
 
 Then open the web page and click **Send to local Bridge**.
 
+## One-Line Updates
+
+This project is moving quickly. If you already installed it, update before producing serious client or team-facing material.
+
+Update a local clone:
+
+```bash
+cd ultimate-ppt-master-skill
+npm run update
+```
+
+Update the Codex Skill install:
+
+```bash
+bash -lc 'set -e; dir="$HOME/.codex/skills/ultimate-ppt-master"; if [ -d "$dir/.git" ]; then git -C "$dir" pull --ff-only; else git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git "$dir"; fi; cd "$dir"; npm run setup'
+```
+
+Update a generic Agent Skill install:
+
+```bash
+bash -lc 'set -e; dir="$HOME/agent-skills/ultimate-ppt-master"; if [ -d "$dir/.git" ]; then git -C "$dir" pull --ff-only; else mkdir -p "$HOME/agent-skills"; git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git "$dir"; fi; cd "$dir"; npm run setup'
+```
+
+Or ask Codex:
+
+```text
+Update ~/.codex/skills/ultimate-ppt-master to the latest GitHub version, run npm run setup, then use the README demo to confirm it works.
+```
+
+## Input To Output Demo
+
+![Agentic Developer Stack generated deck](assets/readme/agentic-demo-preview.png)
+
+This public sample shows what users should provide and what they get back:
+
+| What you provide | What it produces |
+|---|---|
+| A sanitized `source.md` with topic, public references, narrative, slide outline, and constraints. | A self-contained Web Deck plus a handoff structure that a local Agent can continue into PPTX / Web Deck production. |
+| A clear Agent prompt with audience, output route, and quality requirements. | Reproducible production files such as `agent-prompt.md`, `engine-plan.md`, and `quality-checklist.md`. |
+
+Input material excerpt:
+
+```text
+Topic: Agentic Developer Stack 2026
+Goal: use a non-sensitive tech trend to explain why the web page is the front door and the Skill is the production engine.
+Sources: Google I/O 2026 developer highlights, Google Developers Blog, and public technology coverage.
+Output: a 10-slide magazine-style Web Deck, with a handoff path ready for editable PPTX production.
+```
+
+Example Agent prompt:
+
+```text
+Use $ultimate-ppt-master with examples/agentic-developer-tools-2026/source.sanitized.md.
+Create a polished magazine-style Web Deck for GitHub Pages and keep the handoff ready for an editable PPTX route.
+Verify layout, mobile readability, source references, and final exported files before delivery.
+```
+
+Open the full sample:
+
+- [Input material: source.sanitized.md](./examples/agentic-developer-tools-2026/source.sanitized.md)
+- [Generated Web Deck](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/agentic-developer-tools-2026/web-demo.html)
+- [Example notes](./examples/agentic-developer-tools-2026)
+
 ## Web Experience
 
 ![Agent Connect Hub preview](assets/readme/web-hub-preview.svg)
