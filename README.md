@@ -52,6 +52,12 @@ This release moves the project from "a web page that can generate a prompt" towa
 - Bridge / handoff kits still preserve `manifest`, `engine-plan`, and `quality-checklist` so the Agent has a clear acceptance contract;
 - the public tech demo is polished as a concrete "what to provide / what you get" sample.
 
+## Next Direction
+
+The next release direction is **Content & Template Presets**: richer scenario packs that include `source.md` skeletons, narrative structures, recommended slide rosters, template / brand / chart candidates, quality checks, and visible sample outputs.
+
+Read the plan: [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md). Seed preset catalog: [templates/presets](./templates/presets).
+
 ## Why Not Just Use Codex To Install A Skill?
 
 You can. For expert users, direct Skill install is still the fastest path.
@@ -325,6 +331,7 @@ Maintenance references:
 | Pick Web vs Skill vs Desktop Later | [Choosing a Workflow](./docs/choosing-a-workflow.md) |
 | Configure provider keys locally | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | Understand why this exists beside direct Skill install | [Product Positioning](./docs/product-positioning.md) |
+| See the next content/template direction | [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md) |
 | Review v2.3.0 release focus | [Release Notes - v2.3.0](./docs/release-notes-v2.3.0.md) |
 | Review the local upstream benchmark | [Upstream Benchmark - May 2026](./docs/upstream-benchmark-2026-05.md) |
 | Debug setup, extraction, output, provider, Tauri, or agent loading issues | [Troubleshooting](./docs/troubleshooting.md) |

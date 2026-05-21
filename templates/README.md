@@ -21,6 +21,13 @@ The `layouts/` directory contains pre-built page layout templates organized by d
 - **Human browsing**: [layouts/README.md](./layouts/README.md)
 - **Slim lookup (discovery only)**: [layouts/layouts_index.json](./layouts/layouts_index.json) — used to answer "what templates exist?". Step 3 triggers on an explicit directory path supplied by the user, not on names from this index.
 
+## Preset Directions
+
+The `presets/` directory is the v2.4 seed for scenario-level content packs. Presets sit above raw templates: they define what the user should provide, the default narrative, the recommended slide roster, and which layout / brand / chart candidates should be considered.
+
+- **Seed catalog**: [presets/preset-directions.json](./presets/preset-directions.json)
+- **Roadmap**: [../docs/next-roadmap.md](../docs/next-roadmap.md)
+
 ## Brand Identity Presets
 
 The `brands/` directory holds brand-only templates: identity bundles (color / typography / logo / voice / icon style) without an SVG page roster. Brands follow the **same explicit-path trigger rule as layout templates** — at SKILL.md Step 3 the user supplies the brand directory path to apply it; bare brand names never trigger. Both layout and brand inputs land in the same project directory (`<project_path>/templates/`). When supplied together, Step 3 fuses them into a single `design_spec.md` (brand wins on identity tokens, layout wins on page structure) — see `SKILL.md` Step 3 for the precedence table.

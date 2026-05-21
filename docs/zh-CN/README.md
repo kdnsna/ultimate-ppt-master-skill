@@ -25,6 +25,7 @@
 - Agent 配置：[Agent Setup](../agent-setup.md)
 - 工作流选择：[Choosing a Workflow](../choosing-a-workflow.md)
 - 产品定位反思：[产品定位反思](./product-positioning.md)
+- 下一步内容 / 模板方向：[下一步路线 - 内容与模板预设](./next-roadmap.md)
 - v2.3.0 发布说明：[发布说明 - v2.3.0](./release-notes-v2.3.0.md)
 - 上游基准测试：[上游基准测试 - 2026 年 5 月](./upstream-benchmark-2026-05.md)
 - 桌面端源码预览：[Quickstart Desktop](../quickstart-desktop.md)

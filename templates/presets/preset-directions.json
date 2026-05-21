@@ -1,0 +1,353 @@
+{
+  "executive_business_review": {
+    "status": "seed",
+    "summary": "Quarterly/monthly business review, executive update, growth diagnosis, and next-action planning.",
+    "primaryOutput": "pptx",
+    "secondaryOutput": "web_deck",
+    "audience": ["executives", "business owners", "project leads"],
+    "sourceRequirements": [
+      "period and business context",
+      "top KPI table",
+      "growth / decline drivers",
+      "risks and open decisions",
+      "next-quarter actions"
+    ],
+    "narrativeSkeleton": [
+      "open with the business question",
+      "show KPI reality before interpretation",
+      "separate drivers, risks, and opportunities",
+      "turn findings into accountable actions"
+    ],
+    "slideRoster": [
+      "cover",
+      "executive summary",
+      "KPI dashboard",
+      "performance variance",
+      "driver analysis",
+      "risk and opportunity map",
+      "priority actions",
+      "timeline / owner plan",
+      "appendix"
+    ],
+    "templateCandidates": {
+      "layouts": ["科技蓝商务", "mckinsey", "招商银行"],
+      "charts": ["kpi_cards", "stacked_bar_chart", "line_chart", "matrix_2x2", "timeline"],
+      "webDeckStyle": "swiss"
+    },
+    "qualityChecks": [
+      "every KPI has source context",
+      "actions have owner and time horizon",
+      "summary does not overclaim beyond source",
+      "PPTX remains editable"
+    ]
+  },
+  "consulting_proposal": {
+    "status": "seed",
+    "summary": "Consulting proposal, diagnosis, options, roadmap, and recommendation deck.",
+    "primaryOutput": "pptx",
+    "secondaryOutput": "web_deck",
+    "audience": ["client executives", "internal steering committee"],
+    "sourceRequirements": [
+      "client situation",
+      "pain points",
+      "constraints",
+      "available data",
+      "decision timeline"
+    ],
+    "narrativeSkeleton": [
+      "define the decision",
+      "prove the problem",
+      "compare options",
+      "recommend a route",
+      "show implementation plan"
+    ],
+    "slideRoster": [
+      "cover",
+      "context and objective",
+      "current-state diagnosis",
+      "issue tree",
+      "option comparison",
+      "recommended solution",
+      "implementation roadmap",
+      "governance and risks",
+      "commercial / next steps"
+    ],
+    "templateCandidates": {
+      "layouts": ["mckinsey"],
+      "charts": ["matrix_2x2", "process_flow", "timeline", "gantt_chart", "waterfall_chart"],
+      "webDeckStyle": "swiss"
+    },
+    "qualityChecks": [
+      "problem statement is specific",
+      "recommendation follows from evidence",
+      "roadmap is feasible",
+      "risks are not buried"
+    ]
+  },
+  "product_pitch": {
+    "status": "seed",
+    "summary": "Product pitch, launch narrative, investor update, or demo-day story.",
+    "primaryOutput": "web_deck",
+    "secondaryOutput": "pptx",
+    "audience": ["investors", "partners", "customers", "product teams"],
+    "sourceRequirements": [
+      "product one-liner",
+      "target user",
+      "problem and urgency",
+      "solution proof",
+      "traction or roadmap",
+      "ask / call to action"
+    ],
+    "narrativeSkeleton": [
+      "hook with user pain",
+      "show the product wedge",
+      "prove why now",
+      "make the demo tangible",
+      "close with the ask"
+    ],
+    "slideRoster": [
+      "cover",
+      "problem",
+      "user / market shift",
+      "solution",
+      "product workflow",
+      "proof / traction",
+      "business model or adoption path",
+      "roadmap",
+      "ask"
+    ],
+    "templateCandidates": {
+      "layouts": ["google_style", "anthropic"],
+      "brands": ["google", "anthropic"],
+      "charts": ["hub_spoke", "pipeline_with_stages", "timeline"],
+      "webDeckStyle": "editorial"
+    },
+    "qualityChecks": [
+      "first three slides are understandable without narration",
+      "product proof is concrete",
+      "visuals show real workflow or state",
+      "mobile Web Deck remains readable"
+    ]
+  },
+  "training_courseware": {
+    "status": "seed",
+    "summary": "Internal training, onboarding, workshop, or structured lesson deck.",
+    "primaryOutput": "pptx",
+    "secondaryOutput": "web_deck",
+    "audience": ["learners", "new hires", "workshop participants"],
+    "sourceRequirements": [
+      "learning objective",
+      "learner background",
+      "modules",
+      "examples / exercises",
+      "assessment or practice task"
+    ],
+    "narrativeSkeleton": [
+      "state the skill outcome",
+      "chunk content into modules",
+      "teach with examples",
+      "add practice and reflection",
+      "close with checklist"
+    ],
+    "slideRoster": [
+      "cover",
+      "learning objectives",
+      "agenda",
+      "module opener",
+      "concept explanation",
+      "worked example",
+      "practice task",
+      "knowledge check",
+      "summary checklist"
+    ],
+    "templateCandidates": {
+      "layouts": ["academic_defense", "smart_red"],
+      "charts": ["process_flow", "timeline", "matrix_2x2"],
+      "webDeckStyle": "editorial"
+    },
+    "qualityChecks": [
+      "each module has one clear learning outcome",
+      "examples are practical",
+      "dense pages are split",
+      "speaker notes support teaching"
+    ]
+  },
+  "research_academic_defense": {
+    "status": "seed",
+    "summary": "Academic defense, research progress report, paper presentation, or grant update.",
+    "primaryOutput": "pptx",
+    "secondaryOutput": "web_deck",
+    "audience": ["committee", "academic reviewers", "research peers"],
+    "sourceRequirements": [
+      "research question",
+      "method",
+      "dataset / evidence",
+      "key findings",
+      "limitations",
+      "future work"
+    ],
+    "narrativeSkeleton": [
+      "motivate the research gap",
+      "explain method before results",
+      "show findings with evidence",
+      "acknowledge limitations",
+      "state contribution"
+    ],
+    "slideRoster": [
+      "cover",
+      "research background",
+      "question and contribution",
+      "method",
+      "data / materials",
+      "results",
+      "discussion",
+      "limitations",
+      "future work",
+      "Q&A"
+    ],
+    "templateCandidates": {
+      "layouts": ["academic_defense", "重庆大学", "medical_university"],
+      "charts": ["line_chart", "grouped_bar_chart", "radar_chart", "process_flow"],
+      "webDeckStyle": "swiss"
+    },
+    "qualityChecks": [
+      "claims match evidence",
+      "method is reproducible enough for audience",
+      "figures have labels",
+      "limitations are explicit"
+    ]
+  },
+  "government_soe_report": {
+    "status": "seed",
+    "summary": "Government, state-owned enterprise, policy, infrastructure, or formal work report.",
+    "primaryOutput": "pptx",
+    "secondaryOutput": "web_deck",
+    "audience": ["government leaders", "SOE leadership", "project stakeholders"],
+    "sourceRequirements": [
+      "policy or project background",
+      "objectives",
+      "current progress",
+      "key metrics",
+      "implementation plan",
+      "risk controls"
+    ],
+    "narrativeSkeleton": [
+      "start with policy / strategic context",
+      "show progress and evidence",
+      "organize around key workstreams",
+      "close with implementation safeguards"
+    ],
+    "slideRoster": [
+      "cover",
+      "strategic background",
+      "overall progress",
+      "workstream detail",
+      "project timeline",
+      "risk controls",
+      "support needed",
+      "next steps"
+    ],
+    "templateCandidates": {
+      "layouts": ["government_blue", "government_red", "中国电建_现代", "china_telecom_template"],
+      "charts": ["timeline", "gantt_chart", "process_flow", "layered_architecture"],
+      "webDeckStyle": "swiss"
+    },
+    "qualityChecks": [
+      "tone is formal and restrained",
+      "slogans do not replace evidence",
+      "timeline and responsibilities are clear",
+      "visual density is controlled"
+    ]
+  },
+  "finance_branch_solution": {
+    "status": "seed",
+    "summary": "Banking, branch operation, payment, pension finance, or financial product solution deck.",
+    "primaryOutput": "pptx",
+    "secondaryOutput": "web_deck",
+    "audience": ["branch leaders", "financial product teams", "business clients"],
+    "sourceRequirements": [
+      "business background",
+      "customer segment",
+      "product or solution",
+      "operational data",
+      "risk / compliance constraints",
+      "sales or rollout plan"
+    ],
+    "narrativeSkeleton": [
+      "define business opportunity",
+      "segment customer needs",
+      "explain solution architecture",
+      "show operating model",
+      "turn into rollout actions"
+    ],
+    "slideRoster": [
+      "cover",
+      "opportunity summary",
+      "customer segmentation",
+      "solution overview",
+      "process / operating model",
+      "case or scenario",
+      "risk and compliance",
+      "rollout plan",
+      "expected impact"
+    ],
+    "templateCandidates": {
+      "layouts": ["招商银行", "科技蓝商务"],
+      "charts": ["funnel_chart", "process_flow", "kpi_cards", "timeline"],
+      "webDeckStyle": "swiss"
+    },
+    "qualityChecks": [
+      "compliance-sensitive claims are cautious",
+      "customer scenarios are concrete",
+      "financial data is labeled",
+      "action plan is branch-executable"
+    ]
+  },
+  "tech_trend_web_deck": {
+    "status": "seed",
+    "summary": "Technology trend, public demo, thought leadership, or shareable editorial Web Deck.",
+    "primaryOutput": "web_deck",
+    "secondaryOutput": "pptx",
+    "audience": ["public readers", "developer community", "product teams"],
+    "sourceRequirements": [
+      "topic",
+      "public references",
+      "angle",
+      "key signals",
+      "implications",
+      "safe non-sensitive constraints"
+    ],
+    "narrativeSkeleton": [
+      "open with the shift",
+      "show the external signal",
+      "translate it into a stack or behavior change",
+      "explain product implication",
+      "close with a practical takeaway"
+    ],
+    "slideRoster": [
+      "cover",
+      "proof of input-to-output path",
+      "trend hook",
+      "news signal",
+      "stack shift",
+      "user need",
+      "product implication",
+      "demo flow",
+      "architecture",
+      "quality bar",
+      "takeaway"
+    ],
+    "templateCandidates": {
+      "layouts": ["google_style", "anthropic", "pixel_retro"],
+      "brands": ["google", "anthropic"],
+      "charts": ["layered_architecture", "pipeline_with_stages", "hub_spoke", "timeline"],
+      "webDeckStyle": "editorial"
+    },
+    "qualityChecks": [
+      "public sources are cited",
+      "topic is non-sensitive",
+      "visual rhythm alternates dense and breathing slides",
+      "desktop and mobile Web Deck views are checked"
+    ]
+  }
+}

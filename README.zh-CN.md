@@ -52,6 +52,12 @@ v2.3 的统一方向是：**输入看得懂，产出看得见，本地 Agent 接
 - Bridge / handoff kit 继续保留 `manifest`、`engine-plan`、`quality-checklist`，让 Agent 有明确验收标准；
 - 示例产物按公开科技主题打磨，作为用户理解“给什么、出什么”的样板。
 
+## 下一步方向
+
+下一次更新重点建议放在 **内容与模板预设**：为高频场景沉淀 `source.md` 骨架、叙事结构、推荐页型、模板 / 品牌 / 图表候选、质量检查和可见样板产物。
+
+路线文档：[下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md)。预设种子目录：[templates/presets](./templates/presets)。
+
 ## 为什么不直接让 Codex 安装 Skill？
 
 可以。对专家用户来说，直接安装 Skill 仍然是最快路径。
@@ -325,6 +331,7 @@ npm run desktop
 | 选择 Web / Skill / Desktop Later | [Choosing a Workflow](./docs/choosing-a-workflow.md) |
 | 本地配置 provider key | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | 理解它为什么不只是“多装一个 Skill” | [产品定位反思](./docs/zh-CN/product-positioning.md) |
+| 查看下一步内容 / 模板方向 | [下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md) |
 | 查看 v2.3.0 发布重点 | [发布说明 - v2.3.0](./docs/zh-CN/release-notes-v2.3.0.md) |
 | 查看本机上游基准测试 | [上游基准测试 - 2026 年 5 月](./docs/zh-CN/upstream-benchmark-2026-05.md) |
 | 排查安装、解析、输出、provider、Tauri 或 Agent 加载问题 | [Troubleshooting](./docs/troubleshooting.md) |

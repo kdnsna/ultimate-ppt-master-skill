@@ -18,6 +18,15 @@
       "enterprise style"
     ]
   },
+  "anthropic": {
+    "summary": "AI tech talks, developer conferences, technical training, product launches.",
+    "keywords": [
+      "Tech-forward",
+      "professional",
+      "modern",
+      "conclusion-first"
+    ]
+  },
   "china_telecom_template": {
     "summary": "China Telecom related briefings, 政企数字化方案, 转型规划, 内部汇报.",
     "keywords": [
@@ -25,6 +34,26 @@
       "structured",
       "restrained",
       "enterprise-government hybrid"
+    ]
+  },
+  "exhibit": {
+    "summary": "Strategic planning, executive reports, investment analysis, board presentations.",
+    "keywords": [
+      "Premium",
+      "refined",
+      "authoritative",
+      "data-driven",
+      "conclusion-first"
+    ]
+  },
+  "google_style": {
+    "summary": "Annual work reports, technical sharing, project showcases, data-driven presentations.",
+    "keywords": [
+      "Professional",
+      "modern",
+      "clean and restrained",
+      "data-driven",
+      "generous whitespace"
     ]
   },
   "government_blue": {
@@ -43,6 +72,15 @@
       "dignified",
       "professional",
       "modern government style"
+    ]
+  },
+  "mckinsey": {
+    "summary": "Strategic consulting, executive briefings, investment analysis, business proposals.",
+    "keywords": [
+      "Data-driven",
+      "structured thinking",
+      "professional whitespace",
+      "minimalist premium"
     ]
   },
   "medical_university": {
@@ -71,6 +109,15 @@
       "warm",
       "healing",
       "trustworthy"
+    ]
+  },
+  "smart_red": {
+    "summary": "Company introductions, product launches, solution presentations, education industry courseware.",
+    "keywords": [
+      "Modern",
+      "energetic",
+      "professional",
+      "geometric"
     ]
   },
   "中国电建_常规": {
@@ -123,6 +170,15 @@
       "structured",
       "product-focused",
       "refined finance"
+    ]
+  },
+  "科技蓝商务": {
+    "summary": "Corporate reports, product launches, proposals, process standards, training materials.",
+    "keywords": [
+      "Tech",
+      "business",
+      "professional",
+      "clean"
     ]
   },
   "重庆大学": {

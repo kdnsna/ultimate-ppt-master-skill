@@ -113,6 +113,7 @@ For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 | Index | Path | Purpose |
 |-------|------|---------|
 | Layout templates | `${SKILL_DIR}/templates/layouts/layouts_index.json` | Query available page layout templates |
+| Scenario preset directions | `${SKILL_DIR}/templates/presets/preset-directions.json` | Seed common deck structures, source requirements, template candidates, and QA checks |
 | Brand presets | `${SKILL_DIR}/templates/brands/brands_index.json` | Query available brand identity presets (color / typography / logo / voice) |
 | Visualization templates | `${SKILL_DIR}/templates/charts/charts_index.json` | Query available visualization SVG templates (charts, infographics, diagrams, frameworks) |
 | Icon library | `${SKILL_DIR}/templates/icons/` | See `${SKILL_DIR}/templates/icons/README.md`; search icons on demand with `ls templates/icons/<library>/ \| grep <keyword>` |
@@ -291,6 +292,8 @@ Import source content (choose based on the situation):
 1. User names a specific template (e.g., "用 mckinsey 模板" / "use the academic_defense template")
 2. User names a style / brand reference that maps to a template (e.g., "McKinsey 那种" / "Google style" / "学术答辩样式")
 3. User explicitly asks what templates exist (e.g., "有哪些模板可以用")
+
+**Scenario preset hint (non-blocking).** If the task clearly matches a common scenario, read `${SKILL_DIR}/templates/presets/preset-directions.json` and use the matching preset to seed the narrative, source requirements, recommended slide roster, candidate charts, and quality checks. This does not force a visual template. Only copy layout/brand template files when the user explicitly requests that template, asks what templates exist and chooses one, or the handoff manifest already contains an explicit preset/template selection.
 
 Only when a trigger fires: read `${SKILL_DIR}/templates/layouts/layouts_index.json`, resolve the match (or list available options for trigger 3), and copy template files to the project directory:
 
