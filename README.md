@@ -3,7 +3,7 @@
 > Turn PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into Agent-ready presentation projects, then produce editable PowerPoint decks or magazine-style Web Decks locally.
 
 <p align="center">
-  <strong>v2.3.4</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.4.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.3.4" src="https://img.shields.io/badge/Version-2.3.4-172033?style=for-the-badge">
+  <img alt="Version 2.4.0" src="https://img.shields.io/badge/Version-2.4.0-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -57,25 +57,31 @@ The goal is simple: **the web page should make the workflow easy to understand; 
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
 
-## v2.3.4 Release Focus
+## v2.4.0 Release Focus
 
-v2.3.4 keeps the product promise intact while removing the first-run trap around Bridge startup: **visible input, safe local setup, proven Agent handoff.**
+v2.4.0 turns the recent Web + Bridge work into a more reusable production system: **GitHub-informed direction, stronger preset packs, and release gates for reusable deck starters.**
 
-This release hardens the Web Experience as a beginner-friendly local handoff studio:
+This release improves the Web Experience and Skill package in the places that help other people reuse it:
 
-- the home page explains Bridge, Agent, API key, and handoff in plain language before asking users to configure anything;
-- the Web Experience is split into menu pages for starting, sources, configuration, handoff, and preview instead of crowding everything into one surface;
-- one-click checks detect the local Bridge, installed agents such as Codex / Hermes / OpenClaw / Claude Code, and configured model providers without exposing keys;
-- the configuration page can install or update the Skill for Codex / generic local agents through Bridge, or copy a terminal command when Bridge is offline;
-- Bridge startup commands copied from the page now find the local checkout before running `npm run bridge`, so they work even when pasted from `~` or another folder;
-- content preset packs are now visible in the web UI and bundled with source skeletons and quality checks;
+- a GitHub technology scan maps current signals such as MarkItDown, MCP servers, Slidev, Marp, PptxGenJS, DOM-to-PPTX, and open AI presentation products to concrete product decisions;
+- Consulting Proposal and Tech Trend Web Deck now join Executive Business Review and Product Pitch as reusable preset starter packs;
+- each starter pack has a machine-readable `preset.json`, sanitized `source.md`, and `quality-checklist.md`;
+- `scripts/audit_preset_packs.py` verifies preset-pack contracts before release and now runs in CI;
+- the Web Experience exposes the new pack paths and richer quality checks so handoff prompts are more specific;
 - Bridge / handoff kits still preserve `manifest`, `engine-plan`, and `quality-checklist` so the Agent has a clear acceptance contract.
+
+### v2.4.0 In Plain Words
+
+- You no longer start from a blank prompt. Pick a starter pack and the project tells the Agent what material to ask for, which story shape to use, which templates fit, and what to check.
+- The new GitHub scan explains why the project cares about Markdown handoff, local agents, editable PPTX, and web decks. It is the reasoning behind the release, not vague trend-chasing.
+- Every starter pack now has a small public proof: a source skeleton, a web preview, a cover image, and a checklist. That makes the output direction easier to understand before anyone runs the full workflow.
+- Maintainers get a simple audit command, `npm run audit:presets`, so reusable packs cannot silently lose required files.
 
 ## Next Direction
 
-v2.3.4 ships a safer **Bridge + Skill setup path** on top of the content presets. The next direction is to deepen those packs with more sample outputs, brand/template coverage, and scenario-specific quality checks.
+v2.4.0 ships a stronger **preset-pack reuse layer** on top of the Bridge + Skill setup path. The next direction is to add production-grade sample decks, screenshot sets, and benchmark runs for each pack before calling them stable.
 
-Read the plan: [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md). Seed preset catalog: [templates/presets](./templates/presets).
+Read the plan: [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md). Read the scan: [GitHub Technology Scan - May 2026](./docs/github-tech-scan-2026-05.md). Preset catalog: [templates/presets](./templates/presets).
 
 ## Why Not Just Use Codex To Install A Skill?
 
@@ -291,6 +297,10 @@ Full guide: [Agent Setup](./docs/agent-setup.md).
 
 Public sanitized demos:
 
+- [Executive Business Review Starter](./examples/executive-business-review-starter)
+- [Consulting Proposal Starter](./examples/consulting-proposal-starter)
+- [Product Pitch Starter](./examples/product-pitch-starter)
+- [Tech Trend Web Deck Starter](./examples/tech-trend-web-deck-starter)
 - [Agentic Developer Stack 2026](./examples/agentic-developer-tools-2026)
 - [Desktop Cultural Tourism Demo](./examples/desktop-cultural-tourism-demo)
 
@@ -334,17 +344,19 @@ Maintenance references:
 | Configure provider keys locally | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | Understand why this exists beside direct Skill install | [Product Positioning](./docs/product-positioning.md) |
 | See the next content/template direction | [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md) |
-| Review v2.3.4 release focus | [Release Notes - v2.3.4](./docs/release-notes-v2.3.4.md) |
+| Review v2.4.0 release focus | [Release Notes - v2.4.0](./docs/release-notes-v2.4.0.md) |
+| Review GitHub technology signals | [GitHub Technology Scan - May 2026](./docs/github-tech-scan-2026-05.md) |
 | Review the local upstream benchmark | [Upstream Benchmark - May 2026](./docs/upstream-benchmark-2026-05.md) |
 | Debug setup, extraction, output, provider, Tauri, or agent loading issues | [Troubleshooting](./docs/troubleshooting.md) |
 | Release, Pages, Homebrew, signing, privacy, and maintenance | [Release and Maintenance](./docs/release-maintenance.md) |
 
-## v2.3.4 Highlights
+## v2.4.0 Highlights
 
-- Fixed copied Bridge startup commands so they no longer fail when users paste them outside the repository root.
-- Added Bridge-backed Skill install / update actions for Codex and generic local Agent directories.
+- Added a GitHub technology scan that links current open-source signals to project decisions.
+- Promoted Consulting Proposal and Tech Trend Web Deck into reusable starter packs.
+- Added visible starter proofs for Executive Business Review, Consulting Proposal, Product Pitch, and Tech Trend Web Deck.
+- Added a preset-pack audit script and wired it into CI.
 - Kept one-click local setup checks and agent selection across Codex, Hermes, OpenClaw, and Claude Code.
-- Kept content preset packs visible in the web UI with source requirements, template candidates, and quality checks.
 - Kept Bridge / handoff kit focused on local source staging, provider readiness, Agent commands, previews, and quality checks.
 - Kept the Skill as the high-quality production route for final PPTX / Web Deck generation, preview, and repair.
 

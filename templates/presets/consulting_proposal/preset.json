@@ -1,0 +1,73 @@
+{
+  "id": "consulting_proposal",
+  "status": "draft-pack",
+  "scenario": "Consulting proposal, diagnosis, options, roadmap, and recommendation deck.",
+  "audience": [
+    "client executives",
+    "internal steering committee",
+    "project sponsor"
+  ],
+  "primaryOutput": "pptx",
+  "secondaryOutput": "web_deck",
+  "recommendedSlideCount": 10,
+  "sourceRequirements": [
+    "client situation and decision context",
+    "business pain points with evidence",
+    "constraints, assumptions, and non-goals",
+    "available data and source confidence",
+    "option set and evaluation criteria",
+    "decision timeline and required next step"
+  ],
+  "narrativeSkeleton": [
+    "Define the decision before showing analysis.",
+    "Prove the problem with evidence, not generic pain language.",
+    "Compare realistic options against clear criteria.",
+    "Recommend one route and state why alternatives are weaker.",
+    "Translate the recommendation into a phased roadmap and governance plan."
+  ],
+  "slideRoster": [
+    "cover and decision question",
+    "executive answer",
+    "client context",
+    "current-state diagnosis",
+    "issue tree",
+    "evidence page",
+    "option comparison",
+    "recommended solution",
+    "implementation roadmap",
+    "risks, governance, and next steps"
+  ],
+  "templateCandidates": {
+    "layouts": [
+      "mckinsey",
+      "科技蓝商务"
+    ],
+    "brands": [],
+    "charts": [
+      "matrix_2x2",
+      "process_flow",
+      "timeline",
+      "gantt_chart",
+      "waterfall_chart",
+      "value_chain"
+    ],
+    "webDeckStyle": "swiss"
+  },
+  "qualityChecks": [
+    "The decision question is visible in the first two slides.",
+    "Problem statements are backed by source evidence.",
+    "Option comparison uses explicit criteria, not vague pros and cons.",
+    "Recommendation follows from the evidence and criteria.",
+    "Roadmap includes owner, phase, milestone, and dependency.",
+    "Commercial or resourcing claims are clearly labeled as assumptions when not sourced.",
+    "PPTX remains editable and suitable for client review."
+  ],
+  "sampleProof": {
+    "source": "templates/presets/consulting_proposal/source.md",
+    "qualityChecklist": "templates/presets/consulting_proposal/quality-checklist.md",
+    "generatedOutput": "examples/consulting-proposal-starter/web-demo.html",
+    "screenshot": "examples/consulting-proposal-starter/cover.svg",
+    "publicDemoSafe": true,
+    "notes": "Synthetic consulting proposal skeleton and visible starter proof for public demos and local agent handoff."
+  }
+}

@@ -49,8 +49,14 @@ jobs:
       - name: Build web experience
         run: npm run build:web
 
+      - name: Audit preset starter packs
+        run: npm run audit:presets
+
       - name: Audit desktop dependencies
         run: npm --prefix apps/desktop audit --audit-level=high
+
+      - name: Run Node integration tests
+        run: npm run test:node
 
       - name: Run worker tests
         run: npm run test:worker

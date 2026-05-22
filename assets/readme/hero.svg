@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master v2.3.4 beginner workflow</title>
+  <title id="title">Ultimate PPT Master v2.4.0 reusable preset workflow</title>
   <desc id="desc">A beginner-friendly workflow showing the Web Experience, local Bridge connector, AI helper, and generated local handoff project folder.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
@@ -29,7 +29,7 @@
     <circle cx="30" cy="24" r="8" fill="#2563EB"/>
     <circle cx="56" cy="24" r="8" fill="#10B981"/>
     <circle cx="82" cy="24" r="8" fill="#EF5B3F"/>
-    <text x="112" y="30" fill="#526173" font-size="15" font-weight="850">v2.3.4 Beginner-ready Web Experience</text>
+    <text x="112" y="30" fill="#526173" font-size="15" font-weight="850">v2.4.0 Reusable preset workflow</text>
 
     <text x="0" y="122" fill="#172033" font-size="66" font-weight="950">Ultimate PPT Master</text>
     <text x="0" y="174" fill="#2563EB" font-size="34" font-weight="900">Open web. Connect local. Hand off to AI.</text>

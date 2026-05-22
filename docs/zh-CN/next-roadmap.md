@@ -35,18 +35,25 @@ v2.3 已经把第一公里讲清楚：输入看得懂，产出看得见，本地
 
 预设种子目录：[`templates/presets/preset-directions.json`](../../templates/presets/preset-directions.json)
 
-## v2.4 候选预设包
+## v2.4 Starter Pack
 
 | 预设 | 主要输出 | 为什么重要 |
 |---|---|---|
 | 经营复盘 / 高管汇报 | 可编辑 PPTX + 可选 Web Deck | 月报、季报、经营复盘非常常见，需要稳定的 KPI、诊断和行动页。 |
 | 咨询方案 | 可编辑 PPTX | 强化问题定义、方案比较、路线图和建议页，减少空泛商务感。 |
 | 产品路演 | Web Deck + 可选 PPTX | 让公开 demo、产品发布和创业叙事更有记忆点。 |
+| 科技趋势 Web Deck | Web Deck | 保持公开样板路线的视觉冲击力、来源可信度和可分享性。 |
+
+这四个预设已经在 [`templates/presets`](../../templates/presets) 下具备 starter-pack 文件夹，并在 `examples/*-starter/` 下有可见 starter proof。它们目前是 `draft-pack` 质量，适合 handoff 和测试；要晋级 `stable-pack`，还需要补完整生产级成品、截图集和 QA / benchmark 记录。
+
+## 后续候选预设包
+
+| 预设 | 主要输出 | 为什么重要 |
+|---|---|---|
 | 培训课件 | 可编辑 PPTX | 把内训、工作坊和新人培训变成可复用课程结构。 |
 | 学术答辩 / 研究汇报 | 可编辑 PPTX | 复用现有学术模板，并补上稳定研究叙事。 |
 | 政务 / 国企汇报 | 可编辑 PPTX | 复用政务和国企模板，保证正式场景的语气和版式。 |
 | 金融 / 分支机构方案 | 可编辑 PPTX | 沉淀银行、金融产品和分支机构经营方案的固定结构。 |
-| 科技趋势 Web Deck | Web Deck | 保持公开样板路线的视觉冲击力和可分享性。 |
 
 ## 发布标准
 
@@ -63,8 +70,8 @@ v2.3 已经把第一公里讲清楚：输入看得懂，产出看得见，本地
 
 | 版本 | 重点 |
 |---|---|
-| v2.4 | 把预设种子变成可用内容包，并在 Web Experience 中露出。 |
-| v2.5 | 增加模板图库，提供截图、示例 prompt 和“适合什么”的标签。 |
+| v2.4 | 把第一批预设种子变成 starter pack，在 Web Experience 中露出，并把 pack 契约审计接入 CI。 |
+| v2.5 | 为每个 starter pack 增加生产级样板、截图集、benchmark 记录和“适合什么”的标签。 |
 | v2.6 | 增加 PPTX 与 Web Deck 双路线的预设质量基准测试。 |
 
 ## 产品原则

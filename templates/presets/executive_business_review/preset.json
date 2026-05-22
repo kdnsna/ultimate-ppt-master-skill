@@ -65,9 +65,9 @@
   "sampleProof": {
     "source": "templates/presets/executive_business_review/source.md",
     "qualityChecklist": "templates/presets/executive_business_review/quality-checklist.md",
-    "generatedOutput": "pending",
-    "screenshot": "pending",
+    "generatedOutput": "examples/executive-business-review-starter/web-demo.html",
+    "screenshot": "examples/executive-business-review-starter/cover.svg",
     "publicDemoSafe": true,
-    "notes": "Synthetic sanitized business review skeleton for public demos."
+    "notes": "Synthetic sanitized business review skeleton and visible starter proof for public demos."
   }
 }

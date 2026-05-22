@@ -12,13 +12,21 @@ class ReleaseIntegrityTest(unittest.TestCase):
         version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
         web_version = json.loads((ROOT / "apps/web/package.json").read_text(encoding="utf-8"))["version"]
 
-        self.assertEqual(version, "2.3.4")
+        self.assertEqual(version, "2.4.0")
         self.assertEqual(web_version, version)
         self.assertIn(f"v{version}", (ROOT / "README.md").read_text(encoding="utf-8"))
         self.assertIn(f"v{version}", (ROOT / "README.zh-CN.md").read_text(encoding="utf-8"))
         self.assertIn(f'appVersion = "{version}"', (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8"))
         self.assertTrue((ROOT / f"docs/release-notes-v{version}.md").is_file())
         self.assertTrue((ROOT / f"docs/zh-CN/release-notes-v{version}.md").is_file())
+        self.assertIn(
+            "Plain-Language Update Notes",
+            (ROOT / f"docs/release-notes-v{version}.md").read_text(encoding="utf-8"),
+        )
+        self.assertIn(
+            "白话更新栏",
+            (ROOT / f"docs/zh-CN/release-notes-v{version}.md").read_text(encoding="utf-8"),
+        )
 
     def test_core_entry_scripts_exist(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
@@ -46,7 +54,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v2.3.4", hero)
+        self.assertIn("v2.4.0", hero)
         self.assertIn("Local connector", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)

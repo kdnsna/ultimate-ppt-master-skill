@@ -65,9 +65,9 @@
   "sampleProof": {
     "source": "templates/presets/product_pitch/source.md",
     "qualityChecklist": "templates/presets/product_pitch/quality-checklist.md",
-    "generatedOutput": "pending",
-    "screenshot": "pending",
+    "generatedOutput": "examples/product-pitch-starter/web-demo.html",
+    "screenshot": "examples/product-pitch-starter/cover.svg",
     "publicDemoSafe": true,
-    "notes": "Synthetic product pitch skeleton for public demos and web handoff."
+    "notes": "Synthetic product pitch skeleton and visible starter proof for public demos and web handoff."
   }
 }

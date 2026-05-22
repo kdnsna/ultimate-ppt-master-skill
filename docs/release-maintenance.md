@@ -8,8 +8,10 @@ Use this checklist when preparing a public release or accepting a contribution.
 npm run doctor
 npm --prefix apps/web ci
 npm run build:web
+npm run audit:presets
 npm run build:desktop
 npm --prefix apps/desktop audit
+npm run test:node
 npm run test:worker
 git diff --check
 ```
@@ -47,6 +49,8 @@ It should cover:
 - desktop dependency install;
 - desktop frontend build;
 - dependency audit;
+- preset starter-pack audit;
+- Bridge and Web Experience Node tests;
 - Python worker tests;
 - whitespace checks.
 
@@ -123,11 +127,12 @@ When syncing upstream:
 
 ## Version Notes
 
-v2.3.4 positions this repository as:
+v2.4.0 positions this repository as:
 
 - a web-first static experience for public discovery, source intake, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing;
 - a localhost-only Agent Bridge for local source parsing, provider readiness checks, and handoff project creation;
 - a portable agent skill for production-grade deck generation;
+- a reusable preset-pack catalog with release-audited starter packs;
 - a retained desktop preview for future signed native distribution;
 - a documented provider convention that keeps API keys local.
 

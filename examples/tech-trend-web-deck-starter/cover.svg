@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Tech Trend Web Deck starter proof</title>
+  <desc id="desc">A magazine-style trend deck preview with source signals and local-first workflow.</desc>
+  <rect width="1200" height="675" fill="#fbfaf7"/>
+  <rect x="70" y="70" width="1060" height="535" rx="20" fill="#172033"/>
+  <text x="112" y="138" fill="#f97316" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850">TECH TREND WEB DECK</text>
+  <text x="112" y="212" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="930">The deck is becoming</text>
+  <text x="112" y="276" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="930">a local agent workflow.</text>
+  <g font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800">
+    <rect x="116" y="370" width="180" height="70" rx="12" fill="#2563eb"/>
+    <text x="154" y="413" fill="#ffffff">Source</text>
+    <rect x="328" y="370" width="180" height="70" rx="12" fill="#10b981"/>
+    <text x="366" y="413" fill="#ffffff">Markdown</text>
+    <rect x="540" y="370" width="180" height="70" rx="12" fill="#f97316"/>
+    <text x="588" y="413" fill="#ffffff">Handoff</text>
+    <rect x="752" y="370" width="180" height="70" rx="12" fill="#ffffff"/>
+    <text x="798" y="413" fill="#172033">Agent QA</text>
+  </g>
+  <text x="112" y="536" fill="#b9c6d6" font-family="Inter, Arial, sans-serif" font-size="22">Starter proof: public signals -> stack shift -> builder takeaway.</text>
+</svg>
+

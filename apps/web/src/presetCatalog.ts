@@ -122,6 +122,7 @@ export const presetCatalog: WebPreset[] = [
   },
   {
     id: "consulting_proposal",
+    packPath: "templates/presets/consulting_proposal",
     label: { zh: "咨询方案", en: "Consulting Proposal" },
     summary: {
       zh: "问题定义、方案比较、推荐路径和实施路线。",
@@ -176,8 +177,10 @@ export const presetCatalog: WebPreset[] = [
     qualityChecks: [
       { zh: "问题陈述具体", en: "problem statement is specific" },
       { zh: "建议来自证据", en: "recommendation follows evidence" },
+      { zh: "方案比较使用明确标准", en: "option comparison uses explicit criteria" },
       { zh: "路线图可执行", en: "roadmap is feasible" },
-      { zh: "风险不被埋掉", en: "risks are visible" }
+      { zh: "风险不被埋掉", en: "risks are visible" },
+      { zh: "PPTX 适合客户继续评审修改", en: "PPTX remains editable for client review" }
     ],
     storyboard: {
       zh: [
@@ -507,6 +510,7 @@ export const presetCatalog: WebPreset[] = [
   },
   {
     id: "tech_trend_web_deck",
+    packPath: "templates/presets/tech_trend_web_deck",
     label: { zh: "科技趋势 Web Deck", en: "Tech Trend Web Deck" },
     summary: { zh: "公开趋势分享和思想领导力，强调来源、变化、影响和实践建议。", en: "Public trend or thought-leadership deck with sources, shift, implications, and takeaway." },
     scenario: "launch",
@@ -542,8 +546,10 @@ export const presetCatalog: WebPreset[] = [
     qualityChecks: [
       { zh: "引用公开来源", en: "public sources are cited" },
       { zh: "主题非敏感", en: "topic is non-sensitive" },
+      { zh: "事实和解读在视觉上分开", en: "facts and interpretation are visually separated" },
       { zh: "节奏有疏密变化", en: "visual rhythm alternates dense and breathing slides" },
-      { zh: "桌面和移动端已检查", en: "desktop and mobile views are checked" }
+      { zh: "桌面和移动端已检查", en: "desktop and mobile views are checked" },
+      { zh: "可选 PPTX 附录保持可编辑", en: "optional PPTX appendix remains editable" }
     ],
     storyboard: {
       zh: [

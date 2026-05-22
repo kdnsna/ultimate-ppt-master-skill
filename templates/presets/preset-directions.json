@@ -43,7 +43,8 @@
     ]
   },
   "consulting_proposal": {
-    "status": "seed",
+    "status": "pack",
+    "packPath": "templates/presets/consulting_proposal",
     "summary": "Consulting proposal, diagnosis, options, roadmap, and recommendation deck.",
     "primaryOutput": "pptx",
     "secondaryOutput": "web_deck",
@@ -81,8 +82,10 @@
     "qualityChecks": [
       "problem statement is specific",
       "recommendation follows from evidence",
+      "option comparison uses explicit criteria",
       "roadmap is feasible",
-      "risks are not buried"
+      "risks are not buried",
+      "PPTX remains editable for client review"
     ]
   },
   "product_pitch": {
@@ -306,7 +309,8 @@
     ]
   },
   "tech_trend_web_deck": {
-    "status": "seed",
+    "status": "pack",
+    "packPath": "templates/presets/tech_trend_web_deck",
     "summary": "Technology trend, public demo, thought leadership, or shareable editorial Web Deck.",
     "primaryOutput": "web_deck",
     "secondaryOutput": "pptx",
@@ -348,8 +352,10 @@
     "qualityChecks": [
       "public sources are cited",
       "topic is non-sensitive",
+      "facts and interpretation are visually separated",
       "visual rhythm alternates dense and breathing slides",
-      "desktop and mobile Web Deck views are checked"
+      "desktop and mobile Web Deck views are checked",
+      "optional PPTX appendix remains editable"
     ]
   }
 }

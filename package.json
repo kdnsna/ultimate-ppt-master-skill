@@ -1,7 +1,7 @@
 {
   "name": "ultimate-ppt-master",
   "private": true,
-  "version": "2.3.4",
+  "version": "2.4.0",
   "description": "Local-first AI presentation hub for Web Experience, Agent Bridge, editable PowerPoint, and Web Deck workflows.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
@@ -17,7 +17,9 @@
     "package:desktop": "npm --prefix apps/desktop run tauri:build",
     "package:desktop:dmg": "npm --prefix apps/desktop run tauri:build:dmg",
     "package:desktop:homebrew": "bash scripts/package-homebrew-release.sh",
+    "audit:presets": "python3 scripts/audit_preset_packs.py",
     "test:worker": "bash -lc 'if [ -x .venv/bin/python ]; then .venv/bin/python -m unittest discover -s tests; else python3 -m unittest discover -s tests; fi'",
+    "test:node": "node --test tests/*.test.mjs",
     "test:bridge": "node --test tests/bridge.test.mjs"
   }
 }

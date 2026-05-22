@@ -1,5 +1,5 @@
 <svg width="1200" height="640" viewBox="0 0 1200 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master Web Experience v2.3.4 preview</title>
+  <title id="title">Ultimate PPT Master Web Experience v2.4.0 preview</title>
   <desc id="desc">A preview of the beginner-friendly Web Experience with menu pages, glossary cards, one-click checks, and local project handoff.</desc>
   <rect width="1200" height="640" rx="28" fill="#F4F7FB"/>
   <rect x="42" y="42" width="1116" height="556" rx="24" fill="#FFFFFF" stroke="#D9E3EE"/>
@@ -8,7 +8,7 @@
   <circle cx="104" cy="73" r="8" fill="#FFD166"/>
   <circle cx="130" cy="73" r="8" fill="#06D6A0"/>
   <rect x="178" y="58" width="468" height="30" rx="15" fill="#27344A"/>
-  <text x="198" y="78" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="14">ultimate-ppt-master / v2.3.4 guided workspace</text>
+  <text x="198" y="78" fill="#B9C6D6" font-family="Inter, Arial, sans-serif" font-size="14">ultimate-ppt-master / v2.4.0 guided workspace</text>
 
   <text x="72" y="148" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="850">PPT Project Prep Studio</text>
   <text x="72" y="180" fill="#5D6B82" font-family="Inter, Arial, sans-serif" font-size="16">Start with plain language, then send a real local project to an AI helper.</text>
@@ -77,7 +77,7 @@
     <g transform="translate(22 92)">
       <rect width="308" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
       <circle cx="18" cy="17" r="7" fill="#10B981"/>
-      <text x="36" y="22" fill="#172033" font-size="12" font-weight="850">Bridge v2.3.4 · 127.0.0.1</text>
+      <text x="36" y="22" fill="#172033" font-size="12" font-weight="850">Bridge v2.4.0 · 127.0.0.1</text>
       <rect y="48" width="308" height="34" rx="10" fill="#FFFFFF" stroke="#CBD5E1"/>
       <circle cx="18" cy="17" r="7" fill="#10B981"/>
       <text x="36" y="22" fill="#172033" font-size="12" font-weight="850">Codex / Hermes / OpenClaw available</text>

@@ -9,6 +9,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 ## What It Does
 
 - lets users choose source type, scenario, output mode, visual style, language, agent tool, and model preference;
+- exposes reusable preset starter packs with pack paths, template candidates, and scenario-specific quality checks;
 - explains Bridge, Agent, API key, and handoff in plain language before the first configuration step;
 - splits the workspace into Start, Sources, Configuration, Handoff, and Preview pages so first-time users do not face every control at once;
 - accepts pasted source notes, source URLs, and dropped `.md`, `.txt`, `.pdf`, `.docx`, `.pptx`, `.xlsx`, and related files;

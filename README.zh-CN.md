@@ -3,7 +3,7 @@
 > 把 PDF、Word、PPTX、Excel、URL 和零散笔记整理成 Agent 能直接接手的演示项目，再在本地生成可编辑 PowerPoint 或杂志风 Web Deck。
 
 <p align="center">
-  <strong>v2.3.4</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.4.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.3.4" src="https://img.shields.io/badge/Version-2.3.4-172033?style=for-the-badge">
+  <img alt="Version 2.4.0" src="https://img.shields.io/badge/Version-2.4.0-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -57,25 +57,31 @@ Ultimate PPT Master 是一个 **本地优先的 AI 演示生产中枢**。它不
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
 
-## v2.3.4 发布重点
+## v2.4.0 发布重点
 
-v2.3.4 继续守住产品承诺，同时补上 Bridge 第一次启动最容易踩的坑：**输入看得懂，本地配置更安全，Agent 接得住。**
+v2.4.0 把最近几版 Web + Bridge 的能力沉淀成更可复用的生产系统：**GitHub 趋势有证据、场景预设更完整、发布前有自动门禁。**
 
-这次重点不是把功能挤在一个页面，而是把 Web Experience 打磨成新手也能顺着走的本地交接台：
+这次重点放在别人能不能更容易复用、Agent 产出能不能更稳定：
 
-- 首页先用通俗话解释 Bridge、Agent、API key、handoff，再让用户配置；
-- Web Experience 拆成开始、资料与目标、配置检测、交付给 AI 助手、预览与文件等菜单页，不再把所有功能挤在一起；
-- 一键检测可以检查本机 Bridge、Codex / Hermes / OpenClaw / Claude Code 等 Agent，以及已配置模型 provider，且不泄露密钥；
-- 配置页可以通过 Bridge 一键把 Skill 安装或更新到 Codex / 通用本地 Agent 目录；Bridge 离线时会复制终端命令；
-- 网页复制的 Bridge 启动命令会先寻找本机 checkout，再运行 `npm run bridge`，即使从 `~` 等其他目录粘贴也不会找错 `package.json`；
-- 内容预设包已经在网页端露出，包含资料要求、模板候选和质量检查；
+- 新增 GitHub 技术扫描，把 MarkItDown、MCP servers、Slidev、Marp、PptxGenJS、DOM-to-PPTX、开源 AI 演示产品等信号映射到项目决策；
+- 咨询方案、科技趋势 Web Deck 升级为 starter pack，和经营复盘、产品路演一起组成第一批可复用预设包；
+- 每个 starter pack 都包含机器可读 `preset.json`、脱敏 `source.md` 和 `quality-checklist.md`；
+- 新增 `scripts/audit_preset_packs.py`，用于发布前审计预设包契约，并已接入 CI；
+- Web Experience 露出新的 pack path 和更具体的质量检查，让 handoff prompt 不再泛泛；
 - Bridge / handoff kit 继续保留 `manifest`、`engine-plan`、`quality-checklist`，让 Agent 有明确验收标准。
+
+### v2.4.0 白话更新栏
+
+- 以后不用从空白 prompt 开始。选一个 starter pack，项目就会告诉 Agent：该要哪些资料、按什么故事结构讲、用哪些模板、最后检查什么。
+- 新增 GitHub 技术扫描，不是为了堆热词，而是解释为什么这个项目要重视 Markdown 交接、本地 Agent、可编辑 PPTX 和 Web Deck。
+- 每个 starter pack 都有一个小样板：source 骨架、网页预览、封面图和检查清单。别人没跑完整流程前，也能一眼看懂大概会产出什么。
+- 维护者多了一个简单命令：`npm run audit:presets`。以后预设包少文件、少字段、proof 还写着 pending，CI 会拦住。
 
 ## 下一步方向
 
-v2.3.4 在内容预设基础上补强了 **Bridge + Skill 配置路径**。下一步建议继续加深这些预设包：补更多可见样板、品牌 / 模板覆盖和场景化质量检查。
+v2.4.0 在 Bridge + Skill 配置路径之上补强了 **预设包复用层**。下一步建议为每个 pack 补完整生产级成品、截图集和基准测试，再把它们从 draft-pack 推到 stable-pack。
 
-路线文档：[下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md)。预设种子目录：[templates/presets](./templates/presets)。
+路线文档：[下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md)。技术扫描：[GitHub 技术扫描 - 2026 年 5 月](./docs/zh-CN/github-tech-scan-2026-05.md)。预设目录：[templates/presets](./templates/presets)。
 
 ## 为什么不直接让 Codex 安装 Skill？
 
@@ -291,6 +297,10 @@ Turn the provided source material into an editable PPTX and preview the result b
 
 公开脱敏示例：
 
+- [经营复盘 Starter](./examples/executive-business-review-starter)
+- [咨询方案 Starter](./examples/consulting-proposal-starter)
+- [产品路演 Starter](./examples/product-pitch-starter)
+- [科技趋势 Web Deck Starter](./examples/tech-trend-web-deck-starter)
 - [Agentic Developer Stack 2026](./examples/agentic-developer-tools-2026)
 - [Desktop Cultural Tourism Demo](./examples/desktop-cultural-tourism-demo)
 
@@ -334,17 +344,19 @@ npm run desktop
 | 本地配置 provider key | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | 理解它为什么不只是“多装一个 Skill” | [产品定位反思](./docs/zh-CN/product-positioning.md) |
 | 查看下一步内容 / 模板方向 | [下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md) |
-| 查看 v2.3.4 发布重点 | [发布说明 - v2.3.4](./docs/zh-CN/release-notes-v2.3.4.md) |
+| 查看 v2.4.0 发布重点 | [发布说明 - v2.4.0](./docs/zh-CN/release-notes-v2.4.0.md) |
+| 查看 GitHub 技术趋势 | [GitHub 技术扫描 - 2026 年 5 月](./docs/zh-CN/github-tech-scan-2026-05.md) |
 | 查看本机上游基准测试 | [上游基准测试 - 2026 年 5 月](./docs/zh-CN/upstream-benchmark-2026-05.md) |
 | 排查安装、解析、输出、provider、Tauri 或 Agent 加载问题 | [Troubleshooting](./docs/troubleshooting.md) |
 | 发布、Pages、Homebrew、签名、公证、隐私和维护 | [Release and Maintenance](./docs/release-maintenance.md) |
 
-## v2.3.4 重点变化
+## v2.4.0 重点变化
 
-- 修复网页复制的 Bridge 启动命令，避免用户在非仓库目录粘贴时触发 `package.json` 找不到的问题。
-- 配置页新增由 Bridge 执行的 Skill 安装 / 更新动作，覆盖 Codex 和通用本地 Agent 目录。
+- 新增 GitHub 技术扫描，把当前开源信号转成项目判断。
+- 咨询方案、科技趋势 Web Deck 升级为可复用 starter pack。
+- 为经营复盘、咨询方案、产品路演、科技趋势 Web Deck 增加可见 starter proof。
+- 新增预设包审计脚本，并接入 CI。
 - 保留一键检测和一键选择可用 AI 助手，覆盖 Codex、Hermes、OpenClaw、Claude Code。
-- 内容预设包在网页端可选，能看到资料要求、模板候选和质量检查。
 - Bridge / handoff kit 继续负责本地资料打包、provider 状态、Agent 命令、预览文件和质量检查。
 - Skill 仍然是高质量生产路线，负责最终 PPTX / Web Deck 的深度生成、预览和修复。
 

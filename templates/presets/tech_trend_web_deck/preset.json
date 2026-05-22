@@ -1,0 +1,78 @@
+{
+  "id": "tech_trend_web_deck",
+  "status": "draft-pack",
+  "scenario": "Technology trend, public demo, thought leadership, or shareable editorial Web Deck.",
+  "audience": [
+    "public readers",
+    "developer community",
+    "product teams",
+    "AI tool users"
+  ],
+  "primaryOutput": "web_deck",
+  "secondaryOutput": "pptx",
+  "recommendedSlideCount": 11,
+  "sourceRequirements": [
+    "topic and angle",
+    "public references with dates",
+    "key external signals",
+    "stack, workflow, or behavior change",
+    "implications for builders or users",
+    "safe non-sensitive constraints"
+  ],
+  "narrativeSkeleton": [
+    "Open with the shift, not the tool list.",
+    "Show public signals and why they matter now.",
+    "Translate the signal into a workflow, stack, or behavior change.",
+    "Show what builders should do differently.",
+    "Close with a practical takeaway and source trail."
+  ],
+  "slideRoster": [
+    "cover with trend thesis",
+    "why now",
+    "public signal wall",
+    "before / after workflow",
+    "stack shift",
+    "user behavior change",
+    "product implication",
+    "demo flow",
+    "quality bar",
+    "risks and caveats",
+    "takeaway and sources"
+  ],
+  "templateCandidates": {
+    "layouts": [
+      "google_style",
+      "anthropic",
+      "pixel_retro"
+    ],
+    "brands": [
+      "google",
+      "anthropic"
+    ],
+    "charts": [
+      "layered_architecture",
+      "pipeline_with_stages",
+      "hub_spoke",
+      "timeline",
+      "comparison_columns"
+    ],
+    "webDeckStyle": "editorial"
+  },
+  "qualityChecks": [
+    "Every external signal links to a public source or citation note.",
+    "The deck separates observed facts, interpretation, and recommendation.",
+    "The first three slides are understandable without narration.",
+    "Visual rhythm alternates dense evidence pages and breathing thesis pages.",
+    "Desktop and mobile Web Deck views are checked for overlap.",
+    "Images show actual product, workflow, or state when possible.",
+    "Optional PPTX appendix keeps summary and source trail editable."
+  ],
+  "sampleProof": {
+    "source": "templates/presets/tech_trend_web_deck/source.md",
+    "qualityChecklist": "templates/presets/tech_trend_web_deck/quality-checklist.md",
+    "generatedOutput": "examples/tech-trend-web-deck-starter/web-demo.html",
+    "screenshot": "examples/tech-trend-web-deck-starter/cover.svg",
+    "publicDemoSafe": true,
+    "notes": "Synthetic tech trend skeleton and visible starter proof for public Web Deck demos and source-cited agent handoff."
+  }
+}

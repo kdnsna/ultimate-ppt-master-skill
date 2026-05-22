@@ -35,18 +35,25 @@ Every stable preset should include:
 
 Seed catalog: [`templates/presets/preset-directions.json`](../templates/presets/preset-directions.json)
 
-## Candidate v2.4 Packs
+## v2.4 Starter Packs
 
 | Preset | Main output | Why it matters |
 |---|---|---|
 | Executive Business Review | Editable PPTX + optional Web Deck | Common quarterly and monthly reporting use case; needs stable KPI, diagnosis, and action pages. |
 | Consulting Proposal | Editable PPTX | Gives the Skill a stronger default for problem framing, options, roadmap, and commercial recommendation. |
 | Product Pitch | Web Deck + optional PPTX | Helps public demos and startup/product storytelling feel less generic. |
+| Tech Trend Web Deck | Web Deck | Keeps the public demo route visually strong, source-cited, and shareable. |
+
+These four now have starter-pack folders under [`templates/presets`](../templates/presets) plus visible starter proofs under `examples/*-starter/`. They are `draft-pack` quality, meaning they are useful for handoff and testing but still need full production-grade sample decks, screenshot sets, and benchmark notes before `stable-pack` promotion.
+
+## Candidate Later Packs
+
+| Preset | Main output | Why it matters |
+|---|---|---|
 | Training Courseware | Editable PPTX | Turns internal training, workshops, and onboarding into repeatable lesson structures. |
 | Research / Academic Defense | Editable PPTX | Uses existing academic templates and adds a stable research narrative. |
 | Government / SOE Report | Editable PPTX | Uses existing government and state-owned enterprise templates for formal reporting. |
 | Finance / Branch Solution | Editable PPTX | Builds repeatable banking and financial solution decks with stricter tone control. |
-| Tech Trend Web Deck | Web Deck | Keeps the public demo route visually strong and shareable. |
 
 ## Release Criteria
 
@@ -63,8 +70,8 @@ Do not call a preset "stable" until it has:
 
 | Version | Focus |
 |---|---|
-| v2.4 | Turn the seed preset directions into usable content packs and expose them in the Web Experience. |
-| v2.5 | Add a template gallery with screenshots, sample prompts, and "best for" labels. |
+| v2.4 | Turn the first seed preset directions into usable starter packs, expose them in the Web Experience, and audit pack contracts in CI. |
+| v2.5 | Add production-grade sample outputs, screenshot sets, benchmark notes, and "best for" labels for each starter pack. |
 | v2.6 | Add benchmark runs that compare preset output quality across PPTX and Web Deck routes. |
 
 ## Product Rule

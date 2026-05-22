@@ -5,10 +5,22 @@ import { test } from "node:test";
 
 test("web experience exposes content preset packs", async () => {
   const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+  const catalogSource = await readFile("apps/web/src/presetCatalog.ts", "utf8");
 
   assert.match(appSource, /presetCatalog/);
   assert.match(appSource, /contentPreset/);
   assert.match(appSource, /applyPreset/);
+  assert.match(catalogSource, /templates\/presets\/consulting_proposal/);
+  assert.match(catalogSource, /templates\/presets\/tech_trend_web_deck/);
+});
+
+test("docs include the GitHub technology scan used for v2.4 direction", async () => {
+  const scan = await readFile("docs/github-tech-scan-2026-05.md", "utf8");
+
+  assert.match(scan, /microsoft\/markitdown/);
+  assert.match(scan, /modelcontextprotocol\/servers/);
+  assert.match(scan, /slidevjs\/slidev/);
+  assert.match(scan, /gitbrent\/PptxGenJS/);
 });
 
 test("web experience gives first-time users a Hermes-aware first step", async () => {

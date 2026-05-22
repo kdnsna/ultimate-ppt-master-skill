@@ -151,7 +151,7 @@ const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v2.3";
-const appVersion = "2.3.4";
+const appVersion = "2.4.0";
 
 const labels = {
   zh: {
@@ -159,12 +159,12 @@ const labels = {
     studio: "PPT 项目准备工作台",
     route: `v${appVersion} · 先填任务、再检测本机、最后交给 AI 助手`,
     subtitle: "把资料、目标、页数和风格先整理清楚；检测你电脑上可用的本机工具；最后生成一个能交给 AI 助手继续制作的本地项目包。",
-    whyTitle: "v2.3 最大提升是什么？",
-    whySubtitle: "不再只解释“能做什么”，而是把资料、路线、命令、示例产物和质量检查放到同一个工作台里，让用户知道该给什么、会得到什么、怎么交给 AI 助手验收。",
+    whyTitle: "v2.4 最大提升是什么？",
+    whySubtitle: "把 GitHub 技术扫描、场景预设包、模板候选和质量门禁连起来，让用户不从空 prompt 开始，维护者也能用脚本检查预设是否可发布。",
     whyCards: [
-      { title: "输入更清楚", text: "示例直接展示资料文件、给 AI 助手的任务说明和真实生成结果。" },
-      { title: "更新更容易", text: "已经安装的用户可以用一条命令更新本地仓库或 Skill。" },
-      { title: "交付更可验", text: "本地项目包会保留执行路线、文件清单、检查清单和预览文件。" },
+      { title: "预设更可复用", text: "经营复盘、咨询方案、产品路演和科技趋势都有 starter pack。" },
+      { title: "趋势有证据", text: "技术扫描把 MarkItDown、MCP、Slidev、Marp、PptxGenJS 等方向映射到产品判断。" },
+      { title: "发布更可验", text: "预设包有机器可读契约、source 骨架、检查清单和自动审计脚本。" },
       { title: "质量不降级", text: "最终仍走 PPT Master 与歸藏路线，网页负责整理和交接。" }
     ],
     plainGlossaryTitle: "先把几个词讲清楚",
@@ -299,7 +299,7 @@ const labels = {
     activeRoute: "启用",
     optionalRoute: "备用",
     demoTitle: "Web Deck 示例",
-    demoText: "v2.3 脱敏样板，展示输入材料到 Web Deck 成品的路径。",
+    demoText: "v2.4 脱敏样板，展示输入材料到 Web Deck 成品的路径。",
     skillTitle: "AI 技能路线",
     skillText: "高质量生产路线，负责真实文件解析、生成、检查和导出。",
     desktopTitle: "Desktop Later",
@@ -331,12 +331,12 @@ const labels = {
     studio: "PPT Project Prep Studio",
     route: `v${appVersion} · write the task, check this Mac, hand off to an AI helper`,
     subtitle: "Organize sources, goals, slide count, and style first; check which local tools are available on this computer; then create a local project folder an AI helper can continue from.",
-    whyTitle: "What is new in v2.3?",
-    whySubtitle: "The product no longer only explains what it can do. It puts source material, route choices, update commands, demo outputs, and quality checks into one workspace so users know what to provide, what they get, and how an AI helper should verify it.",
+    whyTitle: "What is new in v2.4?",
+    whySubtitle: "The product now connects GitHub technology signals, scenario preset packs, template candidates, and release gates so users do not start from a blank prompt and maintainers can audit reusable packs.",
     whyCards: [
-      { title: "Input is clearer", text: "Examples show the source file, AI-helper task, and real generated output." },
-      { title: "Updates are easier", text: "Existing users can update a local clone or Skill install with one command." },
-      { title: "Delivery is checkable", text: "Local project folders preserve the route, file manifest, checklist, and preview files." },
+      { title: "Presets are reusable", text: "Business review, consulting, product pitch, and tech trend now have starter packs." },
+      { title: "Trends are grounded", text: "The technology scan maps MarkItDown, MCP, Slidev, Marp, PptxGenJS, and adjacent tools to product choices." },
+      { title: "Release gates are checkable", text: "Preset packs have a machine-readable contract, source skeleton, checklist, and audit script." },
       { title: "Quality stays upstream", text: "Final production still uses PPT Master and Guizang routes; web handles staging." }
     ],
     plainGlossaryTitle: "A few words in plain English",
@@ -471,7 +471,7 @@ const labels = {
     activeRoute: "Active",
     optionalRoute: "Optional",
     demoTitle: "Web Deck demo",
-    demoText: "A v2.3 sanitized sample showing source material turning into a Web Deck.",
+    demoText: "A v2.4 sanitized sample showing source material turning into a Web Deck.",
     skillTitle: "AI Skill path",
     skillText: "Production-grade route for real file parsing, generation, QA, and export.",
     desktopTitle: "Desktop Later",

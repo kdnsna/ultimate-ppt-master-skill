@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Product Pitch starter proof</title>
+  <desc id="desc">A product pitch preview showing Web Experience, Bridge, Agent Skill, and outputs.</desc>
+  <rect width="1200" height="675" fill="#fbfaf7"/>
+  <rect x="70" y="70" width="1060" height="535" rx="20" fill="#ffffff" stroke="#d8e0ea"/>
+  <text x="112" y="138" fill="#ef5b3f" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850">PRODUCT PITCH</text>
+  <text x="112" y="212" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="930">AI decks need</text>
+  <text x="112" y="276" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="930">a production handoff.</text>
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="116" y="368" width="210" height="92" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="142" y="405" fill="#2563eb" font-size="18" font-weight="850">Web Experience</text>
+    <text x="142" y="435" fill="#475569" font-size="16">Prepare the brief</text>
+    <rect x="364" y="368" width="210" height="92" rx="14" fill="#ecfdf5" stroke="#a7f3d0"/>
+    <text x="390" y="405" fill="#047857" font-size="18" font-weight="850">Bridge</text>
+    <text x="390" y="435" fill="#475569" font-size="16">Write local files</text>
+    <rect x="612" y="368" width="210" height="92" rx="14" fill="#fff7ed" stroke="#fed7aa"/>
+    <text x="638" y="405" fill="#c2410c" font-size="18" font-weight="850">Agent Skill</text>
+    <text x="638" y="435" fill="#475569" font-size="16">Produce and QA</text>
+  </g>
+  <text x="112" y="542" fill="#617085" font-family="Inter, Arial, sans-serif" font-size="22">Starter proof: pain -> product workflow -> visible proof -> ask.</text>
+</svg>
+
