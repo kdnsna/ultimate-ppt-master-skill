@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kdnsna.github.io/ultimate-ppt-master-skill/sitemap.xml

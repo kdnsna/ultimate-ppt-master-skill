@@ -1,4 +1,4 @@
-# Ultimate PPT Master
+# Ultimate PPT Master - Local-first AI Presentation Generator
 
 > Turn PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into Agent-ready presentation projects, then produce editable PowerPoint decks or magazine-style Web Decks locally.
 
@@ -11,11 +11,13 @@
 <p align="center">
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Open Web Experience</strong></a>
   ·
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v2.4.0"><strong>Latest Release</strong></a>
+  ·
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/discussions"><strong>Discussions</strong></a>
+  ·
   <a href="#use-it-in-three-moves"><strong>3-Step Quickstart</strong></a>
   ·
   <a href="#use-as-agent-skill"><strong>Use as Agent Skill</strong></a>
-  ·
-  <a href="#desktop-later"><strong>Desktop Later</strong></a>
 </p>
 
 <p align="center">
@@ -25,7 +27,17 @@
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
+  <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-172033?style=for-the-badge">
 </p>
+
+## Why People Star It
+
+| If you need... | Ultimate PPT Master gives you... |
+|---|---|
+| An AI presentation generator that does not hide your source files | A local-first Web Experience plus Bridge handoff folder. |
+| Editable PowerPoint output, not screenshots pasted into slides | A PPTX-oriented Agent Skill path with quality checks. |
+| Better first drafts from messy PDFs, Word docs, PPTX, URLs, and notes | Starter packs, source skeletons, manifests, and QA checklists. |
+| Web-native, magazine-style decks for demos or reports | A Web Deck route with browser previews and shareable HTML output. |
 
 ## Use It In Three Moves
 

@@ -1,4 +1,4 @@
-# Ultimate PPT Master
+# Ultimate PPT Master - 本地优先的 AI PPT 生成器
 
 > 把 PDF、Word、PPTX、Excel、URL 和零散笔记整理成 Agent 能直接接手的演示项目，再在本地生成可编辑 PowerPoint 或杂志风 Web Deck。
 
@@ -11,11 +11,13 @@
 <p align="center">
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>打开 Web Experience</strong></a>
   ·
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v2.4.0"><strong>最新 Release</strong></a>
+  ·
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/discussions"><strong>Discussions</strong></a>
+  ·
   <a href="#三步用起来"><strong>三步用起来</strong></a>
   ·
   <a href="#作为-agent-skill-使用"><strong>作为 Agent Skill 使用</strong></a>
-  ·
-  <a href="#桌面端-later"><strong>桌面端 Later</strong></a>
 </p>
 
 <p align="center">
@@ -25,7 +27,17 @@
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
+  <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-172033?style=for-the-badge">
 </p>
+
+## 为什么值得 Star
+
+| 如果你需要... | Ultimate PPT Master 给你... |
+|---|---|
+| 一个不把源文件藏起来的 AI PPT 生成器 | 本地优先的 Web Experience + Bridge 项目包。 |
+| 真正可编辑的 PowerPoint，而不是整页截图 | 面向 PPTX 的 Agent Skill 路线和质量检查。 |
+| 从混乱 PDF、Word、PPTX、URL、笔记里更快起稿 | starter pack、source 骨架、manifest 和 QA 清单。 |
+| 用网页做杂志风汇报或演示 | Web Deck 路线、浏览器预览和可分享 HTML 输出。 |
 
 ## 三步用起来
 

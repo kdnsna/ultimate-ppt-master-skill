@@ -25,6 +25,7 @@
 - Agent 配置：[Agent Setup](../agent-setup.md)
 - 工作流选择：[Choosing a Workflow](../choosing-a-workflow.md)
 - 产品定位反思：[产品定位反思](./product-positioning.md)
+- GitHub 曝光运营清单：[Public Growth Playbook](../public-growth-playbook.md)
 - 下一步内容 / 模板方向：[下一步路线 - 内容与模板预设](./next-roadmap.md)
 - v2.4.0 发布说明：[发布说明 - v2.4.0](./release-notes-v2.4.0.md)
 - GitHub 技术扫描：[GitHub 技术扫描 - 2026 年 5 月](./github-tech-scan-2026-05.md)

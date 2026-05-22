@@ -17,6 +17,7 @@ The desktop app remains available as an advanced local preview and future distri
 | I want Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf to generate decks. | Agent Skill | [Agent Setup](./agent-setup.md) |
 | I want to know which workflow gives better results. | Decision guide | [Choosing a Workflow](./choosing-a-workflow.md) |
 | I want to know why this exists beside direct Skill install. | Product positioning | [Product Positioning](./product-positioning.md) |
+| I want to improve public GitHub exposure. | Growth checklist | [Public Growth Playbook](./public-growth-playbook.md) |
 | I want to see the next content/template direction. | Roadmap | [Next Roadmap - Content and Template Presets](./next-roadmap.md) |
 | I want to know what changed in v2.4.0. | Release notes | [Release Notes - v2.4.0](./release-notes-v2.4.0.md) |
 | I want to see which GitHub trends influenced v2.4.0. | Technology scan | [GitHub Technology Scan - May 2026](./github-tech-scan-2026-05.md) |
