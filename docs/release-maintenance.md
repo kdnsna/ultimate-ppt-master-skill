@@ -54,6 +54,10 @@ It should cover:
 - Python worker tests;
 - whitespace checks.
 
+CI should run on the current GitHub Actions JavaScript runtime generation. For
+v2.4.0 that means Node 24 in the workflows and current official action majors
+for checkout, Node, and Python setup.
+
 The Pages workflow lives at:
 
 ```text
@@ -61,6 +65,8 @@ The Pages workflow lives at:
 ```
 
 It builds `apps/web` with `GITHUB_PAGES=true` and deploys the static artifact to GitHub Pages.
+Keep the Pages helper actions on their current Node 24-compatible majors before
+publishing a release tag.
 
 The release workflow lives at:
 

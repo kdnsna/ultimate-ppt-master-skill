@@ -23,6 +23,7 @@ Reusable preset starter packs are now a first-class release surface. The project
 - Added visible starter proofs under `examples/*-starter/` for all four v2.4 packs.
 - Added `scripts/audit_preset_packs.py` and `npm run audit:presets` to verify pack contracts before release.
 - Wired the preset audit into CI so reusable packs cannot silently lose required files or fields.
+- Updated CI, Pages, and desktop-release workflows to the current Node 24-compatible GitHub Actions majors.
 - Updated the Web Experience preset catalog with pack paths and stronger quality checks.
 - Updated README, docs, and version markers for v2.4.0.
 
