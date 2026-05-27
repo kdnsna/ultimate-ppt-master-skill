@@ -1,0 +1,28 @@
+{
+  "version": "2.5.0",
+  "presetId": "consulting_proposal",
+  "status": "passed",
+  "publicDemoSafe": true,
+  "checkedAt": "2026-05-27",
+  "summary": {
+    "zh": "合成咨询方案样例已具备 source、Web Deck、封面截图和交付检查清单；重点证明问题定义、选项比较和路线图结构可复用。",
+    "en": "Synthetic consulting proposal proof includes source, Web Deck, cover screenshot, and delivery checklist."
+  },
+  "checks": [
+    {
+      "id": "source-contract",
+      "status": "passed",
+      "summary": "Source brief includes decision context, evidence, options, and roadmap inputs."
+    },
+    {
+      "id": "visual-review",
+      "status": "passed",
+      "summary": "Starter proof keeps client-facing structure visible without private data."
+    },
+    {
+      "id": "handoff-contract",
+      "status": "passed",
+      "summary": "Preset declares expected artifacts, review commands, and acceptance criteria."
+    }
+  ]
+}

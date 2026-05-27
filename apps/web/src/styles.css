@@ -126,8 +126,8 @@ main {
 
 .studio-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
+  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 0.72fr);
+  gap: 22px;
   align-items: end;
   padding: 24px;
   border: 1px solid var(--line);
@@ -174,6 +174,99 @@ h2 {
 .action-stack {
   display: grid;
   gap: 10px;
+}
+
+.header-rail {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.quality-workbench {
+  min-width: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 12px;
+  border-left: 4px solid var(--blue);
+}
+
+.quality-workbench-head,
+.design-doctor-head {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.quality-workbench-head svg,
+.design-doctor-head svg {
+  color: var(--green);
+  margin-top: 2px;
+}
+
+.quality-workbench strong,
+.design-doctor-panel strong {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.28;
+}
+
+.quality-workbench p,
+.design-doctor-panel p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.quality-workbench-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.quality-workbench-grid div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.quality-workbench-grid span,
+.design-doctor-panel dt {
+  display: block;
+  color: var(--blue);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.quality-workbench-grid strong,
+.design-doctor-panel dd {
+  display: block;
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.design-doctor-panel {
+  margin-top: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 8px;
+  background: #f0fdf4;
+}
+
+.design-doctor-panel dl {
+  margin: 0;
+  display: grid;
+  gap: 9px;
 }
 
 .primary-action,
@@ -1589,6 +1682,13 @@ pre {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .quality-workbench {
+    padding-left: 0;
+    padding-top: 14px;
+    border-left: 0;
+    border-top: 4px solid var(--blue);
+  }
+
   .status-strip {
     grid-template-columns: 1fr;
   }
@@ -1648,6 +1748,7 @@ pre {
   }
 
   .header-actions,
+  .quality-workbench-grid,
   .configuration-actions,
   .beginner-steps,
   .control-grid,

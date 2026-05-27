@@ -48,5 +48,5 @@ Suggested one-line listing:
 
 > Ultimate PPT Master - Local-first AI presentation hub for Codex/Claude Code; turns PDFs, docs, PPTX, URLs, and notes into agent-ready projects, editable PowerPoint decks, and magazine-style Web Decks.
 
-Include the GitHub Pages demo and v2.4.0 release link when the target list format
-allows it.
+Include the GitHub Pages demo, v2.5.0 release link, and the public proof-pack
+case carousel when the target list format allows it.

@@ -3,7 +3,7 @@
 > Turn PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into Agent-ready presentation projects, then produce editable PowerPoint decks or magazine-style Web Decks locally.
 
 <p align="center">
-  <strong>v2.4.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.5.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -11,17 +11,17 @@
 <p align="center">
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Open Web Experience</strong></a>
   ·
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v2.4.0"><strong>Latest Release</strong></a>
+  <a href="./docs/release-notes-v2.5.0.md"><strong>v2.5.0 Notes</strong></a>
   ·
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/discussions"><strong>Discussions</strong></a>
   ·
-  <a href="#use-it-in-three-moves"><strong>3-Step Quickstart</strong></a>
+  <a href="#60-second-quickstart"><strong>60-second quickstart</strong></a>
   ·
   <a href="#use-as-agent-skill"><strong>Use as Agent Skill</strong></a>
 </p>
 
 <p align="center">
-  <img alt="Version 2.4.0" src="https://img.shields.io/badge/Version-2.4.0-172033?style=for-the-badge">
+  <img alt="Version 2.5.0" src="https://img.shields.io/badge/Version-2.5.0-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -30,31 +30,48 @@
   <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-172033?style=for-the-badge">
 </p>
 
+## 60-second quickstart
+
+For a first run, copy this and keep every source file on your own machine:
+
+```bash
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
+cd ultimate-ppt-master-skill
+npm run setup
+npm run doctor
+npm run bridge
+```
+
+Then open [the Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/), pick a Chinese office preset, paste a rough goal or upload local source files, and click **Send to local connector**. The Bridge writes a handoff folder with the brief, source material, manifest, preview, quality checklist, and `quality-report.json`.
+
+| First choice | Best default |
+|---|---|
+| I need a weekly or quarterly update | **Executive Business Review** |
+| I need a client-facing recommendation | **Consulting Proposal** |
+| I need a public product story | **Product Pitch** |
+| I need a visual web deck for a trend topic | **Tech Trend Web Deck** |
+
+## v2.5 case carousel
+
+![v2.5 Quality Workbench case carousel](assets/readme/v2.5-case-carousel.gif)
+
+These are public synthetic proof packs: input source, selected preset, generated output, screenshot cover, and quality report are all committed so users can judge the workflow before installing anything.
+
+| Case | Fits | Proof |
+|---|---|---|
+| Executive Business Review | Operations review, CEO/department update, KPI story | [Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) · [Source](./examples/executive-business-review-starter/source.sanitized.md) · [Quality report](./examples/executive-business-review-starter/quality-report.json) |
+| Consulting Proposal | Client diagnosis, transformation proposal, decision memo | [Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/consulting-proposal-starter/web-demo.html) · [Source](./examples/consulting-proposal-starter/source.sanitized.md) · [Quality report](./examples/consulting-proposal-starter/quality-report.json) |
+| Product Pitch | Launch story, demo day, stakeholder buy-in | [Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/product-pitch-starter/web-demo.html) · [Source](./examples/product-pitch-starter/source.sanitized.md) · [Quality report](./examples/product-pitch-starter/quality-report.json) |
+| Tech Trend Web Deck | Public trend briefing, conference talk, thought leadership | [Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/tech-trend-web-deck-starter/web-demo.html) · [Source](./examples/tech-trend-web-deck-starter/source.sanitized.md) · [Quality report](./examples/tech-trend-web-deck-starter/quality-report.json) |
+
 ## Why People Star It
 
 | If you need... | Ultimate PPT Master gives you... |
 |---|---|
 | An AI presentation generator that does not hide your source files | A local-first Web Experience plus Bridge handoff folder. |
 | Editable PowerPoint output, not screenshots pasted into slides | A PPTX-oriented Agent Skill path with quality checks. |
-| Better first drafts from messy PDFs, Word docs, PPTX, URLs, and notes | Starter packs, source skeletons, manifests, and QA checklists. |
+| Better first drafts from messy PDFs, Word docs, PPTX, URLs, and notes | Stable packs, source skeletons, manifests, QA checklists, and quality reports. |
 | Web-native, magazine-style decks for demos or reports | A Web Deck route with browser previews and shareable HTML output. |
-
-## Use It In Three Moves
-
-| Step | What you do | What you get |
-|---|---|---|
-| **1. Open the Web Experience** | Visit [the static web page](https://kdnsna.github.io/ultimate-ppt-master-skill/), pick a preset, and write or paste the deck goal. | A readable brief, preview, source template, and plain-language setup guide. |
-| **2. Connect this computer** | Run `npm run bridge` from a local clone when you want real file parsing and local project output. | The local connector (Bridge) detects Codex / Hermes / OpenClaw / Claude Code and keeps files on `127.0.0.1`. |
-| **3. Send it to an AI helper** | Click **Send to local connector**, then copy or launch the generated command. | A local project folder with source files, manifest, agent prompt, preview, and quality checklist. |
-
-```bash
-git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
-cd ultimate-ppt-master-skill
-npm run setup
-npm run bridge
-```
-
-Then open the web page and click **Send to local connector**.
 
 ## What It Is
 
@@ -69,31 +86,28 @@ The goal is simple: **the web page should make the workflow easy to understand; 
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
 
-## v2.4.0 Release Focus
+## v2.5.0 Release Focus
 
-v2.4.0 turns the recent Web + Bridge work into a more reusable production system: **GitHub-informed direction, stronger preset packs, and release gates for reusable deck starters.**
+v2.5.0 turns Ultimate PPT Master into a **PPT quality workbench for Chinese office users**. It keeps the local-first Web + Bridge + Skill architecture and improves first use, preset quality, visual review, sample proof, and delivery gates.
 
-This release improves the Web Experience and Skill package in the places that help other people reuse it:
+This release focuses on practical office delivery:
 
-- a GitHub technology scan maps current signals such as MarkItDown, MCP servers, Slidev, Marp, PptxGenJS, DOM-to-PPTX, and open AI presentation products to concrete product decisions;
-- Consulting Proposal and Tech Trend Web Deck now join Executive Business Review and Product Pitch as reusable preset starter packs;
-- each starter pack has a machine-readable `preset.json`, sanitized `source.md`, and `quality-checklist.md`;
-- `scripts/audit_preset_packs.py` verifies preset-pack contracts before release and now runs in CI;
-- the Web Experience exposes the new pack paths and richer quality checks so handoff prompts are more specific;
-- Bridge / handoff kits still preserve `manifest`, `engine-plan`, and `quality-checklist` so the Agent has a clear acceptance contract.
+- Business Review and Consulting Proposal stay as the first default paths; Training Courseware and Academic Defense move ahead of showcase decks in the Web preset menu.
+- Stable packs now declare `userLevel`, `qualityProfile`, `proofArtifacts`, and `notFor` so users can see who a preset is for and where it does not fit.
+- Design Doctor makes visual review understandable: SVG checks, browser review, `workflows/visual-review.md`, `quality-report.json`, and a Chinese summary are part of the handoff contract.
+- Bridge / handoff kits now preserve `qualityProfile`, `expectedArtifacts`, and `reviewCommands` in `manifest.json` and `project-brief.json`.
+- `scripts/audit_quality_proofs.py` verifies stable proof artifacts before publishing.
 
-### v2.4.0 In Plain Words
+### v2.5.0 In Plain Words
 
-- You no longer start from a blank prompt. Pick a starter pack and the project tells the Agent what material to ask for, which story shape to use, which templates fit, and what to check.
-- The new GitHub scan explains why the project cares about Markdown handoff, local agents, editable PPTX, and web decks. It is the reasoning behind the release, not vague trend-chasing.
-- Every starter pack now has a small public proof: a source skeleton, a web preview, a cover image, and a checklist. That makes the output direction easier to understand before anyone runs the full workflow.
-- Maintainers get a simple audit command, `npm run audit:presets`, so reusable packs cannot silently lose required files.
+- The web page is no longer just a form. The first screen now shows the current task, next step, quality status, and delivery gates.
+- Presets are no longer vague examples. A stable pack must have a public synthetic source, generated output, screenshot, quality report, and suitability boundary.
+- The Agent gets more than a prompt. It receives a contract that says what should be produced and how to check it.
+- Design Doctor reports first and repairs only when the user explicitly asks.
 
-## Next Direction
+## Quality Proofs
 
-v2.4.0 ships a stronger **preset-pack reuse layer** on top of the Bridge + Skill setup path. The next direction is to add production-grade sample decks, screenshot sets, and benchmark runs for each pack before calling them stable.
-
-Read the plan: [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md). Read the scan: [GitHub Technology Scan - May 2026](./docs/github-tech-scan-2026-05.md). Preset catalog: [templates/presets](./templates/presets).
+Read the benchmark note: [Quality Workbench v2.5](./docs/quality-workbench-v2.5.md). Read the roadmap: [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md). Preset catalog: [templates/presets](./templates/presets).
 
 ## Why Not Just Use Codex To Install A Skill?
 
@@ -106,7 +120,7 @@ The product adds value by:
 - turning a vague request into a structured brief;
 - packaging real source files into a local handoff folder;
 - showing Bridge, Agent, and provider readiness before production;
-- generating an engine plan and quality checklist;
+- generating an engine plan, quality checklist, and quality report;
 - preserving the original upstream quality routes instead of replacing them with a weaker web-only generator.
 
 Read the deeper positioning note: [Product Positioning](./docs/product-positioning.md).
@@ -356,21 +370,20 @@ Maintenance references:
 | Configure provider keys locally | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | Understand why this exists beside direct Skill install | [Product Positioning](./docs/product-positioning.md) |
 | See the next content/template direction | [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md) |
-| Review v2.4.0 release focus | [Release Notes - v2.4.0](./docs/release-notes-v2.4.0.md) |
+| Review v2.5.0 release focus | [Release Notes - v2.5.0](./docs/release-notes-v2.5.0.md) |
+| Review the quality proof matrix | [Quality Workbench v2.5](./docs/quality-workbench-v2.5.md) |
 | Review GitHub technology signals | [GitHub Technology Scan - May 2026](./docs/github-tech-scan-2026-05.md) |
 | Review the local upstream benchmark | [Upstream Benchmark - May 2026](./docs/upstream-benchmark-2026-05.md) |
 | Debug setup, extraction, output, provider, Tauri, or agent loading issues | [Troubleshooting](./docs/troubleshooting.md) |
 | Release, Pages, Homebrew, signing, privacy, and maintenance | [Release and Maintenance](./docs/release-maintenance.md) |
 
-## v2.4.0 Highlights
+## v2.5.0 Highlights
 
-- Added a GitHub technology scan that links current open-source signals to project decisions.
-- Promoted Consulting Proposal and Tech Trend Web Deck into reusable starter packs.
-- Added visible starter proofs for Executive Business Review, Consulting Proposal, Product Pitch, and Tech Trend Web Deck.
-- Added a preset-pack audit script and wired it into CI.
-- Kept one-click local setup checks and agent selection across Codex, Hermes, OpenClaw, and Claude Code.
-- Kept Bridge / handoff kit focused on local source staging, provider readiness, Agent commands, previews, and quality checks.
-- Kept the Skill as the high-quality production route for final PPTX / Web Deck generation, preview, and repair.
+- Reworked the Web first screen into a quality workbench with task preview, next step, and quality status.
+- Promoted the four current packs to `stable-pack` with quality metadata and proof artifacts.
+- Added Design Doctor entry points and `quality-report.json` to handoff kits.
+- Added quality proof audit coverage with `npm run audit:quality`.
+- Strengthened Bridge manifest and project brief contracts for local Agent execution.
 
 See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for upstream baselines and adaptation policy.
 

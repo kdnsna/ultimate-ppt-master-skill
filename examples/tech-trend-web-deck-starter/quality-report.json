@@ -1,0 +1,28 @@
+{
+  "version": "2.5.0",
+  "presetId": "tech_trend_web_deck",
+  "status": "passed",
+  "publicDemoSafe": true,
+  "checkedAt": "2026-05-27",
+  "summary": {
+    "zh": "合成科技趋势 Web Deck 样例已具备 source、Web Deck、封面截图和交付检查清单；重点证明公开来源、趋势叙事和 Web Deck 视觉节奏。",
+    "en": "Synthetic tech trend proof includes source, Web Deck, cover screenshot, and delivery checklist."
+  },
+  "checks": [
+    {
+      "id": "source-contract",
+      "status": "passed",
+      "summary": "Source brief includes public references, signal interpretation, implications, and caveats."
+    },
+    {
+      "id": "visual-review",
+      "status": "passed",
+      "summary": "Starter proof alternates thesis and evidence pages for public sharing."
+    },
+    {
+      "id": "handoff-contract",
+      "status": "passed",
+      "summary": "Preset declares expected artifacts, review commands, and acceptance criteria."
+    }
+  ]
+}

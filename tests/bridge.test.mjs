@@ -77,6 +77,56 @@ test("handoff writes project files and extracts browser text attachments", async
   await rm(outputDir, { recursive: true, force: true });
 });
 
+test("handoff writes v2.5 quality contract into manifest and report", async () => {
+  const outputDir = await mkdtemp(join(tmpdir(), "upm-bridge-quality-"));
+  await withServer({ outputDir }, async (baseUrl) => {
+    const qualityProfile = {
+      label: "中文办公交付质量",
+      acceptanceCriteria: ["结论先行", "关键页无拥挤", "图表可读", "来源可追溯"]
+    };
+    const expectedArtifacts = ["preview-web-deck.html", "quality-report.json", "final.pptx"];
+    const reviewCommands = [
+      "python3 scripts/svg_quality_checker.py <project_path>",
+      "python3 scripts/visual_review.py <project_path>"
+    ];
+
+    const response = await fetch(`${baseUrl}/handoff`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        form: { title: "Quality Contract Deck" },
+        sourceMarkdown: "# Source\n\nQuality notes.",
+        agentPrompt: "Use the skill.",
+        projectBrief: { title: "Quality Contract Deck" },
+        enginePlanMarkdown: "# Engine",
+        qualityChecklist: "# Checklist",
+        qualityProfile,
+        expectedArtifacts,
+        reviewCommands
+      })
+    });
+
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(payload.ok, true);
+    assert.ok(payload.files.includes("quality-report.json"));
+    assert.deepEqual(payload.manifest.qualityProfile, qualityProfile);
+    assert.deepEqual(payload.manifest.expectedArtifacts, expectedArtifacts);
+    assert.deepEqual(payload.manifest.reviewCommands, reviewCommands);
+
+    const manifest = JSON.parse(await readFile(join(payload.projectPath, "manifest.json"), "utf8"));
+    assert.deepEqual(manifest.qualityProfile, qualityProfile);
+    assert.deepEqual(manifest.expectedArtifacts, expectedArtifacts);
+    assert.deepEqual(manifest.reviewCommands, reviewCommands);
+
+    const report = JSON.parse(await readFile(join(payload.projectPath, "quality-report.json"), "utf8"));
+    assert.equal(report.status, "pending");
+    assert.deepEqual(report.qualityProfile, qualityProfile);
+    assert.match(report.summary.zh, /视觉复查/);
+  });
+  await rm(outputDir, { recursive: true, force: true });
+});
+
 test("agent launch is command-only unless allow launch is enabled", async () => {
   await withServer({ allowLaunch: false }, async (baseUrl) => {
     const response = await fetch(`${baseUrl}/agent/launch`, {

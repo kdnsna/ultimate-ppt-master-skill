@@ -1,6 +1,7 @@
 {
   "id": "executive_business_review",
-  "status": "draft-pack",
+  "status": "stable-pack",
+  "userLevel": "中文办公用户 / office user",
   "scenario": "Quarterly or monthly business review for executives.",
   "audience": [
     "executive team",
@@ -62,6 +63,31 @@
     "PPTX text, shapes, charts, and speaker notes remain editable.",
     "Optional Web Deck is checked on desktop and mobile widths."
   ],
+  "qualityProfile": {
+    "label": "中文经营汇报交付质量",
+    "acceptanceCriteria": [
+      "cover and executive summary state the management answer first",
+      "KPI pages keep period, unit, source, and owner visible",
+      "charts and tables remain editable in the PPTX route",
+      "desktop and mobile Web Deck previews have no clipping, overlap, or tiny text"
+    ],
+    "reviewCommands": [
+      "python3 scripts/svg_quality_checker.py <project_path>",
+      "python3 scripts/visual_review.py <project_path>"
+    ],
+    "expectedArtifacts": [
+      "source.md",
+      "project-brief.json",
+      "preview-web-deck.html",
+      "quality-checklist.md",
+      "quality-report.json",
+      "final.pptx"
+    ]
+  },
+  "notFor": [
+    "pure marketing launch decks with little operational data",
+    "private board material that cannot be represented with sanitized public proof"
+  ],
   "sampleProof": {
     "source": "templates/presets/executive_business_review/source.md",
     "qualityChecklist": "templates/presets/executive_business_review/quality-checklist.md",
@@ -69,5 +95,13 @@
     "screenshot": "examples/executive-business-review-starter/cover.svg",
     "publicDemoSafe": true,
     "notes": "Synthetic sanitized business review skeleton and visible starter proof for public demos."
+  },
+  "proofArtifacts": {
+    "source": "templates/presets/executive_business_review/source.md",
+    "qualityChecklist": "templates/presets/executive_business_review/quality-checklist.md",
+    "generatedOutput": "examples/executive-business-review-starter/web-demo.html",
+    "screenshot": "examples/executive-business-review-starter/cover.svg",
+    "qualityReport": "examples/executive-business-review-starter/quality-report.json",
+    "benchmarkNote": "docs/quality-workbench-v2.5.md"
   }
 }

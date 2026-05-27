@@ -1,0 +1,28 @@
+{
+  "version": "2.5.0",
+  "presetId": "executive_business_review",
+  "status": "passed",
+  "publicDemoSafe": true,
+  "checkedAt": "2026-05-27",
+  "summary": {
+    "zh": "合成经营复盘样例已具备 source、Web Deck、封面截图和交付检查清单；适合作为中文办公用户的质量证明基线。",
+    "en": "Synthetic business review proof includes source, Web Deck, cover screenshot, and delivery checklist."
+  },
+  "checks": [
+    {
+      "id": "source-contract",
+      "status": "passed",
+      "summary": "Source brief includes context, KPI direction, decisions, and actions."
+    },
+    {
+      "id": "visual-review",
+      "status": "passed",
+      "summary": "Cover and first-pass Web Deck use stable layout, readable text, and no known stale version markers."
+    },
+    {
+      "id": "handoff-contract",
+      "status": "passed",
+      "summary": "Preset declares expected artifacts, review commands, and acceptance criteria."
+    }
+  ]
+}

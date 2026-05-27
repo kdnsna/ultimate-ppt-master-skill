@@ -3,7 +3,7 @@
 > 把 PDF、Word、PPTX、Excel、URL 和零散笔记整理成 Agent 能直接接手的演示项目，再在本地生成可编辑 PowerPoint 或杂志风 Web Deck。
 
 <p align="center">
-  <strong>v2.4.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v2.5.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -11,17 +11,17 @@
 <p align="center">
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>打开 Web Experience</strong></a>
   ·
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v2.4.0"><strong>最新 Release</strong></a>
+  <a href="./docs/zh-CN/release-notes-v2.5.0.md"><strong>v2.5.0 说明</strong></a>
   ·
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/discussions"><strong>Discussions</strong></a>
   ·
-  <a href="#三步用起来"><strong>三步用起来</strong></a>
+  <a href="#60-秒开箱即用"><strong>60 秒开箱即用</strong></a>
   ·
   <a href="#作为-agent-skill-使用"><strong>作为 Agent Skill 使用</strong></a>
 </p>
 
 <p align="center">
-  <img alt="Version 2.4.0" src="https://img.shields.io/badge/Version-2.4.0-172033?style=for-the-badge">
+  <img alt="Version 2.5.0" src="https://img.shields.io/badge/Version-2.5.0-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -30,31 +30,48 @@
   <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-172033?style=for-the-badge">
 </p>
 
+## 60 秒开箱即用
+
+第一次试用，直接复制下面几行；资料始终留在你自己的电脑上：
+
+```bash
+git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
+cd ultimate-ppt-master-skill
+npm run setup
+npm run doctor
+npm run bridge
+```
+
+然后打开 [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/)，选择一个中文办公预设，粘贴一句目标或导入本地资料，点击 **发送到本机连接器**。Bridge 会生成一个 handoff 文件夹，里面有 brief、源资料、manifest、预览、质量检查清单和 `quality-report.json`。
+
+| 第一眼怎么选 | 推荐默认预设 |
+|---|---|
+| 我要做周报、月报、季度复盘 | **经营复盘** |
+| 我要做客户方案或管理建议 | **咨询方案** |
+| 我要讲产品、路演或 demo day | **产品路演** |
+| 我要做趋势观察或公开演讲 | **科技趋势 Web Deck** |
+
+## v2.5 案例动态展示
+
+![v2.5 Quality Workbench case carousel](assets/readme/v2.5-case-carousel.gif)
+
+这些都是公开合成案例：输入资料、所选预设、生成输出、封面截图和质量报告都在仓库里，别人不用安装也能先判断“它到底能产出什么”。
+
+| 案例 | 适合 | 证明材料 |
+|---|---|---|
+| 经营复盘 | 经营会、部门复盘、KPI 故事线 | [Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) · [Source](./examples/executive-business-review-starter/source.sanitized.md) · [Quality report](./examples/executive-business-review-starter/quality-report.json) |
+| 咨询方案 | 客户诊断、转型建议、决策汇报 | [Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/consulting-proposal-starter/web-demo.html) · [Source](./examples/consulting-proposal-starter/source.sanitized.md) · [Quality report](./examples/consulting-proposal-starter/quality-report.json) |
+| 产品路演 | 新品介绍、demo day、内部争取资源 | [Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/product-pitch-starter/web-demo.html) · [Source](./examples/product-pitch-starter/source.sanitized.md) · [Quality report](./examples/product-pitch-starter/quality-report.json) |
+| 科技趋势 | 公开趋势分享、行业观察、技术洞察 | [Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/tech-trend-web-deck-starter/web-demo.html) · [Source](./examples/tech-trend-web-deck-starter/source.sanitized.md) · [Quality report](./examples/tech-trend-web-deck-starter/quality-report.json) |
+
 ## 为什么值得 Star
 
 | 如果你需要... | Ultimate PPT Master 给你... |
 |---|---|
 | 一个不把源文件藏起来的 AI PPT 生成器 | 本地优先的 Web Experience + Bridge 项目包。 |
 | 真正可编辑的 PowerPoint，而不是整页截图 | 面向 PPTX 的 Agent Skill 路线和质量检查。 |
-| 从混乱 PDF、Word、PPTX、URL、笔记里更快起稿 | starter pack、source 骨架、manifest 和 QA 清单。 |
+| 从混乱 PDF、Word、PPTX、URL、笔记里更快起稿 | stable pack、source 骨架、manifest、QA 清单和质量报告。 |
 | 用网页做杂志风汇报或演示 | Web Deck 路线、浏览器预览和可分享 HTML 输出。 |
-
-## 三步用起来
-
-| 步骤 | 你做什么 | 得到什么 |
-|---|---|---|
-| **1. 打开 Web Experience** | 进入 [静态网页](https://kdnsna.github.io/ultimate-ppt-master-skill/)，选一个内容预设，再写一句任务或粘贴资料摘要。 | 清晰的 brief、网页预览、`source.md` 模板和通俗配置指引。 |
-| **2. 连接这台电脑** | 如果要解析真实 PDF/Word/PPTX/Excel/URL，在本地 clone 后运行 `npm run bridge`。 | 本机连接器（Bridge）会检测 Codex / Hermes / OpenClaw / Claude Code，并把资料留在 `127.0.0.1`。 |
-| **3. 交给 AI 助手** | 点击 **发送到本机连接器**，再复制或启动生成的命令。 | 一个本地项目包，里面有资料、manifest、Agent prompt、预览和质量检查清单。 |
-
-```bash
-git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
-cd ultimate-ppt-master-skill
-npm run setup
-npm run bridge
-```
-
-然后打开网页，点击 **发送到本机连接器**。
 
 ## 这是个什么项目
 
@@ -69,31 +86,28 @@ Ultimate PPT Master 是一个 **本地优先的 AI 演示生产中枢**。它不
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
 
-## v2.4.0 发布重点
+## v2.5.0 发布重点
 
-v2.4.0 把最近几版 Web + Bridge 的能力沉淀成更可复用的生产系统：**GitHub 趋势有证据、场景预设更完整、发布前有自动门禁。**
+v2.5.0 把 Ultimate PPT Master 定位成 **面向中文办公用户的 PPT 质量工作台**。它继续保持本地优先的 Web + Bridge + Skill 架构，不把项目变成黑盒云生成器。
 
-这次重点放在别人能不能更容易复用、Agent 产出能不能更稳定：
+这次重点放在普通用户能不能更容易上手、Agent 产出能不能更可验收：
 
-- 新增 GitHub 技术扫描，把 MarkItDown、MCP servers、Slidev、Marp、PptxGenJS、DOM-to-PPTX、开源 AI 演示产品等信号映射到项目决策；
-- 咨询方案、科技趋势 Web Deck 升级为 starter pack，和经营复盘、产品路演一起组成第一批可复用预设包；
-- 每个 starter pack 都包含机器可读 `preset.json`、脱敏 `source.md` 和 `quality-checklist.md`；
-- 新增 `scripts/audit_preset_packs.py`，用于发布前审计预设包契约，并已接入 CI；
-- Web Experience 露出新的 pack path 和更具体的质量检查，让 handoff prompt 不再泛泛；
-- Bridge / handoff kit 继续保留 `manifest`、`engine-plan`、`quality-checklist`，让 Agent 有明确验收标准。
+- 经营复盘、咨询方案继续作为默认路径；培训课件、学术答辩在网页预设菜单里前移；
+- stable pack 新增 `userLevel`、`qualityProfile`、`proofArtifacts`、`notFor`，说明适合谁、不适合谁、要交付什么；
+- Design Doctor 把 SVG 检查、浏览器视觉复查、`workflows/visual-review.md`、`quality-report.json` 和中文摘要组合成一个用户能理解的步骤；
+- Bridge / handoff kit 会把 `qualityProfile`、`expectedArtifacts`、`reviewCommands` 写进 `manifest.json` 和 `project-brief.json`；
+- 新增 `scripts/audit_quality_proofs.py`，发布前检查 stable pack 的公开证明。
 
-### v2.4.0 白话更新栏
+### v2.5.0 白话更新栏
 
-- 以后不用从空白 prompt 开始。选一个 starter pack，项目就会告诉 Agent：该要哪些资料、按什么故事结构讲、用哪些模板、最后检查什么。
-- 新增 GitHub 技术扫描，不是为了堆热词，而是解释为什么这个项目要重视 Markdown 交接、本地 Agent、可编辑 PPTX 和 Web Deck。
-- 每个 starter pack 都有一个小样板：source 骨架、网页预览、封面图和检查清单。别人没跑完整流程前，也能一眼看懂大概会产出什么。
-- 维护者多了一个简单命令：`npm run audit:presets`。以后预设包少文件、少字段、proof 还写着 pending，CI 会拦住。
+- 首页不再右侧空着：现在会显示当前任务、下一步、质量状态和交付门禁。
+- 预设不再只是方向建议：stable pack 必须有公开合成资料、生成输出、截图、质量报告和适用边界。
+- Agent 收到的不只是一段 prompt，而是一份可验收合同。
+- Design Doctor 默认先报告和建议，只有用户明确要求时才自动修 SVG。
 
-## 下一步方向
+## 质量证明
 
-v2.4.0 在 Bridge + Skill 配置路径之上补强了 **预设包复用层**。下一步建议为每个 pack 补完整生产级成品、截图集和基准测试，再把它们从 draft-pack 推到 stable-pack。
-
-路线文档：[下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md)。技术扫描：[GitHub 技术扫描 - 2026 年 5 月](./docs/zh-CN/github-tech-scan-2026-05.md)。预设目录：[templates/presets](./templates/presets)。
+质量证明矩阵：[v2.5 质量工作台](./docs/zh-CN/quality-workbench-v2.5.md)。路线文档：[下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md)。预设目录：[templates/presets](./templates/presets)。
 
 ## 为什么不直接让 Codex 安装 Skill？
 
@@ -106,7 +120,7 @@ Ultimate PPT Master 解决的是这之前的一分钟：用户有文件、有粗
 - 把模糊需求变成结构化 brief；
 - 把真实资料整理成本地 handoff 文件夹；
 - 在生产前显示 Bridge、Agent、provider 是否可用；
-- 自动生成 engine plan 和质量检查清单；
+- 自动生成 engine plan、质量检查清单和质量报告；
 - 保留原作者路线的质量上限，而不是替换成弱网页生成器。
 
 更完整的反思见：[产品定位反思](./docs/zh-CN/product-positioning.md)。
@@ -356,21 +370,20 @@ npm run desktop
 | 本地配置 provider key | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | 理解它为什么不只是“多装一个 Skill” | [产品定位反思](./docs/zh-CN/product-positioning.md) |
 | 查看下一步内容 / 模板方向 | [下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md) |
-| 查看 v2.4.0 发布重点 | [发布说明 - v2.4.0](./docs/zh-CN/release-notes-v2.4.0.md) |
+| 查看 v2.5.0 发布重点 | [发布说明 - v2.5.0](./docs/zh-CN/release-notes-v2.5.0.md) |
+| 查看质量证明矩阵 | [v2.5 质量工作台](./docs/zh-CN/quality-workbench-v2.5.md) |
 | 查看 GitHub 技术趋势 | [GitHub 技术扫描 - 2026 年 5 月](./docs/zh-CN/github-tech-scan-2026-05.md) |
 | 查看本机上游基准测试 | [上游基准测试 - 2026 年 5 月](./docs/zh-CN/upstream-benchmark-2026-05.md) |
 | 排查安装、解析、输出、provider、Tauri 或 Agent 加载问题 | [Troubleshooting](./docs/troubleshooting.md) |
 | 发布、Pages、Homebrew、签名、公证、隐私和维护 | [Release and Maintenance](./docs/release-maintenance.md) |
 
-## v2.4.0 重点变化
+## v2.5.0 重点变化
 
-- 新增 GitHub 技术扫描，把当前开源信号转成项目判断。
-- 咨询方案、科技趋势 Web Deck 升级为可复用 starter pack。
-- 为经营复盘、咨询方案、产品路演、科技趋势 Web Deck 增加可见 starter proof。
-- 新增预设包审计脚本，并接入 CI。
-- 保留一键检测和一键选择可用 AI 助手，覆盖 Codex、Hermes、OpenClaw、Claude Code。
-- Bridge / handoff kit 继续负责本地资料打包、provider 状态、Agent 命令、预览文件和质量检查。
-- Skill 仍然是高质量生产路线，负责最终 PPTX / Web Deck 的深度生成、预览和修复。
+- Web 第一屏升级为质量工作台，显示任务预览、下一步和质量状态。
+- 四个当前 pack 升级为 `stable-pack`，带质量元数据和公开证明产物。
+- 新增 Design Doctor 入口，并把 `quality-report.json` 写进 handoff kit。
+- 新增 `npm run audit:quality` 的质量证明审计。
+- Bridge manifest 和 project brief 增加质量目标、预期产物和检查命令。
 
 上游同步与本地适配策略见 [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md)。
 

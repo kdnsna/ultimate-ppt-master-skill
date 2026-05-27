@@ -9,6 +9,7 @@ npm run doctor
 npm --prefix apps/web ci
 npm run build:web
 npm run audit:presets
+npm run audit:quality
 npm run build:desktop
 npm --prefix apps/desktop audit
 npm run test:node
@@ -50,12 +51,13 @@ It should cover:
 - desktop frontend build;
 - dependency audit;
 - preset starter-pack audit;
+- stable pack quality proof audit;
 - Bridge and Web Experience Node tests;
 - Python worker tests;
 - whitespace checks.
 
 CI should run on the current GitHub Actions JavaScript runtime generation. For
-v2.4.0 that means Node 24 in the workflows and current official action majors
+v2.5.0 that means Node 24 in the workflows and current official action majors
 for checkout, Node, and Python setup.
 
 The Pages workflow lives at:
@@ -133,12 +135,13 @@ When syncing upstream:
 
 ## Version Notes
 
-v2.4.0 positions this repository as:
+v2.5.0 positions this repository as:
 
-- a web-first static experience for public discovery, source intake, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing;
-- a localhost-only Agent Bridge for local source parsing, provider readiness checks, and handoff project creation;
+- a quality workbench for Chinese office users, with Business Review, Consulting Proposal, Training Courseware, and Academic Defense as the practical default path;
+- a web-first static experience for public discovery, source intake, current task preview, next-step guidance, Design Doctor, handoff-kit export, and demo viewing;
+- a localhost-only Agent Bridge for local source parsing, provider readiness checks, quality-profile handoff, and project creation;
 - a portable agent skill for production-grade deck generation;
-- a reusable preset-pack catalog with release-audited starter packs;
+- a reusable preset-pack catalog with release-audited starter packs, public proof artifacts, and quality reports;
 - a retained desktop preview for future signed native distribution;
 - a documented provider convention that keeps API keys local.
 

@@ -9,9 +9,9 @@ Preset directions are scenario-level defaults for future content packs. They sit
 
 The seed catalog is [`preset-directions.json`](./preset-directions.json).
 
-## Starter Packs
+## Stable Packs
 
-The first v2.4 starter packs are now usable as Agent handoff starters:
+The first v2.5 stable packs are now usable as Agent handoff quality contracts:
 
 | Preset | Pack | Primary output |
 |---|---|---|
@@ -25,12 +25,13 @@ Each pack includes:
 - `preset.json` - machine-readable preset contract;
 - `source.md` - sanitized sample source skeleton;
 - `quality-checklist.md` - delivery checks the Agent should pass before final output.
-- visible starter proof under `examples/*-starter/` with `web-demo.html` and `cover.svg`.
+- visible starter proof under `examples/*-starter/` with `web-demo.html`, `cover.svg`, and `quality-report.json`.
 
-Run the release audit before promoting a pack:
+Run the release audits before promoting a pack:
 
 ```bash
 python3 scripts/audit_preset_packs.py
+python3 scripts/audit_quality_proofs.py
 ```
 
 For the roadmap, see [`docs/next-roadmap.md`](../../docs/next-roadmap.md).

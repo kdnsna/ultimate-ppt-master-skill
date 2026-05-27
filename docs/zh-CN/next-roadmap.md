@@ -1,6 +1,6 @@
 # 下一步路线 - 内容与模板预设
 
-v2.3 已经把第一公里讲清楚：输入看得懂，产出看得见，本地 Agent 接得住。
+v2.5 已经把第一公里变得更清楚、更可验：输入看得懂，预设有证明，本地 Agent 接得住，Design Doctor 能复查。
 
 下一步的产品重点应该是产出稳定性。Ultimate PPT Master 不能只依赖 Agent 临场发挥，而要把内容结构、模板预设、图表选择和检查标准沉淀下来，让用户不用每次从空白 prompt 开始。
 
@@ -35,7 +35,7 @@ v2.3 已经把第一公里讲清楚：输入看得懂，产出看得见，本地
 
 预设种子目录：[`templates/presets/preset-directions.json`](../../templates/presets/preset-directions.json)
 
-## v2.4 Starter Pack
+## v2.5 Stable Pack
 
 | 预设 | 主要输出 | 为什么重要 |
 |---|---|---|
@@ -44,7 +44,7 @@ v2.3 已经把第一公里讲清楚：输入看得懂，产出看得见，本地
 | 产品路演 | Web Deck + 可选 PPTX | 让公开 demo、产品发布和创业叙事更有记忆点。 |
 | 科技趋势 Web Deck | Web Deck | 保持公开样板路线的视觉冲击力、来源可信度和可分享性。 |
 
-这四个预设已经在 [`templates/presets`](../../templates/presets) 下具备 starter-pack 文件夹，并在 `examples/*-starter/` 下有可见 starter proof。它们目前是 `draft-pack` 质量，适合 handoff 和测试；要晋级 `stable-pack`，还需要补完整生产级成品、截图集和 QA / benchmark 记录。
+这四个预设已经在 [`templates/presets`](../../templates/presets) 下具备 stable-pack 文件夹，在 `examples/*-starter/` 下有可见 starter proof，并补充了 `quality-report.json`。证明矩阵见 [v2.5 质量工作台](./quality-workbench-v2.5.md)。
 
 ## 后续候选预设包
 
@@ -71,8 +71,8 @@ v2.3 已经把第一公里讲清楚：输入看得懂，产出看得见，本地
 | 版本 | 重点 |
 |---|---|
 | v2.4 | 把第一批预设种子变成 starter pack，在 Web Experience 中露出，并把 pack 契约审计接入 CI。 |
-| v2.5 | 为每个 starter pack 增加生产级样板、截图集、benchmark 记录和“适合什么”的标签。 |
-| v2.6 | 增加 PPTX 与 Web Deck 双路线的预设质量基准测试。 |
+| v2.5 | 把当前 pack 推到 stable proof 合同，加入 Design Doctor，并把质量目标写入 handoff manifest。 |
+| v2.6 | 增加更深入的 PPTX 与 Web Deck 双路线预设质量基准测试。 |
 
 ## 产品原则
 

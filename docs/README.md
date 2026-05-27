@@ -19,8 +19,9 @@ The desktop app remains available as an advanced local preview and future distri
 | I want to know why this exists beside direct Skill install. | Product positioning | [Product Positioning](./product-positioning.md) |
 | I want to improve public GitHub exposure. | Growth checklist | [Public Growth Playbook](./public-growth-playbook.md) |
 | I want to see the next content/template direction. | Roadmap | [Next Roadmap - Content and Template Presets](./next-roadmap.md) |
-| I want to know what changed in v2.4.0. | Release notes | [Release Notes - v2.4.0](./release-notes-v2.4.0.md) |
-| I want to see which GitHub trends influenced v2.4.0. | Technology scan | [GitHub Technology Scan - May 2026](./github-tech-scan-2026-05.md) |
+| I want to see the stable proof matrix. | Quality workbench | [Quality Workbench v2.5](./quality-workbench-v2.5.md) |
+| I want to know what changed in v2.5.0. | Release notes | [Release Notes - v2.5.0](./release-notes-v2.5.0.md) |
+| I want to see which GitHub trends influenced the roadmap. | Technology scan | [GitHub Technology Scan - May 2026](./github-tech-scan-2026-05.md) |
 | I want to see the local upstream comparison. | Benchmark | [Upstream Benchmark - May 2026](./upstream-benchmark-2026-05.md) |
 | I need model/API/provider keys. | Provider setup | [Model and Provider Setup](./model-provider-setup.md) |
 | I want the local desktop preview. | Desktop Later | [Quickstart Desktop](./quickstart-desktop.md) |
@@ -45,7 +46,7 @@ Every public support path should point to an inspectable artifact:
 | Question | First check | Evidence to keep |
 |---|---|---|
 | Does the web app build? | `npm run build:web` | `apps/web/dist`, Pages workflow logs. |
-| Does the Agent Connect Studio work? | Web Experience file intake, Bridge status, outline, live Web Deck preview, preview tabs, and handoff buttons | Generated Agent prompt, `source.md`, `extracted-source.md`, `manifest.json`, `attachments/`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `handoff-kit.zip`. |
+| Does the Agent Connect Studio work? | Web Experience file intake, Bridge status, outline, live Web Deck preview, preview tabs, Design Doctor, and handoff buttons | Generated Agent prompt, `source.md`, `extracted-source.md`, `manifest.json`, `attachments/`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, `quality-report.json`, and `handoff-kit.zip`. |
 | Did source extraction work in a local project? | Bridge `manifest.json` | `attachments[].parseStatus`, `extracted-source.md`, original files in `attachments/`. |
 | Where did the output go? | Workbench export panel or manifest | `generatedFiles`, `outputs/`, `previews/`. |
 | Why does a deck look wrong? | Project log and source markdown | `logs/desktop-worker.log`, redacted source excerpt. |

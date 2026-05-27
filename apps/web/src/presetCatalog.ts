@@ -10,9 +10,28 @@ export type PresetId =
 
 type LanguageText = Record<"zh" | "en", string>;
 
+interface WebQualityProfile {
+  label: LanguageText;
+  acceptanceCriteria: LanguageText[];
+  reviewCommands: string[];
+  expectedArtifacts: string[];
+}
+
+interface WebProofArtifacts {
+  source: string;
+  generatedOutput: string;
+  screenshot: string;
+  qualityReport: string;
+  benchmarkNote: string;
+}
+
 export interface WebPreset {
   id: PresetId;
   packPath?: string;
+  userLevel?: LanguageText;
+  qualityProfile?: WebQualityProfile;
+  proofArtifacts?: WebProofArtifacts;
+  notFor?: LanguageText[];
   label: LanguageText;
   summary: LanguageText;
   scenario: "executive" | "consulting" | "training" | "launch" | "investor";
@@ -39,10 +58,58 @@ export interface WebPreset {
   storyboard: Record<"zh" | "en", Array<{ title: string; intent: string }>>;
 }
 
+const chineseOfficeUserLevel = { zh: "中文办公用户", en: "Chinese office users" };
+
+const designDoctorReviewCommands = [
+  "python3 scripts/svg_quality_checker.py <project_path>",
+  "python3 scripts/visual_review.py <project_path>"
+];
+
+const pptxQualityArtifacts = [
+  "source.md",
+  "project-brief.json",
+  "preview-web-deck.html",
+  "quality-checklist.md",
+  "quality-report.json",
+  "final.pptx"
+];
+
+const webQualityArtifacts = [
+  "source.md",
+  "project-brief.json",
+  "preview-web-deck.html",
+  "quality-checklist.md",
+  "quality-report.json",
+  "final-web-deck.html"
+];
+
 export const presetCatalog: WebPreset[] = [
   {
     id: "executive_business_review",
     packPath: "templates/presets/executive_business_review",
+    userLevel: chineseOfficeUserLevel,
+    qualityProfile: {
+      label: { zh: "中文经营汇报交付质量", en: "Chinese business review delivery quality" },
+      acceptanceCriteria: [
+        { zh: "封面和高管摘要先给管理结论", en: "cover and executive summary state the management answer first" },
+        { zh: "KPI 页保留周期、单位、来源和负责人", en: "KPI pages keep period, unit, source, and owner visible" },
+        { zh: "PPTX 路线保持图表、文本和备注可编辑", en: "PPTX route keeps charts, text, and notes editable" },
+        { zh: "桌面和移动预览无裁切、重叠和小字", en: "desktop and mobile previews have no clipping, overlap, or tiny text" }
+      ],
+      reviewCommands: designDoctorReviewCommands,
+      expectedArtifacts: pptxQualityArtifacts
+    },
+    proofArtifacts: {
+      source: "templates/presets/executive_business_review/source.md",
+      generatedOutput: "examples/executive-business-review-starter/web-demo.html",
+      screenshot: "examples/executive-business-review-starter/cover.svg",
+      qualityReport: "examples/executive-business-review-starter/quality-report.json",
+      benchmarkNote: "docs/quality-workbench-v2.5.md"
+    },
+    notFor: [
+      { zh: "缺少经营数据的纯营销路演", en: "pure marketing launches with little operating data" },
+      { zh: "不能脱敏展示的董事会私密材料", en: "private board-only material that cannot be sanitized" }
+    ],
     label: { zh: "经营复盘 / 高管汇报", en: "Executive Business Review" },
     summary: {
       zh: "月报、季报和经营复盘，强调 KPI、原因、风险和可负责行动。",
@@ -123,6 +190,29 @@ export const presetCatalog: WebPreset[] = [
   {
     id: "consulting_proposal",
     packPath: "templates/presets/consulting_proposal",
+    userLevel: chineseOfficeUserLevel,
+    qualityProfile: {
+      label: { zh: "中文咨询方案交付质量", en: "Chinese consulting proposal delivery quality" },
+      acceptanceCriteria: [
+        { zh: "先呈现决策问题，再展开分析", en: "decision question appears before analysis detail" },
+        { zh: "推荐方案来自证据和明确评价标准", en: "recommendation follows evidence and explicit evaluation criteria" },
+        { zh: "路线图写清阶段、负责人、里程碑和依赖", en: "roadmap names phase, owner, milestone, and dependency" },
+        { zh: "PPTX 可供客户继续评审修改", en: "PPTX remains editable and ready for client review" }
+      ],
+      reviewCommands: designDoctorReviewCommands,
+      expectedArtifacts: pptxQualityArtifacts
+    },
+    proofArtifacts: {
+      source: "templates/presets/consulting_proposal/source.md",
+      generatedOutput: "examples/consulting-proposal-starter/web-demo.html",
+      screenshot: "examples/consulting-proposal-starter/cover.svg",
+      qualityReport: "examples/consulting-proposal-starter/quality-report.json",
+      benchmarkNote: "docs/quality-workbench-v2.5.md"
+    },
+    notFor: [
+      { zh: "需要强品牌艺术指导的创意 campaign", en: "creative campaigns that need heavy brand art direction" },
+      { zh: "未经专业复核的法律或金融建议", en: "legal or financial advice without professional review" }
+    ],
     label: { zh: "咨询方案", en: "Consulting Proposal" },
     summary: {
       zh: "问题定义、方案比较、推荐路径和实施路线。",
@@ -202,6 +292,29 @@ export const presetCatalog: WebPreset[] = [
   {
     id: "product_pitch",
     packPath: "templates/presets/product_pitch",
+    userLevel: chineseOfficeUserLevel,
+    qualityProfile: {
+      label: { zh: "产品路演展示质量", en: "Product pitch showcase quality" },
+      acceptanceCriteria: [
+        { zh: "前三页无旁白也能读懂", en: "first three slides are understandable without narration" },
+        { zh: "产品证明展示工作流、状态或用户结果", en: "product proof shows workflow, state, or user outcome" },
+        { zh: "市场和 traction 判断有来源或标注假设", en: "market and traction claims are sourced or labeled as assumptions" },
+        { zh: "移动端 Web Deck 可读且控件不重叠", en: "mobile Web Deck remains readable with no overlapping controls" }
+      ],
+      reviewCommands: designDoctorReviewCommands,
+      expectedArtifacts: webQualityArtifacts
+    },
+    proofArtifacts: {
+      source: "templates/presets/product_pitch/source.md",
+      generatedOutput: "examples/product-pitch-starter/web-demo.html",
+      screenshot: "examples/product-pitch-starter/cover.svg",
+      qualityReport: "examples/product-pitch-starter/quality-report.json",
+      benchmarkNote: "docs/quality-workbench-v2.5.md"
+    },
+    notFor: [
+      { zh: "需要密集 KPI 表的例行状态汇报", en: "routine status reports that need dense KPI tables" },
+      { zh: "未经合规复核的受监管融资材料", en: "regulated fundraising material without compliance review" }
+    ],
     label: { zh: "产品路演", en: "Product Pitch" },
     summary: {
       zh: "发布、demo day、融资或产品叙事，强调用户痛点、产品状态和明确 ask。",
@@ -511,6 +624,29 @@ export const presetCatalog: WebPreset[] = [
   {
     id: "tech_trend_web_deck",
     packPath: "templates/presets/tech_trend_web_deck",
+    userLevel: chineseOfficeUserLevel,
+    qualityProfile: {
+      label: { zh: "科技趋势 Web Deck 公开展示质量", en: "Tech trend Web Deck public showcase quality" },
+      acceptanceCriteria: [
+        { zh: "每个外部信号都有公开来源或引用说明", en: "every external signal has a public source or citation note" },
+        { zh: "事实、解读和建议在视觉上分开", en: "facts, interpretation, and recommendations stay visually separated" },
+        { zh: "页面节奏在证据页和观点页之间切换", en: "visual rhythm alternates evidence pages and thesis pages" },
+        { zh: "桌面和移动端无重叠或裁切文字", en: "desktop and mobile Web Deck views have no overlap or clipped text" }
+      ],
+      reviewCommands: designDoctorReviewCommands,
+      expectedArtifacts: webQualityArtifacts
+    },
+    proofArtifacts: {
+      source: "templates/presets/tech_trend_web_deck/source.md",
+      generatedOutput: "examples/tech-trend-web-deck-starter/web-demo.html",
+      screenshot: "examples/tech-trend-web-deck-starter/cover.svg",
+      qualityReport: "examples/tech-trend-web-deck-starter/quality-report.json",
+      benchmarkNote: "docs/quality-workbench-v2.5.md"
+    },
+    notFor: [
+      { zh: "不能引用公开资料的机密战略汇报", en: "confidential strategy decks that cannot cite public material" },
+      { zh: "需要方法论优先结构的正式学术答辩", en: "formal academic defense decks that require methodology-first structure" }
+    ],
     label: { zh: "科技趋势 Web Deck", en: "Tech Trend Web Deck" },
     summary: { zh: "公开趋势分享和思想领导力，强调来源、变化、影响和实践建议。", en: "Public trend or thought-leadership deck with sources, shift, implications, and takeaway." },
     scenario: "launch",

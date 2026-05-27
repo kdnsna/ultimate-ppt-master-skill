@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Consulting Proposal starter proof</title>
+  <desc id="desc">A consulting proposal preview with decision question, option matrix, and roadmap.</desc>
+  <rect width="1200" height="675" fill="#172033"/>
+  <rect x="70" y="70" width="1060" height="535" rx="18" fill="#ffffff"/>
+  <text x="112" y="132" fill="#2563eb" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850">CONSULTING PROPOSAL</text>
+  <text x="112" y="198" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="920">Choose one operating route.</text>
+  <text x="112" y="254" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="920">Make the evidence visible.</text>
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="112" y="344" width="250" height="120" rx="12" fill="#eff6ff"/>
+    <text x="138" y="388" fill="#1d4ed8" font-size="20" font-weight="850">Diagnose</text>
+    <text x="138" y="426" fill="#475569" font-size="18">Problem and root cause</text>
+    <rect x="390" y="344" width="250" height="120" rx="12" fill="#ecfdf5"/>
+    <text x="416" y="388" fill="#047857" font-size="20" font-weight="850">Compare</text>
+    <text x="416" y="426" fill="#475569" font-size="18">Options and criteria</text>
+    <rect x="668" y="344" width="250" height="120" rx="12" fill="#fff7ed"/>
+    <text x="694" y="388" fill="#c2410c" font-size="20" font-weight="850">Recommend</text>
+    <text x="694" y="426" fill="#475569" font-size="18">Route and roadmap</text>
+  </g>
+  <text x="112" y="542" fill="#617085" font-family="Inter, Arial, sans-serif" font-size="22">Starter proof: decision question -> option matrix -> implementation roadmap.</text>
+</svg>
+

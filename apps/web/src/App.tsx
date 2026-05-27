@@ -38,7 +38,7 @@ type StylePreset = "business" | "consulting" | "editorial" | "swiss" | "academic
 type AgentTool = "codex" | "claude" | "hermes" | "openclaw" | "generic";
 type SkillTarget = "codex" | "generic";
 type ModelPreference = "auto" | "openai" | "gemini" | "qwen" | "deepseek" | "custom";
-type PreviewMode = "prompt" | "source" | "extracted" | "manifest" | "brief" | "webdeck" | "checklist";
+type PreviewMode = "prompt" | "source" | "extracted" | "manifest" | "brief" | "webdeck" | "checklist" | "qualityReport";
 type WorkspaceView = "start" | "sources" | "configuration" | "handoff" | "preview";
 type UploadedSourceKind = "file" | "url";
 type UploadedSourceStatus = "textExtracted" | "attachedOnly" | "urlOnly";
@@ -55,6 +55,22 @@ interface EnginePlan {
   webRoute: string;
   styleRoute: string;
   fusionRoute: string;
+}
+
+interface QualityContract {
+  label: string;
+  userLevel: string;
+  acceptanceCriteria: string[];
+  expectedArtifacts: string[];
+  reviewCommands: string[];
+  notFor: string[];
+  proofArtifacts?: {
+    source: string;
+    generatedOutput: string;
+    screenshot: string;
+    qualityReport: string;
+    benchmarkNote: string;
+  };
 }
 
 interface FormState {
@@ -141,6 +157,9 @@ interface HandoffResult {
   suggestedCommands: Record<string, string>;
   manifest: {
     attachments: Array<{ name: string; parseStatus: string; message: string }>;
+    qualityProfile?: QualityContract;
+    expectedArtifacts?: string[];
+    reviewCommands?: string[];
   };
 }
 
@@ -150,22 +169,22 @@ const demoUrl = `${baseUrl}examples/agentic-developer-tools-2026/web-demo.html`;
 const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
-const storageKey = "ultimate-ppt-master-web-brief-v2.3";
-const appVersion = "2.4.0";
+const storageKey = "ultimate-ppt-master-web-brief-v2.5";
+const appVersion = "2.5.0";
 
 const labels = {
   zh: {
     product: "Ultimate PPT Master",
-    studio: "PPT 项目准备工作台",
-    route: `v${appVersion} · 先填任务、再检测本机、最后交给 AI 助手`,
-    subtitle: "把资料、目标、页数和风格先整理清楚；检测你电脑上可用的本机工具；最后生成一个能交给 AI 助手继续制作的本地项目包。",
-    whyTitle: "v2.4 最大提升是什么？",
-    whySubtitle: "把 GitHub 技术扫描、场景预设包、模板候选和质量门禁连起来，让用户不从空 prompt 开始，维护者也能用脚本检查预设是否可发布。",
+    studio: "PPT 质量工作台",
+    route: `v${appVersion} · 中文办公默认路径 · 质量合同随 handoff 一起走`,
+    subtitle: "把经营复盘、咨询方案、培训课件和学术答辩这类中文办公任务先整理成可验收合同；网页降低门槛，本地 Skill 和 Agent 负责最终质量。",
+    whyTitle: "v2.5 最大提升是什么？",
+    whySubtitle: "把预设、公开样例、Design Doctor 视觉复查和 handoff 合同连起来，让普通办公用户知道适合谁、要交什么资料、交付前检查什么。",
     whyCards: [
-      { title: "预设更可复用", text: "经营复盘、咨询方案、产品路演和科技趋势都有 starter pack。" },
-      { title: "趋势有证据", text: "技术扫描把 MarkItDown、MCP、Slidev、Marp、PptxGenJS 等方向映射到产品判断。" },
-      { title: "发布更可验", text: "预设包有机器可读契约、source 骨架、检查清单和自动审计脚本。" },
-      { title: "质量不降级", text: "最终仍走 PPT Master 与歸藏路线，网页负责整理和交接。" }
+      { title: "中文办公默认", text: "经营复盘、咨询方案、培训课件和学术答辩优先，产品路演和科技趋势作为展示型路线。" },
+      { title: "质量可证明", text: "stable pack 必须有合成 source、输出、截图、quality-report 和适用边界。" },
+      { title: "视觉可复查", text: "Design Doctor 把 SVG 检查、浏览器复查和中文摘要变成用户能理解的一步。" },
+      { title: "交付有合同", text: "Bridge 把质量目标、预期产物和检查命令写入 manifest 与 project-brief。" }
     ],
     plainGlossaryTitle: "先把几个词讲清楚",
     plainGlossaryText: "你可以先按中文名字理解；括号里的英文是项目里原本的技术名，后面文档和按钮会继续沿用。",
@@ -264,12 +283,24 @@ const labels = {
     previewBrief: "brief.json",
     previewWebDeck: "preview-web-deck.html",
     previewChecklist: "quality-checklist.md",
+    previewQualityReport: "quality-report.json",
     contentPreset: "内容预设",
     presetSummary: "预设说明",
     presetRoute: "推荐路线",
     presetRequirements: "资料要求",
     presetTemplates: "模板候选",
     presetChecks: "关键检查",
+    bestFor: "适合谁",
+    notFor: "不适合",
+    qualityWorkbenchTitle: "当前任务预览",
+    qualityWorkbenchSubtitle: "右侧不再留白：这里显示下一步、质量状态和交付门禁。",
+    nextStep: "下一步",
+    qualityStatus: "质量状态",
+    qualityProfile: "质量目标",
+    expectedArtifacts: "预期产物",
+    reviewCommands: "检查命令",
+    designDoctorTitle: "Design Doctor / 视觉复查",
+    designDoctorText: "默认只生成 quality-report.json 和中文摘要；只有你明确要求时才自动修 SVG。",
     sourceType: "资料类型",
     scenario: "使用场景",
     outputMode: "输出形式",
@@ -299,7 +330,7 @@ const labels = {
     activeRoute: "启用",
     optionalRoute: "备用",
     demoTitle: "Web Deck 示例",
-    demoText: "v2.4 脱敏样板，展示输入材料到 Web Deck 成品的路径。",
+    demoText: "v2.5 质量证明样板，展示输入材料、预设、输出和检查结果。",
     skillTitle: "AI 技能路线",
     skillText: "高质量生产路线，负责真实文件解析、生成、检查和导出。",
     desktopTitle: "Desktop Later",
@@ -328,16 +359,16 @@ const labels = {
   },
   en: {
     product: "Ultimate PPT Master",
-    studio: "PPT Project Prep Studio",
-    route: `v${appVersion} · write the task, check this Mac, hand off to an AI helper`,
-    subtitle: "Organize sources, goals, slide count, and style first; check which local tools are available on this computer; then create a local project folder an AI helper can continue from.",
-    whyTitle: "What is new in v2.4?",
-    whySubtitle: "The product now connects GitHub technology signals, scenario preset packs, template candidates, and release gates so users do not start from a blank prompt and maintainers can audit reusable packs.",
+    studio: "PPT Quality Workbench",
+    route: `v${appVersion} · Chinese-office default path · quality contract in every handoff`,
+    subtitle: "Turn business reviews, consulting proposals, training decks, and academic defenses into an inspectable local contract first. The web lowers the first step; the local Skill and Agent keep final quality high.",
+    whyTitle: "What is new in v2.5?",
+    whySubtitle: "The product connects presets, public proofs, Design Doctor visual review, and handoff contracts so non-technical office users can see who it is for, what to provide, and what to check before delivery.",
     whyCards: [
-      { title: "Presets are reusable", text: "Business review, consulting, product pitch, and tech trend now have starter packs." },
-      { title: "Trends are grounded", text: "The technology scan maps MarkItDown, MCP, Slidev, Marp, PptxGenJS, and adjacent tools to product choices." },
-      { title: "Release gates are checkable", text: "Preset packs have a machine-readable contract, source skeleton, checklist, and audit script." },
-      { title: "Quality stays upstream", text: "Final production still uses PPT Master and Guizang routes; web handles staging." }
+      { title: "Office defaults", text: "Business review, consulting, training, and academic defense come first; product pitch and tech trend stay as showcase routes." },
+      { title: "Proof required", text: "Stable packs need synthetic source, output, screenshot, quality report, and suitability boundaries." },
+      { title: "Visual review", text: "Design Doctor turns SVG checks, browser review, and Chinese summaries into a clear user step." },
+      { title: "Contract handoff", text: "Bridge writes quality goals, expected artifacts, and review commands into manifest and project brief." }
     ],
     plainGlossaryTitle: "A few words in plain English",
     plainGlossaryText: "Read the plain name first. The word in parentheses is the technical term used by the repo and docs.",
@@ -436,12 +467,24 @@ const labels = {
     previewBrief: "brief.json",
     previewWebDeck: "preview-web-deck.html",
     previewChecklist: "quality-checklist.md",
+    previewQualityReport: "quality-report.json",
     contentPreset: "Content preset",
     presetSummary: "Preset summary",
     presetRoute: "Recommended route",
     presetRequirements: "Source requirements",
     presetTemplates: "Template candidates",
     presetChecks: "Key checks",
+    bestFor: "Best for",
+    notFor: "Not for",
+    qualityWorkbenchTitle: "Current task preview",
+    qualityWorkbenchSubtitle: "The right side now carries next step, quality status, and delivery gates.",
+    nextStep: "Next step",
+    qualityStatus: "Quality status",
+    qualityProfile: "Quality profile",
+    expectedArtifacts: "Expected artifacts",
+    reviewCommands: "Review commands",
+    designDoctorTitle: "Design Doctor / visual review",
+    designDoctorText: "By default it writes quality-report.json and a plain-language Chinese summary. Automatic SVG repair only happens when explicitly requested.",
     sourceType: "Source type",
     scenario: "Scenario",
     outputMode: "Output",
@@ -471,7 +514,7 @@ const labels = {
     activeRoute: "Active",
     optionalRoute: "Optional",
     demoTitle: "Web Deck demo",
-    demoText: "A v2.4 sanitized sample showing source material turning into a Web Deck.",
+    demoText: "A v2.5 quality proof showing input, preset, output, and review result.",
     skillTitle: "AI Skill path",
     skillText: "Production-grade route for real file parsing, generation, QA, and export.",
     desktopTitle: "Desktop Later",
@@ -584,14 +627,16 @@ export function App() {
   const t = labels[form.language];
   const storyboard = useMemo(() => buildStoryboard(form), [form]);
   const enginePlan = useMemo(() => buildEnginePlan(form), [form]);
+  const qualityContract = useMemo(() => buildQualityContract(form, activePreset, enginePlan), [form, activePreset, enginePlan]);
   const readiness = useMemo(() => scoreBrief(form, sources), [form, sources]);
-  const manifest = useMemo(() => buildManifest(form, sources, readiness, enginePlan, bridge), [form, sources, readiness, enginePlan, bridge]);
-  const prompt = useMemo(() => buildPrompt(form, storyboard, enginePlan, sources), [form, storyboard, enginePlan, sources]);
-  const sourceTemplate = useMemo(() => buildSourceTemplate(form, storyboard, enginePlan, sources), [form, storyboard, enginePlan, sources]);
+  const manifest = useMemo(() => buildManifest(form, sources, readiness, enginePlan, bridge, qualityContract), [form, sources, readiness, enginePlan, bridge, qualityContract]);
+  const prompt = useMemo(() => buildPrompt(form, storyboard, enginePlan, sources, qualityContract), [form, storyboard, enginePlan, sources, qualityContract]);
+  const sourceTemplate = useMemo(() => buildSourceTemplate(form, storyboard, enginePlan, sources, qualityContract), [form, storyboard, enginePlan, sources, qualityContract]);
   const extractedSource = useMemo(() => buildExtractedSource(form, sources), [form, sources]);
-  const qualityChecklist = useMemo(() => buildQualityChecklist(form, enginePlan, sources), [form, enginePlan, sources]);
+  const qualityChecklist = useMemo(() => buildQualityChecklist(form, enginePlan, sources, qualityContract), [form, enginePlan, sources, qualityContract]);
+  const qualityReport = useMemo(() => buildQualityReport(form, qualityContract), [form, qualityContract]);
   const webDeckHtml = useMemo(() => buildWebDeckHtml(form, storyboard, enginePlan, sources), [form, storyboard, enginePlan, sources]);
-  const briefObject = useMemo(() => buildBriefObject(form, storyboard, readiness, enginePlan, sources), [form, storyboard, readiness, enginePlan, sources]);
+  const briefObject = useMemo(() => buildBriefObject(form, storyboard, readiness, enginePlan, sources, qualityContract), [form, storyboard, readiness, enginePlan, sources, qualityContract]);
   const briefJson = useMemo(() => JSON.stringify(briefObject, null, 2), [briefObject]);
   const manifestJson = useMemo(() => JSON.stringify(manifest, null, 2), [manifest]);
   const providers = useMemo(() => mergeProviderTests(bridge?.providers || fallbackProviders(form.language), providerTests), [bridge, form.language, providerTests]);
@@ -614,7 +659,9 @@ export function App() {
               ? briefJson
               : previewMode === "webdeck"
                 ? webDeckHtml
-                : qualityChecklist;
+                : previewMode === "qualityReport"
+                  ? qualityReport
+                  : qualityChecklist;
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify(form));
@@ -768,6 +815,7 @@ export function App() {
       webDeckHtml,
       enginePlanMarkdown: buildEnginePlanMarkdown(form, enginePlan),
       qualityChecklist,
+      qualityReport,
       manifestJson,
       readme: buildKitReadme(form, enginePlan, sources),
       sources
@@ -797,6 +845,8 @@ export function App() {
         webDeckHtml,
         enginePlanMarkdown: buildEnginePlanMarkdown(form, enginePlan),
         qualityChecklist,
+        qualityReport,
+        qualityContract,
         readme: buildKitReadme(form, enginePlan, sources),
         sources
       });
@@ -962,15 +1012,24 @@ export function App() {
             <h1>{t.studio}</h1>
             <p>{t.subtitle}</p>
           </div>
-          <div className="header-actions">
-            <button className="primary-action" onClick={sendToBridge}>
-              <PlugZap size={18} />
-              {t.sendBridge}
-            </button>
-            <button className="secondary-action" onClick={downloadHandoffKit}>
-              <Download size={18} />
-              {t.downloadKit}
-            </button>
+          <div className="header-rail">
+            <QualityWorkbenchPanel
+              form={form}
+              preset={activePreset}
+              readiness={readiness.score}
+              qualityContract={qualityContract}
+              labels={t}
+            />
+            <div className="header-actions">
+              <button className="primary-action" onClick={sendToBridge}>
+                <PlugZap size={18} />
+                {t.sendBridge}
+              </button>
+              <button className="secondary-action" onClick={downloadHandoffKit}>
+                <Download size={18} />
+                {t.downloadKit}
+              </button>
+            </div>
           </div>
         </section>
 
@@ -1096,6 +1155,7 @@ export function App() {
               <SelectField label={t.modelPreference} value={form.modelPreference} onChange={(value) => update("modelPreference", value as ModelPreference)} options={toOptions(optionText.modelPreference, form.language)} />
             </div>
             <PresetSummary preset={activePreset} language={form.language} labels={t} />
+            <DesignDoctorPanel qualityContract={qualityContract} labels={t} />
             <div className="field-stack">
               <label>
                 {t.titleField}
@@ -1233,6 +1293,7 @@ export function App() {
               <span>preview-web-deck.html</span>
               <span>engine-plan.md</span>
               <span>quality-checklist.md</span>
+              <span>quality-report.json</span>
             </div>
             <div className="route-list">
               <InfoRow icon={MonitorPlay} title={t.demoTitle} text={t.demoText} />
@@ -1316,6 +1377,7 @@ export function App() {
             <button className={previewMode === "brief" ? "active" : ""} onClick={() => setPreviewMode("brief")}>{t.previewBrief}</button>
             <button className={previewMode === "webdeck" ? "active" : ""} onClick={() => setPreviewMode("webdeck")}>{t.previewWebDeck}</button>
             <button className={previewMode === "checklist" ? "active" : ""} onClick={() => setPreviewMode("checklist")}>{t.previewChecklist}</button>
+            <button className={previewMode === "qualityReport" ? "active" : ""} onClick={() => setPreviewMode("qualityReport")}>{t.previewQualityReport}</button>
           </div>
           <div className="preview-actions">
             <button className="secondary-action" onClick={() => copyText(visiblePreview)}>
@@ -1781,6 +1843,84 @@ function EngineCard({
   );
 }
 
+function QualityWorkbenchPanel({
+  form,
+  preset,
+  readiness,
+  qualityContract,
+  labels: t
+}: {
+  form: FormState;
+  preset: WebPreset;
+  readiness: number;
+  qualityContract: QualityContract;
+  labels: typeof labels.zh;
+}) {
+  const nextStep = readiness < 80
+    ? form.language === "zh" ? "补齐标题、核心结论和资料摘要" : "Complete title, core message, and source notes"
+    : form.language === "zh" ? "发送到本机连接器并运行 Design Doctor" : "Send to local connector and run Design Doctor";
+
+  return (
+    <aside className="quality-workbench" aria-label={t.qualityWorkbenchTitle}>
+      <div className="quality-workbench-head">
+        <ShieldCheck size={18} />
+        <div>
+          <strong>{t.qualityWorkbenchTitle}</strong>
+          <p>{t.qualityWorkbenchSubtitle}</p>
+        </div>
+      </div>
+      <div className="quality-workbench-grid">
+        <div>
+          <span>{t.contentPreset}</span>
+          <strong>{preset.label[form.language]}</strong>
+        </div>
+        <div>
+          <span>{t.qualityStatus}</span>
+          <strong>{readiness}% · {qualityContract.label}</strong>
+        </div>
+        <div>
+          <span>{t.nextStep}</span>
+          <strong>{nextStep}</strong>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function DesignDoctorPanel({
+  qualityContract,
+  labels: t
+}: {
+  qualityContract: QualityContract;
+  labels: typeof labels.zh;
+}) {
+  return (
+    <div className="design-doctor-panel">
+      <div className="design-doctor-head">
+        <Activity size={17} />
+        <div>
+          <strong>{t.designDoctorTitle}</strong>
+          <p>{t.designDoctorText}</p>
+        </div>
+      </div>
+      <dl>
+        <div>
+          <dt>{t.qualityProfile}</dt>
+          <dd>{qualityContract.acceptanceCriteria.slice(0, 2).join(" · ")}</dd>
+        </div>
+        <div>
+          <dt>{t.expectedArtifacts}</dt>
+          <dd>{qualityContract.expectedArtifacts.slice(0, 4).join(" · ")}</dd>
+        </div>
+        <div>
+          <dt>{t.reviewCommands}</dt>
+          <dd>{qualityContract.reviewCommands.join(" · ")}</dd>
+        </div>
+      </dl>
+    </div>
+  );
+}
+
 function PresetSummary({
   preset,
   language,
@@ -1801,6 +1941,8 @@ function PresetSummary({
     ...preset.templateCandidates.charts.slice(0, 3)
   ].join(" · ");
   const checks = preset.qualityChecks.slice(0, 3).map((item) => item[language]).join(" · ");
+  const bestFor = preset.userLevel?.[language] || (language === "zh" ? "通用用户" : "general users");
+  const notFor = preset.notFor?.slice(0, 2).map((item) => item[language]).join(" · ") || (language === "zh" ? "暂无明确排除场景" : "No explicit exclusions yet");
 
   return (
     <div className="preset-summary">
@@ -1826,6 +1968,14 @@ function PresetSummary({
           <dt>{t.presetChecks}</dt>
           <dd>{checks}</dd>
         </div>
+        <div>
+          <dt>{t.bestFor}</dt>
+          <dd>{bestFor}</dd>
+        </div>
+        <div>
+          <dt>{t.notFor}</dt>
+          <dd>{notFor}</dd>
+        </div>
       </dl>
     </div>
   );
@@ -1839,7 +1989,17 @@ function toOptions<T extends string>(items: Record<T, Record<Language, string>>,
 }
 
 function presetOptions(language: Language) {
-  return presetCatalog.map((preset) => ({
+  const priority: PresetId[] = [
+    "executive_business_review",
+    "consulting_proposal",
+    "training_courseware",
+    "research_academic_defense",
+    "product_pitch",
+    "tech_trend_web_deck",
+    "government_soe_report",
+    "finance_branch_solution"
+  ];
+  return [...presetCatalog].sort((a, b) => priority.indexOf(a.id) - priority.indexOf(b.id)).map((preset) => ({
     value: preset.id,
     label: preset.label[language]
   }));
@@ -1938,6 +2098,63 @@ function buildEnginePlan(form: FormState): EnginePlan {
   };
 }
 
+function buildQualityContract(form: FormState, preset: WebPreset, enginePlan: EnginePlan): QualityContract {
+  const zh = form.language === "zh";
+  const fallbackArtifacts = enginePlan.webActive && !enginePlan.pptxActive
+    ? ["source.md", "project-brief.json", "preview-web-deck.html", "quality-checklist.md", "quality-report.json", "final-web-deck.html"]
+    : ["source.md", "project-brief.json", "preview-web-deck.html", "quality-checklist.md", "quality-report.json", "final.pptx"];
+  const fallbackCriteria = zh
+    ? [
+      "核心结论出现在封面和收束页",
+      "每页只承担一个主要任务",
+      "交付前运行视觉复查并输出 quality-report.json",
+      "敏感资料默认留在本地"
+    ]
+    : [
+      "core message appears in cover and conclusion",
+      "each slide has one primary job",
+      "run visual review and output quality-report.json before delivery",
+      "sensitive source material stays local by default"
+    ];
+
+  return {
+    label: preset.qualityProfile?.label[form.language] || (zh ? "中文办公交付质量" : "Office delivery quality"),
+    userLevel: preset.userLevel?.[form.language] || (zh ? "中文办公用户" : "office users"),
+    acceptanceCriteria: preset.qualityProfile?.acceptanceCriteria.map((item) => item[form.language]) || fallbackCriteria,
+    expectedArtifacts: preset.qualityProfile?.expectedArtifacts || fallbackArtifacts,
+    reviewCommands: preset.qualityProfile?.reviewCommands || [
+      "python3 scripts/svg_quality_checker.py <project_path>",
+      "python3 scripts/visual_review.py <project_path>"
+    ],
+    notFor: preset.notFor?.map((item) => item[form.language]) || [],
+    proofArtifacts: preset.proofArtifacts
+  };
+}
+
+function buildQualityReport(form: FormState, qualityContract: QualityContract) {
+  const zh = form.language === "zh";
+  return JSON.stringify({
+    version: appVersion,
+    presetId: form.presetId,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+    qualityProfile: qualityContract,
+    expectedArtifacts: qualityContract.expectedArtifacts,
+    reviewCommands: qualityContract.reviewCommands,
+    summary: {
+      zh: "Design Doctor / 视觉复查尚未运行。请先生成预览和最终文件，再按 reviewCommands 运行检查；默认只报告问题和建议。",
+      en: "Design Doctor has not run yet. Generate preview and final files, then run reviewCommands. It reports issues and suggestions by default."
+    },
+    checks: [
+      {
+        id: "quality-contract",
+        status: "pending",
+        summary: zh ? "等待 Agent 按质量目标验收。" : "Waiting for the Agent to validate against the quality contract."
+      }
+    ]
+  }, null, 2);
+}
+
 function buildStoryboard(form: FormState): StoryItem[] {
   const zh = form.language === "zh";
   const preset = findPreset(form.presetId);
@@ -1997,7 +2214,7 @@ function buildStoryboard(form: FormState): StoryItem[] {
   return repeated.slice(0, Math.min(repeated.length, targetCount));
 }
 
-function buildPrompt(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[]) {
+function buildPrompt(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[], qualityContract: QualityContract) {
   const preset = findPreset(form.presetId);
   const sourceType = readOption(optionText.sourceType, form.sourceType, form.language);
   const scenario = readOption(optionText.scenario, form.scenario, form.language);
@@ -2009,6 +2226,9 @@ function buildPrompt(form: FormState, storyboard: StoryItem[], enginePlan: Engin
   const sourceManifest = sourceSummaryMarkdown(sources, form.language);
   const presetRequirements = preset.sourceRequirements.map((item) => `- ${item[form.language]}`).join("\n");
   const presetChecks = preset.qualityChecks.map((item) => `- ${item[form.language]}`).join("\n");
+  const qualityCriteria = qualityContract.acceptanceCriteria.map((item) => `- ${item}`).join("\n");
+  const reviewCommands = qualityContract.reviewCommands.map((item) => `- ${item}`).join("\n");
+  const expectedArtifacts = qualityContract.expectedArtifacts.map((item) => `- ${item}`).join("\n");
   const presetRoute = `${preset.label[form.language]} (${preset.packPath || "seed direction"})`;
   const activeEngines = [
     enginePlan.pptxActive ? `PPTX: ${enginePlan.pptxRoute}` : "",
@@ -2016,13 +2236,13 @@ function buildPrompt(form: FormState, storyboard: StoryItem[], enginePlan: Engin
   ].filter(Boolean).join("\n- ");
 
   if (form.language === "en") {
-    return `Use the ultimate-ppt-master Agent Skill for this presentation task.\n\nProject title: ${form.title}\nAudience: ${form.audience}\nCore message: ${form.coreMessage}\nSource type: ${sourceType}\nScenario: ${scenario}\nContent preset: ${presetRoute}\nOutput target: ${output}\nVisual style: ${style}\nTarget length: ${form.slideCount} slides\nPreferred agent: ${agent}\nModel preference: ${model}\n\nExecution route:\n- ${activeEngines}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Visual route: ${enginePlan.styleRoute}\n\nPreset source requirements:\n${presetRequirements}\n\nPreset quality checks:\n${presetChecks}\n\nSource material:\n${sourceManifest}\n\nLocal Bridge expectations:\n- If this folder was created by Agent Bridge, read extracted-source.md first, then inspect attachments/ for original files.\n- If a PDF/DOCX/PPTX/XLSX converter failed, keep the original attachment and parse it with the best local tool available.\n- Never upload private source material unless the user explicitly approves it.\n\nSuggested outline:\n${outline}\n\nRequirements:\n- Read AGENTS.md and SKILL.md from the ultimate-ppt-master repository.\n- Respect the third-party notices and upstream license attributions.\n- Build the narrative before generating slides.\n- Use the selected content preset as the default structure, but adapt it to the actual source evidence.\n- Use the PPTX route for editable PowerPoint and the Web Deck route for magazine / Swiss HTML output.\n- Render or preview the result, inspect issues, repair obvious layout problems, and list final files.\n- Keep logs and intermediate artifacts in the local project folder.\n\nExtra requirements:\n${form.constraints || "No extra requirements."}`;
+    return `Use the ultimate-ppt-master Agent Skill for this presentation task.\n\nProject title: ${form.title}\nAudience: ${form.audience}\nCore message: ${form.coreMessage}\nSource type: ${sourceType}\nScenario: ${scenario}\nContent preset: ${presetRoute}\nOutput target: ${output}\nVisual style: ${style}\nTarget length: ${form.slideCount} slides\nPreferred agent: ${agent}\nModel preference: ${model}\n\nExecution route:\n- ${activeEngines}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Visual route: ${enginePlan.styleRoute}\n\nPreset source requirements:\n${presetRequirements}\n\nPreset quality checks:\n${presetChecks}\n\nDesign Doctor quality contract:\n${qualityCriteria}\n\nExpected artifacts:\n${expectedArtifacts}\n\nRecommended review commands:\n${reviewCommands}\n\nSource material:\n${sourceManifest}\n\nLocal Bridge expectations:\n- If this folder was created by Agent Bridge, read extracted-source.md first, then inspect attachments/ for original files.\n- If a PDF/DOCX/PPTX/XLSX converter failed, keep the original attachment and parse it with the best local tool available.\n- Never upload private source material unless the user explicitly approves it.\n\nSuggested outline:\n${outline}\n\nRequirements:\n- Read AGENTS.md and SKILL.md from the ultimate-ppt-master repository.\n- Respect the third-party notices and upstream license attributions.\n- Build the narrative before generating slides.\n- Use the selected content preset as the default structure, but adapt it to the actual source evidence.\n- Use the PPTX route for editable PowerPoint and the Web Deck route for magazine / Swiss HTML output.\n- Render or preview the result, inspect issues, repair obvious layout problems, and list final files.\n- Write or update quality-report.json with the visual review result and a plain-language Chinese summary.\n- Keep logs and intermediate artifacts in the local project folder.\n\nExtra requirements:\n${form.constraints || "No extra requirements."}`;
   }
 
-  return `请使用 ultimate-ppt-master Agent Skill 完成这次演示文稿任务。\n\n项目标题：${form.title}\n目标听众：${form.audience}\n核心结论：${form.coreMessage}\n资料类型：${sourceType}\n使用场景：${scenario}\n内容预设：${presetRoute}\n输出目标：${output}\n视觉风格：${style}\n目标页数：${form.slideCount} 页\n优先 Agent：${agent}\n模型偏好：${model}\n\n执行路线：\n- ${activeEngines}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n预设资料要求：\n${presetRequirements}\n\n预设质量检查：\n${presetChecks}\n\n源资料：\n${sourceManifest}\n\n本地 Bridge 预期：\n- 如果这个目录由 Agent Bridge 创建，请先读 extracted-source.md，再检查 attachments/ 里的原始文件。\n- 如果 PDF/DOCX/PPTX/XLSX 转换失败，请保留原始附件，并用本地最合适的工具继续解析。\n- 私有资料默认留在本地，除非我明确要求，不要上传。\n\n建议页纲：\n${outline}\n\n执行要求：\n- 读取 ultimate-ppt-master 仓库里的 AGENTS.md 和 SKILL.md。\n- 尊重第三方声明和当前仓库保留的上游版权归属。\n- 先完成叙事结构，再生成页面。\n- 使用当前内容预设作为默认结构，但必须根据真实资料证据调整。\n- PPTX 使用可编辑 PowerPoint 路线；Web Deck 使用杂志化 / Swiss HTML 路线。\n- 渲染或预览结果，检查问题，修复明显版式错误，并列出最终文件。\n- 日志和中间产物保存在本地项目目录。\n\n补充要求：\n${form.constraints || "无额外要求。"}`;
+  return `请使用 ultimate-ppt-master Agent Skill 完成这次演示文稿任务。\n\n项目标题：${form.title}\n目标听众：${form.audience}\n核心结论：${form.coreMessage}\n资料类型：${sourceType}\n使用场景：${scenario}\n内容预设：${presetRoute}\n输出目标：${output}\n视觉风格：${style}\n目标页数：${form.slideCount} 页\n优先 Agent：${agent}\n模型偏好：${model}\n\n执行路线：\n- ${activeEngines}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n预设资料要求：\n${presetRequirements}\n\n预设质量检查：\n${presetChecks}\n\nDesign Doctor 质量合同：\n${qualityCriteria}\n\n预期产物：\n${expectedArtifacts}\n\n推荐检查命令：\n${reviewCommands}\n\n源资料：\n${sourceManifest}\n\n本地 Bridge 预期：\n- 如果这个目录由 Agent Bridge 创建，请先读 extracted-source.md，再检查 attachments/ 里的原始文件。\n- 如果 PDF/DOCX/PPTX/XLSX 转换失败，请保留原始附件，并用本地最合适的工具继续解析。\n- 私有资料默认留在本地，除非我明确要求，不要上传。\n\n建议页纲：\n${outline}\n\n执行要求：\n- 读取 ultimate-ppt-master 仓库里的 AGENTS.md 和 SKILL.md。\n- 尊重第三方声明和当前仓库保留的上游版权归属。\n- 先完成叙事结构，再生成页面。\n- 使用当前内容预设作为默认结构，但必须根据真实资料证据调整。\n- PPTX 使用可编辑 PowerPoint 路线；Web Deck 使用杂志化 / Swiss HTML 路线。\n- 渲染或预览结果，检查问题，修复明显版式错误，并列出最终文件。\n- 写入或更新 quality-report.json，包含视觉复查结果和中文摘要。\n- 日志和中间产物保存在本地项目目录。\n\n补充要求：\n${form.constraints || "无额外要求。"}`;
 }
 
-function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[]) {
+function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[], qualityContract: QualityContract) {
   const preset = findPreset(form.presetId);
   const scenario = readOption(optionText.scenario, form.scenario, form.language);
   const output = readOption(optionText.outputMode, form.outputMode, form.language);
@@ -2031,6 +2251,8 @@ function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePla
   const sourceManifest = sourceSummaryMarkdown(sources, form.language);
   const requirements = preset.sourceRequirements.map((item) => `- ${item[form.language]}`).join("\n");
   const roster = preset.slideRoster.map((item, index) => `- ${index + 1}. ${item[form.language]}`).join("\n");
+  const qualityCriteria = qualityContract.acceptanceCriteria.map((item) => `- ${item}`).join("\n");
+  const reviewCommands = qualityContract.reviewCommands.map((item) => `- ${item}`).join("\n");
   const templates = [
     `- layouts: ${preset.templateCandidates.layouts.join(", ")}`,
     preset.templateCandidates.brands?.length ? `- brands: ${preset.templateCandidates.brands.join(", ")}` : "",
@@ -2038,9 +2260,9 @@ function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePla
     `- webDeckStyle: ${preset.templateCandidates.webDeckStyle}`
   ].filter(Boolean).join("\n");
   if (form.language === "en") {
-    return `# ${form.title}\n\n## Audience\n${form.audience}\n\n## Core message\n${form.coreMessage}\n\n## Scenario\n${scenario}\n\n## Content preset\n${preset.label.en} (${preset.packPath || "seed direction"})\n\n## Desired output\n${output}, about ${form.slideCount} slides.\n\n## Visual style\n${style}\n\n## Engine route\n- PPTX: ${enginePlan.pptxActive ? "active" : "optional"} - ${enginePlan.pptxRoute}\n- Web Deck: ${enginePlan.webActive ? "active" : "optional"} - ${enginePlan.webRoute}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Style route: ${enginePlan.styleRoute}\n\n## Preset source requirements\n${requirements}\n\n## Preset slide roster\n${roster}\n\n## Preset template candidates\n${templates}\n\n## Source intake\n${sourceManifest}\n\n## Source notes\n${form.sourceNotes}\n\n## Suggested outline\n${outline}\n\n## Extra requirements\n${form.constraints}\n`;
+    return `# ${form.title}\n\n## Audience\n${form.audience}\n\n## Core message\n${form.coreMessage}\n\n## Scenario\n${scenario}\n\n## Content preset\n${preset.label.en} (${preset.packPath || "seed direction"})\n\n## Desired output\n${output}, about ${form.slideCount} slides.\n\n## Visual style\n${style}\n\n## Engine route\n- PPTX: ${enginePlan.pptxActive ? "active" : "optional"} - ${enginePlan.pptxRoute}\n- Web Deck: ${enginePlan.webActive ? "active" : "optional"} - ${enginePlan.webRoute}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Style route: ${enginePlan.styleRoute}\n\n## Preset source requirements\n${requirements}\n\n## Preset slide roster\n${roster}\n\n## Preset template candidates\n${templates}\n\n## Quality profile\n${qualityCriteria}\n\n## Review commands\n${reviewCommands}\n\n## Source intake\n${sourceManifest}\n\n## Source notes\n${form.sourceNotes}\n\n## Suggested outline\n${outline}\n\n## Extra requirements\n${form.constraints}\n`;
   }
-  return `# ${form.title}\n\n## 目标听众\n${form.audience}\n\n## 核心结论\n${form.coreMessage}\n\n## 使用场景\n${scenario}\n\n## 内容预设\n${preset.label.zh}（${preset.packPath || "种子方向"}）\n\n## 目标输出\n${output}，约 ${form.slideCount} 页。\n\n## 视觉风格\n${style}\n\n## 双引擎路线\n- PPTX：${enginePlan.pptxActive ? "启用" : "备用"} - ${enginePlan.pptxRoute}\n- Web Deck：${enginePlan.webActive ? "启用" : "备用"} - ${enginePlan.webRoute}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n## 预设资料要求\n${requirements}\n\n## 预设页面结构\n${roster}\n\n## 预设模板候选\n${templates}\n\n## 资料导入\n${sourceManifest}\n\n## 源资料要点\n${form.sourceNotes}\n\n## 建议页纲\n${outline}\n\n## 补充要求\n${form.constraints}\n`;
+  return `# ${form.title}\n\n## 目标听众\n${form.audience}\n\n## 核心结论\n${form.coreMessage}\n\n## 使用场景\n${scenario}\n\n## 内容预设\n${preset.label.zh}（${preset.packPath || "种子方向"}）\n\n## 目标输出\n${output}，约 ${form.slideCount} 页。\n\n## 视觉风格\n${style}\n\n## 双引擎路线\n- PPTX：${enginePlan.pptxActive ? "启用" : "备用"} - ${enginePlan.pptxRoute}\n- Web Deck：${enginePlan.webActive ? "启用" : "备用"} - ${enginePlan.webRoute}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n## 预设资料要求\n${requirements}\n\n## 预设页面结构\n${roster}\n\n## 预设模板候选\n${templates}\n\n## 质量目标\n${qualityCriteria}\n\n## 检查命令\n${reviewCommands}\n\n## 资料导入\n${sourceManifest}\n\n## 源资料要点\n${form.sourceNotes}\n\n## 建议页纲\n${outline}\n\n## 补充要求\n${form.constraints}\n`;
 }
 
 function buildExtractedSource(form: FormState, sources: UploadedSource[]) {
@@ -2077,16 +2299,19 @@ function buildEnginePlanMarkdown(form: FormState, enginePlan: EnginePlan) {
   return `# 双引擎执行计划\n\n## 启用路线\n- PPTX 路线：${enginePlan.pptxActive ? "启用" : "备用"}\n- Web Deck 路线：${enginePlan.webActive ? "启用" : "备用"}\n- 视觉路线：${enginePlan.styleRoute}\n\n## 分工\n- Hugo He / ppt-master 路线：${enginePlan.pptxRoute}\n- op7418 / 歸藏路线：${enginePlan.webRoute}\n- Ultimate Fusion 前台：${enginePlan.fusionRoute}\n\n## Agent Connect 规则\nWeb Experience 负责导入和路线规划；本地 Bridge 负责资料解析和项目落盘；Skill 工作流负责最终生产。\n\n## 归属规则\n保留仓库 LICENSE 和 THIRD_PARTY_NOTICES，不移除上游版权归属。\n`;
 }
 
-function buildQualityChecklist(form: FormState, enginePlan: EnginePlan, sources: UploadedSource[]) {
+function buildQualityChecklist(form: FormState, enginePlan: EnginePlan, sources: UploadedSource[], qualityContract: QualityContract) {
   const preset = findPreset(form.presetId);
   const sourceLine = sources.length > 0
     ? sources.map((source) => `- [ ] ${source.name}: ${source.status}`).join("\n")
     : "- [ ] No uploaded files; source.md should be checked against pasted notes.";
   const presetChecks = preset.qualityChecks.map((item) => `- [ ] ${item[form.language]}`).join("\n");
+  const qualityCriteria = qualityContract.acceptanceCriteria.map((item) => `- [ ] ${item}`).join("\n");
+  const expectedArtifacts = qualityContract.expectedArtifacts.map((item) => `- [ ] ${item}`).join("\n");
+  const reviewCommands = qualityContract.reviewCommands.map((item) => `- ${item}`).join("\n");
   if (form.language === "en") {
-    return `# Quality checklist\n\n## Selected preset\n${presetChecks}\n\n## Source and story\n- [ ] extracted-source.md reflects real source files, not only pasted notes.\n- [ ] Core message appears in the cover and conclusion.\n- [ ] Every slide has one job and one primary takeaway.\n- [ ] Sensitive material stays local unless the user explicitly approves upload.\n\n## Source files\n${sourceLine}\n\n## PPTX route\n- [ ] Route status: ${enginePlan.pptxActive ? "active" : "optional"}.\n- [ ] Text, shapes, charts, and notes remain editable.\n- [ ] Run SVG/PPTX rendering checks from the Skill workflow.\n- [ ] Inspect exported pages and repair clipping, overlaps, tiny text, and broken charts.\n\n## Web Deck route\n- [ ] Route status: ${enginePlan.webActive ? "active" : "optional"}.\n- [ ] Use ${enginePlan.styleRoute} consistently.\n- [ ] Desktop and mobile viewports do not overlap text, controls, or media.\n\n## Delivery\n- [ ] Final files are named clearly.\n- [ ] Include what was generated, what was checked, and which source files were parsed.\n- [ ] Keep upstream license and third-party notices intact.\n`;
+    return `# Quality checklist\n\n## Selected preset\n${presetChecks}\n\n## Design Doctor contract\n${qualityCriteria}\n\n## Expected artifacts\n${expectedArtifacts}\n\n## Review commands\n${reviewCommands}\n\n## Source and story\n- [ ] extracted-source.md reflects real source files, not only pasted notes.\n- [ ] Core message appears in the cover and conclusion.\n- [ ] Every slide has one job and one primary takeaway.\n- [ ] Sensitive material stays local unless the user explicitly approves upload.\n\n## Source files\n${sourceLine}\n\n## PPTX route\n- [ ] Route status: ${enginePlan.pptxActive ? "active" : "optional"}.\n- [ ] Text, shapes, charts, and notes remain editable.\n- [ ] Run SVG/PPTX rendering checks from the Skill workflow.\n- [ ] Inspect exported pages and repair clipping, overlaps, tiny text, and broken charts.\n\n## Web Deck route\n- [ ] Route status: ${enginePlan.webActive ? "active" : "optional"}.\n- [ ] Use ${enginePlan.styleRoute} consistently.\n- [ ] Desktop and mobile viewports do not overlap text, controls, or media.\n\n## Delivery\n- [ ] Final files are named clearly.\n- [ ] quality-report.json includes the visual review result and Chinese summary.\n- [ ] Include what was generated, what was checked, and which source files were parsed.\n- [ ] Keep upstream license and third-party notices intact.\n`;
   }
-  return `# 质量检查清单\n\n## 当前预设\n${presetChecks}\n\n## 资料与叙事\n- [ ] extracted-source.md 已根据真实源文件修正，而不只是网页粘贴摘要。\n- [ ] 核心结论出现在封面和收束页。\n- [ ] 每一页只承担一个主要任务，并有清晰 takeaway。\n- [ ] 敏感资料默认留在本地，除非用户明确同意上传。\n\n## 源文件\n${sourceLine}\n\n## PPTX 路线\n- [ ] 路线状态：${enginePlan.pptxActive ? "启用" : "备用"}。\n- [ ] 文本、形状、图表、备注保持可编辑。\n- [ ] 按 Skill 工作流运行 SVG / PPTX 渲染检查。\n- [ ] 检查导出页面并修复裁切、重叠、小字和图表损坏。\n\n## Web Deck 路线\n- [ ] 路线状态：${enginePlan.webActive ? "启用" : "备用"}。\n- [ ] 统一使用 ${enginePlan.styleRoute}。\n- [ ] 桌面端和移动端不出现文字、控件或媒体互相遮挡。\n\n## 交付\n- [ ] 最终文件命名清晰。\n- [ ] 简短说明生成了什么、检查了什么、解析了哪些源文件。\n- [ ] 保留上游版权和第三方声明。\n`;
+  return `# 质量检查清单\n\n## 当前预设\n${presetChecks}\n\n## Design Doctor 合同\n${qualityCriteria}\n\n## 预期产物\n${expectedArtifacts}\n\n## 检查命令\n${reviewCommands}\n\n## 资料与叙事\n- [ ] extracted-source.md 已根据真实源文件修正，而不只是网页粘贴摘要。\n- [ ] 核心结论出现在封面和收束页。\n- [ ] 每一页只承担一个主要任务，并有清晰 takeaway。\n- [ ] 敏感资料默认留在本地，除非用户明确同意上传。\n\n## 源文件\n${sourceLine}\n\n## PPTX 路线\n- [ ] 路线状态：${enginePlan.pptxActive ? "启用" : "备用"}。\n- [ ] 文本、形状、图表、备注保持可编辑。\n- [ ] 按 Skill 工作流运行 SVG / PPTX 渲染检查。\n- [ ] 检查导出页面并修复裁切、重叠、小字和图表损坏。\n\n## Web Deck 路线\n- [ ] 路线状态：${enginePlan.webActive ? "启用" : "备用"}。\n- [ ] 统一使用 ${enginePlan.styleRoute}。\n- [ ] 桌面端和移动端不出现文字、控件或媒体互相遮挡。\n\n## 交付\n- [ ] 最终文件命名清晰。\n- [ ] quality-report.json 包含视觉复查结果和中文摘要。\n- [ ] 简短说明生成了什么、检查了什么、解析了哪些源文件。\n- [ ] 保留上游版权和第三方声明。\n`;
 }
 
 function buildWebDeckHtml(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[]) {
@@ -2219,7 +2444,8 @@ function buildBriefObject(
   storyboard: StoryItem[],
   readiness: { score: number; missing: string[] },
   enginePlan: EnginePlan,
-  sources: UploadedSource[]
+  sources: UploadedSource[],
+  qualityContract: QualityContract
 ) {
   const preset = findPreset(form.presetId);
   return {
@@ -2233,10 +2459,16 @@ function buildBriefObject(
       id: preset.id,
       label: preset.label[form.language],
       packPath: preset.packPath,
+      userLevel: qualityContract.userLevel,
       sourceRequirements: preset.sourceRequirements.map((item) => item[form.language]),
       templateCandidates: preset.templateCandidates,
-      qualityChecks: preset.qualityChecks.map((item) => item[form.language])
+      qualityChecks: preset.qualityChecks.map((item) => item[form.language]),
+      notFor: qualityContract.notFor,
+      proofArtifacts: qualityContract.proofArtifacts
     },
+    qualityProfile: qualityContract,
+    expectedArtifacts: qualityContract.expectedArtifacts,
+    reviewCommands: qualityContract.reviewCommands,
     scenario: form.scenario,
     outputMode: form.outputMode,
     stylePreset: form.stylePreset,
@@ -2257,7 +2489,8 @@ function buildManifest(
   sources: UploadedSource[],
   readiness: { score: number; missing: string[] },
   enginePlan: EnginePlan,
-  bridge: BridgeHealth | null
+  bridge: BridgeHealth | null,
+  qualityContract: QualityContract
 ) {
   const preset = findPreset(form.presetId);
   return {
@@ -2291,8 +2524,14 @@ function buildManifest(
       id: preset.id,
       label: preset.label[form.language],
       packPath: preset.packPath || null,
-      status: preset.packPath ? "pack" : "seed"
+      status: preset.packPath ? "stable-pack" : "seed",
+      userLevel: qualityContract.userLevel,
+      notFor: qualityContract.notFor,
+      proofArtifacts: qualityContract.proofArtifacts || null
     },
+    qualityProfile: qualityContract,
+    expectedArtifacts: qualityContract.expectedArtifacts,
+    reviewCommands: qualityContract.reviewCommands,
     readiness,
     enginePlan,
     attachments: sources.map(sourceForManifest)
@@ -2321,6 +2560,7 @@ async function buildHandoffZip({
   webDeckHtml,
   enginePlanMarkdown,
   qualityChecklist,
+  qualityReport,
   manifestJson,
   readme,
   sources
@@ -2332,6 +2572,7 @@ async function buildHandoffZip({
   webDeckHtml: string;
   enginePlanMarkdown: string;
   qualityChecklist: string;
+  qualityReport: string;
   manifestJson: string;
   readme: string;
   sources: UploadedSource[];
@@ -2344,6 +2585,7 @@ async function buildHandoffZip({
   zip.file("preview-web-deck.html", webDeckHtml);
   zip.file("engine-plan.md", enginePlanMarkdown);
   zip.file("quality-checklist.md", qualityChecklist);
+  zip.file("quality-report.json", qualityReport);
   zip.file("manifest.json", manifestJson);
   zip.file("README.md", readme);
   zip.file("attachments/manifest.json", JSON.stringify(sources.map(sourceForManifest), null, 2));
@@ -2367,6 +2609,8 @@ function buildBridgePayload({
   webDeckHtml,
   enginePlanMarkdown,
   qualityChecklist,
+  qualityReport,
+  qualityContract,
   readme,
   sources
 }: {
@@ -2378,6 +2622,8 @@ function buildBridgePayload({
   webDeckHtml: string;
   enginePlanMarkdown: string;
   qualityChecklist: string;
+  qualityReport: string;
+  qualityContract: QualityContract;
   readme: string;
   sources: UploadedSource[];
 }) {
@@ -2390,6 +2636,10 @@ function buildBridgePayload({
     previewWebDeckHtml: webDeckHtml,
     enginePlanMarkdown,
     qualityChecklist,
+    qualityReport,
+    qualityProfile: qualityContract,
+    expectedArtifacts: qualityContract.expectedArtifacts,
+    reviewCommands: qualityContract.reviewCommands,
     readme,
     attachments: sources.map((source) => ({
       id: source.id,
@@ -2407,9 +2657,9 @@ function buildBridgePayload({
 function buildKitReadme(form: FormState, enginePlan: EnginePlan, sources: UploadedSource[]) {
   const preset = findPreset(form.presetId);
   if (form.language === "en") {
-    return `# Ultimate PPT Master handoff kit\n\nFiles:\n- source.md: structured source brief\n- extracted-source.md: browser pre-read source plus Bridge conversion target\n- attachments/: original source files\n- manifest.json: handoff metadata\n- agent-prompt.md: prompt to send to the Agent\n- project-brief.json: machine-readable settings\n- preview-web-deck.html: browser-local Web Deck preview\n- engine-plan.md: PPTX / Web Deck / Fusion route split\n- quality-checklist.md: production checks before delivery\n\nPreset: ${preset.label.en} (${preset.packPath || "seed direction"})\nSource count: ${sources.length}\n\nActive route:\n- PPTX: ${enginePlan.pptxActive ? "active" : "optional"}\n- Web Deck: ${enginePlan.webActive ? "active" : "optional"}\n- Style: ${enginePlan.styleRoute}\n\nNext step:\nOpen this folder in Codex first, or another local Agent that can read the ultimate-ppt-master Skill. Ask it to read agent-prompt.md and inspect attachments/ before producing.\n`;
+    return `# Ultimate PPT Master handoff kit\n\nFiles:\n- source.md: structured source brief\n- extracted-source.md: browser pre-read source plus Bridge conversion target\n- attachments/: original source files\n- manifest.json: handoff metadata and quality contract\n- agent-prompt.md: prompt to send to the Agent\n- project-brief.json: machine-readable settings\n- preview-web-deck.html: browser-local Web Deck preview\n- engine-plan.md: PPTX / Web Deck / Fusion route split\n- quality-checklist.md: production checks before delivery\n- quality-report.json: Design Doctor review status and summary\n\nPreset: ${preset.label.en} (${preset.packPath || "seed direction"})\nSource count: ${sources.length}\n\nActive route:\n- PPTX: ${enginePlan.pptxActive ? "active" : "optional"}\n- Web Deck: ${enginePlan.webActive ? "active" : "optional"}\n- Style: ${enginePlan.styleRoute}\n\nNext step:\nOpen this folder in Codex first, or another local Agent that can read the ultimate-ppt-master Skill. Ask it to read agent-prompt.md, inspect attachments/, run the review commands, and update quality-report.json before producing.\n`;
   }
-  return `# Ultimate PPT Master handoff kit\n\n文件：\n- source.md：结构化资料 brief\n- extracted-source.md：网页预读资料和 Bridge 转换目标\n- attachments/：原始源文件\n- manifest.json：交付元数据\n- agent-prompt.md：发给 Agent 的执行 prompt\n- project-brief.json：机器可读配置\n- preview-web-deck.html：浏览器本地 Web Deck 预览\n- engine-plan.md：PPTX / Web Deck / Fusion 路线分工\n- quality-checklist.md：交付前生产检查清单\n\n内容预设：${preset.label.zh}（${preset.packPath || "种子方向"}）\n源文件数量：${sources.length}\n\n启用路线：\n- PPTX：${enginePlan.pptxActive ? "启用" : "备用"}\n- Web Deck：${enginePlan.webActive ? "启用" : "备用"}\n- 视觉：${enginePlan.styleRoute}\n\n下一步：\n优先用 Codex 打开这个文件夹，或交给其他能读取 ultimate-ppt-master Skill 的本地 Agent。请 Agent 先读 agent-prompt.md，并检查 attachments/ 后再生产。\n`;
+  return `# Ultimate PPT Master handoff kit\n\n文件：\n- source.md：结构化资料 brief\n- extracted-source.md：网页预读资料和 Bridge 转换目标\n- attachments/：原始源文件\n- manifest.json：交付元数据和质量合同\n- agent-prompt.md：发给 Agent 的执行 prompt\n- project-brief.json：机器可读配置\n- preview-web-deck.html：浏览器本地 Web Deck 预览\n- engine-plan.md：PPTX / Web Deck / Fusion 路线分工\n- quality-checklist.md：交付前生产检查清单\n- quality-report.json：Design Doctor 复查状态和中文摘要\n\n内容预设：${preset.label.zh}（${preset.packPath || "种子方向"}）\n源文件数量：${sources.length}\n\n启用路线：\n- PPTX：${enginePlan.pptxActive ? "启用" : "备用"}\n- Web Deck：${enginePlan.webActive ? "启用" : "备用"}\n- 视觉：${enginePlan.styleRoute}\n\n下一步：\n优先用 Codex 打开这个文件夹，或交给其他能读取 ultimate-ppt-master Skill 的本地 Agent。请 Agent 先读 agent-prompt.md，检查 attachments/，运行检查命令，并在生产前更新 quality-report.json。\n`;
 }
 
 function sourceSummaryMarkdown(sources: UploadedSource[], language: Language) {

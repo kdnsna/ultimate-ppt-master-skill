@@ -14,6 +14,29 @@ test("web experience exposes content preset packs", async () => {
   assert.match(catalogSource, /templates\/presets\/tech_trend_web_deck/);
 });
 
+test("web experience exposes the v2.5 quality workbench and Design Doctor", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+
+  assert.match(appSource, /QualityWorkbenchPanel/);
+  assert.match(appSource, /DesignDoctorPanel/);
+  assert.match(appSource, /qualityProfile/);
+  assert.match(appSource, /expectedArtifacts/);
+  assert.match(appSource, /reviewCommands/);
+  assert.match(appSource, /quality-report\.json/);
+  assert.match(appSource, /visual_review\.py/);
+});
+
+test("preset catalog exposes office-user quality metadata", async () => {
+  const catalogSource = await readFile("apps/web/src/presetCatalog.ts", "utf8");
+
+  assert.match(catalogSource, /userLevel/);
+  assert.match(catalogSource, /qualityProfile/);
+  assert.match(catalogSource, /proofArtifacts/);
+  assert.match(catalogSource, /notFor/);
+  assert.match(catalogSource, /中文办公用户/);
+  assert.match(catalogSource, /visual_review\.py/);
+});
+
 test("docs include the GitHub technology scan used for v2.4 direction", async () => {
   const scan = await readFile("docs/github-tech-scan-2026-05.md", "utf8");
 

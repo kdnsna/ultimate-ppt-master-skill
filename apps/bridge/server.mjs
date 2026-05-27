@@ -559,6 +559,24 @@ function findCommand(binary) {
 
 async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   const title = payload?.form?.title || payload?.title || "ultimate-ppt-master-handoff";
+  const projectBrief = typeof payload.projectBrief === "string" ? parseJsonMaybe(payload.projectBrief) : payload.projectBrief || {};
+  const qualityProfile = payload.qualityProfile || projectBrief.qualityProfile || {};
+  const expectedArtifacts = Array.isArray(payload.expectedArtifacts)
+    ? payload.expectedArtifacts
+    : Array.isArray(projectBrief.expectedArtifacts)
+      ? projectBrief.expectedArtifacts
+      : [];
+  const reviewCommands = Array.isArray(payload.reviewCommands)
+    ? payload.reviewCommands
+    : Array.isArray(projectBrief.reviewCommands)
+      ? projectBrief.reviewCommands
+      : [];
+  const enrichedProjectBrief = {
+    ...projectBrief,
+    qualityProfile,
+    expectedArtifacts,
+    reviewCommands
+  };
   const slug = slugify(title);
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const projectPath = join(outputDir, `${slug}-${timestamp}`);
@@ -577,7 +595,7 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
 
   await writeProjectFile("source.md", payload.sourceMarkdown || payload.source || "");
   await writeProjectFile("agent-prompt.md", payload.agentPrompt || "");
-  await writeProjectFile("project-brief.json", typeof payload.projectBrief === "string" ? payload.projectBrief : JSON.stringify(payload.projectBrief || {}, null, 2));
+  await writeProjectFile("project-brief.json", JSON.stringify(enrichedProjectBrief, null, 2));
   await writeProjectFile("preview-web-deck.html", payload.previewWebDeckHtml || "");
   await writeProjectFile("engine-plan.md", payload.enginePlanMarkdown || payload.enginePlan || "");
   await writeProjectFile("quality-checklist.md", payload.qualityChecklist || "");
@@ -610,11 +628,15 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     title,
     projectPath,
     repoRoot,
+    qualityProfile,
+    expectedArtifacts,
+    reviewCommands,
     attachments: attachmentResults.map(({ markdown, ...item }) => item),
     suggestedCommands: suggestedCommands(projectPath)
   };
 
   await writeProjectFile("extracted-source.md", `${extractedSections.join("\n")}\n`);
+  await writeProjectFile("quality-report.json", JSON.stringify(createPendingQualityReport({ title, qualityProfile, expectedArtifacts, reviewCommands }), null, 2));
   await writeProjectFile("manifest.json", JSON.stringify(manifest, null, 2));
 
   return {
@@ -623,6 +645,31 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     files,
     manifest,
     suggestedCommands: manifest.suggestedCommands
+  };
+}
+
+function parseJsonMaybe(value) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return {};
+  }
+}
+
+function createPendingQualityReport({ title, qualityProfile, expectedArtifacts, reviewCommands }) {
+  return {
+    version: BRIDGE_VERSION,
+    title,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+    qualityProfile,
+    expectedArtifacts,
+    reviewCommands,
+    summary: {
+      zh: "Design Doctor / 视觉复查尚未运行。请先生成预览和最终文件，再按 reviewCommands 运行检查；默认只报告问题和建议，只有明确要求时才自动修 SVG。",
+      en: "Design Doctor has not run yet. Generate the preview and final files, then run reviewCommands. By default it reports issues and suggestions before automatic repair."
+    },
+    checks: []
   };
 }
 

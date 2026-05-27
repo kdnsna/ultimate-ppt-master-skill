@@ -1,6 +1,6 @@
 # Next Roadmap - Content and Template Presets
 
-v2.3 made the first mile clearer: visible input, proven output, local Agent handoff.
+v2.5 makes the first mile clearer and more checkable: visible input, preset proof, local Agent handoff, and Design Doctor review.
 
 The next product priority is output stability. Ultimate PPT Master should become richer in content patterns and template presets, so users do not start from a blank prompt every time and Agents have stronger defaults before they generate slides.
 
@@ -35,7 +35,7 @@ Every stable preset should include:
 
 Seed catalog: [`templates/presets/preset-directions.json`](../templates/presets/preset-directions.json)
 
-## v2.4 Starter Packs
+## v2.5 Stable Packs
 
 | Preset | Main output | Why it matters |
 |---|---|---|
@@ -44,7 +44,7 @@ Seed catalog: [`templates/presets/preset-directions.json`](../templates/presets/
 | Product Pitch | Web Deck + optional PPTX | Helps public demos and startup/product storytelling feel less generic. |
 | Tech Trend Web Deck | Web Deck | Keeps the public demo route visually strong, source-cited, and shareable. |
 
-These four now have starter-pack folders under [`templates/presets`](../templates/presets) plus visible starter proofs under `examples/*-starter/`. They are `draft-pack` quality, meaning they are useful for handoff and testing but still need full production-grade sample decks, screenshot sets, and benchmark notes before `stable-pack` promotion.
+These four now have stable-pack folders under [`templates/presets`](../templates/presets), visible starter proofs under `examples/*-starter/`, and `quality-report.json` files tracked in the public proof matrix. See [Quality Workbench v2.5](./quality-workbench-v2.5.md).
 
 ## Candidate Later Packs
 
@@ -71,8 +71,8 @@ Do not call a preset "stable" until it has:
 | Version | Focus |
 |---|---|
 | v2.4 | Turn the first seed preset directions into usable starter packs, expose them in the Web Experience, and audit pack contracts in CI. |
-| v2.5 | Add production-grade sample outputs, screenshot sets, benchmark notes, and "best for" labels for each starter pack. |
-| v2.6 | Add benchmark runs that compare preset output quality across PPTX and Web Deck routes. |
+| v2.5 | Promote current packs to stable proof contracts, add Design Doctor, and write quality profiles into handoff manifests. |
+| v2.6 | Add deeper benchmark runs that compare preset output quality across PPTX and Web Deck routes. |
 
 ## Product Rule
 
