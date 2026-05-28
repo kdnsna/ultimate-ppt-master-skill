@@ -106,6 +106,60 @@ class ReleaseIntegrityTest(unittest.TestCase):
         ):
             self.assertIn(expected, readme_zh)
 
+    def test_readmes_surface_quality_workbench_market_and_completion_audit(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        marketplace_prompt = (
+            "Use $ultimate-ppt-master to turn my source material into a "
+            "quality-checked PPTX or Web Deck with a visual review report."
+        )
+
+        for expected in (
+            "Quality Workbench",
+            "Benchmark Wall",
+            "Completion Audit",
+            "Design Doctor",
+            "Quality Checked",
+            "Skill Market Ready",
+            "Benchmark Proofs",
+            "agents/marketplace-listing.json",
+            "assets/skill-market/*",
+            "npm run audit:market",
+            marketplace_prompt,
+            "No Bridge",
+            "Bridge online",
+            "Open Web Experience",
+            "Choose a preset",
+            "Send to Bridge",
+            "Hand off to Agent",
+            "./docs/completion-audit-v2.5-quality-workbench.md",
+            "./docs/skill-market-distribution.md",
+        ):
+            self.assertIn(expected, readme)
+
+        for expected in (
+            "质量工作台",
+            "公开案例墙",
+            "完成审计",
+            "Design Doctor",
+            "质量检查后交付",
+            "开箱即用",
+            "Skill 市场分发",
+            "agents/marketplace-listing.json",
+            "assets/skill-market/*",
+            "npm run audit:market",
+            marketplace_prompt,
+            "无 Bridge",
+            "有 Bridge",
+            "打开 Web Experience",
+            "选择预设",
+            "发送 Bridge",
+            "交给 Agent",
+            "./docs/completion-audit-v2.5-quality-workbench.md",
+            "./docs/zh-CN/skill-market-distribution.md",
+        ):
+            self.assertIn(expected, readme_zh)
+
     def test_public_benchmark_page_lists_all_quality_proofs(self):
         benchmark = ROOT / "apps" / "web" / "public" / "benchmark" / "index.html"
         self.assertTrue(benchmark.is_file())

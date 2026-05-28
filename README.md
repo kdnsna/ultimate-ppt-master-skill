@@ -1,6 +1,6 @@
-# Ultimate PPT Master - Local-first AI Presentation Generator
+# Ultimate PPT Master - Local-first AI Presentation Quality Workbench
 
-> Turn PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into Agent-ready presentation projects, then produce editable PowerPoint decks or magazine-style Web Decks locally.
+> Local-first + quality-checked delivery for Chinese office users: turn PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into Agent-ready presentation projects, then produce editable PowerPoint decks or magazine-style Web Decks locally.
 
 <p align="center">
   <strong>v2.5.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
@@ -11,13 +11,23 @@
 <p align="center">
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Open Web Experience</strong></a>
   ·
-  <a href="./docs/release-notes-v2.5.0.md"><strong>v2.5.0 Notes</strong></a>
+  <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Benchmark Wall</strong></a>
   ·
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/discussions"><strong>Discussions</strong></a>
+  <a href="./docs/quality-workbench-v2.5.md"><strong>Quality Workbench</strong></a>
+  ·
+  <a href="./docs/skill-market-distribution.md"><strong>Skill Market</strong></a>
+  ·
+  <a href="./docs/completion-audit-v2.5-quality-workbench.md"><strong>Completion Audit</strong></a>
+</p>
+
+<p align="center">
+  <a href="./docs/release-notes-v2.5.0.md"><strong>v2.5.0 Notes</strong></a>
   ·
   <a href="#60-second-quickstart"><strong>60-second quickstart</strong></a>
   ·
   <a href="#use-as-agent-skill"><strong>Use as Agent Skill</strong></a>
+  ·
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/discussions"><strong>Discussions</strong></a>
 </p>
 
 <p align="center">
@@ -25,6 +35,10 @@
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
+  <img alt="Quality Checked" src="https://img.shields.io/badge/Quality-Checked-0F766E?style=for-the-badge">
+  <img alt="Design Doctor" src="https://img.shields.io/badge/Design-Doctor-7C3AED?style=for-the-badge">
+  <img alt="Skill Market Ready" src="https://img.shields.io/badge/Skill%20Market-Ready-F97316?style=for-the-badge">
+  <img alt="Benchmark Proofs" src="https://img.shields.io/badge/Benchmark-Proofs-2563EB?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
   <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-172033?style=for-the-badge">
@@ -42,14 +56,29 @@ npm run doctor
 npm run bridge
 ```
 
-Then open [the Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/), pick a Chinese office preset, paste a rough goal or upload local source files, and click **Send to local connector**. The Bridge writes a handoff folder with the brief, source material, manifest, preview, quality checklist, and `quality-report.json`.
+Then open [the Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/) and choose the route that matches how much local setup you want today.
 
-| First choice | Best default |
+| Mode | What to do first | What you get |
+|---|---|---|
+| **No Bridge** | Open public demos and the Benchmark Wall. | See real synthetic cases, covers, sources, and quality reports before installing anything. |
+| **Bridge online** | Pick a Chinese office preset, paste a goal or upload local files, then click **Send to Bridge**. | A local handoff folder with the brief, source material, manifest, preview, quality checklist, `quality-report.json`, and Agent commands. |
+
+First click path:
+
+| Step | Click or action | Result |
+|---|---|---|
+| 1 | **Open Web Experience** | Start from the product UI instead of reading architecture first. |
+| 2 | **Choose a preset** | Select business review, consulting, training/defense, pitch, or trend deck. |
+| 3 | Paste a goal or add files | Keep source material local and make the task explicit. |
+| 4 | **Send to Bridge** | Write a local handoff contract when the connector is running. |
+| 5 | **Hand off to Agent** | Let Codex, Claude Code, Hermes, OpenClaw, or another local agent produce and review. |
+
+| First scenario | Best default |
 |---|---|
-| I need a weekly or quarterly update | **Executive Business Review** |
-| I need a client-facing recommendation | **Consulting Proposal** |
-| I need a public product story | **Product Pitch** |
-| I need a visual web deck for a trend topic | **Tech Trend Web Deck** |
+| Business review, weekly update, monthly report, or quarterly review | **Executive Business Review** |
+| Consulting proposal, client recommendation, diagnosis, or decision memo | **Consulting Proposal** |
+| Training courseware or academic defense | **Training Courseware / Academic Defense** |
+| Product pitch or tech trend showcase | **Product Pitch / Tech Trend Web Deck** |
 
 ## v2.5 case carousel
 
@@ -107,13 +136,39 @@ This release focuses on practical office delivery:
 
 ## Quality Proofs
 
-Open the public proof wall: [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/). Read the benchmark note: [Quality Workbench v2.5](./docs/quality-workbench-v2.5.md). Read the roadmap: [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md). Preset catalog: [templates/presets](./templates/presets).
+The public proof surface is now a product feature, not a footnote. Open the [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) to see the current "input -> preset -> output -> review" chain before you run the project locally.
+
+Each proof pack includes:
+
+- `source.sanitized.md`: synthetic source material that can be inspected publicly;
+- generated demo output: Web Deck or starter output for the selected preset;
+- screenshot or cover asset for quick visual judgment;
+- `quality-report.json`: machine-readable review result;
+- Design Doctor scorecard: report-only visual review with recommended fixes.
+
+Design Doctor is intentionally report-first. It combines SVG checks, browser visual review, `workflows/visual-review.md`, `quality-report.json`, and a plain-language summary; automatic SVG repair only happens when the user explicitly asks for it.
+
+Read the benchmark note: [Quality Workbench v2.5](./docs/quality-workbench-v2.5.md). Review the completion evidence: [Completion Audit](./docs/completion-audit-v2.5-quality-workbench.md). Preset catalog: [templates/presets](./templates/presets).
 
 ## Skill Market Distribution
 
-The next growth path is not only GitHub Pages. The repository now carries marketplace metadata in `agents/openai.yaml`, a structured listing contract in `agents/marketplace-listing.json`, listing artwork in `assets/skill-market/`, and a distribution checklist for skill directories and curated agent marketplaces.
+The next growth path is not only GitHub Pages. The repository is now ready to be described as an installable Agent Skill instead of only a code repo.
 
-Read the checklist: [Skill Market Distribution](./docs/skill-market-distribution.md).
+Marketplace distribution assets:
+
+- `agents/openai.yaml`: OpenAI/Codex-style skill metadata and invocation examples;
+- `agents/marketplace-listing.json`: structured listing contract for marketplace review;
+- `assets/skill-market/*`: icon and card artwork for listing surfaces;
+- public benchmark packs: proof that the skill can produce quality-checked outputs;
+- `npm run audit:market`: machine check for marketplace metadata, links, and assets.
+
+Copyable marketplace prompt:
+
+```text
+Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report.
+```
+
+Read the checklist: [Skill Market Distribution](./docs/skill-market-distribution.md). Chinese checklist: [Skill 市场分发](./docs/zh-CN/skill-market-distribution.md).
 
 ## Why Not Just Use Codex To Install A Skill?
 
@@ -277,6 +332,7 @@ Every handoff project is meant to be understandable by both humans and agents:
 - `project-brief.json`: structured scenario, audience, style, and output settings;
 - `engine-plan.md`: PPTX / Web Deck production plan;
 - `quality-checklist.md`: review checklist before final delivery;
+- `quality-report.json`: Design Doctor and delivery-gate result;
 - `preview-web-deck.html`: browser-local rough preview;
 - `README.md`: handoff folder instructions.
 
@@ -378,10 +434,31 @@ Maintenance references:
 | See the next content/template direction | [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md) |
 | Review v2.5.0 release focus | [Release Notes - v2.5.0](./docs/release-notes-v2.5.0.md) |
 | Review the quality proof matrix | [Quality Workbench v2.5](./docs/quality-workbench-v2.5.md) |
+| Browse public proof packs | [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) |
+| Prepare marketplace or agent-directory distribution | [Skill Market Distribution](./docs/skill-market-distribution.md) |
+| Verify the v2.5 quality workbench is complete | [Completion Audit](./docs/completion-audit-v2.5-quality-workbench.md) |
 | Review GitHub technology signals | [GitHub Technology Scan - May 2026](./docs/github-tech-scan-2026-05.md) |
 | Review the local upstream benchmark | [Upstream Benchmark - May 2026](./docs/upstream-benchmark-2026-05.md) |
 | Debug setup, extraction, output, provider, Tauri, or agent loading issues | [Troubleshooting](./docs/troubleshooting.md) |
 | Release, Pages, Homebrew, signing, privacy, and maintenance | [Release and Maintenance](./docs/release-maintenance.md) |
+
+## Pre-Push Stability Gates
+
+Maintainers should keep the README promise tied to executable checks:
+
+```bash
+npm run doctor
+npm run audit:presets
+npm run audit:quality
+npm run audit:market
+npm run test:node
+npm run test:worker
+npm run build:web
+npm run build:desktop
+git diff --check
+```
+
+The latest push-prep pass also verified the Web homepage, Benchmark Wall, and four public proof decks at desktop and mobile widths.
 
 ## v2.5.0 Highlights
 
@@ -389,6 +466,7 @@ Maintenance references:
 - Promoted the four current packs to `stable-pack` with quality metadata and proof artifacts.
 - Added Design Doctor entry points and `quality-report.json` to handoff kits.
 - Added quality proof audit coverage with `npm run audit:quality`.
+- Added marketplace readiness coverage with `npm run audit:market`.
 - Strengthened Bridge manifest and project brief contracts for local Agent execution.
 
 See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for upstream baselines and adaptation policy.
