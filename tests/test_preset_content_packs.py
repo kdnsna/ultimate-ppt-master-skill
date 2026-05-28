@@ -91,6 +91,18 @@ class PresetContentPackTest(unittest.TestCase):
                 self.assertEqual(report["presetId"], data["id"])
                 self.assertEqual(report["version"], "2.5.0")
                 self.assertIn(report["status"], ("passed", "reviewed"))
+                self.assertIn("designDoctor", report)
+                doctor = report["designDoctor"]
+                self.assertEqual(doctor["repairPolicy"]["default"], "report-only")
+                self.assertIs(doctor["repairPolicy"]["autoRepair"], False)
+                self.assertGreaterEqual(len(doctor["scorecard"]), 3)
+                self.assertGreaterEqual(len(doctor["repairRecommendations"]), 2)
+                for score in doctor["scorecard"]:
+                    self.assertIn("id", score)
+                    self.assertIn("label", score)
+                    self.assertIn("score", score)
+                    self.assertGreaterEqual(score["score"], 0)
+                    self.assertLessEqual(score["score"], 100)
 
     def test_preset_pack_contract_is_actionable(self):
         for preset_path in sorted(PRESETS_DIR.glob("*/preset.json")):

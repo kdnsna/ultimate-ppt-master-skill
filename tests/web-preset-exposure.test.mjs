@@ -97,3 +97,16 @@ test("web experience exposes one-click skill install actions", async () => {
   assert.match(appSource, /installCodexSkill/);
   assert.match(appSource, /fallbackSkillInstallCommand/);
 });
+
+test("web experience surfaces v2.6 onboarding, design scoring, and benchmark wall", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+
+  assert.match(appSource, /OneClickRunbookPanel/);
+  assert.match(appSource, /BenchmarkWall/);
+  assert.match(appSource, /designDoctorScores/);
+  assert.match(appSource, /benchmarkCases/);
+  assert.match(appSource, /开箱跑通/);
+  assert.match(appSource, /视觉评分/);
+  assert.match(appSource, /案例墙/);
+  assert.match(appSource, /Skill 市场分发/);
+});

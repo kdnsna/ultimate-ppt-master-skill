@@ -4,6 +4,11 @@ Use this guide when you want Ultimate PPT Master to run as a portable agent skil
 
 For the lowest-friction public entry, start from the [Web Experience](./web-experience.md). Its Configuration page can install or update the Skill for Codex / generic local agents through Bridge; if Bridge is offline, it copies the same terminal commands shown below. Download the generated `handoff-kit.zip` when you want to continue production from a local project folder.
 
+For skill marketplaces and agent directories, keep the public listing aligned
+with [Skill Market Distribution](./skill-market-distribution.md). The listing
+metadata lives in `agents/openai.yaml`; visual assets live in
+`assets/skill-market/`.
+
 ## Prerequisites
 
 - Python 3.10+

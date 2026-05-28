@@ -23,6 +23,20 @@ Use this checklist when improving GitHub exposure for Ultimate PPT Master.
   starter task.
 - Keep public examples sanitized. Do not commit client documents, source decks,
   API keys, or local logs.
+- Keep [Skill Market Distribution](./skill-market-distribution.md) current when
+  changing `SKILL.md`, `agents/openai.yaml`, proof packs, or marketplace images.
+
+## Skill Marketplace Surface
+
+- Keep `agents/openai.yaml` short, honest, and aligned with the current
+  production path: local-first handoff, quality-checked PPTX, Web Deck, and
+  Design Doctor review.
+- Use `assets/skill-market/ultimate-ppt-master-icon.svg` for compact listings
+  and `assets/skill-market/ultimate-ppt-master-card.svg` for richer cards.
+- Link marketplace visitors to the README quickstart first, then to the Web
+  Experience and proof-pack benchmark wall.
+- Do not claim hosted generation, enterprise compliance, or fully automated SVG
+  repair unless those paths have release tests and public proof artifacts.
 
 ## Pages And Search
 

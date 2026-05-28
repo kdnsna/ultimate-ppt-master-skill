@@ -18,6 +18,8 @@ The desktop app remains available as an advanced local preview and future distri
 | I want to know which workflow gives better results. | Decision guide | [Choosing a Workflow](./choosing-a-workflow.md) |
 | I want to know why this exists beside direct Skill install. | Product positioning | [Product Positioning](./product-positioning.md) |
 | I want to improve public GitHub exposure. | Growth checklist | [Public Growth Playbook](./public-growth-playbook.md) |
+| I want to prepare the skill for marketplaces and agent directories. | Skill Market Distribution | [Skill Market Distribution](./skill-market-distribution.md) |
+| I want to audit whether the v2.5 optimization is actually complete. | Completion audit | [Completion Audit - v2.5 Quality Workbench and Skill Market Distribution](./completion-audit-v2.5-quality-workbench.md) |
 | I want to see the next content/template direction. | Roadmap | [Next Roadmap - Content and Template Presets](./next-roadmap.md) |
 | I want to see the stable proof matrix. | Quality workbench | [Quality Workbench v2.5](./quality-workbench-v2.5.md) |
 | I want to know what changed in v2.5.0. | Release notes | [Release Notes - v2.5.0](./release-notes-v2.5.0.md) |
@@ -36,6 +38,7 @@ The desktop app remains available as an advanced local preview and future distri
 | Curious visitor | Open the Web Experience | Fastest path: no install, no backend account, no model key, no local environment setup. |
 | GitHub/agent user | Run Bridge, then hand the folder to Codex or install as a Skill | Best quality today because the agent can inspect source files, run the pipeline, preview, fix, and export. |
 | Team maintaining polished decks | Web Experience + Bridge for intake + Agent Skill for production | Keeps the front door simple while preserving deep local control. |
+| Skill marketplace maintainer | README first screen + `agents/openai.yaml` + `agents/marketplace-listing.json` + benchmark wall | Proves the skill can be discovered, invoked, and accepted before distribution. |
 | Desktop user or maintainer | Use desktop as an advanced local preview | Native distribution still depends on signing, notarization, and packaging maturity. |
 | API integrator | Use Bridge/provider dashboard for local key checks | The browser never stores keys; Bridge can test configured providers locally. |
 

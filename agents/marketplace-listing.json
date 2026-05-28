@@ -1,0 +1,81 @@
+{
+  "id": "ultimate-ppt-master",
+  "name": "Ultimate PPT Master",
+  "displayName": "终极融合PPT大师",
+  "version": "2.5.0",
+  "invocation": "$ultimate-ppt-master",
+  "category": [
+    "presentation generation",
+    "editable PPTX",
+    "web deck",
+    "office productivity"
+  ],
+  "shortDescription": "Generate quality-checked PPTX and Web Decks from local source files.",
+  "positioning": "A local-first PPT quality workbench for Chinese office users, consultants, operators, trainers, and agent users who need editable deliverables.",
+  "defaultPrompt": "Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report.",
+  "metadata": {
+    "openai": "agents/openai.yaml",
+    "skillEntrypoint": "SKILL.md",
+    "distributionGuide": "docs/skill-market-distribution.md",
+    "distributionGuideZh": "docs/zh-CN/skill-market-distribution.md"
+  },
+  "assets": {
+    "iconSmall": "assets/skill-market/ultimate-ppt-master-icon.svg",
+    "listingCard": "assets/skill-market/ultimate-ppt-master-card.svg",
+    "readmeCarousel": "assets/readme/v2.5-case-carousel.gif"
+  },
+  "links": {
+    "repository": "https://github.com/kdnsna/ultimate-ppt-master-skill",
+    "webExperience": "https://kdnsna.github.io/ultimate-ppt-master-skill/",
+    "benchmarkWall": "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
+    "quickstart": "README.md#60-second-quickstart",
+    "agentSetup": "docs/agent-setup.md"
+  },
+  "proof": {
+    "benchmarkWall": "apps/web/public/benchmark/index.html",
+    "qualityWorkbench": "docs/quality-workbench-v2.5.md",
+    "repairPolicy": "report-only by default; automatic SVG repair only when the user explicitly asks",
+    "cases": [
+      {
+        "id": "executive-business-review-starter",
+        "title": "Executive Business Review / 经营复盘",
+        "bestFor": "Operations reviews, CEO or department updates, KPI storylines.",
+        "source": "examples/executive-business-review-starter/source.sanitized.md",
+        "demo": "apps/web/public/examples/executive-business-review-starter/web-demo.html",
+        "qualityReport": "examples/executive-business-review-starter/quality-report.json"
+      },
+      {
+        "id": "consulting-proposal-starter",
+        "title": "Consulting Proposal / 咨询方案",
+        "bestFor": "Client diagnosis, transformation proposals, and decision memos.",
+        "source": "examples/consulting-proposal-starter/source.sanitized.md",
+        "demo": "apps/web/public/examples/consulting-proposal-starter/web-demo.html",
+        "qualityReport": "examples/consulting-proposal-starter/quality-report.json"
+      },
+      {
+        "id": "product-pitch-starter",
+        "title": "Product Pitch / 产品路演",
+        "bestFor": "Launch stories, demo day decks, and stakeholder buy-in.",
+        "source": "examples/product-pitch-starter/source.sanitized.md",
+        "demo": "apps/web/public/examples/product-pitch-starter/web-demo.html",
+        "qualityReport": "examples/product-pitch-starter/quality-report.json"
+      },
+      {
+        "id": "tech-trend-web-deck-starter",
+        "title": "Tech Trend Web Deck / 科技趋势",
+        "bestFor": "Public trend briefings, conference talks, and technical narratives.",
+        "source": "examples/tech-trend-web-deck-starter/source.sanitized.md",
+        "demo": "apps/web/public/examples/tech-trend-web-deck-starter/web-demo.html",
+        "qualityReport": "examples/tech-trend-web-deck-starter/quality-report.json"
+      }
+    ]
+  },
+  "acceptanceGates": [
+    "npm run audit:presets",
+    "npm run audit:quality",
+    "npm run audit:market",
+    "npm run test:node",
+    "npm run test:worker",
+    "npm run build:web"
+  ]
+}

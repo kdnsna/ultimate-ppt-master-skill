@@ -10,6 +10,7 @@ npm --prefix apps/web ci
 npm run build:web
 npm run audit:presets
 npm run audit:quality
+npm run audit:market
 npm run build:desktop
 npm --prefix apps/desktop audit
 npm run test:node
@@ -52,6 +53,7 @@ It should cover:
 - dependency audit;
 - preset starter-pack audit;
 - stable pack quality proof audit;
+- skill marketplace metadata, public proof wall, and listing asset audit;
 - Bridge and Web Experience Node tests;
 - Python worker tests;
 - whitespace checks.

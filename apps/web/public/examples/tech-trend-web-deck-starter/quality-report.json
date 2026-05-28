@@ -24,5 +24,48 @@
       "status": "passed",
       "summary": "Preset declares expected artifacts, review commands, and acceptance criteria."
     }
-  ]
+  ],
+  "designDoctor": {
+    "repairPolicy": {
+      "default": "report-only",
+      "autoRepair": false,
+      "requiresExplicitUserRequest": true
+    },
+    "scorecard": [
+      {
+        "id": "layout",
+        "label": {
+          "zh": "版式稳定",
+          "en": "Layout stability"
+        },
+        "score": 93
+      },
+      {
+        "id": "evidence",
+        "label": {
+          "zh": "证据闭环",
+          "en": "Evidence loop"
+        },
+        "score": 89
+      },
+      {
+        "id": "editability",
+        "label": {
+          "zh": "可编辑交付",
+          "en": "Editable delivery"
+        },
+        "score": 82
+      }
+    ],
+    "repairRecommendations": [
+      {
+        "zh": "默认先报告事实、解读和建议是否分离，以及公开来源是否足够清楚。",
+        "en": "Report whether facts, interpretation, and recommendations stay separate with clear public sources."
+      },
+      {
+        "zh": "只有用户明确要求自动修复时，才调整 Web Deck 页面节奏或 SVG 版式。",
+        "en": "Only adjust Web Deck rhythm or SVG layout when explicitly requested."
+      }
+    ]
+  }
 }

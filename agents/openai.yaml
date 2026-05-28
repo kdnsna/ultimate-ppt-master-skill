@@ -1,6 +1,9 @@
 interface:
   display_name: "终极融合PPT大师"
-  short_description: "Create PPTX or magazine-style web decks"
-  default_prompt: "Use $ultimate-ppt-master to help me choose a PPT style and create a presentation from my source material."
+  short_description: "Generate quality-checked PPTX/Web Decks"
+  icon_small: "./assets/skill-market/ultimate-ppt-master-icon.svg"
+  icon_large: "./assets/skill-market/ultimate-ppt-master-card.svg"
+  brand_color: "#0F766E"
+  default_prompt: "Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report."
 policy:
   allow_implicit_invocation: true

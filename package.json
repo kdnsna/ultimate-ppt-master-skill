@@ -19,6 +19,7 @@
     "package:desktop:homebrew": "bash scripts/package-homebrew-release.sh",
     "audit:presets": "python3 scripts/audit_preset_packs.py",
     "audit:quality": "python3 scripts/audit_quality_proofs.py",
+    "audit:market": "python3 scripts/audit_skill_market.py",
     "test:worker": "bash -lc 'if [ -x .venv/bin/python ]; then .venv/bin/python -m unittest discover -s tests; else python3 -m unittest discover -s tests; fi'",
     "test:node": "node --test tests/*.test.mjs",
     "test:bridge": "node --test tests/bridge.test.mjs"

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Ultimate PPT Master icon">
+  <rect width="512" height="512" rx="96" fill="#0f766e"/>
+  <rect x="82" y="82" width="348" height="348" rx="42" fill="#f8fafc"/>
+  <rect x="118" y="126" width="132" height="42" rx="10" fill="#172033"/>
+  <rect x="118" y="194" width="276" height="28" rx="8" fill="#2563eb"/>
+  <rect x="118" y="246" width="218" height="28" rx="8" fill="#10b981"/>
+  <rect x="118" y="298" width="250" height="28" rx="8" fill="#f59e0b"/>
+  <path d="M374 114l24 44 50 8-36 35 9 50-47-24-45 24 8-50-36-35 50-8z" fill="#ef5b3f"/>
+</svg>

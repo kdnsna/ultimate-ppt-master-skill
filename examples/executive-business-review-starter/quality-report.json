@@ -24,5 +24,48 @@
       "status": "passed",
       "summary": "Preset declares expected artifacts, review commands, and acceptance criteria."
     }
-  ]
+  ],
+  "designDoctor": {
+    "repairPolicy": {
+      "default": "report-only",
+      "autoRepair": false,
+      "requiresExplicitUserRequest": true
+    },
+    "scorecard": [
+      {
+        "id": "layout",
+        "label": {
+          "zh": "版式稳定",
+          "en": "Layout stability"
+        },
+        "score": 92
+      },
+      {
+        "id": "evidence",
+        "label": {
+          "zh": "证据闭环",
+          "en": "Evidence loop"
+        },
+        "score": 90
+      },
+      {
+        "id": "editability",
+        "label": {
+          "zh": "可编辑交付",
+          "en": "Editable delivery"
+        },
+        "score": 86
+      }
+    ],
+    "repairRecommendations": [
+      {
+        "zh": "默认只报告文字溢出、遮挡、空白页和证据缺口，不自动改 SVG。",
+        "en": "Report overflow, overlap, blank pages, and evidence gaps by default; do not auto-edit SVG."
+      },
+      {
+        "zh": "用户明确要求自动修复后，再运行 SVG 修复流程并保留前后截图。",
+        "en": "Run SVG repair only after explicit user approval, then keep before/after screenshots."
+      }
+    ]
+  }
 }

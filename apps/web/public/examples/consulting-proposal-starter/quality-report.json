@@ -24,5 +24,48 @@
       "status": "passed",
       "summary": "Preset declares expected artifacts, review commands, and acceptance criteria."
     }
-  ]
+  ],
+  "designDoctor": {
+    "repairPolicy": {
+      "default": "report-only",
+      "autoRepair": false,
+      "requiresExplicitUserRequest": true
+    },
+    "scorecard": [
+      {
+        "id": "layout",
+        "label": {
+          "zh": "版式稳定",
+          "en": "Layout stability"
+        },
+        "score": 91
+      },
+      {
+        "id": "evidence",
+        "label": {
+          "zh": "证据闭环",
+          "en": "Evidence loop"
+        },
+        "score": 88
+      },
+      {
+        "id": "editability",
+        "label": {
+          "zh": "可编辑交付",
+          "en": "Editable delivery"
+        },
+        "score": 87
+      }
+    ],
+    "repairRecommendations": [
+      {
+        "zh": "默认先报告客户方案里的判断跳跃、证据缺口和路线图不清晰问题。",
+        "en": "Report recommendation jumps, evidence gaps, and roadmap ambiguity before editing."
+      },
+      {
+        "zh": "只有用户明确要求自动修复时，才调整 SVG 或重排页面。",
+        "en": "Only adjust SVG or page layout when the user explicitly asks for automatic repair."
+      }
+    ]
+  }
 }

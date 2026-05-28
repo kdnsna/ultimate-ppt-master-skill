@@ -107,7 +107,13 @@ This release focuses on practical office delivery:
 
 ## Quality Proofs
 
-Read the benchmark note: [Quality Workbench v2.5](./docs/quality-workbench-v2.5.md). Read the roadmap: [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md). Preset catalog: [templates/presets](./templates/presets).
+Open the public proof wall: [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/). Read the benchmark note: [Quality Workbench v2.5](./docs/quality-workbench-v2.5.md). Read the roadmap: [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md). Preset catalog: [templates/presets](./templates/presets).
+
+## Skill Market Distribution
+
+The next growth path is not only GitHub Pages. The repository now carries marketplace metadata in `agents/openai.yaml`, a structured listing contract in `agents/marketplace-listing.json`, listing artwork in `assets/skill-market/`, and a distribution checklist for skill directories and curated agent marketplaces.
+
+Read the checklist: [Skill Market Distribution](./docs/skill-market-distribution.md).
 
 ## Why Not Just Use Codex To Install A Skill?
 

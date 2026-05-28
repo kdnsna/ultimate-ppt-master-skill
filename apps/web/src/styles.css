@@ -269,6 +269,42 @@ h2 {
   gap: 9px;
 }
 
+.design-score-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.design-score-grid article {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(16, 185, 129, 0.24);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.design-score-grid span {
+  display: inline-flex;
+  min-width: 34px;
+  height: 26px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #fff;
+  background: var(--green);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.design-score-grid strong {
+  display: block;
+  margin-top: 7px;
+}
+
+.design-score-grid p {
+  margin-top: 5px;
+}
+
 .primary-action,
 .secondary-action {
   min-width: 160px;
@@ -523,6 +559,8 @@ h2 {
 .app[data-view="start"] .web-preview-panel,
 .app[data-view="start"] .preview-panel,
 .app[data-view="sources"] .beginner-guide,
+.app[data-view="sources"] .one-click-runbook,
+.app[data-view="sources"] .benchmark-wall,
 .app[data-view="sources"] .plain-glossary,
 .app[data-view="sources"] .value-strip,
 .app[data-view="sources"] .configuration-page,
@@ -531,12 +569,16 @@ h2 {
 .app[data-view="sources"] .web-preview-panel,
 .app[data-view="sources"] .preview-panel,
 .app[data-view="configuration"] .beginner-guide,
+.app[data-view="configuration"] .one-click-runbook,
+.app[data-view="configuration"] .benchmark-wall,
 .app[data-view="configuration"] .plain-glossary,
 .app[data-view="configuration"] .value-strip,
 .app[data-view="configuration"] .studio-grid,
 .app[data-view="configuration"] .web-preview-panel,
 .app[data-view="configuration"] .preview-panel,
 .app[data-view="handoff"] .beginner-guide,
+.app[data-view="handoff"] .one-click-runbook,
+.app[data-view="handoff"] .benchmark-wall,
 .app[data-view="handoff"] .plain-glossary,
 .app[data-view="handoff"] .value-strip,
 .app[data-view="handoff"] .configuration-page,
@@ -546,6 +588,8 @@ h2 {
 .app[data-view="handoff"] .web-preview-panel,
 .app[data-view="handoff"] .preview-panel,
 .app[data-view="preview"] .beginner-guide,
+.app[data-view="preview"] .one-click-runbook,
+.app[data-view="preview"] .benchmark-wall,
 .app[data-view="preview"] .plain-glossary,
 .app[data-view="preview"] .value-strip,
 .app[data-view="preview"] .configuration-page,
@@ -707,6 +751,144 @@ h2 {
   min-width: 0;
   min-height: 34px;
   padding: 0 10px;
+}
+
+.one-click-runbook,
+.benchmark-wall {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.46fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.runbook-intro,
+.runbook-grid article,
+.benchmark-copy,
+.benchmark-grid article {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.runbook-intro,
+.benchmark-copy {
+  padding: 18px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.runbook-intro h2,
+.benchmark-copy h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1.18;
+  font-weight: 950;
+}
+
+.runbook-intro p:not(.eyebrow),
+.benchmark-copy p:not(.eyebrow) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.runbook-meter {
+  padding: 12px;
+  display: grid;
+  gap: 7px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.runbook-meter span,
+.runbook-meter em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.runbook-meter strong {
+  color: var(--ink);
+  font-size: 22px;
+}
+
+.runbook-grid,
+.benchmark-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.benchmark-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.runbook-grid article,
+.benchmark-grid article {
+  min-height: 154px;
+  padding: 15px;
+  display: grid;
+  align-content: start;
+  gap: 9px;
+}
+
+.runbook-grid span {
+  width: 36px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #fff;
+  background: var(--blue);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.runbook-grid strong,
+.benchmark-grid strong {
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.runbook-grid p,
+.benchmark-grid p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.benchmark-grid div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.benchmark-actions a,
+.benchmark-grid a {
+  min-height: 32px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 850;
 }
 
 .plain-glossary {
@@ -1672,6 +1854,8 @@ pre {
   .studio-grid,
   .value-strip,
   .beginner-guide,
+  .one-click-runbook,
+  .benchmark-wall,
   .plain-glossary,
   .configuration-hero,
   .page-guide {
@@ -1696,6 +1880,8 @@ pre {
   .provider-grid,
   .agent-grid,
   .value-grid,
+  .runbook-grid,
+  .benchmark-grid,
   .plain-glossary-grid,
   .beginner-steps,
   .workspace-nav,
@@ -1756,7 +1942,10 @@ pre {
   .url-row,
   .provider-grid,
   .agent-grid,
+  .design-score-grid,
   .value-grid,
+  .runbook-grid,
+  .benchmark-grid,
   .plain-glossary-grid,
   .workspace-nav,
   .setup-grid {

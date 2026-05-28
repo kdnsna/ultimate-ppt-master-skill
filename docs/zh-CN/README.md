@@ -15,6 +15,7 @@
 | 新用户 / 普通访客 | Web Experience | 不用安装、不用账号、不用模型 key，先快速整理 brief、预览 Web Deck 并导出 handoff kit。 |
 | GitHub / Agent 用户 | Bridge + Skill | 效果最好，网页能落盘真实项目，Agent 可以读资料、跑脚本、预览、修正、导出。 |
 | 团队要稳定交付 | Web Experience + Bridge + Skill | 网页端做导入和交付包，Bridge 做本地解析，Skill 做最终生产。 |
+| Skill 市场维护者 | README 首屏 + `agents/openai.yaml` + `agents/marketplace-listing.json` + 案例墙 | 先证明能被发现、能被调用、能被验收，再去市场分发。 |
 | 想看桌面端 | Desktop Later | 可源码运行，但签名、公证、Homebrew 后续再做主推。 |
 | 想接自己的大模型 API | Bridge / Provider Dashboard | 浏览器不保存 key，Bridge 从本地环境读取并测试 provider。 |
 
@@ -26,6 +27,8 @@
 - 工作流选择：[Choosing a Workflow](../choosing-a-workflow.md)
 - 产品定位反思：[产品定位反思](./product-positioning.md)
 - GitHub 曝光运营清单：[Public Growth Playbook](../public-growth-playbook.md)
+- Skill 市场分发：[Skill 市场分发](./skill-market-distribution.md)
+- v2.5 优化完成审计：[Completion Audit - v2.5 Quality Workbench and Skill Market Distribution](../completion-audit-v2.5-quality-workbench.md)
 - 下一步内容 / 模板方向：[下一步路线 - 内容与模板预设](./next-roadmap.md)
 - v2.5 质量工作台：[v2.5 质量工作台](./quality-workbench-v2.5.md)
 - v2.5.0 发布说明：[发布说明 - v2.5.0](./release-notes-v2.5.0.md)

@@ -172,6 +172,72 @@ const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v2.5";
 const appVersion = "2.5.0";
 
+const designDoctorScores = [
+  {
+    key: "layout",
+    score: 92,
+    zh: "版式稳定",
+    en: "Layout stability",
+    zhHint: "检查文字溢出、遮挡、页边距和移动端可读性。",
+    enHint: "Checks overflow, overlap, margins, and mobile readability."
+  },
+  {
+    key: "evidence",
+    score: 88,
+    zh: "证据闭环",
+    en: "Evidence loop",
+    zhHint: "确认每页结论能回到 source.md、附件或公开样例证明。",
+    enHint: "Confirms every claim maps back to source.md, attachments, or public proof."
+  },
+  {
+    key: "editability",
+    score: 86,
+    zh: "可编辑交付",
+    en: "Editable delivery",
+    zhHint: "优先保留真实文字、图表、备注和检查命令，而不是整页截图。",
+    enHint: "Prioritizes real text, charts, notes, and review commands over flat screenshots."
+  }
+];
+
+const benchmarkCases = [
+  {
+    id: "executive",
+    zhTitle: "经营复盘",
+    enTitle: "Executive Business Review",
+    zhUse: "经营会、部门复盘、KPI 故事线",
+    enUse: "KPI review, executive update, operating rhythm",
+    path: "examples/executive-business-review-starter/web-demo.html",
+    report: "examples/executive-business-review-starter/quality-report.json"
+  },
+  {
+    id: "consulting",
+    zhTitle: "咨询方案",
+    enTitle: "Consulting Proposal",
+    zhUse: "客户诊断、转型建议、路线图",
+    enUse: "Diagnosis, recommendation, implementation roadmap",
+    path: "examples/consulting-proposal-starter/web-demo.html",
+    report: "examples/consulting-proposal-starter/quality-report.json"
+  },
+  {
+    id: "product",
+    zhTitle: "产品路演",
+    enTitle: "Product Pitch",
+    zhUse: "新品介绍、demo day、资源争取",
+    enUse: "Launch story, demo day, stakeholder buy-in",
+    path: "examples/product-pitch-starter/web-demo.html",
+    report: "examples/product-pitch-starter/quality-report.json"
+  },
+  {
+    id: "trend",
+    zhTitle: "科技趋势",
+    enTitle: "Tech Trend Web Deck",
+    zhUse: "趋势观察、公开演讲、技术洞察",
+    enUse: "Trend briefing, public talk, technical narrative",
+    path: "examples/tech-trend-web-deck-starter/web-demo.html",
+    report: "examples/tech-trend-web-deck-starter/quality-report.json"
+  }
+];
+
 const labels = {
   zh: {
     product: "Ultimate PPT Master",
@@ -1063,6 +1129,10 @@ export function App() {
           onLaunchAgent={() => void launchOrCopyAgent()}
         />
 
+        <OneClickRunbookPanel language={form.language} bridgeReady={Boolean(bridge)} readiness={readiness.score} />
+
+        <BenchmarkWall language={form.language} />
+
         <PlainLanguageGlossary labels={t} />
 
         <section className="value-strip" aria-label={t.whyTitle}>
@@ -1686,6 +1756,93 @@ function BeginnerGuide({
   );
 }
 
+function OneClickRunbookPanel({
+  language,
+  bridgeReady,
+  readiness
+}: {
+  language: Language;
+  bridgeReady: boolean;
+  readiness: number;
+}) {
+  const zh = language === "zh";
+  const steps = zh
+    ? [
+        ["开箱跑通", "先用内置经营复盘样例跑一遍，不需要准备真实资料。"],
+        ["补真实资料", "把 PDF / Word / PPTX / Excel 交给 Bridge，本地生成 source.md。"],
+        ["视觉评分", "Design Doctor 输出 layout、evidence、editability 三类评分。"],
+        ["Skill 市场分发", "用 agents/openai.yaml、案例墙和 README 首屏证明它能被发现、能被调用、能被验收。"]
+      ]
+    : [
+        ["First run", "Start with the built-in business review sample before collecting real files."],
+        ["Add real sources", "Let Bridge turn PDF / Word / PPTX / Excel into local source.md."],
+        ["Design score", "Design Doctor reports layout, evidence, and editability scores."],
+        ["Skill market distribution", "Use agents/openai.yaml, the benchmark wall, and the README first screen as proof."]
+      ];
+
+  return (
+    <section className="one-click-runbook" aria-label={zh ? "开箱跑通" : "One-click runbook"}>
+      <div className="runbook-intro">
+        <p className="eyebrow">{zh ? "v2.6 direction" : "v2.6 direction"}</p>
+        <h2>{zh ? "从第一眼到可交付，只保留一条默认路" : "One default path from first click to delivery"}</h2>
+        <p>
+          {zh
+            ? "下一阶段不先炫技，而是把样例试跑、真实资料、本地 handoff、Design Doctor 和 Skill 市场入口串成一条普通用户能跟住的路线。"
+            : "The next step is not another advanced knob. It connects sample run, real sources, local handoff, Design Doctor, and skill-market readiness into one path."}
+        </p>
+        <div className="runbook-meter">
+          <span>{zh ? "当前 brief 准备度" : "Current brief readiness"}</span>
+          <strong>{readiness}%</strong>
+          <div className="meter" aria-hidden="true"><span style={{ width: `${readiness}%` }} /></div>
+          <em>{bridgeReady ? (zh ? "Bridge 已连接" : "Bridge connected") : (zh ? "可先下载 zip 或启动 Bridge" : "Download zip or start Bridge first")}</em>
+        </div>
+      </div>
+      <div className="runbook-grid">
+        {steps.map(([title, text], index) => (
+          <article key={title}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{title}</strong>
+            <p>{text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BenchmarkWall({ language }: { language: Language }) {
+  const zh = language === "zh";
+  return (
+    <section className="benchmark-wall" aria-label={zh ? "案例墙" : "Benchmark wall"}>
+      <div className="benchmark-copy">
+        <p className="eyebrow">{zh ? "public benchmark" : "public benchmark"}</p>
+        <h2>{zh ? "案例墙：先看输入、输出和质量报告" : "Benchmark wall: inspect input, output, and quality report first"}</h2>
+        <p>
+          {zh
+            ? "README 动图负责第一眼，这里负责证明链：每个案例都能打开 demo，并回到对应 quality-report.json。"
+            : "The README animation handles the first impression; this wall keeps the proof chain visible for every case."}
+        </p>
+        <div className="benchmark-actions">
+          <a href={`${baseUrl}benchmark/`}>{zh ? "打开公开案例墙" : "Open public benchmark"}</a>
+          <a href={`${repoUrl}/blob/main/docs/skill-market-distribution.md`}>{zh ? "Skill 市场清单" : "Skill market checklist"}</a>
+        </div>
+      </div>
+      <div className="benchmark-grid">
+        {benchmarkCases.map((item) => (
+          <article key={item.id}>
+            <strong>{zh ? item.zhTitle : item.enTitle}</strong>
+            <p>{zh ? item.zhUse : item.enUse}</p>
+            <div>
+              <a href={`${baseUrl}${item.path}`}>{zh ? "打开 demo" : "Open demo"}</a>
+              <a href={`${repoUrl}/blob/main/${item.report}`}>{zh ? "质量报告" : "Quality report"}</a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function PlainLanguageGlossary({ labels: t }: { labels: typeof labels.zh }) {
   return (
     <section className="plain-glossary" aria-label={t.plainGlossaryTitle}>
@@ -1894,6 +2051,8 @@ function DesignDoctorPanel({
   qualityContract: QualityContract;
   labels: typeof labels.zh;
 }) {
+  const zh = t.studio.includes("质量");
+
   return (
     <div className="design-doctor-panel">
       <div className="design-doctor-head">
@@ -1917,6 +2076,15 @@ function DesignDoctorPanel({
           <dd>{qualityContract.reviewCommands.join(" · ")}</dd>
         </div>
       </dl>
+      <div className="design-score-grid" aria-label={t.designDoctorTitle}>
+        {designDoctorScores.map((item) => (
+          <article key={item.key}>
+            <span>{item.score}</span>
+            <strong>{zh ? item.zh : item.en}</strong>
+            <p>{zh ? item.zhHint : item.enHint}</p>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }

@@ -204,6 +204,79 @@ def discover_pages(project_path: Path, requested: list[str] | None) -> list[str]
     return selected
 
 
+def build_design_doctor_summary(records: list[dict]) -> dict:
+    """Build a report-first Design Doctor contract from render records.
+
+    This is deliberately conservative: it only scores renderer health and
+    obvious blank-page signals. Human/agent rubric review still happens in the
+    visual-review workflow before any SVG repair.
+    """
+    total = max(len(records), 1)
+    rendered = sum(1 for rec in records if rec.get('ok'))
+    blank = sum(1 for rec in records if rec.get('all_background'))
+    failed = sum(1 for rec in records if not rec.get('ok'))
+
+    render_score = max(0, round(100 * (rendered - blank) / total))
+    visibility_score = max(0, 100 - failed * 25 - blank * 20)
+    handoff_score = 100 if failed == 0 else max(40, 100 - failed * 30)
+
+    page_findings = []
+    for rec in records:
+        if not rec.get('ok'):
+            severity = 'fail'
+            zh = f"{rec.get('page')}: 渲染失败，需要先修复预览或依赖。"
+            en = f"{rec.get('page')}: render failed; fix preview server or dependencies first."
+        elif rec.get('all_background'):
+            severity = 'warning'
+            zh = f"{rec.get('page')}: PNG 接近纯背景，需人工确认是否为空页。"
+            en = f"{rec.get('page')}: PNG is near all-background; manually confirm the slide is not blank."
+        else:
+            severity = 'passed'
+            zh = f"{rec.get('page')}: 浏览器渲染成功，可进入版式人工复查。"
+            en = f"{rec.get('page')}: browser render succeeded; continue to layout review."
+        page_findings.append({'page': rec.get('page'), 'severity': severity, 'zh': zh, 'en': en})
+
+    return {
+        'repairPolicy': {
+            'default': 'report-only',
+            'autoRepair': False,
+            'requiresExplicitUserRequest': True,
+        },
+        'scorecard': [
+            {
+                'id': 'render-health',
+                'label': {'zh': '渲染健康度', 'en': 'Render health'},
+                'score': render_score,
+            },
+            {
+                'id': 'blank-page-risk',
+                'label': {'zh': '空白页风险', 'en': 'Blank-page risk'},
+                'score': visibility_score,
+            },
+            {
+                'id': 'handoff-readiness',
+                'label': {'zh': '交付复查准备度', 'en': 'Handoff review readiness'},
+                'score': handoff_score,
+            },
+        ],
+        'repairRecommendations': [
+            {
+                'zh': '先把失败或疑似空白页面列入 quality-report.json，不自动改 SVG。',
+                'en': 'Record failed or blank-looking pages in quality-report.json before changing SVGs.',
+            },
+            {
+                'zh': '只有用户明确要求自动修复时，才运行 SVG 修复流程。',
+                'en': 'Only run SVG repair when the user explicitly asks for automatic fixes.',
+            },
+            {
+                'zh': '修复后重新运行 visual_review.py，并保留修复前后截图。',
+                'en': 'After fixes, rerun visual_review.py and keep before/after screenshots.',
+            },
+        ],
+        'pageFindings': page_findings,
+    }
+
+
 def check_server(server_url: str) -> None:
     """Probe server liveness via /api/slides. Raises RuntimeError if down."""
     url = f"{server_url.rstrip('/')}/api/slides"
@@ -293,6 +366,7 @@ def main() -> int:
         'failed': sum(1 for r in records if not r['ok']),
         'all_background': sum(1 for r in records if r.get('all_background')),
         'pages': records,
+        'designDoctor': build_design_doctor_summary(records),
     }
     print(json.dumps(summary, indent=2, ensure_ascii=False))
 

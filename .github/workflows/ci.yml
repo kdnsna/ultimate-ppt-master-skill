@@ -52,6 +52,12 @@ jobs:
       - name: Audit preset starter packs
         run: npm run audit:presets
 
+      - name: Audit stable quality proofs
+        run: npm run audit:quality
+
+      - name: Audit skill marketplace readiness
+        run: npm run audit:market
+
       - name: Audit desktop dependencies
         run: npm --prefix apps/desktop audit --audit-level=high
 

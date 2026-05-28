@@ -67,6 +67,13 @@ def audit_preset(preset_path: Path, errors: list[str]) -> None:
             require(report.get("presetId") == preset_id, f"{preset_id}: quality report presetId mismatch", errors)
             require(report.get("status") in {"passed", "reviewed"}, f"{preset_id}: quality report status invalid", errors)
             require(report.get("publicDemoSafe") is True, f"{preset_id}: quality report must be public demo safe", errors)
+            doctor = report.get("designDoctor", {})
+            require(isinstance(doctor, dict), f"{preset_id}: designDoctor must be an object", errors)
+            repair_policy = doctor.get("repairPolicy", {})
+            require(repair_policy.get("default") == "report-only", f"{preset_id}: designDoctor repair policy must be report-only", errors)
+            require(repair_policy.get("autoRepair") is False, f"{preset_id}: designDoctor autoRepair must default to false", errors)
+            require(len(doctor.get("scorecard", [])) >= 3, f"{preset_id}: designDoctor scorecard too short", errors)
+            require(len(doctor.get("repairRecommendations", [])) >= 2, f"{preset_id}: designDoctor repair recommendations too short", errors)
 
     for proof_key in ("generatedOutput", "benchmarkNote"):
         proof_value = proof.get(proof_key)

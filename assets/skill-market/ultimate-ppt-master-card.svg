@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Ultimate PPT Master skill market card">
+  <rect width="1200" height="630" fill="#f8fafc"/>
+  <rect x="64" y="64" width="1072" height="502" rx="32" fill="#ffffff" stroke="#d8e0ea" stroke-width="2"/>
+  <rect x="100" y="106" width="14" height="418" rx="7" fill="#0f766e"/>
+  <text x="146" y="178" fill="#172033" font-family="Arial, sans-serif" font-size="56" font-weight="700">Ultimate PPT Master</text>
+  <text x="148" y="234" fill="#0f766e" font-family="Arial, sans-serif" font-size="30" font-weight="700">quality-checked PPTX / Web Deck skill</text>
+  <rect x="148" y="302" width="256" height="48" rx="10" fill="#172033"/>
+  <text x="172" y="334" fill="#ffffff" font-family="Arial, sans-serif" font-size="22" font-weight="700">local-first handoff</text>
+  <rect x="432" y="302" width="242" height="48" rx="10" fill="#2563eb"/>
+  <text x="456" y="334" fill="#ffffff" font-family="Arial, sans-serif" font-size="22" font-weight="700">Design Doctor</text>
+  <rect x="702" y="302" width="270" height="48" rx="10" fill="#10b981"/>
+  <text x="726" y="334" fill="#ffffff" font-family="Arial, sans-serif" font-size="22" font-weight="700">public proof packs</text>
+  <text x="148" y="426" fill="#394150" font-family="Arial, sans-serif" font-size="28">Turn messy source files into inspectable presentation projects,</text>
+  <text x="148" y="466" fill="#394150" font-family="Arial, sans-serif" font-size="28">then produce editable PowerPoint or magazine-style web decks.</text>
+  <circle cx="1030" cy="156" r="56" fill="#0f766e"/>
+  <path d="M1010 156l18 18 34-44" fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
