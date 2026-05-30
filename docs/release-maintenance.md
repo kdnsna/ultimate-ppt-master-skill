@@ -59,7 +59,7 @@ It should cover:
 - whitespace checks.
 
 CI should run on the current GitHub Actions JavaScript runtime generation. For
-v2.5.0 that means Node 24 in the workflows and current official action majors
+v3.0.0 that means Node 24 in the workflows and current official action majors
 for checkout, Node, and Python setup.
 
 The Pages workflow lives at:
@@ -137,7 +137,7 @@ When syncing upstream:
 
 ## Version Notes
 
-v2.5.0 positions this repository as:
+v3.0.0 positions this repository as:
 
 - a quality workbench for Chinese office users, with Business Review, Consulting Proposal, Training Courseware, and Academic Defense as the practical default path;
 - a web-first static experience for public discovery, source intake, current task preview, next-step guidance, Design Doctor, handoff-kit export, and demo viewing;

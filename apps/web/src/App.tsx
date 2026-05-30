@@ -27,7 +27,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import JSZip from "jszip";
 import { useEffect, useMemo, useState } from "react";
-import type { ChangeEvent, DragEvent } from "react";
+import type { ChangeEvent, DragEvent, ReactNode } from "react";
 import { findPreset, presetCatalog, type PresetId, type WebPreset } from "./presetCatalog";
 
 type Language = "zh" | "en";
@@ -38,8 +38,11 @@ type StylePreset = "business" | "consulting" | "editorial" | "swiss" | "academic
 type AgentTool = "codex" | "claude" | "hermes" | "openclaw" | "generic";
 type SkillTarget = "codex" | "generic";
 type ModelPreference = "auto" | "openai" | "gemini" | "qwen" | "deepseek" | "custom";
-type PreviewMode = "prompt" | "source" | "extracted" | "manifest" | "brief" | "webdeck" | "checklist" | "qualityReport";
+type PreviewMode = "prompt" | "source" | "extracted" | "manifest" | "brief" | "webdeck" | "checklist" | "qualityReport" | "codexTask" | "assetPlan" | "elementKit";
 type WorkspaceView = "start" | "sources" | "configuration" | "handoff" | "preview";
+type WorkflowStepId = "brief" | "sources" | "bridge" | "agent" | "handoff" | "review";
+type StepStatus = "locked" | "ready" | "active" | "complete" | "blocked";
+type QualityGateLevel = "quick" | "formal-business" | "showcase";
 type UploadedSourceKind = "file" | "url";
 type UploadedSourceStatus = "textExtracted" | "attachedOnly" | "urlOnly";
 
@@ -71,6 +74,28 @@ interface QualityContract {
     qualityReport: string;
     benchmarkNote: string;
   };
+}
+
+interface QualityGate {
+  level: QualityGateLevel;
+  requiredInputs: string[];
+  acceptanceCriteria: string[];
+  artifactChecks: string[];
+  reviewCommands: string[];
+  assetStrategy?: Record<string, string>;
+}
+
+interface WorkflowState {
+  currentStep: WorkflowStepId;
+  blockedReason: string;
+}
+
+interface WorkflowStep {
+  id: WorkflowStepId;
+  status: StepStatus;
+  title: string;
+  detail: string;
+  action: string;
 }
 
 interface FormState {
@@ -158,6 +183,8 @@ interface HandoffResult {
   manifest: {
     attachments: Array<{ name: string; parseStatus: string; message: string }>;
     qualityProfile?: QualityContract;
+    qualityGate?: QualityGate;
+    workflowState?: WorkflowState;
     expectedArtifacts?: string[];
     reviewCommands?: string[];
   };
@@ -169,8 +196,8 @@ const demoUrl = `${baseUrl}examples/agentic-developer-tools-2026/web-demo.html`;
 const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
-const storageKey = "ultimate-ppt-master-web-brief-v2.5";
-const appVersion = "2.5.0";
+const storageKey = "ultimate-ppt-master-web-brief-v3";
+const appVersion = "3.0.0";
 
 const designDoctorScores = [
   {
@@ -244,7 +271,7 @@ const labels = {
     studio: "PPT 质量工作台",
     route: `v${appVersion} · 中文办公默认路径 · 质量合同随 handoff 一起走`,
     subtitle: "把经营复盘、咨询方案、培训课件和学术答辩这类中文办公任务先整理成可验收合同；网页降低门槛，本地 Skill 和 Agent 负责最终质量。",
-    whyTitle: "v2.5 最大提升是什么？",
+    whyTitle: "v3.0 最大提升是什么？",
     whySubtitle: "把预设、公开样例、Design Doctor 视觉复查和 handoff 合同连起来，让普通办公用户知道适合谁、要交什么资料、交付前检查什么。",
     whyCards: [
       { title: "中文办公默认", text: "经营复盘、咨询方案、培训课件和学术答辩优先，产品路演和科技趋势作为展示型路线。" },
@@ -341,6 +368,14 @@ const labels = {
     sourcePanel: "资料导入",
     structurePanel: "目标与路线",
     handoffPanel: "交接给 AI 助手",
+    handoffExecutionTitle: "下一步执行",
+    handoffExecutionBridgeOffline: "先启动 Bridge。离线时网页只能下载 zip，不能写入本地项目或检测 AI 助手。",
+    handoffExecutionBridgeOnline: "Bridge 已连接。下一步先发送到本地项目包，再交给 AI 助手执行。",
+    handoffExecutionReady: "本地项目包已生成。先复制元素生成命令，再复制 AI 助手命令继续生产。",
+    elementGenerationCommand: "元素生成命令",
+    needsManualHint: "如果没有 IMAGE_BACKEND / OpenAI key，脚本会写出 Needs-Manual prompts；打开 images/image_prompts.md，在 ChatGPT 生成后保存到列出的路径。",
+    generatedNowTitle: "当前项目包已包含",
+    codexNextTitle: "Codex 后续生成 / 更新",
     providerPanel: "模型账号 / Key 状态",
     previewPrompt: "AI 助手任务说明",
     previewSource: "source.md",
@@ -350,6 +385,9 @@ const labels = {
     previewWebDeck: "preview-web-deck.html",
     previewChecklist: "quality-checklist.md",
     previewQualityReport: "quality-report.json",
+    previewCodexTask: "codex-task.md",
+    previewAssetPlan: "asset-plan.md",
+    previewElementKit: "visual-element-kit.md",
     contentPreset: "内容预设",
     presetSummary: "预设说明",
     presetRoute: "推荐路线",
@@ -396,7 +434,7 @@ const labels = {
     activeRoute: "启用",
     optionalRoute: "备用",
     demoTitle: "Web Deck 示例",
-    demoText: "v2.5 质量证明样板，展示输入材料、预设、输出和检查结果。",
+    demoText: "v3.0 质量证明样板，展示输入材料、预设、输出、ChatGPT 小元素闭环和检查结果。",
     skillTitle: "AI 技能路线",
     skillText: "高质量生产路线，负责真实文件解析、生成、检查和导出。",
     desktopTitle: "Desktop Later",
@@ -407,6 +445,26 @@ const labels = {
     chooseFiles: "选择文件",
     remove: "移除",
     noSources: "还没有添加真实文件。可以先粘贴摘要，也可以拖入资料。",
+    noRealSourcesYet: "还没有真实资料",
+    handoffNotCreated: "尚未生成项目包",
+    formalBusinessQualityGate: "正式商务交付",
+    wizardTitle: "一步步完成",
+    wizardSubtitle: "连接之后只看当前步骤：先把 brief 和资料准备好，再连接 Bridge、选择 AI 助手、生成项目包，最后做质量复查。",
+    wizardPrimary: "当前动作",
+    wizardCurrent: "当前步骤",
+    workflowBrief: "准备 brief",
+    workflowSources: "添加资料",
+    workflowBridge: "连接 Bridge",
+    workflowAgent: "选择 AI 助手",
+    workflowHandoff: "生成 handoff",
+    workflowReview: "质量复查",
+    statusLocked: "未解锁",
+    statusReady: "可执行",
+    statusActive: "当前",
+    statusComplete: "完成",
+    statusBlocked: "受阻",
+    auxiliaryTitle: "辅助资料",
+    auxiliaryText: "案例墙、术语和市场分发内容收在这里；主流程不需要先看这些。",
     bridgeOnline: "本机连接器已连接",
     bridgeOffline: "本机连接器未连接",
     bridgeChecking: "检测本机连接器",
@@ -428,7 +486,7 @@ const labels = {
     studio: "PPT Quality Workbench",
     route: `v${appVersion} · Chinese-office default path · quality contract in every handoff`,
     subtitle: "Turn business reviews, consulting proposals, training decks, and academic defenses into an inspectable local contract first. The web lowers the first step; the local Skill and Agent keep final quality high.",
-    whyTitle: "What is new in v2.5?",
+    whyTitle: "What is new in v3.0?",
     whySubtitle: "The product connects presets, public proofs, Design Doctor visual review, and handoff contracts so non-technical office users can see who it is for, what to provide, and what to check before delivery.",
     whyCards: [
       { title: "Office defaults", text: "Business review, consulting, training, and academic defense come first; product pitch and tech trend stay as showcase routes." },
@@ -525,6 +583,14 @@ const labels = {
     sourcePanel: "Source intake",
     structurePanel: "Target and route",
     handoffPanel: "Hand off to AI helper",
+    handoffExecutionTitle: "Next execution step",
+    handoffExecutionBridgeOffline: "Start Bridge first. While offline, the page can download a zip but cannot write a local project or detect AI helpers.",
+    handoffExecutionBridgeOnline: "Bridge is connected. Send the brief to a local handoff folder before giving it to an AI helper.",
+    handoffExecutionReady: "The local handoff folder is ready. Copy the element-generation command, then copy the AI-helper command for production.",
+    elementGenerationCommand: "Element-generation command",
+    needsManualHint: "If IMAGE_BACKEND / OpenAI key is not configured, the script writes Needs-Manual prompts; open images/image_prompts.md, generate in ChatGPT, and save outputs to the listed paths.",
+    generatedNowTitle: "Included now",
+    codexNextTitle: "Generated / updated by Codex",
     providerPanel: "Model account / key status",
     previewPrompt: "AI-helper task",
     previewSource: "source.md",
@@ -534,6 +600,9 @@ const labels = {
     previewWebDeck: "preview-web-deck.html",
     previewChecklist: "quality-checklist.md",
     previewQualityReport: "quality-report.json",
+    previewCodexTask: "codex-task.md",
+    previewAssetPlan: "asset-plan.md",
+    previewElementKit: "visual-element-kit.md",
     contentPreset: "Content preset",
     presetSummary: "Preset summary",
     presetRoute: "Recommended route",
@@ -580,7 +649,7 @@ const labels = {
     activeRoute: "Active",
     optionalRoute: "Optional",
     demoTitle: "Web Deck demo",
-    demoText: "A v2.5 quality proof showing input, preset, output, and review result.",
+    demoText: "A v3.0 quality proof showing input, preset, output, the ChatGPT micro-asset loop, and review result.",
     skillTitle: "AI Skill path",
     skillText: "Production-grade route for real file parsing, generation, QA, and export.",
     desktopTitle: "Desktop Later",
@@ -591,6 +660,26 @@ const labels = {
     chooseFiles: "Choose files",
     remove: "Remove",
     noSources: "No real files yet. Paste notes or drop source files.",
+    noRealSourcesYet: "No real sources yet",
+    handoffNotCreated: "Handoff not created",
+    formalBusinessQualityGate: "Formal business delivery",
+    wizardTitle: "Step-by-step path",
+    wizardSubtitle: "After connecting, focus on the current step: prepare the brief and sources, connect Bridge, choose an AI helper, create the handoff, then run quality review.",
+    wizardPrimary: "Current action",
+    wizardCurrent: "Current step",
+    workflowBrief: "Prepare brief",
+    workflowSources: "Add sources",
+    workflowBridge: "Connect Bridge",
+    workflowAgent: "Choose AI helper",
+    workflowHandoff: "Create handoff",
+    workflowReview: "Quality review",
+    statusLocked: "Locked",
+    statusReady: "Ready",
+    statusActive: "Current",
+    statusComplete: "Complete",
+    statusBlocked: "Blocked",
+    auxiliaryTitle: "Auxiliary resources",
+    auxiliaryText: "Benchmark wall, glossary, and distribution notes live here so the main workflow can stay focused.",
     bridgeOnline: "Local connector connected",
     bridgeOffline: "Local connector offline",
     bridgeChecking: "Checking local connector",
@@ -695,16 +784,14 @@ export function App() {
   const enginePlan = useMemo(() => buildEnginePlan(form), [form]);
   const qualityContract = useMemo(() => buildQualityContract(form, activePreset, enginePlan), [form, activePreset, enginePlan]);
   const readiness = useMemo(() => scoreBrief(form, sources), [form, sources]);
-  const manifest = useMemo(() => buildManifest(form, sources, readiness, enginePlan, bridge, qualityContract), [form, sources, readiness, enginePlan, bridge, qualityContract]);
-  const prompt = useMemo(() => buildPrompt(form, storyboard, enginePlan, sources, qualityContract), [form, storyboard, enginePlan, sources, qualityContract]);
+  const qualityGate = useMemo(() => buildQualityGate(form, qualityContract, enginePlan), [form, qualityContract, enginePlan]);
+  const prompt = useMemo(() => buildPrompt(form, storyboard, enginePlan, sources, qualityContract, qualityGate), [form, storyboard, enginePlan, sources, qualityContract, qualityGate]);
   const sourceTemplate = useMemo(() => buildSourceTemplate(form, storyboard, enginePlan, sources, qualityContract), [form, storyboard, enginePlan, sources, qualityContract]);
   const extractedSource = useMemo(() => buildExtractedSource(form, sources), [form, sources]);
-  const qualityChecklist = useMemo(() => buildQualityChecklist(form, enginePlan, sources, qualityContract), [form, enginePlan, sources, qualityContract]);
-  const qualityReport = useMemo(() => buildQualityReport(form, qualityContract), [form, qualityContract]);
+  const qualityChecklist = useMemo(() => buildQualityChecklist(form, enginePlan, sources, qualityContract, qualityGate), [form, enginePlan, sources, qualityContract, qualityGate]);
+  const assetPlan = useMemo(() => buildAssetPlan(form, sources, qualityGate), [form, sources, qualityGate]);
+  const visualElementKit = useMemo(() => buildVisualElementKit(form, qualityGate), [form, qualityGate]);
   const webDeckHtml = useMemo(() => buildWebDeckHtml(form, storyboard, enginePlan, sources), [form, storyboard, enginePlan, sources]);
-  const briefObject = useMemo(() => buildBriefObject(form, storyboard, readiness, enginePlan, sources, qualityContract), [form, storyboard, readiness, enginePlan, sources, qualityContract]);
-  const briefJson = useMemo(() => JSON.stringify(briefObject, null, 2), [briefObject]);
-  const manifestJson = useMemo(() => JSON.stringify(manifest, null, 2), [manifest]);
   const providers = useMemo(() => mergeProviderTests(bridge?.providers || fallbackProviders(form.language), providerTests), [bridge, form.language, providerTests]);
   const agents = bridge?.agents || fallbackAgents();
   const skillTargets = bridge?.skillTargets?.length ? bridge.skillTargets : fallbackSkillTargets(form.language);
@@ -712,6 +799,15 @@ export function App() {
   const selectedAgent = agents.find((agent) => agent.id === form.agentTool);
   const availableAgents = agents.filter((agent) => agent.available);
   const recommendedAgent = selectedAgent?.available ? selectedAgent : availableAgents[0];
+  const workflowSteps = useMemo(() => buildWorkflowSteps({ form, sources, readiness, bridge, selectedAgent, handoffResult, labels: t }), [form, sources, readiness, bridge, selectedAgent, handoffResult, t]);
+  const workflowState = useMemo(() => buildWorkflowState(workflowSteps), [workflowSteps]);
+  const codexTask = useMemo(() => buildCodexTask(form, enginePlan, sources, qualityGate, workflowState, qualityContract), [form, enginePlan, sources, qualityGate, workflowState, qualityContract]);
+  const codexAgentGuide = useMemo(() => buildCodexAgentGuide(form, qualityGate), [form, qualityGate]);
+  const qualityReport = useMemo(() => buildQualityReport(form, qualityContract, qualityGate, workflowState), [form, qualityContract, qualityGate, workflowState]);
+  const manifest = useMemo(() => buildManifest(form, sources, readiness, enginePlan, bridge, qualityContract, qualityGate, workflowState), [form, sources, readiness, enginePlan, bridge, qualityContract, qualityGate, workflowState]);
+  const briefObject = useMemo(() => buildBriefObject(form, storyboard, readiness, enginePlan, sources, qualityContract, qualityGate, workflowState), [form, storyboard, readiness, enginePlan, sources, qualityContract, qualityGate, workflowState]);
+  const briefJson = useMemo(() => JSON.stringify(briefObject, null, 2), [briefObject]);
+  const manifestJson = useMemo(() => JSON.stringify(manifest, null, 2), [manifest]);
   const visiblePreview =
     previewMode === "prompt"
       ? prompt
@@ -727,7 +823,13 @@ export function App() {
                 ? webDeckHtml
                 : previewMode === "qualityReport"
                   ? qualityReport
-                  : qualityChecklist;
+                  : previewMode === "codexTask"
+                    ? codexTask
+                    : previewMode === "assetPlan"
+                      ? assetPlan
+                      : previewMode === "elementKit"
+                        ? visualElementKit
+                        : qualityChecklist;
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify(form));
@@ -882,6 +984,10 @@ export function App() {
       enginePlanMarkdown: buildEnginePlanMarkdown(form, enginePlan),
       qualityChecklist,
       qualityReport,
+      assetPlan,
+      visualElementKit,
+      codexTask,
+      codexAgentGuide,
       manifestJson,
       readme: buildKitReadme(form, enginePlan, sources),
       sources
@@ -912,7 +1018,13 @@ export function App() {
         enginePlanMarkdown: buildEnginePlanMarkdown(form, enginePlan),
         qualityChecklist,
         qualityReport,
+        assetPlan,
+        visualElementKit,
+        codexTask,
+        codexAgentGuide,
         qualityContract,
+        qualityGate,
+        workflowState,
         readme: buildKitReadme(form, enginePlan, sources),
         sources
       });
@@ -1083,14 +1195,24 @@ export function App() {
               form={form}
               preset={activePreset}
               readiness={readiness.score}
+              sourceCount={sources.length}
+              bridge={bridge}
+              handoffResult={handoffResult}
               qualityContract={qualityContract}
               labels={t}
             />
             <div className="header-actions">
-              <button className="primary-action" onClick={sendToBridge}>
-                <PlugZap size={18} />
-                {t.sendBridge}
-              </button>
+              {bridge ? (
+                <button className="primary-action" onClick={sendToBridge}>
+                  <PlugZap size={18} />
+                  {t.sendBridge}
+                </button>
+              ) : (
+                <button className="primary-action" onClick={() => void copyText(bridgeCommand)}>
+                  <Clipboard size={18} />
+                  {t.copyBridgeCommand}
+                </button>
+              )}
               <button className="secondary-action" onClick={downloadHandoffKit}>
                 <Download size={18} />
                 {t.downloadKit}
@@ -1111,46 +1233,61 @@ export function App() {
           sourceCount={sources.length}
           readiness={readiness.score}
           bridge={bridge}
+          handoffResult={handoffResult}
           onChange={setActiveView}
         />
 
         <PageGuide activeView={activeView} labels={t} />
 
-        <BeginnerGuide
-          bridge={bridge}
-          checking={bridgeChecking}
-          selectedAgent={selectedAgent}
-          recommendedAgent={recommendedAgent}
+        <GuidedWorkflowPanel
+          steps={workflowSteps}
           labels={t}
-          onCheckBridge={() => void checkBridge(false)}
+          onOpenSources={() => setActiveView("sources")}
           onCopyBridgeCommand={() => void copyText(bridgeCommand)}
-          onUseRecommendedAgent={() => void autoSelectAgent()}
+          onCheckBridge={() => void checkBridge(false)}
+          onAutoSelectAgent={() => void autoSelectAgent()}
           onSendBridge={() => void sendToBridge()}
           onLaunchAgent={() => void launchOrCopyAgent()}
+          onOpenReview={() => setActiveView("preview")}
         />
 
-        <OneClickRunbookPanel language={form.language} bridgeReady={Boolean(bridge)} readiness={readiness.score} />
+        <AuxiliaryResources labels={t}>
+          <BeginnerGuide
+            bridge={bridge}
+            checking={bridgeChecking}
+            selectedAgent={selectedAgent}
+            recommendedAgent={recommendedAgent}
+            labels={t}
+            onCheckBridge={() => void checkBridge(false)}
+            onCopyBridgeCommand={() => void copyText(bridgeCommand)}
+            onUseRecommendedAgent={() => void autoSelectAgent()}
+            onSendBridge={() => void sendToBridge()}
+            onLaunchAgent={() => void launchOrCopyAgent()}
+          />
 
-        <BenchmarkWall language={form.language} />
+          <OneClickRunbookPanel language={form.language} bridgeReady={Boolean(bridge)} readiness={readiness.score} sourceCount={sources.length} />
 
-        <PlainLanguageGlossary labels={t} />
+          <BenchmarkWall language={form.language} />
 
-        <section className="value-strip" aria-label={t.whyTitle}>
-          <div className="value-intro">
-            <p className="eyebrow">{form.language === "zh" ? "Product edge" : "Product edge"}</p>
-            <h2>{t.whyTitle}</h2>
-            <p>{t.whySubtitle}</p>
-          </div>
-          <div className="value-grid">
-            {t.whyCards.map((item, index) => (
-              <article key={item.title}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <strong>{item.title}</strong>
-                <p>{item.text}</p>
-              </article>
-            ))}
-          </div>
-        </section>
+          <PlainLanguageGlossary labels={t} />
+
+          <section className="value-strip" aria-label={t.whyTitle}>
+            <div className="value-intro">
+              <p className="eyebrow">{form.language === "zh" ? "Product edge" : "Product edge"}</p>
+              <h2>{t.whyTitle}</h2>
+              <p>{t.whySubtitle}</p>
+            </div>
+            <div className="value-grid">
+              {t.whyCards.map((item, index) => (
+                <article key={item.title}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{item.title}</strong>
+                  <p>{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        </AuxiliaryResources>
 
         <ConfigurationPage
           bridge={bridge}
@@ -1309,26 +1446,44 @@ export function App() {
           <section className="panel handoff-panel" aria-labelledby="handoff-title">
             <PanelTitle icon={PlugZap} id="handoff-title" title={t.handoffPanel} />
             <BridgeStatusCard
-          bridge={bridge}
-          checking={bridgeChecking}
-          error={bridgeError}
-          labels={t}
-          bridgeCommand={bridgeCommand}
-          onRefresh={() => void checkBridge(false)}
-        />
+              bridge={bridge}
+              checking={bridgeChecking}
+              error={bridgeError}
+              labels={t}
+              bridgeCommand={bridgeCommand}
+              onRefresh={() => void checkBridge(false)}
+            />
+            <HandoffExecutionPanel
+              bridge={bridge}
+              handoffResult={handoffResult}
+              agentCommand={agentCommand || handoffResult?.suggestedCommands?.[form.agentTool] || handoffResult?.suggestedCommands?.codex || ""}
+              bridgeCommand={bridgeCommand}
+              labels={t}
+              onCopy={copyText}
+            />
             <div className="action-stack">
-              <button className="primary-action full" onClick={sendToBridge}>
-                <FolderOpen size={18} />
-                {t.sendBridge}
-              </button>
-              <button className="secondary-action full" onClick={launchOrCopyAgent}>
-                <Play size={18} />
-                {t.launchAgent}
-              </button>
-              <button className="secondary-action full" onClick={() => copyText(prompt)}>
-                <Clipboard size={18} />
-                {copyState || t.copyPrompt}
-              </button>
+              {bridge && handoffResult ? (
+                <>
+                  <button className="primary-action full" onClick={launchOrCopyAgent}>
+                    <Play size={18} />
+                    {t.launchAgent}
+                  </button>
+                  <button className="secondary-action full" onClick={() => copyText(prompt)}>
+                    <Clipboard size={18} />
+                    {copyState || t.copyPrompt}
+                  </button>
+                </>
+              ) : bridge ? (
+                <button className="primary-action full" onClick={sendToBridge}>
+                  <FolderOpen size={18} />
+                  {t.sendBridge}
+                </button>
+              ) : (
+                <button className="primary-action full" onClick={() => void copyText(bridgeCommand)}>
+                  <Clipboard size={18} />
+                  {t.copyBridgeCommand}
+                </button>
+              )}
               <button className="secondary-action full" onClick={downloadHandoffKit}>
                 <FileArchive size={18} />
                 {t.downloadKit}
@@ -1342,18 +1497,8 @@ export function App() {
                 <span>{handoffResult.files.length} files</span>
               </div>
             )}
-            {agentCommand && (
-              <div className="command-box">
-                <strong>{t.commandReady}</strong>
-                <code>{agentCommand}</code>
-                <button className="secondary-action full" onClick={() => copyText(agentCommand)}>
-                  <Clipboard size={17} />
-                  {t.copyCommand}
-                </button>
-              </div>
-            )}
             <div className="kit-box">
-              <strong>{t.kitIncludes}</strong>
+              <strong>{t.generatedNowTitle}</strong>
               <span>source.md</span>
               <span>extracted-source.md</span>
               <span>attachments/</span>
@@ -1363,7 +1508,20 @@ export function App() {
               <span>preview-web-deck.html</span>
               <span>engine-plan.md</span>
               <span>quality-checklist.md</span>
+              <span>asset-plan.md</span>
+              <span>visual-element-kit.md</span>
+              <span>codex-task.md</span>
+              <span>AGENTS.md</span>
               <span>quality-report.json</span>
+            </div>
+            <div className="kit-box">
+              <strong>{t.codexNextTitle}</strong>
+              <span>assets/generated/element-manifest.json</span>
+              <span>images/image_prompts.json</span>
+              <span>images/image_prompts.md</span>
+              <span>final PPTX / Web Deck outputs</span>
+              <span>updated asset-plan.md</span>
+              <span>updated quality-report.json</span>
             </div>
             <div className="route-list">
               <InfoRow icon={MonitorPlay} title={t.demoTitle} text={t.demoText} />
@@ -1447,6 +1605,9 @@ export function App() {
             <button className={previewMode === "brief" ? "active" : ""} onClick={() => setPreviewMode("brief")}>{t.previewBrief}</button>
             <button className={previewMode === "webdeck" ? "active" : ""} onClick={() => setPreviewMode("webdeck")}>{t.previewWebDeck}</button>
             <button className={previewMode === "checklist" ? "active" : ""} onClick={() => setPreviewMode("checklist")}>{t.previewChecklist}</button>
+            <button className={previewMode === "codexTask" ? "active" : ""} onClick={() => setPreviewMode("codexTask")}>{t.previewCodexTask}</button>
+            <button className={previewMode === "assetPlan" ? "active" : ""} onClick={() => setPreviewMode("assetPlan")}>{t.previewAssetPlan}</button>
+            <button className={previewMode === "elementKit" ? "active" : ""} onClick={() => setPreviewMode("elementKit")}>{t.previewElementKit}</button>
             <button className={previewMode === "qualityReport" ? "active" : ""} onClick={() => setPreviewMode("qualityReport")}>{t.previewQualityReport}</button>
           </div>
           <div className="preview-actions">
@@ -1485,6 +1646,7 @@ function WorkspaceNav({
   sourceCount,
   readiness,
   bridge,
+  handoffResult,
   onChange
 }: {
   activeView: WorkspaceView;
@@ -1492,13 +1654,14 @@ function WorkspaceNav({
   sourceCount: number;
   readiness: number;
   bridge: BridgeHealth | null;
+  handoffResult: HandoffResult | null;
   onChange: (view: WorkspaceView) => void;
 }) {
   const items: Array<{ id: WorkspaceView; label: string; meta: string; icon: LucideIcon }> = [
     { id: "start", label: t.navStart, meta: bridge ? t.bridgeOnline : t.bridgeOffline, icon: Sparkles },
-    { id: "sources", label: t.navSources, meta: `${sourceCount} files · ${readiness}%`, icon: UploadCloud },
+    { id: "sources", label: t.navSources, meta: sourceProgressLabel(sourceCount, readiness, t), icon: UploadCloud },
     { id: "configuration", label: t.navConfig, meta: t.oneClickDetect, icon: Server },
-    { id: "handoff", label: t.navHandoff, meta: t.commandReady, icon: PlugZap },
+    { id: "handoff", label: t.navHandoff, meta: handoffProgressLabel(handoffResult, t), icon: PlugZap },
     { id: "preview", label: t.navPreview, meta: "HTML / JSON", icon: MonitorPlay }
   ];
 
@@ -1533,6 +1696,94 @@ function PageGuide({ activeView, labels: t }: { activeView: WorkspaceView; label
       <p>{copy.text}</p>
     </section>
   );
+}
+
+function AuxiliaryResources({ labels: t, children }: { labels: typeof labels.zh; children: ReactNode }) {
+  return (
+    <details className="auxiliary-resources">
+      <summary>
+        <span>{t.auxiliaryTitle}</span>
+        <p>{t.auxiliaryText}</p>
+      </summary>
+      <div className="auxiliary-content">{children}</div>
+    </details>
+  );
+}
+
+function GuidedWorkflowPanel({
+  steps,
+  labels: t,
+  onOpenSources,
+  onCopyBridgeCommand,
+  onCheckBridge,
+  onAutoSelectAgent,
+  onSendBridge,
+  onLaunchAgent,
+  onOpenReview
+}: {
+  steps: WorkflowStep[];
+  labels: typeof labels.zh;
+  onOpenSources: () => void;
+  onCopyBridgeCommand: () => void;
+  onCheckBridge: () => void;
+  onAutoSelectAgent: () => void;
+  onSendBridge: () => void;
+  onLaunchAgent: () => void;
+  onOpenReview: () => void;
+}) {
+  const activeStep = steps.find((step) => step.status === "active" || step.status === "blocked" || step.status === "ready") || steps[steps.length - 1];
+  if (!activeStep) return null;
+  const activeIndex = Math.max(0, steps.findIndex((step) => step.id === activeStep.id));
+  const actionMap: Record<WorkflowStepId, () => void> = {
+    brief: onOpenSources,
+    sources: onOpenSources,
+    bridge: activeStep.status === "blocked" ? onCopyBridgeCommand : onCheckBridge,
+    agent: onAutoSelectAgent,
+    handoff: onSendBridge,
+    review: activeStep.status === "complete" ? onOpenReview : onLaunchAgent
+  };
+
+  return (
+    <section className="guided-workflow" aria-label={t.wizardTitle}>
+      <div className="guided-workflow-head">
+        <div>
+          <p className="eyebrow">{t.formalBusinessQualityGate}</p>
+          <h2>{t.wizardTitle}</h2>
+          <p>{t.wizardSubtitle}</p>
+        </div>
+        <button className="primary-action" onClick={actionMap[activeStep.id]}>
+          <ChevronIcon />
+          {activeStep.action}
+        </button>
+      </div>
+      <article className={`guided-current-step ${activeStep.status}`}>
+        <span>{t.wizardCurrent} · {String(activeIndex + 1).padStart(2, "0")} · {workflowStatusLabel(activeStep.status, t)}</span>
+        <strong>{activeStep.title}</strong>
+        <p>{activeStep.detail}</p>
+      </article>
+      <ol className="guided-step-rail">
+        {steps.map((step, index) => (
+          <li key={step.id} className={step.status}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{step.title}</strong>
+            <em>{workflowStatusLabel(step.status, t)}</em>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function ChevronIcon() {
+  return <ExternalLink size={17} />;
+}
+
+function workflowStatusLabel(status: StepStatus, t: typeof labels.zh) {
+  if (status === "complete") return t.statusComplete;
+  if (status === "blocked") return t.statusBlocked;
+  if (status === "active") return t.statusActive;
+  if (status === "ready") return t.statusReady;
+  return t.statusLocked;
 }
 
 function ConfigurationPage({
@@ -1575,6 +1826,7 @@ function ConfigurationPage({
   const configuredProviders = providers.filter((provider) => provider.configured).length;
   const availableAgents = agents.filter((agent) => agent.available).length;
   const installedSkills = skillTargets.filter((target) => target.installed).length;
+  const bridgeReady = Boolean(bridge);
 
   return (
     <section className="configuration-page">
@@ -1584,77 +1836,90 @@ function ConfigurationPage({
           <h2>{t.setupTitle}</h2>
           <p>{t.setupSubtitle}</p>
         </div>
-        <div className="configuration-actions">
-          <button className="primary-action" onClick={onTestAllProviders}>
-            <RefreshCw size={18} />
-            {testingProvider === "all" ? t.bridgeChecking : t.oneClickDetect}
-          </button>
-          <button className="secondary-action" onClick={onAutoSelectAgent}>
-            <PlugZap size={18} />
-            {t.oneClickConfig}
-          </button>
-        </div>
+        {bridgeReady ? (
+          <div className="configuration-actions">
+            <button className="primary-action" onClick={onTestAllProviders}>
+              <RefreshCw size={18} />
+              {testingProvider === "all" ? t.bridgeChecking : t.oneClickDetect}
+            </button>
+            <button className="secondary-action" onClick={onAutoSelectAgent}>
+              <PlugZap size={18} />
+              {t.oneClickConfig}
+            </button>
+          </div>
+        ) : (
+          <div className="configuration-actions">
+            <button className="primary-action" onClick={onCopyBridgeCommand}>
+              <Clipboard size={18} />
+              {t.copyBridgeCommand}
+            </button>
+          </div>
+        )}
       </div>
       <div className="setup-grid">
-        <article className={bridge ? "ready" : "waiting"}>
+        <article className={bridgeReady ? "ready" : "waiting"}>
           <Server size={19} />
           <strong>{t.bridgeStartTitle}</strong>
           <p>{t.bridgeStartText}</p>
-          <StatusPill ok={Boolean(bridge)} okText={t.bridgeOnline} failText={t.bridgeOffline} />
+          <StatusPill ok={bridgeReady} okText={t.bridgeOnline} failText={t.bridgeOffline} />
           <code>{bridgeCommand}</code>
           <div className="setup-actions">
             <button className="secondary-action" onClick={onCheckBridge}>{t.refreshBridge}</button>
             <button className="secondary-action" onClick={onCopyBridgeCommand}>{t.copyBridgeCommand}</button>
           </div>
         </article>
-        <article className={availableAgents > 0 ? "ready" : "waiting"}>
-          <PlugZap size={19} />
-          <strong>{t.agentSetupTitle}</strong>
-          <p>{t.agentSetupText}</p>
-          <StatusPill ok={availableAgents > 0} okText={`${availableAgents} ${t.agentAvailable}`} failText={t.agentMissing} />
-          <select value={selectedAgent?.id || "generic"} onChange={(event) => onSelectAgent(event.target.value as AgentTool)}>
-            {agents.map((agent) => (
-              <option key={agent.id} value={agent.id}>
-                {agent.label} · {agent.available ? t.agentAvailable : t.agentMissing}
-              </option>
-            ))}
-          </select>
-          <code>{selectedAgent?.path || selectedAgent?.command || "agent"}</code>
-        </article>
-        <article className={configuredProviders > 0 ? "ready" : "waiting"}>
-          <KeyRound size={19} />
-          <strong>{t.modelSetupTitle}</strong>
-          <p>{t.modelSetupText}</p>
-          <StatusPill ok={configuredProviders > 0} okText={`${configuredProviders} ${t.providerConfigured}`} failText={t.providerMissing} />
-          <div className="provider-mini-list">
-            {providers.map((provider) => (
-              <span key={provider.id}>{provider.label}: {provider.configured ? t.providerConfigured : t.providerMissing}</span>
-            ))}
-          </div>
-        </article>
-        <article className={installedSkills > 0 ? "ready" : "waiting"}>
-          <BookOpen size={19} />
-          <strong>{t.skillInstallTitle}</strong>
-          <p>{t.skillInstallText}</p>
-          <StatusPill ok={installedSkills > 0} okText={`${installedSkills} ${t.skillInstalled}`} failText={t.skillMissing} />
-          <div className="provider-mini-list">
-            {skillTargets.map((target) => (
-              <span key={target.id}>
-                {target.label}: {target.installed ? t.skillInstalled : t.skillMissing} · {target.managed ? t.skillManaged : t.skillManual}
-              </span>
-            ))}
-          </div>
-          <div className="setup-actions">
-            <button className="secondary-action" disabled={Boolean(installingSkill)} onClick={() => onInstallSkill("codex")}>
-              {installingSkill === "codex" ? t.installingSkill : t.installCodexSkill}
-            </button>
-            <button className="secondary-action" disabled={Boolean(installingSkill)} onClick={() => onInstallSkill("generic")}>
-              {installingSkill === "generic" ? t.installingSkill : t.installGenericSkill}
-            </button>
-            <button className="secondary-action" onClick={() => onCopySkillCommand("codex")}>{t.copyCodexSkillCommand}</button>
-            <button className="secondary-action" onClick={() => onCopySkillCommand("generic")}>{t.copyGenericSkillCommand}</button>
-          </div>
-        </article>
+        {bridgeReady && (
+          <>
+            <article className={availableAgents > 0 ? "ready" : "waiting"}>
+              <PlugZap size={19} />
+              <strong>{t.agentSetupTitle}</strong>
+              <p>{t.agentSetupText}</p>
+              <StatusPill ok={availableAgents > 0} okText={`${availableAgents} ${t.agentAvailable}`} failText={t.agentMissing} />
+              <select value={selectedAgent?.id || "generic"} onChange={(event) => onSelectAgent(event.target.value as AgentTool)}>
+                {agents.map((agent) => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.label} · {agent.available ? t.agentAvailable : t.agentMissing}
+                  </option>
+                ))}
+              </select>
+              <code>{selectedAgent?.path || selectedAgent?.command || "agent"}</code>
+            </article>
+            <article className={configuredProviders > 0 ? "ready" : "waiting"}>
+              <KeyRound size={19} />
+              <strong>{t.modelSetupTitle}</strong>
+              <p>{t.modelSetupText}</p>
+              <StatusPill ok={configuredProviders > 0} okText={`${configuredProviders} ${t.providerConfigured}`} failText={t.providerMissing} />
+              <div className="provider-mini-list">
+                {providers.map((provider) => (
+                  <span key={provider.id}>{provider.label}: {provider.configured ? t.providerConfigured : t.providerMissing}</span>
+                ))}
+              </div>
+            </article>
+            <article className={installedSkills > 0 ? "ready" : "waiting"}>
+              <BookOpen size={19} />
+              <strong>{t.skillInstallTitle}</strong>
+              <p>{t.skillInstallText}</p>
+              <StatusPill ok={installedSkills > 0} okText={`${installedSkills} ${t.skillInstalled}`} failText={t.skillMissing} />
+              <div className="provider-mini-list">
+                {skillTargets.map((target) => (
+                  <span key={target.id}>
+                    {target.label}: {target.installed ? t.skillInstalled : t.skillMissing} · {target.managed ? t.skillManaged : t.skillManual}
+                  </span>
+                ))}
+              </div>
+              <div className="setup-actions">
+                <button className="secondary-action" disabled={Boolean(installingSkill)} onClick={() => onInstallSkill("codex")}>
+                  {installingSkill === "codex" ? t.installingSkill : t.installCodexSkill}
+                </button>
+                <button className="secondary-action" disabled={Boolean(installingSkill)} onClick={() => onInstallSkill("generic")}>
+                  {installingSkill === "generic" ? t.installingSkill : t.installGenericSkill}
+                </button>
+                <button className="secondary-action" onClick={() => onCopySkillCommand("codex")}>{t.copyCodexSkillCommand}</button>
+                <button className="secondary-action" onClick={() => onCopySkillCommand("generic")}>{t.copyGenericSkillCommand}</button>
+              </div>
+            </article>
+          </>
+        )}
       </div>
       {bridgeMessage && <p className="bridge-message">{bridgeMessage}</p>}
     </section>
@@ -1708,10 +1973,12 @@ function BeginnerGuide({
             <RefreshCw size={18} />
             {checking ? t.bridgeChecking : t.refreshBridge}
           </button>
-          <button className="secondary-action" onClick={onLaunchAgent} disabled={!bridgeReady}>
-            <Play size={18} />
-            {t.launchAgent}
-          </button>
+          {bridgeReady && (
+            <button className="secondary-action" onClick={onLaunchAgent}>
+              <Play size={18} />
+              {t.launchAgent}
+            </button>
+          )}
         </div>
       </div>
       <div className="beginner-steps">
@@ -1759,13 +2026,18 @@ function BeginnerGuide({
 function OneClickRunbookPanel({
   language,
   bridgeReady,
-  readiness
+  readiness,
+  sourceCount
 }: {
   language: Language;
   bridgeReady: boolean;
   readiness: number;
+  sourceCount: number;
 }) {
   const zh = language === "zh";
+  const hasRealSources = sourceCount > 0;
+  const readinessLabel = hasRealSources ? `${readiness}%` : (zh ? "待补资料" : "Sources pending");
+  const readinessWidth = hasRealSources ? readiness : 0;
   const steps = zh
     ? [
         ["开箱跑通", "先用内置经营复盘样例跑一遍，不需要准备真实资料。"],
@@ -1783,7 +2055,7 @@ function OneClickRunbookPanel({
   return (
     <section className="one-click-runbook" aria-label={zh ? "开箱跑通" : "One-click runbook"}>
       <div className="runbook-intro">
-        <p className="eyebrow">{zh ? "v2.6 direction" : "v2.6 direction"}</p>
+        <p className="eyebrow">{zh ? "v3.0 direction" : "v3.0 direction"}</p>
         <h2>{zh ? "从第一眼到可交付，只保留一条默认路" : "One default path from first click to delivery"}</h2>
         <p>
           {zh
@@ -1792,8 +2064,8 @@ function OneClickRunbookPanel({
         </p>
         <div className="runbook-meter">
           <span>{zh ? "当前 brief 准备度" : "Current brief readiness"}</span>
-          <strong>{readiness}%</strong>
-          <div className="meter" aria-hidden="true"><span style={{ width: `${readiness}%` }} /></div>
+          <strong>{readinessLabel}</strong>
+          <div className="meter" aria-hidden="true"><span style={{ width: `${readinessWidth}%` }} /></div>
           <em>{bridgeReady ? (zh ? "Bridge 已连接" : "Bridge connected") : (zh ? "可先下载 zip 或启动 Bridge" : "Download zip or start Bridge first")}</em>
         </div>
       </div>
@@ -1951,6 +2223,73 @@ function BridgeStatusCard({
   );
 }
 
+function HandoffExecutionPanel({
+  bridge,
+  handoffResult,
+  agentCommand,
+  bridgeCommand,
+  labels: t,
+  onCopy
+}: {
+  bridge: BridgeHealth | null;
+  handoffResult: HandoffResult | null;
+  agentCommand: string;
+  bridgeCommand: string;
+  labels: typeof labels.zh;
+  onCopy: (value: string) => Promise<void>;
+}) {
+  const elementCommand = elementGenerationCommand(bridge, handoffResult);
+  const detail = !bridge
+    ? t.handoffExecutionBridgeOffline
+    : !handoffResult
+      ? t.handoffExecutionBridgeOnline
+      : t.handoffExecutionReady;
+
+  return (
+    <div className="handoff-execution">
+      <div>
+        <Workflow size={17} />
+        <div>
+          <strong>{t.handoffExecutionTitle}</strong>
+          <p>{detail}</p>
+        </div>
+      </div>
+      {!bridge ? (
+        <div className="command-box compact">
+          <strong>{t.copyBridgeCommand}</strong>
+          <code>{bridgeCommand}</code>
+          <button className="secondary-action full" onClick={() => onCopy(bridgeCommand)}>
+            <Clipboard size={17} />
+            {t.copyCommand}
+          </button>
+        </div>
+      ) : handoffResult ? (
+        <>
+          <div className="command-box compact">
+            <strong>{t.elementGenerationCommand}</strong>
+            <code>{elementCommand}</code>
+            <button className="secondary-action full" onClick={() => onCopy(elementCommand)}>
+              <Clipboard size={17} />
+              {t.copyCommand}
+            </button>
+            <p>{t.needsManualHint}</p>
+          </div>
+          {agentCommand && (
+            <div className="command-box compact">
+              <strong>{t.commandReady}</strong>
+              <code>{agentCommand}</code>
+              <button className="secondary-action full" onClick={() => onCopy(agentCommand)}>
+                <Clipboard size={17} />
+                {t.copyCommand}
+              </button>
+            </div>
+          )}
+        </>
+      ) : null}
+    </div>
+  );
+}
+
 function StatusPill({ ok, okText, failText }: { ok: boolean; okText: string; failText: string }) {
   return <span className={`status-pill ${ok ? "ok" : "fail"}`}>{ok ? okText : failText}</span>;
 }
@@ -2004,18 +2343,32 @@ function QualityWorkbenchPanel({
   form,
   preset,
   readiness,
+  sourceCount,
+  bridge,
+  handoffResult,
   qualityContract,
   labels: t
 }: {
   form: FormState;
   preset: WebPreset;
   readiness: number;
+  sourceCount: number;
+  bridge: BridgeHealth | null;
+  handoffResult: HandoffResult | null;
   qualityContract: QualityContract;
   labels: typeof labels.zh;
 }) {
-  const nextStep = readiness < 80
-    ? form.language === "zh" ? "补齐标题、核心结论和资料摘要" : "Complete title, core message, and source notes"
-    : form.language === "zh" ? "发送到本机连接器并运行 Design Doctor" : "Send to local connector and run Design Doctor";
+  const hasRealSources = sourceCount > 0;
+  const statusLabel = hasRealSources ? `${readiness}% · ${qualityContract.label}` : t.noRealSourcesYet;
+  const nextStep = !hasRealSources
+    ? t.navSources
+    : readiness < 80
+      ? form.language === "zh" ? "补齐标题、核心结论和资料摘要" : "Complete title, core message, and source notes"
+      : !bridge
+        ? t.copyBridgeCommand
+        : !handoffResult
+          ? t.sendBridge
+          : t.designDoctorTitle;
 
   return (
     <aside className="quality-workbench" aria-label={t.qualityWorkbenchTitle}>
@@ -2033,7 +2386,7 @@ function QualityWorkbenchPanel({
         </div>
         <div>
           <span>{t.qualityStatus}</span>
-          <strong>{readiness}% · {qualityContract.label}</strong>
+          <strong>{statusLabel}</strong>
         </div>
         <div>
           <span>{t.nextStep}</span>
@@ -2199,6 +2552,14 @@ function bridgeStartCommand(bridge: BridgeHealth | null) {
   ].join("\n");
 }
 
+function elementGenerationCommand(bridge: BridgeHealth | null, handoffResult: HandoffResult | null) {
+  const projectPath = handoffResult?.projectPath || "<project_path>";
+  if (bridge?.repoRoot && handoffResult?.projectPath) {
+    return `cd ${shellQuote(bridge.repoRoot)} && python3 scripts/generate_visual_element_kit.py ${shellQuote(projectPath)}`;
+  }
+  return `python3 scripts/generate_visual_element_kit.py ${shellQuote(projectPath)}`;
+}
+
 function shellQuote(value: string) {
   return `'${value.replace(/'/g, "'\\''")}'`;
 }
@@ -2215,6 +2576,94 @@ function loadSavedForm() {
   } catch {
     return defaultForm;
   }
+}
+
+function sourceProgressLabel(sourceCount: number, readiness: number, t: typeof labels.zh) {
+  if (sourceCount === 0) return t.noRealSourcesYet;
+  return `${sourceCount} files · ${readiness}%`;
+}
+
+function handoffProgressLabel(handoffResult: HandoffResult | null, t: typeof labels.zh) {
+  return handoffResult ? t.commandReady : t.handoffNotCreated;
+}
+
+function buildWorkflowSteps({
+  form,
+  sources,
+  readiness,
+  bridge,
+  selectedAgent,
+  handoffResult,
+  labels: t
+}: {
+  form: FormState;
+  sources: UploadedSource[];
+  readiness: { score: number; missing: string[] };
+  bridge: BridgeHealth | null;
+  selectedAgent?: AgentStatus;
+  handoffResult: HandoffResult | null;
+  labels: typeof labels.zh;
+}): WorkflowStep[] {
+  const briefComplete = readiness.score >= 80;
+  const hasRealSources = sources.length > 0;
+  const bridgeReady = Boolean(bridge);
+  const agentReady = Boolean(selectedAgent?.available);
+  const handoffReady = Boolean(handoffResult);
+  const bridgeBlocked = hasRealSources && !bridgeReady;
+  const agentBlocked = bridgeReady && !agentReady;
+
+  return [
+    {
+      id: "brief",
+      status: briefComplete ? "complete" : "active",
+      title: t.workflowBrief,
+      detail: briefComplete ? t.startGuideText : t.sourceGuideText,
+      action: t.navSources
+    },
+    {
+      id: "sources",
+      status: hasRealSources ? "complete" : briefComplete ? "active" : "locked",
+      title: t.workflowSources,
+      detail: hasRealSources ? sourceProgressLabel(sources.length, readiness.score, t) : t.noRealSourcesYet,
+      action: t.navSources
+    },
+    {
+      id: "bridge",
+      status: bridgeReady ? "complete" : bridgeBlocked ? "blocked" : "locked",
+      title: t.workflowBridge,
+      detail: bridgeReady ? t.bridgeOnlineHelp : t.bridgeOfflineHelp,
+      action: bridgeReady ? t.refreshBridge : t.copyBridgeCommand
+    },
+    {
+      id: "agent",
+      status: agentReady ? "complete" : agentBlocked ? "blocked" : "locked",
+      title: t.workflowAgent,
+      detail: agentReady ? formatLabel(t.agentDetected, selectedAgent?.label || "Agent") : t.agentWaiting,
+      action: t.oneClickConfig
+    },
+    {
+      id: "handoff",
+      status: handoffReady ? "complete" : bridgeReady && (agentReady || form.agentTool === "generic") ? "active" : "locked",
+      title: t.workflowHandoff,
+      detail: handoffReady ? t.bridgeSendOk : t.handoffNotCreated,
+      action: t.sendBridge
+    },
+    {
+      id: "review",
+      status: handoffReady ? "active" : "locked",
+      title: t.workflowReview,
+      detail: handoffReady ? t.designDoctorText : t.previewGuideText,
+      action: handoffReady ? t.launchAgent : t.navPreview
+    }
+  ];
+}
+
+function buildWorkflowState(steps: WorkflowStep[]): WorkflowState {
+  const current = steps.find((step) => ["active", "blocked", "ready"].includes(step.status)) || steps[steps.length - 1];
+  return {
+    currentStep: current.id,
+    blockedReason: current.status === "blocked" ? current.detail : ""
+  };
 }
 
 function scoreBrief(form: FormState, sources: UploadedSource[]) {
@@ -2299,7 +2748,101 @@ function buildQualityContract(form: FormState, preset: WebPreset, enginePlan: En
   };
 }
 
-function buildQualityReport(form: FormState, qualityContract: QualityContract) {
+function buildQualityGate(form: FormState, qualityContract: QualityContract, enginePlan: EnginePlan): QualityGate {
+  const zh = form.language === "zh";
+  const requiredInputs = zh
+    ? [
+      "品牌资产或明确替代策略",
+      "可追溯资料来源和证据口径",
+      "ChatGPT 生图优先的视觉素材计划：prompt、文件名和插入页面",
+      "小元素素材包计划：分隔符、指标徽章、流程节点、连接线、图标和纹理",
+      "公开素材检索计划用于证据/官方参考，或明确不联网检索的理由",
+      "图片/图表计划或明确无图策略",
+      "页面节奏和信息图策略"
+    ]
+    : [
+      "brand assets or explicit fallback strategy",
+      "traceable source evidence",
+      "ChatGPT-generation-first visual asset plan with prompts, filenames, and insertion targets",
+      "small reusable element kit plan for dividers, metric badges, process nodes, connectors, icons, and textures",
+      "public asset search plan for evidence/official references or explicit no-search rationale",
+      "image/chart plan or explicit no-image strategy",
+      "page rhythm and infographic strategy"
+    ];
+  const formalCriteria = zh
+    ? [
+      "不得只用标题和卡片堆出整套 deck",
+      "把 ChatGPT/OpenAI 作为主要视觉素材引擎，为页面生成专用配图和可复用小元素",
+      "生成的小元素素材必须规划到 visual-element-kit.md，并在全 deck 复用形成统一视觉语言",
+      "公开检索主要用于证据、官方参考和品牌边界，并记录来源/授权/插入位置",
+      "PPTX 保留真实可编辑文字、形状、图表和备注",
+      "Web Deck 必须有完整视觉系统、版式变化和桌面/移动可读性",
+      "logo must not degrade into text fragments",
+      "交付前运行正式商务审计和 Design Doctor"
+    ]
+    : [
+      "do not build the whole deck from headings and repeated cards only",
+      "treat ChatGPT/OpenAI as the primary visual asset engine for custom supporting visuals and reusable micro-assets",
+      "small generated micro-assets are planned in visual-element-kit.md and reused across the deck",
+      "use public search mainly for evidence, official references, and brand boundaries, then record source, license, and insertion target",
+      "PPTX keeps real editable text, shapes, charts, and notes",
+      "Web Deck has a complete visual system, layout variety, and desktop/mobile readability",
+      "logo must not degrade into text fragments",
+      "run formal delivery audit and Design Doctor before delivery"
+    ];
+  const artifactChecks = zh
+    ? [
+      "manifest.json 包含 formal-business qualityGate",
+      "HTML/PPTX 有足够布局类型",
+      "使用真实图片/品牌素材或写明无图策略",
+      "asset-plan.md 记录公开检索、ChatGPT 生成素材、来源/授权和插入目标",
+      "visual-element-kit.md 记录可复用的 ChatGPT 小元素素材",
+      "PPTX 中存在可编辑文本对象",
+      "无 b/c 等碎片化 logo 文本"
+    ]
+    : [
+      "manifest.json contains formal-business qualityGate",
+      "HTML/PPTX expose enough layout types",
+      "real image/brand assets are used or no-image strategy is explicit",
+      "asset-plan.md records public searches, ChatGPT generated assets, source/license notes, and insert targets",
+      "visual-element-kit.md records reusable ChatGPT-generated micro-assets",
+      "PPTX contains editable text objects",
+      "no b/c-style logo text fragments"
+    ];
+
+  return {
+    level: "formal-business",
+    requiredInputs,
+    acceptanceCriteria: [...formalCriteria, ...qualityContract.acceptanceCriteria],
+    artifactChecks,
+    reviewCommands: [
+      "python3 scripts/audit_formal_delivery.py <project_path>",
+      ...qualityContract.reviewCommands,
+      ...(enginePlan.webActive ? ["node scripts/validate-swiss-deck.mjs <project_path>/ppt/index.html # only for Swiss Style Web Decks"] : [])
+    ],
+    assetStrategy: zh
+      ? {
+        mode: "chatgpt-generation-first",
+        brand: "优先使用用户提供或官方公开品牌资产；没有时使用干净文字/色彩替代，并在 asset-plan.md 写明。",
+        primaryEngine: "默认把 ChatGPT/OpenAI 生图作为视觉素材引擎，用来生成专用场景、小图标、指标徽章、分隔符、连接线、纹理和提示贴片。",
+        microAssets: "正式生产前先生成 visual-element-kit.md 中的小元素素材包，并在页面中复用形成统一视觉语言。",
+        publicSearch: "联网检索主要用于公开证据、官方参考和品牌边界；记录 URL、发布方、授权/使用说明和插入页。",
+        generatedAssets: "ChatGPT/OpenAI 生成素材存到 assets/generated/，并记录 prompt 和目标页。",
+        privacy: "私有资料、客户数据、内部截图默认不上传。"
+      }
+      : {
+        mode: "chatgpt-generation-first",
+        brand: "Use supplied or official public brand assets first; otherwise use a clean text/color fallback and document it in asset-plan.md.",
+        primaryEngine: "Use ChatGPT/OpenAI image generation as the default visual asset engine for custom scenes, icons, metric badges, dividers, connectors, textures, and callout stickers.",
+        microAssets: "Generate the visual-element-kit.md micro-assets before final production and reuse them across pages for a coherent visual language.",
+        publicSearch: "Search mainly for public evidence, official references, and brand boundaries; record URL, publisher, license/usage note, and insert target.",
+        generatedAssets: "Store ChatGPT/OpenAI generated assets under assets/generated/ and record prompts plus target slides.",
+        privacy: "Private source material, customer data, and internal screenshots stay local by default."
+      }
+  };
+}
+
+function buildQualityReport(form: FormState, qualityContract: QualityContract, qualityGate: QualityGate, workflowState: WorkflowState) {
   const zh = form.language === "zh";
   return JSON.stringify({
     version: appVersion,
@@ -2307,8 +2850,10 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract) {
     status: "pending",
     createdAt: new Date().toISOString(),
     qualityProfile: qualityContract,
+    qualityGate,
+    workflowState,
     expectedArtifacts: qualityContract.expectedArtifacts,
-    reviewCommands: qualityContract.reviewCommands,
+    reviewCommands: qualityGate.reviewCommands,
     summary: {
       zh: "Design Doctor / 视觉复查尚未运行。请先生成预览和最终文件，再按 reviewCommands 运行检查；默认只报告问题和建议。",
       en: "Design Doctor has not run yet. Generate preview and final files, then run reviewCommands. It reports issues and suggestions by default."
@@ -2382,7 +2927,14 @@ function buildStoryboard(form: FormState): StoryItem[] {
   return repeated.slice(0, Math.min(repeated.length, targetCount));
 }
 
-function buildPrompt(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[], qualityContract: QualityContract) {
+function buildPrompt(
+  form: FormState,
+  storyboard: StoryItem[],
+  enginePlan: EnginePlan,
+  sources: UploadedSource[],
+  qualityContract: QualityContract,
+  qualityGate: QualityGate
+) {
   const preset = findPreset(form.presetId);
   const sourceType = readOption(optionText.sourceType, form.sourceType, form.language);
   const scenario = readOption(optionText.scenario, form.scenario, form.language);
@@ -2397,6 +2949,10 @@ function buildPrompt(form: FormState, storyboard: StoryItem[], enginePlan: Engin
   const qualityCriteria = qualityContract.acceptanceCriteria.map((item) => `- ${item}`).join("\n");
   const reviewCommands = qualityContract.reviewCommands.map((item) => `- ${item}`).join("\n");
   const expectedArtifacts = qualityContract.expectedArtifacts.map((item) => `- ${item}`).join("\n");
+  const gateInputs = qualityGate.requiredInputs.map((item) => `- ${item}`).join("\n");
+  const gateCriteria = qualityGate.acceptanceCriteria.map((item) => `- ${item}`).join("\n");
+  const gateChecks = qualityGate.artifactChecks.map((item) => `- ${item}`).join("\n");
+  const gateCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
   const presetRoute = `${preset.label[form.language]} (${preset.packPath || "seed direction"})`;
   const activeEngines = [
     enginePlan.pptxActive ? `PPTX: ${enginePlan.pptxRoute}` : "",
@@ -2404,10 +2960,10 @@ function buildPrompt(form: FormState, storyboard: StoryItem[], enginePlan: Engin
   ].filter(Boolean).join("\n- ");
 
   if (form.language === "en") {
-    return `Use the ultimate-ppt-master Agent Skill for this presentation task.\n\nProject title: ${form.title}\nAudience: ${form.audience}\nCore message: ${form.coreMessage}\nSource type: ${sourceType}\nScenario: ${scenario}\nContent preset: ${presetRoute}\nOutput target: ${output}\nVisual style: ${style}\nTarget length: ${form.slideCount} slides\nPreferred agent: ${agent}\nModel preference: ${model}\n\nExecution route:\n- ${activeEngines}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Visual route: ${enginePlan.styleRoute}\n\nPreset source requirements:\n${presetRequirements}\n\nPreset quality checks:\n${presetChecks}\n\nDesign Doctor quality contract:\n${qualityCriteria}\n\nExpected artifacts:\n${expectedArtifacts}\n\nRecommended review commands:\n${reviewCommands}\n\nSource material:\n${sourceManifest}\n\nLocal Bridge expectations:\n- If this folder was created by Agent Bridge, read extracted-source.md first, then inspect attachments/ for original files.\n- If a PDF/DOCX/PPTX/XLSX converter failed, keep the original attachment and parse it with the best local tool available.\n- Never upload private source material unless the user explicitly approves it.\n\nSuggested outline:\n${outline}\n\nRequirements:\n- Read AGENTS.md and SKILL.md from the ultimate-ppt-master repository.\n- Respect the third-party notices and upstream license attributions.\n- Build the narrative before generating slides.\n- Use the selected content preset as the default structure, but adapt it to the actual source evidence.\n- Use the PPTX route for editable PowerPoint and the Web Deck route for magazine / Swiss HTML output.\n- Render or preview the result, inspect issues, repair obvious layout problems, and list final files.\n- Write or update quality-report.json with the visual review result and a plain-language Chinese summary.\n- Keep logs and intermediate artifacts in the local project folder.\n\nExtra requirements:\n${form.constraints || "No extra requirements."}`;
+    return `Use the ultimate-ppt-master Agent Skill for this presentation task.\n\nProject title: ${form.title}\nAudience: ${form.audience}\nCore message: ${form.coreMessage}\nSource type: ${sourceType}\nScenario: ${scenario}\nContent preset: ${presetRoute}\nOutput target: ${output}\nVisual style: ${style}\nTarget length: ${form.slideCount} slides\nPreferred agent: ${agent}\nModel preference: ${model}\n\nExecution route:\n- ${activeEngines}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Visual route: ${enginePlan.styleRoute}\n\nPreset source requirements:\n${presetRequirements}\n\nPreset quality checks:\n${presetChecks}\n\nDesign Doctor quality contract:\n${qualityCriteria}\n\nFormal Business Delivery Gate (${qualityGate.level}):\nRequired inputs:\n${gateInputs}\n\nAcceptance criteria:\n${gateCriteria}\n\nArtifact checks:\n${gateChecks}\n\nGate review commands:\n${gateCommands}\n\nExpected artifacts:\n${expectedArtifacts}\n\nRecommended review commands:\n${reviewCommands}\n\nSource material:\n${sourceManifest}\n\nLocal Bridge expectations:\n- If this folder was created by Agent Bridge, read extracted-source.md first, then inspect attachments/ for original files.\n- If a PDF/DOCX/PPTX/XLSX converter failed, keep the original attachment and parse it with the best local tool available.\n- Never upload private source material unless the user explicitly approves it.\n\nSuggested outline:\n${outline}\n\nRequirements:\n- Read AGENTS.md, SKILL.md, quality-checklist.md, manifest.json, and project-brief.json from the ultimate-ppt-master project folder before production.\n- Respect the third-party notices and upstream license attributions.\n- Build the narrative before generating slides.\n- Use the selected content preset as the default structure, but adapt it to the actual source evidence.\n- For formal business delivery, do not build the whole deck from repeated title + card pages.\n- Lock the brand assets or fallback strategy, evidence sources, image/chart plan, page rhythm, and infographic strategy before generating final files.\n- Use the PPTX route for editable PowerPoint and the Web Deck route for magazine / Swiss HTML output.\n- PPTX must use editable text, shapes, charts, and images; do not replace slides with full-page screenshots.\n- Logos and brand marks must not degrade into text fragments such as b/c.\n- Render or preview the result, inspect issues, repair obvious layout problems, and list final files.\n- Run the formal delivery audit commands before final delivery.\n- Write or update quality-report.json with the visual review result and a plain-language Chinese summary.\n- Keep logs and intermediate artifacts in the local project folder.\n\nExtra requirements:\n${form.constraints || "No extra requirements."}`;
   }
 
-  return `请使用 ultimate-ppt-master Agent Skill 完成这次演示文稿任务。\n\n项目标题：${form.title}\n目标听众：${form.audience}\n核心结论：${form.coreMessage}\n资料类型：${sourceType}\n使用场景：${scenario}\n内容预设：${presetRoute}\n输出目标：${output}\n视觉风格：${style}\n目标页数：${form.slideCount} 页\n优先 Agent：${agent}\n模型偏好：${model}\n\n执行路线：\n- ${activeEngines}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n预设资料要求：\n${presetRequirements}\n\n预设质量检查：\n${presetChecks}\n\nDesign Doctor 质量合同：\n${qualityCriteria}\n\n预期产物：\n${expectedArtifacts}\n\n推荐检查命令：\n${reviewCommands}\n\n源资料：\n${sourceManifest}\n\n本地 Bridge 预期：\n- 如果这个目录由 Agent Bridge 创建，请先读 extracted-source.md，再检查 attachments/ 里的原始文件。\n- 如果 PDF/DOCX/PPTX/XLSX 转换失败，请保留原始附件，并用本地最合适的工具继续解析。\n- 私有资料默认留在本地，除非我明确要求，不要上传。\n\n建议页纲：\n${outline}\n\n执行要求：\n- 读取 ultimate-ppt-master 仓库里的 AGENTS.md 和 SKILL.md。\n- 尊重第三方声明和当前仓库保留的上游版权归属。\n- 先完成叙事结构，再生成页面。\n- 使用当前内容预设作为默认结构，但必须根据真实资料证据调整。\n- PPTX 使用可编辑 PowerPoint 路线；Web Deck 使用杂志化 / Swiss HTML 路线。\n- 渲染或预览结果，检查问题，修复明显版式错误，并列出最终文件。\n- 写入或更新 quality-report.json，包含视觉复查结果和中文摘要。\n- 日志和中间产物保存在本地项目目录。\n\n补充要求：\n${form.constraints || "无额外要求。"}`;
+  return `请使用 ultimate-ppt-master Agent Skill 完成这次演示文稿任务。\n\n项目标题：${form.title}\n目标听众：${form.audience}\n核心结论：${form.coreMessage}\n资料类型：${sourceType}\n使用场景：${scenario}\n内容预设：${presetRoute}\n输出目标：${output}\n视觉风格：${style}\n目标页数：${form.slideCount} 页\n优先 Agent：${agent}\n模型偏好：${model}\n\n执行路线：\n- ${activeEngines}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n预设资料要求：\n${presetRequirements}\n\n预设质量检查：\n${presetChecks}\n\nDesign Doctor 质量合同：\n${qualityCriteria}\n\n正式商务交付门禁（${qualityGate.level}）：\n必须输入：\n${gateInputs}\n\n验收标准：\n${gateCriteria}\n\n产物检查：\n${gateChecks}\n\n门禁检查命令：\n${gateCommands}\n\n预期产物：\n${expectedArtifacts}\n\n推荐检查命令：\n${reviewCommands}\n\n源资料：\n${sourceManifest}\n\n本地 Bridge 预期：\n- 如果这个目录由 Agent Bridge 创建，请先读 extracted-source.md，再检查 attachments/ 里的原始文件。\n- 如果 PDF/DOCX/PPTX/XLSX 转换失败，请保留原始附件，并用本地最合适的工具继续解析。\n- 私有资料默认留在本地，除非我明确要求，不要上传。\n\n建议页纲：\n${outline}\n\n执行要求：\n- 生产前读取项目目录里的 AGENTS.md、SKILL.md、quality-checklist.md、manifest.json 和 project-brief.json。\n- 尊重第三方声明和当前仓库保留的上游版权归属。\n- 先完成叙事结构，再生成页面。\n- 使用当前内容预设作为默认结构，但必须根据真实资料证据调整。\n- 正式商务交付不能只用重复的标题 + 卡片堆完整套 deck。\n- 生成最终文件前先锁定品牌资产或替代策略、证据来源、图片/图表计划、页面节奏和信息图策略。\n- PPTX 使用可编辑 PowerPoint 路线；Web Deck 使用杂志化 / Swiss HTML 路线。\n- PPTX 必须保留可编辑文本、形状、图表和图片，不能用整页截图替代可编辑对象。\n- logo 和品牌标识不得退化成 b/c 这类文字碎片。\n- 渲染或预览结果，检查问题，修复明显版式错误，并列出最终文件。\n- 最终交付前运行正式商务审计命令。\n- 写入或更新 quality-report.json，包含视觉复查结果和中文摘要。\n- 日志和中间产物保存在本地项目目录。\n\n补充要求：\n${form.constraints || "无额外要求。"}`;
 }
 
 function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[], qualityContract: QualityContract) {
@@ -2467,7 +3023,13 @@ function buildEnginePlanMarkdown(form: FormState, enginePlan: EnginePlan) {
   return `# 双引擎执行计划\n\n## 启用路线\n- PPTX 路线：${enginePlan.pptxActive ? "启用" : "备用"}\n- Web Deck 路线：${enginePlan.webActive ? "启用" : "备用"}\n- 视觉路线：${enginePlan.styleRoute}\n\n## 分工\n- Hugo He / ppt-master 路线：${enginePlan.pptxRoute}\n- op7418 / 歸藏路线：${enginePlan.webRoute}\n- Ultimate Fusion 前台：${enginePlan.fusionRoute}\n\n## Agent Connect 规则\nWeb Experience 负责导入和路线规划；本地 Bridge 负责资料解析和项目落盘；Skill 工作流负责最终生产。\n\n## 归属规则\n保留仓库 LICENSE 和 THIRD_PARTY_NOTICES，不移除上游版权归属。\n`;
 }
 
-function buildQualityChecklist(form: FormState, enginePlan: EnginePlan, sources: UploadedSource[], qualityContract: QualityContract) {
+function buildQualityChecklist(
+  form: FormState,
+  enginePlan: EnginePlan,
+  sources: UploadedSource[],
+  qualityContract: QualityContract,
+  qualityGate: QualityGate
+) {
   const preset = findPreset(form.presetId);
   const sourceLine = sources.length > 0
     ? sources.map((source) => `- [ ] ${source.name}: ${source.status}`).join("\n")
@@ -2476,10 +3038,317 @@ function buildQualityChecklist(form: FormState, enginePlan: EnginePlan, sources:
   const qualityCriteria = qualityContract.acceptanceCriteria.map((item) => `- [ ] ${item}`).join("\n");
   const expectedArtifacts = qualityContract.expectedArtifacts.map((item) => `- [ ] ${item}`).join("\n");
   const reviewCommands = qualityContract.reviewCommands.map((item) => `- ${item}`).join("\n");
+  const gateInputs = qualityGate.requiredInputs.map((item) => `- [ ] ${item}`).join("\n");
+  const gateCriteria = qualityGate.acceptanceCriteria.map((item) => `- [ ] ${item}`).join("\n");
+  const gateChecks = qualityGate.artifactChecks.map((item) => `- [ ] ${item}`).join("\n");
+  const gateCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
   if (form.language === "en") {
-    return `# Quality checklist\n\n## Selected preset\n${presetChecks}\n\n## Design Doctor contract\n${qualityCriteria}\n\n## Expected artifacts\n${expectedArtifacts}\n\n## Review commands\n${reviewCommands}\n\n## Source and story\n- [ ] extracted-source.md reflects real source files, not only pasted notes.\n- [ ] Core message appears in the cover and conclusion.\n- [ ] Every slide has one job and one primary takeaway.\n- [ ] Sensitive material stays local unless the user explicitly approves upload.\n\n## Source files\n${sourceLine}\n\n## PPTX route\n- [ ] Route status: ${enginePlan.pptxActive ? "active" : "optional"}.\n- [ ] Text, shapes, charts, and notes remain editable.\n- [ ] Run SVG/PPTX rendering checks from the Skill workflow.\n- [ ] Inspect exported pages and repair clipping, overlaps, tiny text, and broken charts.\n\n## Web Deck route\n- [ ] Route status: ${enginePlan.webActive ? "active" : "optional"}.\n- [ ] Use ${enginePlan.styleRoute} consistently.\n- [ ] Desktop and mobile viewports do not overlap text, controls, or media.\n\n## Delivery\n- [ ] Final files are named clearly.\n- [ ] quality-report.json includes the visual review result and Chinese summary.\n- [ ] Include what was generated, what was checked, and which source files were parsed.\n- [ ] Keep upstream license and third-party notices intact.\n`;
+    return `# Quality checklist\n\n## Selected preset\n${presetChecks}\n\n## Design Doctor contract\n${qualityCriteria}\n\n## Formal Business Delivery Gate\nLevel: ${qualityGate.level}\n\n### Required inputs\n${gateInputs}\n\n### Acceptance criteria\n${gateCriteria}\n\n### Artifact checks\n${gateChecks}\n\n### Gate review commands\n${gateCommands}\n\n## Expected artifacts\n${expectedArtifacts}\n\n## Review commands\n${reviewCommands}\n\n## Source and story\n- [ ] extracted-source.md reflects real source files, not only pasted notes.\n- [ ] Core message appears in the cover and conclusion.\n- [ ] Every slide has one job and one primary takeaway.\n- [ ] Sensitive material stays local unless the user explicitly approves upload.\n- [ ] Brand assets or a documented replacement strategy are locked before generating final files.\n- [ ] Evidence, image choices, chart/data plans, page rhythm, and infographic strategy are explicit.\n\n## Source files\n${sourceLine}\n\n## PPTX route\n- [ ] Route status: ${enginePlan.pptxActive ? "active" : "optional"}.\n- [ ] Text, shapes, charts, and notes remain editable.\n- [ ] No full-slide screenshot replacement for editable PPTX content.\n- [ ] Logos and brand marks are real assets or clean vector/text treatments, not stray fragments.\n- [ ] Run SVG/PPTX rendering checks from the Skill workflow.\n- [ ] Inspect exported pages and repair clipping, overlaps, tiny text, and broken charts.\n\n## Web Deck route\n- [ ] Route status: ${enginePlan.webActive ? "active" : "optional"}.\n- [ ] Use ${enginePlan.styleRoute} consistently.\n- [ ] Desktop and mobile viewports do not overlap text, controls, or media.\n- [ ] Visual completeness includes real images, charts, or an explicit no-image strategy.\n\n## Delivery\n- [ ] Final files are named clearly.\n- [ ] quality-report.json includes the visual review result and Chinese summary.\n- [ ] Include what was generated, what was checked, and which source files were parsed.\n- [ ] Keep upstream license and third-party notices intact.\n`;
   }
-  return `# 质量检查清单\n\n## 当前预设\n${presetChecks}\n\n## Design Doctor 合同\n${qualityCriteria}\n\n## 预期产物\n${expectedArtifacts}\n\n## 检查命令\n${reviewCommands}\n\n## 资料与叙事\n- [ ] extracted-source.md 已根据真实源文件修正，而不只是网页粘贴摘要。\n- [ ] 核心结论出现在封面和收束页。\n- [ ] 每一页只承担一个主要任务，并有清晰 takeaway。\n- [ ] 敏感资料默认留在本地，除非用户明确同意上传。\n\n## 源文件\n${sourceLine}\n\n## PPTX 路线\n- [ ] 路线状态：${enginePlan.pptxActive ? "启用" : "备用"}。\n- [ ] 文本、形状、图表、备注保持可编辑。\n- [ ] 按 Skill 工作流运行 SVG / PPTX 渲染检查。\n- [ ] 检查导出页面并修复裁切、重叠、小字和图表损坏。\n\n## Web Deck 路线\n- [ ] 路线状态：${enginePlan.webActive ? "启用" : "备用"}。\n- [ ] 统一使用 ${enginePlan.styleRoute}。\n- [ ] 桌面端和移动端不出现文字、控件或媒体互相遮挡。\n\n## 交付\n- [ ] 最终文件命名清晰。\n- [ ] quality-report.json 包含视觉复查结果和中文摘要。\n- [ ] 简短说明生成了什么、检查了什么、解析了哪些源文件。\n- [ ] 保留上游版权和第三方声明。\n`;
+  return `# 质量检查清单\n\n## 当前预设\n${presetChecks}\n\n## Design Doctor 合同\n${qualityCriteria}\n\n## 正式商务交付门禁\n等级：${qualityGate.level}\n\n### 必须输入\n${gateInputs}\n\n### 验收标准\n${gateCriteria}\n\n### 产物检查\n${gateChecks}\n\n### 门禁检查命令\n${gateCommands}\n\n## 预期产物\n${expectedArtifacts}\n\n## 检查命令\n${reviewCommands}\n\n## 资料与叙事\n- [ ] extracted-source.md 已根据真实源文件修正，而不只是网页粘贴摘要。\n- [ ] 核心结论出现在封面和收束页。\n- [ ] 每一页只承担一个主要任务，并有清晰 takeaway。\n- [ ] 敏感资料默认留在本地，除非用户明确同意上传。\n- [ ] 生成最终文件前，品牌资产或替代策略已锁定。\n- [ ] 证据来源、图片选择、图表/数据计划、页面节奏和信息图策略已明确。\n\n## 源文件\n${sourceLine}\n\n## PPTX 路线\n- [ ] 路线状态：${enginePlan.pptxActive ? "启用" : "备用"}。\n- [ ] 文本、形状、图表、备注保持可编辑。\n- [ ] 不用整页截图替代 PPTX 可编辑内容。\n- [ ] logo 和品牌标识是真实素材、干净矢量或规范文字处理，不是零散文字碎片。\n- [ ] 按 Skill 工作流运行 SVG / PPTX 渲染检查。\n- [ ] 检查导出页面并修复裁切、重叠、小字和图表损坏。\n\n## Web Deck 路线\n- [ ] 路线状态：${enginePlan.webActive ? "启用" : "备用"}。\n- [ ] 统一使用 ${enginePlan.styleRoute}。\n- [ ] 桌面端和移动端不出现文字、控件或媒体互相遮挡。\n- [ ] 视觉完整度包含真实图片、图表，或明确的无图策略。\n\n## 交付\n- [ ] 最终文件命名清晰。\n- [ ] quality-report.json 包含视觉复查结果和中文摘要。\n- [ ] 简短说明生成了什么、检查了什么、解析了哪些源文件。\n- [ ] 保留上游版权和第三方声明。\n`;
+}
+
+function buildAssetPlan(form: FormState, sources: UploadedSource[], qualityGate: QualityGate) {
+  const zh = form.language === "zh";
+  const sourceLine = sourceSummaryMarkdown(sources, form.language);
+  const gateInputs = qualityGate.requiredInputs.map((item) => `- ${item}`).join("\n");
+  if (zh) {
+    return `# asset-plan.md
+
+## 项目
+${form.title}
+
+## 正式商务门禁输入
+${gateInputs}
+
+## ChatGPT 生成素材
+- [ ] 把 ChatGPT/OpenAI 作为主要视觉素材引擎：先生成页面专用配图和小元素素材，再用公开检索补证据/官方参考。
+- [ ] 生成 visual-element-kit.md 中的小元素素材包：分隔符、指标徽章、流程节点、连接线、图标点缀、低对比纹理和提示贴片。
+- [ ] 生成位图保存到 assets/generated/，生成 SVG 或图标保存到 assets/generated/svg/。
+- [ ] 记录 prompt、文件名、目标页、人工修改和插入方式。
+
+## 公开素材检索
+- [ ] 先检查 attachments/、extracted-source.md 和 source.md，确认哪些素材已经由用户提供。
+- [ ] 联网检索主要用于真实证据、官方截图、公开政策/行业来源或品牌边界。
+- [ ] 每个候选素材都记录 URL、发布方、授权/使用说明、目标页和是否已插入。
+- [ ] 私有资料、客户数据、内部截图默认不上传；需要上传时必须先得到用户明确许可。
+
+## 插入计划
+| 页面 | 素材需求 | 来源或 prompt | 文件路径 | 状态 |
+| --- | --- | --- | --- | --- |
+| 封面 | 品牌安全主视觉或规范 logo 处理 | 待定 | 待定 | 待定 |
+| 证据页 | 支撑结论的图片/截图/图表 | 待定 | 待定 | 待定 |
+| 流程页 | 可编辑流程图或生成场景图 | 待定 | 待定 | 待定 |
+
+## 当前资料
+${sourceLine}
+
+## 交付规则
+所有插入的图片、图标、logo、截图或生成素材都必须在这里登记。若最终不用图片，请在这里写明无图策略，并确保 manifest.json / project-brief.json 同步说明。
+`;
+  }
+  return `# asset-plan.md
+
+## Project
+${form.title}
+
+## Formal Business Gate Inputs
+${gateInputs}
+
+## ChatGPT generated assets
+- [ ] Treat ChatGPT/OpenAI as the primary visual asset engine: generate custom slide visuals and small reusable elements first, then use public search for evidence or official references.
+- [ ] Generate the visual-element-kit.md micro-assets: section dividers, metric badges, process nodes, connectors, icon accents, subtle textures, and callout stickers.
+- [ ] Save generated bitmaps under assets/generated/ and generated SVG/icons under assets/generated/svg/.
+- [ ] Record prompt, filename, target slide, manual edits, and insertion method.
+
+## Public asset search
+- [ ] Inspect attachments/, extracted-source.md, and source.md before searching.
+- [ ] Use public web search mainly for factual evidence, official screenshots, public policy/industry sources, or brand boundaries.
+- [ ] Record URL, publisher, license/usage note, target slide, and insertion status for every candidate.
+- [ ] Private source files, customer data, and internal screenshots stay local unless the user explicitly approves upload.
+
+## Insertion plan
+| Slide / Section | Asset need | Source or prompt | File path | Status |
+| --- | --- | --- | --- | --- |
+| Cover | brand-safe hero visual or approved logo treatment | pending | pending | pending |
+| Evidence page | image/screenshot/chart supporting a claim | pending | pending | pending |
+| Process page | editable diagram or generated scene | pending | pending | pending |
+
+## Current sources
+${sourceLine}
+
+## Delivery rule
+Every inserted image, icon, logo, screenshot, or generated visual must be listed here. If no imagery is used, write the explicit no-image strategy here and sync it into manifest.json / project-brief.json.
+`;
+}
+
+function buildVisualElementKit(form: FormState, qualityGate: QualityGate) {
+  const zh = form.language === "zh";
+  const mode = qualityGate.assetStrategy?.mode || "chatgpt-generation-first";
+  if (zh) {
+    return `# visual-element-kit.md
+
+项目：${form.title}
+模式：${mode}
+
+## 目的
+把 ChatGPT/OpenAI 作为主要视觉素材引擎。正式生成页面前，先做一批可复用小元素素材，让整套 deck 有统一视觉语言，而不是到处找随机图库。
+
+## micro-assets / 小元素素材
+| 素材类型 | 数量目标 | 用途 | 输出目录 | 状态 |
+| --- | ---: | --- | --- | --- |
+| section divider | 3 | 章节过渡、封面后分隔页 | assets/generated/dividers/ | pending |
+| metric badge | 6 | KPI、权益数字、评分、关键指标 | assets/generated/badges/ | pending |
+| process node | 5 | 流程页、时间线、办理路径 | assets/generated/process/ | pending |
+| connector | 6 | 箭头、虚线、因果链、交接路径 | assets/generated/connectors/ | pending |
+| icon accent | 8 | 证据、风险、动作、用户、渠道等小图标 | assets/generated/icons/ | pending |
+| subtle pattern or texture | 2 | 封面、章节背景、低对比层次 | assets/generated/patterns/ | pending |
+| callout sticker | 4 | 办理提醒、风险提示、决策提示 | assets/generated/callouts/ | pending |
+
+## Prompt 模板
+- "Create a clean business presentation metric badge for [theme], flat vector-like style, transparent background, no text, colors aligned to [palette]."
+- "Create a small process node icon for [step], formal government/finance presentation style, isolated object, no text, editable-friendly shape language."
+- "Create a subtle abstract background texture for [theme], low contrast, no letters, no logos, widescreen presentation use."
+
+## 插入规则
+- 小元素用于增强页面语言，正文、数字、图表标签仍用可编辑文本。
+- 生成素材插入 PPTX/Web Deck 时保留为真实图片或图形对象，不做整页截图。
+- 公开检索只负责证据、官方参考和品牌边界；视觉语言主要靠 ChatGPT 生成。
+- 每个生成文件都同步登记到 asset-plan.md：prompt、文件名、目标页、插入状态。
+`;
+  }
+  return `# visual-element-kit.md
+
+Project: ${form.title}
+Mode: ${mode}
+
+## Purpose
+Use ChatGPT/OpenAI as the primary visual asset engine. Generate small reusable elements before final slide production so the deck has a coherent visual language without relying on random stock imagery.
+
+## Micro-assets / small reusable elements
+| Asset type | Quantity target | Use | Output path | Status |
+| --- | ---: | --- | --- | --- |
+| section divider | 3 | chapter breaks and transition slides | assets/generated/dividers/ | pending |
+| metric badge | 6 | KPI callouts, rights/benefits numbers, scorecards | assets/generated/badges/ | pending |
+| process node | 5 | flow pages, timelines, service journey diagrams | assets/generated/process/ | pending |
+| connector | 6 | arrows, dotted links, handoff paths, causal chains | assets/generated/connectors/ | pending |
+| icon accent | 8 | small semantic markers for evidence, risk, action, user, channel | assets/generated/icons/ | pending |
+| subtle pattern or texture | 2 | cover, section backgrounds, low-contrast visual depth | assets/generated/patterns/ | pending |
+| callout sticker | 4 | reminders, caveats, delivery notes, decision highlights | assets/generated/callouts/ | pending |
+
+## Prompt pattern
+- "Create a clean business presentation metric badge for [theme], flat vector-like style, transparent background, no text, colors aligned to [palette]."
+- "Create a small process node icon for [step], formal government/finance presentation style, isolated object, no text, editable-friendly shape language."
+- "Create a subtle abstract background texture for [theme], low contrast, no letters, no logos, widescreen presentation use."
+
+## Insertion rules
+- Use micro-assets to enrich the visual system; keep body copy, numbers, and chart labels editable.
+- Insert generated assets into PPTX/Web Deck as real images or graphic objects, not full-slide screenshots.
+- Use public search for evidence, official references, and brand boundaries; use ChatGPT-generated micro-assets for the visual language.
+- Register every generated file in asset-plan.md with prompt, filename, target slide, and insertion status.
+`;
+}
+
+function buildCodexTask(
+  form: FormState,
+  enginePlan: EnginePlan,
+  sources: UploadedSource[],
+  qualityGate: QualityGate,
+  workflowState: WorkflowState,
+  qualityContract: QualityContract
+) {
+  const zh = form.language === "zh";
+  const gateInputs = qualityGate.requiredInputs.map((item) => `- ${item}`).join("\n");
+  const gateCriteria = qualityGate.acceptanceCriteria.map((item) => `- ${item}`).join("\n");
+  const gateChecks = qualityGate.artifactChecks.map((item) => `- ${item}`).join("\n");
+  const expectedArtifacts = qualityContract.expectedArtifacts.map((item) => `- ${item}`).join("\n");
+  const reviewCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
+  const sourceLine = sourceSummaryMarkdown(sources, form.language);
+  if (zh) {
+    return `# Codex Task
+
+项目：${form.title}
+当前步骤：${workflowState.currentStep}
+阻塞原因：${workflowState.blockedReason || "无"}
+
+## 先读这些文件
+1. AGENTS.md
+2. manifest.json
+3. project-brief.json
+4. quality-checklist.md
+5. asset-plan.md
+6. visual-element-kit.md
+7. agent-prompt.md
+8. extracted-source.md 和 attachments/
+
+## 正式商务门禁
+必须输入：
+${gateInputs}
+
+验收标准：
+${gateCriteria}
+
+产物检查：
+${gateChecks}
+
+## Codex 素材工作流
+1. 先检查用户给的附件和 extracted-source.md，不要跳过真实资料。
+2. 把 ChatGPT/OpenAI 作为主要视觉素材引擎，先生成页面专用配图和小元素素材。
+3. 在 manifest.json 记录的仓库根目录运行：\`python3 scripts/generate_visual_element_kit.py <project_path>\`。
+4. 如果没有 IMAGE_BACKEND/OpenAI key，不要阻塞：使用 images/image_prompts.md 里的 Needs-Manual prompts，在 ChatGPT 生成后保存到列出的 outputPath。
+5. 按 visual-element-kit.md 生成 micro-assets：section divider、metric badge、process node、connector、icon accent、texture、callout sticker。
+6. 生成素材保存到 assets/generated/，再作为真实图片或图形插入 PPTX/Web Deck；不要用整页截图糊弄可编辑 PPTX。
+7. 联网检索主要用于事实证据、官方参考、品牌边界和来源引用。
+8. 把生成素材 prompt 和公开来源/授权说明都写入 asset-plan.md。
+9. 图表、表格、标签和 PPTX 文字尽量保留可编辑结构。
+
+## 生产步骤
+1. 锁定品牌/替代策略、证据边界、页面节奏、信息图策略、asset-plan.md 和 visual-element-kit.md。
+2. 按 Ultimate PPT Master Skill 生产 ${enginePlan.pptxActive ? "PPTX" : "Web Deck"}${enginePlan.webActive && enginePlan.pptxActive ? " + Web Deck" : ""}。
+3. 版式需要覆盖叙事、对比、流程/时间线、指标、决策和收束页，不能重复标题卡片。
+4. logo 不得退化成 b/c 这类碎片文字。
+5. 运行检查命令，修复明显的溢出、遮挡、图片、图表和可编辑性问题。
+6. 更新 quality-report.json，写清检查项、修复项和剩余风险。
+
+## 预期产物
+${expectedArtifacts}
+
+## 检查命令
+${reviewCommands}
+
+## 当前资料
+${sourceLine}
+
+最终回复必须列出生成文件、插入的 ChatGPT 小元素素材、使用过的公开参考、运行过的检查命令和剩余风险。
+`;
+  }
+  return `# Codex Task
+
+Project: ${form.title}
+Current step: ${workflowState.currentStep}
+Blocked reason: ${workflowState.blockedReason || "none"}
+
+## Read first
+1. AGENTS.md
+2. manifest.json
+3. project-brief.json
+4. quality-checklist.md
+5. asset-plan.md
+6. visual-element-kit.md
+7. agent-prompt.md
+8. extracted-source.md and attachments/
+
+## Formal business gate
+Required inputs:
+${gateInputs}
+
+Acceptance criteria:
+${gateCriteria}
+
+Artifact checks:
+${gateChecks}
+
+## Codex asset workflow
+1. Inspect supplied attachments and extracted-source.md before searching.
+2. Treat ChatGPT/OpenAI as the primary visual asset engine: generate custom slide visuals and small reusable elements before final assembly.
+3. From the repository root recorded in manifest.json, run: \`python3 scripts/generate_visual_element_kit.py <project_path>\`.
+4. If no IMAGE_BACKEND/OpenAI key is configured, do not block: use the Needs-Manual prompts in images/image_prompts.md with ChatGPT and save outputs to the listed outputPath.
+5. Generate the visual-element-kit.md micro-assets: section divider, metric badge, process node, connector, icon accent, subtle texture, and callout sticker.
+6. Save generated assets under assets/generated/ and insert them into the PPTX/Web Deck as real image objects, not flattened full-slide screenshots.
+7. Use public web search mainly for factual evidence, official references, brand boundaries, or source citations.
+8. Record every generated prompt and every public source/license note in asset-plan.md.
+9. Keep charts, tables, labels, and PPTX text editable wherever possible.
+
+## Production steps
+1. Lock brand/fallback strategy, evidence boundaries, page rhythm, infographic strategy, asset-plan.md, and visual-element-kit.md.
+2. Produce the requested PPTX/Web Deck using the Ultimate PPT Master Skill workflow.
+3. Vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
+4. Do not let logos degrade into b/c-style text fragments.
+5. Run review commands and repair layout, text overflow, image, chart, and editability issues.
+6. Update quality-report.json with checks run, issues found, repairs made, and remaining risk.
+
+## Expected artifacts
+${expectedArtifacts}
+
+## Review commands
+${reviewCommands}
+
+## Current sources
+${sourceLine}
+
+Final response must list generated files, ChatGPT micro-assets inserted, public references used, review commands run, and remaining risks.
+`;
+}
+
+function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate) {
+  if (form.language === "zh") {
+    return `# AGENTS.md
+
+## Codex 本地规则
+- 工作范围限于这个 handoff 文件夹和 Ultimate PPT Master 仓库脚本。
+- 编辑或生成前先读 codex-task.md。
+- 私有资料、客户数据、内部截图和 API key 默认不上传；除非用户明确同意。
+- ChatGPT/OpenAI 生图是主要视觉素材引擎。先读 visual-element-kit.md，需要视觉丰富度时先运行或处理 scripts/generate_visual_element_kit.py。
+- 如果没有配置 image backend/key，使用 images/image_prompts.md 里的 Needs-Manual prompts，在 ChatGPT 生成后保存到 assets/generated/。
+- 允许为了公开证据、官方参考和品牌边界进行联网检索，但必须把来源、授权/使用说明和插入目标写入 asset-plan.md。
+- 生成文件放到 assets/generated/，prompt 写入 asset-plan.md。
+- ${qualityGate.level} 交付不得以重复标题卡、整页截图 PPTX、碎片 logo 或缺失 quality-report.json 收尾。
+- 存在 HTML 或 PPTX 产物时，最终回复前运行正式商务审计。
+`;
+  }
+  return `# AGENTS.md
+
+## Codex local rules
+- Work only in this handoff folder and the Ultimate PPT Master repository scripts.
+- Read codex-task.md before editing or generating deliverables.
+- Keep private source material, customer data, internal screenshots, and API keys local unless the user explicitly approves upload.
+- ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py first when the deck needs visual richness.
+- If no image backend/key is configured, use images/image_prompts.md Needs-Manual prompts with ChatGPT and save outputs under assets/generated/.
+- Public web search is allowed mainly for evidence, official references, and brand boundaries; record sources, usage notes, and insertion targets in asset-plan.md.
+- Save generated outputs under assets/generated/ and record prompts in asset-plan.md.
+- ${qualityGate.level} delivery must not finish with repeated title-card slides, flat PPTX screenshots, broken logo fragments, or missing quality-report.json.
+- Run the formal delivery audit before final response whenever HTML or PPTX artifacts exist.
+`;
 }
 
 function buildWebDeckHtml(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[]) {
@@ -2499,8 +3368,9 @@ function buildWebDeckHtml(form: FormState, storyboard: StoryItem[], enginePlan: 
   const noteCards = notes.length > 0
     ? notes.slice(0, 4).map((note, index) => `<li><b>${String(index + 1).padStart(2, "0")}</b><span>${escapeHtml(note)}</span></li>`).join("")
     : `<li><b>01</b><span>${zh ? "把真实资料交给 Bridge 后，Agent 会补齐数据、证据和页面内容。" : "After real files are sent to Bridge, the Agent will fill data, evidence, and slide content."}</span></li>`;
+  const previewLayouts = ["narrative", "comparison", "timeline", "metrics", "decision"];
   const storySlides = storyboard.map((item, index) => `
-    <section class="slide story">
+    <section class="slide story" data-layout="${previewLayouts[index % previewLayouts.length]}">
       <div class="slide-index">${String(index + 1).padStart(2, "0")}</div>
       <div class="slide-grid">
         <p class="kicker">${escapeHtml(preset.label[form.language])} / ${escapeHtml(scenario)} / ${escapeHtml(style)}</p>
@@ -2568,7 +3438,7 @@ function buildWebDeckHtml(form: FormState, storyboard: StoryItem[], enginePlan: 
 </head>
 <body class="${className}">
   <main class="deck" aria-label="${safeTitle}">
-    <section class="slide cover">
+    <section class="slide cover" data-layout="cover">
       <div>
         <p class="kicker">Ultimate PPT Master / ${escapeHtml(preset.label[form.language])}</p>
         <h1>${safeTitle}</h1>
@@ -2581,7 +3451,7 @@ function buildWebDeckHtml(form: FormState, storyboard: StoryItem[], enginePlan: 
       </div>
       <p class="footer">${zh ? "浏览器本地生成的预览稿 - 用于交给 Agent 继续生产" : "Browser-local preview - hand this to the Agent for production"}</p>
     </section>
-    <section class="slide">
+    <section class="slide" data-layout="source-signal">
       <div>
         <p class="kicker">${zh ? "资料信号" : "Source signal"}</p>
         <h2>${zh ? "从文件、URL 和摘要到可执行 brief" : "From files, URLs, and notes to executable brief"}</h2>
@@ -2590,7 +3460,7 @@ function buildWebDeckHtml(form: FormState, storyboard: StoryItem[], enginePlan: 
       <p class="footer">${safeConstraints}</p>
     </section>
     ${storySlides}
-    <section class="slide">
+    <section class="slide" data-layout="production-route">
       <div>
         <p class="kicker">${zh ? "生产路线" : "Production route"}</p>
         <h2>${zh ? "网页负责连接，Skill 负责高质量成品" : "Web connects. Skill produces."}</h2>
@@ -2613,7 +3483,9 @@ function buildBriefObject(
   readiness: { score: number; missing: string[] },
   enginePlan: EnginePlan,
   sources: UploadedSource[],
-  qualityContract: QualityContract
+  qualityContract: QualityContract,
+  qualityGate: QualityGate,
+  workflowState: WorkflowState
 ) {
   const preset = findPreset(form.presetId);
   return {
@@ -2635,8 +3507,10 @@ function buildBriefObject(
       proofArtifacts: qualityContract.proofArtifacts
     },
     qualityProfile: qualityContract,
+    qualityGate,
+    workflowState,
     expectedArtifacts: qualityContract.expectedArtifacts,
-    reviewCommands: qualityContract.reviewCommands,
+    reviewCommands: qualityGate.reviewCommands,
     scenario: form.scenario,
     outputMode: form.outputMode,
     stylePreset: form.stylePreset,
@@ -2658,7 +3532,9 @@ function buildManifest(
   readiness: { score: number; missing: string[] },
   enginePlan: EnginePlan,
   bridge: BridgeHealth | null,
-  qualityContract: QualityContract
+  qualityContract: QualityContract,
+  qualityGate: QualityGate,
+  workflowState: WorkflowState
 ) {
   const preset = findPreset(form.presetId);
   return {
@@ -2698,8 +3574,10 @@ function buildManifest(
       proofArtifacts: qualityContract.proofArtifacts || null
     },
     qualityProfile: qualityContract,
+    qualityGate,
+    workflowState,
     expectedArtifacts: qualityContract.expectedArtifacts,
-    reviewCommands: qualityContract.reviewCommands,
+    reviewCommands: qualityGate.reviewCommands,
     readiness,
     enginePlan,
     attachments: sources.map(sourceForManifest)
@@ -2729,6 +3607,10 @@ async function buildHandoffZip({
   enginePlanMarkdown,
   qualityChecklist,
   qualityReport,
+  assetPlan,
+  visualElementKit,
+  codexTask,
+  codexAgentGuide,
   manifestJson,
   readme,
   sources
@@ -2741,6 +3623,10 @@ async function buildHandoffZip({
   enginePlanMarkdown: string;
   qualityChecklist: string;
   qualityReport: string;
+  assetPlan: string;
+  visualElementKit: string;
+  codexTask: string;
+  codexAgentGuide: string;
   manifestJson: string;
   readme: string;
   sources: UploadedSource[];
@@ -2753,6 +3639,10 @@ async function buildHandoffZip({
   zip.file("preview-web-deck.html", webDeckHtml);
   zip.file("engine-plan.md", enginePlanMarkdown);
   zip.file("quality-checklist.md", qualityChecklist);
+  zip.file("asset-plan.md", assetPlan);
+  zip.file("visual-element-kit.md", visualElementKit);
+  zip.file("codex-task.md", codexTask);
+  zip.file("AGENTS.md", codexAgentGuide);
   zip.file("quality-report.json", qualityReport);
   zip.file("manifest.json", manifestJson);
   zip.file("README.md", readme);
@@ -2778,7 +3668,13 @@ function buildBridgePayload({
   enginePlanMarkdown,
   qualityChecklist,
   qualityReport,
+  assetPlan,
+  visualElementKit,
+  codexTask,
+  codexAgentGuide,
   qualityContract,
+  qualityGate,
+  workflowState,
   readme,
   sources
 }: {
@@ -2791,7 +3687,13 @@ function buildBridgePayload({
   enginePlanMarkdown: string;
   qualityChecklist: string;
   qualityReport: string;
+  assetPlan: string;
+  visualElementKit: string;
+  codexTask: string;
+  codexAgentGuide: string;
   qualityContract: QualityContract;
+  qualityGate: QualityGate;
+  workflowState: WorkflowState;
   readme: string;
   sources: UploadedSource[];
 }) {
@@ -2805,9 +3707,15 @@ function buildBridgePayload({
     enginePlanMarkdown,
     qualityChecklist,
     qualityReport,
+    assetPlan,
+    visualElementKit,
+    codexTask,
+    codexAgentGuide,
     qualityProfile: qualityContract,
+    qualityGate,
+    workflowState,
     expectedArtifacts: qualityContract.expectedArtifacts,
-    reviewCommands: qualityContract.reviewCommands,
+    reviewCommands: qualityGate.reviewCommands,
     readme,
     attachments: sources.map((source) => ({
       id: source.id,
@@ -2825,9 +3733,65 @@ function buildBridgePayload({
 function buildKitReadme(form: FormState, enginePlan: EnginePlan, sources: UploadedSource[]) {
   const preset = findPreset(form.presetId);
   if (form.language === "en") {
-    return `# Ultimate PPT Master handoff kit\n\nFiles:\n- source.md: structured source brief\n- extracted-source.md: browser pre-read source plus Bridge conversion target\n- attachments/: original source files\n- manifest.json: handoff metadata and quality contract\n- agent-prompt.md: prompt to send to the Agent\n- project-brief.json: machine-readable settings\n- preview-web-deck.html: browser-local Web Deck preview\n- engine-plan.md: PPTX / Web Deck / Fusion route split\n- quality-checklist.md: production checks before delivery\n- quality-report.json: Design Doctor review status and summary\n\nPreset: ${preset.label.en} (${preset.packPath || "seed direction"})\nSource count: ${sources.length}\n\nActive route:\n- PPTX: ${enginePlan.pptxActive ? "active" : "optional"}\n- Web Deck: ${enginePlan.webActive ? "active" : "optional"}\n- Style: ${enginePlan.styleRoute}\n\nNext step:\nOpen this folder in Codex first, or another local Agent that can read the ultimate-ppt-master Skill. Ask it to read agent-prompt.md, inspect attachments/, run the review commands, and update quality-report.json before producing.\n`;
+    return `# Ultimate PPT Master handoff kit
+
+Files:
+- source.md: structured source brief
+- extracted-source.md: browser pre-read source plus Bridge conversion target
+- attachments/: original source files
+- manifest.json: handoff metadata and quality contract
+- agent-prompt.md: prompt to send to the Agent
+- project-brief.json: machine-readable settings
+- preview-web-deck.html: browser-local Web Deck preview
+- engine-plan.md: PPTX / Web Deck / Fusion route split
+- quality-checklist.md: production checks before delivery
+- asset-plan.md: public references, ChatGPT generated assets, source/license notes, and insertion targets
+- visual-element-kit.md: ChatGPT-generation-first micro-assets plan for small reusable elements
+- codex-task.md: Codex-specific production sequence
+- AGENTS.md: local Codex rules for privacy, assets, and quality gates
+- quality-report.json: Design Doctor review status and summary
+
+Preset: ${preset.label.en} (${preset.packPath || "seed direction"})
+Source count: ${sources.length}
+
+Active route:
+- PPTX: ${enginePlan.pptxActive ? "active" : "optional"}
+- Web Deck: ${enginePlan.webActive ? "active" : "optional"}
+- Style: ${enginePlan.styleRoute}
+
+Next step:
+Open this folder in Codex first, or another local Agent that can read the ultimate-ppt-master Skill. Ask Codex to read AGENTS.md, codex-task.md, visual-element-kit.md, asset-plan.md, and agent-prompt.md; run or handle scripts/generate_visual_element_kit.py for ChatGPT-first micro-assets; use Needs-Manual prompts when no image key is configured; use public search for evidence or official references; run the review commands; and update quality-report.json before producing.
+`;
   }
-  return `# Ultimate PPT Master handoff kit\n\n文件：\n- source.md：结构化资料 brief\n- extracted-source.md：网页预读资料和 Bridge 转换目标\n- attachments/：原始源文件\n- manifest.json：交付元数据和质量合同\n- agent-prompt.md：发给 Agent 的执行 prompt\n- project-brief.json：机器可读配置\n- preview-web-deck.html：浏览器本地 Web Deck 预览\n- engine-plan.md：PPTX / Web Deck / Fusion 路线分工\n- quality-checklist.md：交付前生产检查清单\n- quality-report.json：Design Doctor 复查状态和中文摘要\n\n内容预设：${preset.label.zh}（${preset.packPath || "种子方向"}）\n源文件数量：${sources.length}\n\n启用路线：\n- PPTX：${enginePlan.pptxActive ? "启用" : "备用"}\n- Web Deck：${enginePlan.webActive ? "启用" : "备用"}\n- 视觉：${enginePlan.styleRoute}\n\n下一步：\n优先用 Codex 打开这个文件夹，或交给其他能读取 ultimate-ppt-master Skill 的本地 Agent。请 Agent 先读 agent-prompt.md，检查 attachments/，运行检查命令，并在生产前更新 quality-report.json。\n`;
+  return `# Ultimate PPT Master handoff kit
+
+文件：
+- source.md：结构化资料 brief
+- extracted-source.md：网页预读资料和 Bridge 转换目标
+- attachments/：原始源文件
+- manifest.json：交付元数据和质量合同
+- agent-prompt.md：发给 Agent 的执行 prompt
+- project-brief.json：机器可读配置
+- preview-web-deck.html：浏览器本地 Web Deck 预览
+- engine-plan.md：PPTX / Web Deck / Fusion 路线分工
+- quality-checklist.md：交付前生产检查清单
+- asset-plan.md：公开参考、ChatGPT 生成素材、来源/授权和插入位置
+- visual-element-kit.md：ChatGPT 生图优先的小元素素材计划
+- codex-task.md：Codex 专用生产步骤
+- AGENTS.md：Codex 本地隐私、素材和质量门禁规则
+- quality-report.json：Design Doctor 复查状态和中文摘要
+
+内容预设：${preset.label.zh}（${preset.packPath || "种子方向"}）
+源文件数量：${sources.length}
+
+启用路线：
+- PPTX：${enginePlan.pptxActive ? "启用" : "备用"}
+- Web Deck：${enginePlan.webActive ? "启用" : "备用"}
+- 视觉：${enginePlan.styleRoute}
+
+下一步：
+优先用 Codex 打开这个文件夹，或交给其他能读取 ultimate-ppt-master Skill 的本地 Agent。请 Codex 先读 AGENTS.md、codex-task.md、visual-element-kit.md、asset-plan.md 和 agent-prompt.md；运行或处理 scripts/generate_visual_element_kit.py 生成 ChatGPT-first 小元素素材；无 key 时使用 Needs-Manual prompts；公开检索主要用于证据或官方参考；运行检查命令，并在生产前更新 quality-report.json。
+`;
 }
 
 function sourceSummaryMarkdown(sources: UploadedSource[], language: Language) {

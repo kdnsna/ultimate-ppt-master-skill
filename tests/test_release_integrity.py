@@ -11,9 +11,12 @@ class ReleaseIntegrityTest(unittest.TestCase):
     def test_public_version_markers_are_aligned(self):
         version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
         web_version = json.loads((ROOT / "apps/web/package.json").read_text(encoding="utf-8"))["version"]
+        web_lock = json.loads((ROOT / "apps/web/package-lock.json").read_text(encoding="utf-8"))
 
-        self.assertEqual(version, "2.5.0")
+        self.assertEqual(version, "3.0.0")
         self.assertEqual(web_version, version)
+        self.assertEqual(web_lock["version"], version)
+        self.assertEqual(web_lock["packages"][""]["version"], version)
         self.assertIn(f"v{version}", (ROOT / "README.md").read_text(encoding="utf-8"))
         self.assertIn(f"v{version}", (ROOT / "README.zh-CN.md").read_text(encoding="utf-8"))
         self.assertIn(f'appVersion = "{version}"', (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8"))
@@ -27,6 +30,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "白话更新栏",
             (ROOT / f"docs/zh-CN/release-notes-v{version}.md").read_text(encoding="utf-8"),
         )
+        self.assertIn(f"release-notes-v{version}.md", (ROOT / "docs/README.md").read_text(encoding="utf-8"))
+        self.assertIn(f"release-notes-v{version}.md", (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8"))
 
     def test_core_entry_scripts_exist(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
@@ -183,10 +188,16 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("Design Doctor scorecard", page)
         self.assertIn("report-only repair policy", page)
 
-    def test_release_docs_include_v25_quality_gate(self):
+    def test_release_docs_include_v3_handoff_generation_loop(self):
         release_maintenance = (ROOT / "docs/release-maintenance.md").read_text(encoding="utf-8")
         growth_playbook = (ROOT / "docs/public-growth-playbook.md").read_text(encoding="utf-8")
         completion_audit = (ROOT / "docs/completion-audit-v2.5-quality-workbench.md").read_text(encoding="utf-8")
+        bridge_doc = (ROOT / "docs/agent-connect-bridge.md").read_text(encoding="utf-8")
+        bridge_doc_zh = (ROOT / "docs/zh-CN/agent-connect-bridge.md").read_text(encoding="utf-8")
+        web_doc = (ROOT / "docs/web-experience.md").read_text(encoding="utf-8")
+        web_doc_zh = (ROOT / "docs/zh-CN/web-experience.md").read_text(encoding="utf-8")
+        release = (ROOT / "docs/release-notes-v3.0.0.md").read_text(encoding="utf-8")
+        release_zh = (ROOT / "docs/zh-CN/release-notes-v3.0.0.md").read_text(encoding="utf-8")
 
         self.assertIn("npm run audit:quality", release_maintenance)
         self.assertIn("npm run audit:market", release_maintenance)
@@ -198,13 +209,45 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertNotIn("v2.4.0 positions", release_maintenance)
         self.assertNotIn("v2.4.0 release link", growth_playbook)
 
+        for text in (bridge_doc, bridge_doc_zh):
+            for expected in (
+                "asset-plan.md",
+                "visual-element-kit.md",
+                "codex-task.md",
+                "AGENTS.md",
+                "quality-report.json",
+            ):
+                self.assertIn(expected, text)
+
+        for text in (web_doc, web_doc_zh, release, release_zh):
+            self.assertIn("formal-business", text)
+            self.assertIn("generate_visual_element_kit.py", text)
+            self.assertIn("Needs-Manual", text)
+            self.assertIn("ChatGPT", text)
+
+    def test_web_handoff_panel_has_executable_next_step_ui(self):
+        app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
+
+        self.assertIn("handoffExecutionTitle", app)
+        self.assertIn("elementGenerationCommand", app)
+        self.assertIn("generate_visual_element_kit.py", app)
+        self.assertIn("generatedNowTitle", app)
+        self.assertIn("codexNextTitle", app)
+        self.assertNotIn("<span>quality-checklist.md</span>\n              <span>quality-checklist.md</span>", app)
+
+    def test_desktop_worker_resource_copy_is_in_sync(self):
+        source = (ROOT / "apps/desktop/worker/desktop_worker.py").read_text(encoding="utf-8")
+        bundled = (ROOT / "apps/desktop/src-tauri/resources/desktop_worker.py").read_text(encoding="utf-8")
+
+        self.assertEqual(bundled, source)
+
     def test_readme_images_match_current_product_positioning(self):
         hero = (ROOT / "assets/readme/hero.svg").read_text(encoding="utf-8")
         web_preview = (ROOT / "assets/readme/web-hub-preview.svg").read_text(encoding="utf-8")
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v2.5.0", hero)
+        self.assertIn("v3.0.0", hero)
         self.assertIn("Local connector", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)
@@ -223,6 +266,37 @@ class ReleaseIntegrityTest(unittest.TestCase):
                 self.assertIn("v2.5", demo)
                 self.assertNotIn("v2.3 Demo", demo)
                 self.assertNotIn("v2.3 Proof", demo)
+
+    def test_web_experience_does_not_advertise_unearned_progress(self):
+        app = (ROOT / "apps" / "web" / "src" / "App.tsx").read_text(encoding="utf-8")
+
+        self.assertNotIn('meta: `${sourceCount} files · ${readiness}%`', app)
+        self.assertNotIn('id: "handoff", label: t.navHandoff, meta: t.commandReady', app)
+        self.assertIn("sourceProgressLabel", app)
+        self.assertIn("handoffProgressLabel", app)
+        self.assertIn("noRealSourcesYet", app)
+        self.assertIn("handoffNotCreated", app)
+
+    def test_formal_business_quality_gate_is_release_guarded(self):
+        app = (ROOT / "apps" / "web" / "src" / "App.tsx").read_text(encoding="utf-8")
+        bridge = (ROOT / "apps" / "bridge" / "server.mjs").read_text(encoding="utf-8")
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+
+        for text in (app, bridge):
+            self.assertIn("qualityGate", text)
+            self.assertIn("formal-business", text)
+            self.assertIn("workflowState", text)
+            self.assertIn("visual-element-kit.md", text)
+            self.assertIn("chatgpt-generation-first", text)
+            self.assertIn("generate_visual_element_kit.py", text)
+            self.assertIn("Needs-Manual", text)
+
+        self.assertTrue((ROOT / "scripts" / "audit_formal_delivery.py").is_file())
+        self.assertTrue((ROOT / "scripts" / "generate_visual_element_kit.py").is_file())
+        self.assertIn("Formal Business Delivery Gate", skill)
+        self.assertIn("logo must not degrade into text fragments", skill)
+        self.assertIn("ChatGPT/OpenAI as the primary visual asset engine", skill)
+        self.assertIn("generate_visual_element_kit.py", skill)
 
     def test_bridge_source_does_not_embed_secret_values(self):
         bridge = (ROOT / "apps/bridge/server.mjs").read_text(encoding="utf-8")

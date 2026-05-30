@@ -46,6 +46,43 @@ Selection rules:
 - If the user has already selected "1", "PPTX", "可编辑", "2", "网页", "杂志风", or equivalent, proceed with that mode without asking again.
 - If the user asks for both modes, complete them as separate deliverables and keep their project folders separate.
 
+## Formal Business Delivery Gate
+
+Default to `qualityGate.level = "formal-business"` for business/report/consulting/training/government/finance decks and for any deliverable expected to be handed to a real stakeholder. This is the default quality bar unless the user explicitly asks for a quick draft.
+
+Before generating final PPTX or Web Deck files, lock these items in `manifest.json`, `project-brief.json`, `agent-prompt.md`, and `quality-checklist.md`:
+- Brand assets or a documented fallback strategy.
+- Traceable evidence sources and data interpretation boundaries.
+- ChatGPT/OpenAI as the primary visual asset engine for custom visuals; record prompts, filenames, target slides, and manual edits in `asset-plan.md`.
+- Reusable small element asset plan in `visual-element-kit.md`: section dividers, metric badges, process nodes, connectors, icon accents, textures, and callout stickers.
+- Local element generation state from `scripts/generate_visual_element_kit.py`: `assets/generated/element-manifest.json`, `images/image_prompts.json`, and `images/image_prompts.md`.
+- Public asset search plan for evidence, official references, and brand boundaries, or explicit no-search rationale; record source URL, publisher, license/usage note, and insertion target for each selected public asset.
+- Image, chart, and infographic plan, or an explicit no-image strategy.
+- Page rhythm, layout variety, and the role of each slide.
+- Artifact checks for editable PPTX objects and complete Web Deck visual rendering.
+
+Formal delivery rules:
+- Do not build a whole deck from repeated title-and-card pages.
+- Do not proceed with only slide titles unless the deck is clearly marked as a draft and the user accepts that limitation.
+- Treat ChatGPT/OpenAI as the primary visual asset engine when visuals can improve the deck. Generate custom supporting visuals and small reusable micro-assets before final slide assembly.
+- Generate and reuse a coherent element kit (`visual-element-kit.md`) rather than relying on random stock imagery: small section dividers, metric badges, process nodes, connectors, icon accents, subtle patterns, and callout stickers.
+- Run `python3 scripts/generate_visual_element_kit.py <project_path>` before final slide assembly. If no image backend/key is configured, continue with `Needs-Manual` prompts in `images/image_prompts.md`; do not block the whole deck.
+- Use public/official/reusable asset search mainly for factual evidence, official references, and brand boundaries; document the source and usage boundary before insertion.
+- Store ChatGPT/OpenAI generated assets under `assets/generated/` or the project image folder, and insert them as real assets.
+- Private source material, internal screenshots, customer data, and API keys stay local unless the user explicitly approves upload.
+- PPTX output must use editable text, shapes, charts, images, and notes; do not flatten slides into full-page screenshots.
+- Logo and brand marks must use real assets, clean vector treatment, or a documented text fallback; logo must not degrade into text fragments such as `b` / `c`.
+- For Web Decks, verify desktop/mobile visual completeness, media rendering, and layout variety.
+- Design Doctor is report-only by default. Do not auto-repair SVG unless the user explicitly requests automatic repair.
+
+Run the formal audit when project artifacts exist:
+
+```bash
+python3 scripts/audit_formal_delivery.py <project_path_or_artifact>
+```
+
+If the audit fails, report the concrete issues and fix the deck before final delivery unless the user explicitly chooses to ship with known risks.
+
 > [!CAUTION]
 > ## 🚨 Global Execution Discipline (MANDATORY)
 >

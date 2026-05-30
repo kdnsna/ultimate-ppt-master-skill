@@ -31,7 +31,7 @@
 - v2.5 优化完成审计：[Completion Audit - v2.5 Quality Workbench and Skill Market Distribution](../completion-audit-v2.5-quality-workbench.md)
 - 下一步内容 / 模板方向：[下一步路线 - 内容与模板预设](./next-roadmap.md)
 - v2.5 质量工作台：[v2.5 质量工作台](./quality-workbench-v2.5.md)
-- v2.5.0 发布说明：[发布说明 - v2.5.0](./release-notes-v2.5.0.md)
+- v3.0.0 发布说明：[发布说明 - v3.0.0](./release-notes-v3.0.0.md)
 - GitHub 技术扫描：[GitHub 技术扫描 - 2026 年 5 月](./github-tech-scan-2026-05.md)
 - 上游基准测试：[上游基准测试 - 2026 年 5 月](./upstream-benchmark-2026-05.md)
 - 桌面端源码预览：[Quickstart Desktop](../quickstart-desktop.md)

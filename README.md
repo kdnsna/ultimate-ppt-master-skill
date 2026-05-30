@@ -3,7 +3,7 @@
 > Local-first + quality-checked delivery for Chinese office users: turn PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into Agent-ready presentation projects, then produce editable PowerPoint decks or magazine-style Web Decks locally.
 
 <p align="center">
-  <strong>v2.5.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v3.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-  <a href="./docs/release-notes-v2.5.0.md"><strong>v2.5.0 Notes</strong></a>
+  <a href="./docs/release-notes-v3.0.0.md"><strong>v3.0.0 Notes</strong></a>
   ·
   <a href="#60-second-quickstart"><strong>60-second quickstart</strong></a>
   ·
@@ -31,7 +31,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.5.0" src="https://img.shields.io/badge/Version-2.5.0-172033?style=for-the-badge">
+  <img alt="Version 3.0.0" src="https://img.shields.io/badge/Version-3.0.0-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -115,24 +115,24 @@ The goal is simple: **the web page should make the workflow easy to understand; 
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
 
-## v2.5.0 Release Focus
+## v3.0.0 Release Focus
 
-v2.5.0 turns Ultimate PPT Master into a **PPT quality workbench for Chinese office users**. It keeps the local-first Web + Bridge + Skill architecture and improves first use, preset quality, visual review, sample proof, and delivery gates.
+v3.0.0 turns Ultimate PPT Master into a **formal-business PPT delivery workbench**. It keeps the local-first Web + Bridge + Skill architecture, but now makes the Codex handoff directly executable and treats ChatGPT/OpenAI visual generation as the default micro-asset loop for polished decks.
 
 This release focuses on practical office delivery:
 
-- Business Review and Consulting Proposal stay as the first default paths; Training Courseware and Academic Defense move ahead of showcase decks in the Web preset menu.
-- Stable packs now declare `userLevel`, `qualityProfile`, `proofArtifacts`, and `notFor` so users can see who a preset is for and where it does not fit.
-- Design Doctor makes visual review understandable: SVG checks, browser review, `workflows/visual-review.md`, `quality-report.json`, and a Chinese summary are part of the handoff contract.
-- Bridge / handoff kits now preserve `qualityProfile`, `expectedArtifacts`, and `reviewCommands` in `manifest.json` and `project-brief.json`.
-- `scripts/audit_quality_proofs.py` verifies stable proof artifacts before publishing.
+- Formal-business quality gates are the default for stakeholder-facing business, finance, government, training, and consulting decks.
+- Handoff folders now include `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, `AGENTS.md`, and `quality-report.json`.
+- Codex receives one execution order: read the handoff files, run or handle `scripts/generate_visual_element_kit.py`, produce PPTX/Web Deck outputs, update asset records, then run the formal delivery audit.
+- ChatGPT/OpenAI-generated micro-assets now have a real local loop: `assets/generated/element-manifest.json`, `images/image_prompts.json`, and `images/image_prompts.md`.
+- No image key is still a supported path: the workflow writes `Needs-Manual` prompts that can be pasted into ChatGPT.
 
-### v2.5.0 In Plain Words
+### v3.0.0 In Plain Words
 
-- The web page is no longer just a form. The first screen now shows the current task, next step, quality status, and delivery gates.
-- Presets are no longer vague examples. A stable pack must have a public synthetic source, generated output, screenshot, quality report, and suitability boundary.
-- The Agent gets more than a prompt. It receives a contract that says what should be produced and how to check it.
-- Design Doctor reports first and repairs only when the user explicitly asks.
+- The web page does not ask users to understand every technical file. It shows the current handoff step and the next command to run.
+- Codex no longer receives only a big prompt. It receives a structured folder, a micro-asset checklist, a quality checklist, and a review command.
+- ChatGPT image generation is used for small reusable elements, not for flattening whole slides or hiding editable text.
+- If image generation is not configured, the project still moves forward with `Needs-Manual` prompts.
 
 ## Quality Proofs
 
@@ -432,7 +432,7 @@ Maintenance references:
 | Configure provider keys locally | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | Understand why this exists beside direct Skill install | [Product Positioning](./docs/product-positioning.md) |
 | See the next content/template direction | [Next Roadmap - Content and Template Presets](./docs/next-roadmap.md) |
-| Review v2.5.0 release focus | [Release Notes - v2.5.0](./docs/release-notes-v2.5.0.md) |
+| Review v3.0.0 release focus | [Release Notes - v3.0.0](./docs/release-notes-v3.0.0.md) |
 | Review the quality proof matrix | [Quality Workbench v2.5](./docs/quality-workbench-v2.5.md) |
 | Browse public proof packs | [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) |
 | Prepare marketplace or agent-directory distribution | [Skill Market Distribution](./docs/skill-market-distribution.md) |
@@ -460,14 +460,14 @@ git diff --check
 
 The latest push-prep pass also verified the Web homepage, Benchmark Wall, and four public proof decks at desktop and mobile widths.
 
-## v2.5.0 Highlights
+## v3.0.0 Highlights
 
-- Reworked the Web first screen into a quality workbench with task preview, next step, and quality status.
-- Promoted the four current packs to `stable-pack` with quality metadata and proof artifacts.
-- Added Design Doctor entry points and `quality-report.json` to handoff kits.
-- Added quality proof audit coverage with `npm run audit:quality`.
-- Added marketplace readiness coverage with `npm run audit:market`.
-- Strengthened Bridge manifest and project brief contracts for local Agent execution.
+- Added the formal-business quality gate to Web, Bridge, Skill, and local audit paths.
+- Added the Codex + ChatGPT micro-asset generation loop with scriptable and `Needs-Manual` modes.
+- Made the Web handoff panel show Bridge state, local project path, element-generation command, and Agent command in order.
+- Added `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, and `AGENTS.md` to handoff kits.
+- Added `scripts/audit_formal_delivery.py` and regression fixtures for repeated-card, no-image, sparse PPTX, and logo-fragment failures.
+- Kept Desktop out of the v3.0.0 release surface while synchronizing its worker resource copy.
 
 See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for upstream baselines and adaptation policy.
 

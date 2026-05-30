@@ -1,6 +1,6 @@
 # Agent Connect Bridge
 
-Agent Connect Bridge 是 v2.3 给静态 Web Experience 配套的本地服务。它让 GitHub Pages 页面连接用户本机 `127.0.0.1`，把真实源文件落盘、本地调用转换脚本、检查 provider 状态，并把项目目录交给 Codex 或其他 Agent。
+Agent Connect Bridge 是 v3.0 给静态 Web Experience 配套的本地服务。它让 GitHub Pages 页面连接用户本机 `127.0.0.1`，把真实源文件落盘、本地调用转换脚本、检查 provider 状态，并把正式商务 handoff 项目目录交给 Codex 或其他 Agent。
 
 ## 快速开始
 
@@ -40,6 +40,19 @@ Bridge 会在本地写入项目：
 - `preview-web-deck.html`：浏览器本地粗预览。
 - `engine-plan.md`：PPTX / Web Deck / Fusion 路线分工。
 - `quality-checklist.md`：交付前检查清单。
+- `asset-plan.md`：公开参考、ChatGPT 生成素材、来源/授权和插入位置。
+- `visual-element-kit.md`：ChatGPT 生图优先的小元素素材清单。
+- `codex-task.md`：Codex 专用生产步骤。
+- `AGENTS.md`：Codex 本地隐私、素材和质量门禁规则。
+- `quality-report.json`：Design Doctor / 正式商务复查状态。
+
+Codex 应先读 `AGENTS.md`、`codex-task.md`、`visual-element-kit.md`、`asset-plan.md`、`quality-checklist.md`、`manifest.json` 和 `project-brief.json`。下一条本地命令是：
+
+```bash
+cd <repoRoot> && python3 scripts/generate_visual_element_kit.py <projectPath>
+```
+
+如果没有配置 image backend 或 OpenAI key，脚本会把 `Needs-Manual` prompts 写到 `images/image_prompts.md`；复制到 ChatGPT 生成后，按清单保存到对应路径。
 
 ## 资料解析
 
@@ -65,7 +78,7 @@ Bridge 复用已有本地转换脚本：
 
 Bridge 只返回 provider 是否配置、模型名、base URL 和 key 来源标签，不返回真实密钥。
 
-v2.3 支持检测：
+支持检测：
 
 - OpenAI / OpenAI-compatible：`OPENAI_API_KEY` 或 `LLM_API_KEY`
 - Gemini：`GEMINI_API_KEY` 或 `GOOGLE_API_KEY`
@@ -106,7 +119,7 @@ npm run bridge -- --allow-launch
 未开启自动启动时，网页仍会给出可复制命令，例如：
 
 ```bash
-cd ~/UltimatePPTMaster/handoffs/my-deck-... && codex "Read agent-prompt.md and follow the Ultimate PPT Master Skill..."
+cd ~/UltimatePPTMaster/handoffs/my-deck-... && codex "Read AGENTS.md, codex-task.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first..."
 ```
 
 ## 排查

@@ -19,7 +19,7 @@ const AGENT_COMMANDS = {
   codex: {
     label: "Codex",
     binary: "codex",
-    prompt: "Read agent-prompt.md and follow the Ultimate PPT Master Skill. Work in this folder and list final files."
+    prompt: "Read AGENTS.md, codex-task.md, and visual-element-kit.md first. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image key is configured, use the Needs-Manual prompts. Execute the ChatGPT-generation-first formal-business workflow, update asset-plan.md and quality-report.json, then list final files."
   },
   claude: {
     label: "Claude Code",
@@ -561,6 +561,11 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   const title = payload?.form?.title || payload?.title || "ultimate-ppt-master-handoff";
   const projectBrief = typeof payload.projectBrief === "string" ? parseJsonMaybe(payload.projectBrief) : payload.projectBrief || {};
   const qualityProfile = payload.qualityProfile || projectBrief.qualityProfile || {};
+  const qualityGate = payload.qualityGate || projectBrief.qualityGate || defaultQualityGate();
+  const workflowState = payload.workflowState || projectBrief.workflowState || {
+    currentStep: "handoff",
+    blockedReason: ""
+  };
   const expectedArtifacts = Array.isArray(payload.expectedArtifacts)
     ? payload.expectedArtifacts
     : Array.isArray(projectBrief.expectedArtifacts)
@@ -570,10 +575,14 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     ? payload.reviewCommands
     : Array.isArray(projectBrief.reviewCommands)
       ? projectBrief.reviewCommands
-      : [];
+      : Array.isArray(qualityGate.reviewCommands)
+        ? qualityGate.reviewCommands
+        : [];
   const enrichedProjectBrief = {
     ...projectBrief,
     qualityProfile,
+    qualityGate,
+    workflowState,
     expectedArtifacts,
     reviewCommands
   };
@@ -599,6 +608,10 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   await writeProjectFile("preview-web-deck.html", payload.previewWebDeckHtml || "");
   await writeProjectFile("engine-plan.md", payload.enginePlanMarkdown || payload.enginePlan || "");
   await writeProjectFile("quality-checklist.md", payload.qualityChecklist || "");
+  await writeProjectFile("asset-plan.md", payload.assetPlan || defaultAssetPlan({ title, qualityGate }));
+  await writeProjectFile("visual-element-kit.md", payload.visualElementKit || defaultVisualElementKit({ title, qualityGate }));
+  await writeProjectFile("codex-task.md", payload.codexTask || defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands }));
+  await writeProjectFile("AGENTS.md", payload.codexAgentGuide || defaultCodexAgentGuide({ qualityGate }));
   await writeProjectFile("README.md", payload.readme || defaultHandoffReadme());
 
   const extractedSections = [
@@ -629,6 +642,8 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     projectPath,
     repoRoot,
     qualityProfile,
+    qualityGate,
+    workflowState,
     expectedArtifacts,
     reviewCommands,
     attachments: attachmentResults.map(({ markdown, ...item }) => item),
@@ -636,7 +651,7 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   };
 
   await writeProjectFile("extracted-source.md", `${extractedSections.join("\n")}\n`);
-  await writeProjectFile("quality-report.json", JSON.stringify(createPendingQualityReport({ title, qualityProfile, expectedArtifacts, reviewCommands }), null, 2));
+  await writeProjectFile("quality-report.json", JSON.stringify(createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands }), null, 2));
   await writeProjectFile("manifest.json", JSON.stringify(manifest, null, 2));
 
   return {
@@ -656,13 +671,62 @@ function parseJsonMaybe(value) {
   }
 }
 
-function createPendingQualityReport({ title, qualityProfile, expectedArtifacts, reviewCommands }) {
+function defaultQualityGate() {
+  return {
+    level: "formal-business",
+    requiredInputs: [
+      "brand assets or explicit fallback strategy",
+      "traceable source evidence",
+      "ChatGPT-generation-first visual asset plan with prompts, filenames, and insertion targets",
+      "small reusable element kit plan for section dividers, metric badges, process nodes, connectors, and icons",
+      "public asset search plan for evidence/official references or explicit no-search rationale",
+      "image/chart plan or explicit no-image strategy",
+      "page rhythm and infographic strategy"
+    ],
+    acceptanceCriteria: [
+      "do not build the whole deck from headings and repeated cards only",
+      "ChatGPT/OpenAI is treated as the primary visual asset engine for custom supporting visuals",
+      "small generated micro-assets are planned in visual-element-kit.md and reused across the deck",
+      "generated assets are stored under assets/generated and listed in asset-plan.md",
+      "public web asset searches are limited to evidence, official references, or brand boundaries and record source URLs, licensing notes, and insertion targets",
+      "PPTX keeps real editable text, shapes, charts, and notes",
+      "Web Deck has a complete visual system, layout variety, and desktop/mobile readability",
+      "logo must not degrade into text fragments",
+      "run formal delivery audit and Design Doctor before delivery"
+    ],
+    artifactChecks: [
+      "manifest.json contains formal-business qualityGate",
+      "HTML/PPTX expose enough layout types",
+      "real image/brand assets are used or no-image strategy is explicit",
+      "asset-plan.md records public searches, generated assets, citations, and insert targets",
+      "visual-element-kit.md records the reusable ChatGPT-generated micro-assets",
+      "PPTX contains editable text objects",
+      "no b/c-style logo text fragments"
+    ],
+    reviewCommands: [
+      "python3 scripts/audit_formal_delivery.py <project_path>"
+    ],
+    assetStrategy: {
+      mode: "chatgpt-generation-first",
+      brand: "Use approved brand assets when supplied; otherwise use a clean text fallback and document it in asset-plan.md.",
+      primaryEngine: "Use ChatGPT/OpenAI image generation as the default visual asset engine for custom scenes, backgrounds, icons, badges, separators, process nodes, and decorative data elements.",
+      microAssets: "Generate a small reusable visual element kit before final slide production and insert those assets consistently across PPTX/Web Deck pages.",
+      publicSearch: "Use public web search mainly for evidence, official references, and brand boundaries; record source URL, license or usage note, and insertion target.",
+      generatedAssets: "Store ChatGPT/OpenAI generated assets under assets/generated, cite the prompt plus target slide, and avoid full-slide screenshots for editable PPTX.",
+      images: "Use generated or supplied visual assets for formal delivery when helpful; if no imagery is appropriate, write an explicit no-image strategy."
+    }
+  };
+}
+
+function createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands }) {
   return {
     version: BRIDGE_VERSION,
     title,
     status: "pending",
     createdAt: new Date().toISOString(),
     qualityProfile,
+    qualityGate,
+    workflowState,
     expectedArtifacts,
     reviewCommands,
     summary: {
@@ -671,6 +735,151 @@ function createPendingQualityReport({ title, qualityProfile, expectedArtifacts, 
     },
     checks: []
   };
+}
+
+function defaultAssetPlan({ title, qualityGate }) {
+  const gateSummary = (qualityGate?.requiredInputs || []).map((item) => `- ${item}`).join("\n");
+  return `# Asset Plan
+
+Project: ${title}
+
+## Required Inputs
+${gateSummary || "- formal-business asset strategy pending"}
+
+## ChatGPT Generated Assets / ChatGPT 生成素材
+- [ ] Treat ChatGPT/OpenAI as the primary visual asset engine: generate custom visuals first, then use public search for evidence, official references, and brand boundaries.
+- [ ] Create a reusable micro-assets pack: section dividers, metric badges, process nodes, connectors, icon accents, subtle patterns, and small callout stickers.
+- [ ] Store generated bitmap assets under \`assets/generated/\` and generated SVG/icons under \`assets/generated/svg/\`.
+- [ ] Record the prompt, filename, target slide, and any manual edits before inserting the asset.
+
+## Public Asset Search / 公开素材检索
+- [ ] Search the public web mainly for official references, factual evidence, brand boundaries, or source citations.
+- [ ] Record each candidate with source URL, publisher, license/usage note, and intended slide or Web Deck section.
+- [ ] Do not upload private source files, customer data, or internal screenshots to external services unless the user explicitly approves it.
+
+## Insertion Targets
+| Slide / Section | Need | Source or prompt | File path | Status |
+| --- | --- | --- | --- | --- |
+| Cover | brand-safe hero visual or approved logo treatment | pending | pending | pending |
+| Evidence page | chart/photo/screenshot that supports a claim | pending | pending | pending |
+| Process page | editable diagram or generated scene | pending | pending | pending |
+
+## Delivery Rule
+Every inserted image, icon, logo, screenshot, or generated visual must be listed here before final delivery. If no imagery is used, write the explicit no-image strategy here and ensure manifest.json / project-brief.json also contain it.
+`;
+}
+
+function defaultVisualElementKit({ title, qualityGate }) {
+  const mode = qualityGate?.assetStrategy?.mode || "chatgpt-generation-first";
+  return `# Visual Element Kit
+
+Project: ${title}
+Mode: ${mode}
+
+## Purpose
+Use ChatGPT/OpenAI as the primary visual asset engine. Generate small reusable elements before final slide production so the deck has a coherent visual language without relying on random stock imagery.
+
+## Micro-assets / 小元素素材
+| Asset type | Quantity target | Use | Output path | Status |
+| --- | ---: | --- | --- | --- |
+| section divider | 3 | chapter breaks and transition slides | assets/generated/dividers/ | pending |
+| metric badge | 6 | KPI callouts, rights/benefits numbers, scorecards | assets/generated/badges/ | pending |
+| process node | 5 | flow pages, timelines, service journey diagrams | assets/generated/process/ | pending |
+| connector | 6 | arrows, dotted links, handoff paths, causal chains | assets/generated/connectors/ | pending |
+| icon accent | 8 | small semantic markers for evidence, risk, action, user, channel | assets/generated/icons/ | pending |
+| subtle pattern or texture | 2 | cover, section backgrounds, low-contrast visual depth | assets/generated/patterns/ | pending |
+| callout sticker | 4 | reminders, caveats, delivery notes, decision highlights | assets/generated/callouts/ | pending |
+
+## Prompt Pattern
+Use short, specific prompts with transparent/isolated backgrounds when possible:
+- "Create a clean business presentation metric badge for [theme], flat vector-like style, transparent background, no text, colors aligned to [palette]."
+- "Create a small process node icon for [step], formal government/finance presentation style, isolated object, no text, editable-friendly shape language."
+- "Create a subtle abstract background texture for [theme], low contrast, no letters, no logos, widescreen presentation use."
+
+## Insertion Rules
+- Generate elements as reusable assets, then compose them with editable PPTX text/shapes.
+- Do not put important text inside generated images.
+- Use public search for factual evidence and official brand boundaries; use ChatGPT-generated micro-assets for visual language.
+- Register every generated file in asset-plan.md with prompt, target slide, and final insertion status.
+`;
+}
+
+function defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands }) {
+  const gateInputs = (qualityGate?.requiredInputs || []).map((item) => `- ${item}`).join("\n");
+  const gateCriteria = (qualityGate?.acceptanceCriteria || []).map((item) => `- ${item}`).join("\n");
+  const gateChecks = (qualityGate?.artifactChecks || []).map((item) => `- ${item}`).join("\n");
+  const artifacts = (expectedArtifacts || []).map((item) => `- ${item}`).join("\n") || "- final PPTX and/or Web Deck artifacts requested in project-brief.json";
+  const commands = (reviewCommands?.length ? reviewCommands : ["python3 scripts/audit_formal_delivery.py <project_path>"]).map((item) => `- ${item}`).join("\n");
+  return `# Codex Task
+
+Project: ${title}
+Current workflow step: ${workflowState?.currentStep || "handoff"}
+Blocked reason: ${workflowState?.blockedReason || "none"}
+
+## Read First
+1. AGENTS.md
+2. manifest.json
+3. project-brief.json
+4. quality-checklist.md
+5. asset-plan.md
+6. visual-element-kit.md
+7. agent-prompt.md
+8. extracted-source.md and attachments/
+
+## Formal Business Gate
+Required inputs:
+${gateInputs}
+
+Acceptance criteria:
+${gateCriteria}
+
+Artifact checks:
+${gateChecks}
+
+## Asset Workflow
+1. Inspect supplied attachments and extracted-source.md before searching.
+2. Treat ChatGPT/OpenAI as the primary visual asset engine: generate custom visual language before final slide production.
+3. From the repository root recorded in manifest.json, run: \`python3 scripts/generate_visual_element_kit.py <project_path>\`.
+4. If no IMAGE_BACKEND/OpenAI key is configured, do not block: use the Needs-Manual prompts in images/image_prompts.md with ChatGPT and save outputs to the listed paths.
+5. Create the visual-element-kit.md micro-assets: section divider, metric badge, process node, connector, icon accent, subtle pattern, and callout sticker.
+6. Save generated assets under assets/generated/ and insert them into the PPTX/Web Deck as real image objects, not flattened full-slide screenshots.
+7. Use public web search mainly for factual evidence, official references, brand boundaries, or source citations.
+8. Record every generated asset prompt and every public source/license note in asset-plan.md.
+9. Keep charts, tables, labels, and PPTX text editable wherever possible.
+
+## Production Steps
+1. Lock brand/fallback strategy, evidence boundaries, page rhythm, infographic strategy, asset-plan.md, and visual-element-kit.md.
+2. Produce the requested PPTX/Web Deck using the Ultimate PPT Master Skill workflow.
+3. Avoid repeated title-card pages; vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
+4. Do not let logos degrade into b/c-style text fragments.
+5. Run review commands and repair obvious layout, text overflow, image, and editability issues.
+6. Update quality-report.json with checks run, issues found, repairs made, and remaining risk.
+
+## Expected Artifacts
+${artifacts}
+
+## Review Commands
+${commands}
+
+Final response: list generated files, generated micro-assets inserted, public references used, review commands run, and any remaining risks.
+`;
+}
+
+function defaultCodexAgentGuide({ qualityGate }) {
+  const level = qualityGate?.level || "formal-business";
+  return `# AGENTS.md
+
+## Codex Local Rules
+- Work in this handoff folder and the Ultimate PPT Master repository scripts only.
+- Read codex-task.md before editing or generating deliverables.
+- Keep private source material local. Do not upload private files, customer data, internal screenshots, or API keys unless the user explicitly approves.
+- ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py before final slide assembly when the deck needs visual richness.
+- If no image backend/key is configured, use images/image_prompts.md Needs-Manual prompts with ChatGPT and save outputs under assets/generated/.
+- Public web search is allowed mainly for evidence, official references, and brand boundaries; record sources and usage notes in asset-plan.md.
+- Store generated outputs under assets/generated/ and record prompts in asset-plan.md.
+- For level ${level}, do not finish with repeated title/card slides, flat PPTX screenshots, broken logo fragments, or missing quality-report.json.
+- Run the formal delivery audit before final response whenever an HTML or PPTX artifact exists.
+`;
 }
 
 async function stageAttachment(item, { attachmentsDir, extractedDir, repoRoot }) {
@@ -787,12 +996,13 @@ function relativeFromProject(filePath) {
 
 function suggestedCommands(projectPath) {
   const quotedPath = shellQuote(projectPath);
+  const instruction = "Read AGENTS.md, codex-task.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, insert reusable micro-assets when useful, run the formal delivery audit, update quality-report.json, then list final files.";
   return {
-    codex: `cd ${quotedPath} && codex "Read agent-prompt.md and follow the Ultimate PPT Master Skill. Produce the requested deck and list final files."`,
-    claude: `cd ${quotedPath} && claude "Read agent-prompt.md and follow SKILL.md from Ultimate PPT Master. Produce the requested deck and list final files."`,
-    hermes: `cd ${quotedPath} && hermes "Read agent-prompt.md and use the Ultimate PPT Master Skill workflow."`,
-    openclaw: `cd ${quotedPath} && openclaw "Read agent-prompt.md and use the Ultimate PPT Master Skill workflow."`,
-    generic: `cd ${quotedPath} && read agent-prompt.md`
+    codex: `cd ${quotedPath} && codex "${instruction}"`,
+    claude: `cd ${quotedPath} && claude "${instruction}"`,
+    hermes: `cd ${quotedPath} && hermes "${instruction}"`,
+    openclaw: `cd ${quotedPath} && openclaw "${instruction}"`,
+    generic: `cd ${quotedPath} && printf '%s\\n' "${instruction}"`
   };
 }
 
@@ -830,7 +1040,7 @@ function launchAgent(payload, { allowLaunch }) {
 }
 
 function defaultHandoffReadme() {
-  return "# Ultimate PPT Master handoff\n\nOpen `agent-prompt.md`, review `extracted-source.md`, then run the suggested local Agent command from `manifest.json`.\n";
+  return "# Ultimate PPT Master handoff\n\nFor Codex, open `AGENTS.md`, `codex-task.md`, and `visual-element-kit.md` first. Then review `asset-plan.md`, `agent-prompt.md`, and `extracted-source.md`, run or handle `scripts/generate_visual_element_kit.py` for ChatGPT-first visual micro-assets, use `Needs-Manual` prompts when no image key is configured, and run the suggested local Agent command from `manifest.json`.\n";
 }
 
 function hasValue(value) {

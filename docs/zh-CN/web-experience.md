@@ -17,7 +17,11 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - 生成浏览器本地的 `preview-web-deck.html`，并在页面中实时预览；
 - 生成可复制的 Agent 指令、`source.md`、`extracted-source.md`、`manifest.json` 和 `project-brief.json`；
 - 下载完整 `handoff-kit.zip`，或发送到本地 Bridge 生成项目目录；
-- handoff kit 内含 `source.md`、`extracted-source.md`、`attachments/`、`manifest.json`、`agent-prompt.md`、`project-brief.json`、`preview-web-deck.html`、`engine-plan.md`、`quality-checklist.md` 和 `README.md`；
+- handoff kit 内含 `source.md`、`extracted-source.md`、`attachments/`、`manifest.json`、`agent-prompt.md`、`project-brief.json`、`preview-web-deck.html`、`engine-plan.md`、`quality-checklist.md`、`asset-plan.md`、`visual-element-kit.md`、`codex-task.md`、`AGENTS.md`、`quality-report.json` 和 `README.md`；
+- 写入 `formal-business` 质量门禁，让 Codex 拿到验收标准、产物检查和复查命令；
+- 生成 ChatGPT 生图优先的小元素计划，覆盖章节分隔符、指标徽章、流程节点、连接线、图标点缀、低对比纹理和提示贴片；
+- Bridge 生成本地 handoff 后，显示精确的 `generate_visual_element_kit.py` 命令；
+- 没有 image backend 或 OpenAI key 时，解释 `Needs-Manual` 降级路径；
 - 打开脱敏 Agentic Developer Stack 2026 Web Deck 示例；
 - 保持 Skill 安装入口足够显眼。
 
@@ -32,7 +36,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 
 Brief 组装完全在浏览器本地完成。用户运行 `npm run bridge` 时，资料只发送到本机 `127.0.0.1`，用于本地解析和项目落盘。
 
-v2.5.0 起，首页继续用通俗语言解释 Bridge、Agent、API key 和 handoff，并把工作台拆成开始、资料与目标、配置检测、交给 AI 助手、预览与文件等菜单页。首屏右侧会显示当前任务预览、下一步和质量状态；内容预设区会显示 stable pack 路径、模板候选、Design Doctor、预期产物和更具体的质量检查。
+v3.0.0 起，Handoff 页变成可执行向导。Bridge 离线时只显示 Bridge 启动命令和 zip 下载；Bridge 在线但还没生成项目时，主动作是发送到 Bridge；handoff 生成后，页面显示本地项目路径、元素生成命令、Agent 命令和 `images/image_prompts.md` 的 `Needs-Manual` fallback 位置。
 
 ## 本地开发
 
@@ -69,8 +73,9 @@ GITHUB_PAGES=true npm run build:web
 | 复制 `source.md` | 剪贴板获得生成后的 source markdown。 |
 | 下载 `source.md` | 浏览器下载带当前表单值和页纲的 Markdown brief。 |
 | 下载 `preview-web-deck.html` | 浏览器下载带当前 brief 和 storyboard 的单文件 HTML 预览。 |
-| 下载 `handoff-kit.zip` | 浏览器下载包含源资料、manifest、attachments、prompt、preview、engine plan、checklist 和 README 的 zip。 |
+| 下载 `handoff-kit.zip` | 浏览器下载包含源资料、manifest、attachments、prompt、preview、engine plan、checklist、asset plan、visual element kit、Codex task、AGENTS guide、quality report 和 README 的 zip。 |
 | 发送到 Bridge | Bridge 写入本地 handoff 文件夹并返回建议 Agent 命令。 |
+| Handoff 执行区 | Bridge 写入本地文件夹后，页面显示 `python3 scripts/generate_visual_element_kit.py <projectPath>`、Agent 命令和 `Needs-Manual` prompt fallback。 |
 | 打开 Web Deck 示例 | 静态构建中的 `examples/agentic-developer-tools-2026/web-demo.html` 能打开。 |
 | Skill 安装说明 | 能跳到 README Skill 区域或 `docs/agent-setup.md`。 |
 | 移动端首屏 | CTA 自动换行，Skill 入口仍然明显。 |

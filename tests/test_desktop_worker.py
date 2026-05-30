@@ -1,4 +1,5 @@
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -106,6 +107,7 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertTrue(Path(result["projectPath"]).exists())
             self.assertTrue(Path(result["logsPath"]).exists())
             self.assertTrue(any(path.endswith("index.html") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("manifest.json") for path in result["generatedFiles"]))
             self.assertIn("产品发布", result["previewHtml"])
             self.assertEqual(result["outputMode"], "web")
             self.assertIn("recommendations", result)
@@ -113,6 +115,22 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertIn("nextActions", result)
             self.assertIn("thumbnailSvg", result)
             self.assertIn("providerConfig", result)
+            manifest = json.loads((Path(result["projectPath"]) / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["qualityGate"]["level"], "formal-business")
+            self.assertIn("no-image strategy", json.dumps(manifest, ensure_ascii=False))
+            self.assertTrue(any(path.endswith("codex-task.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("AGENTS.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("asset-plan.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("visual-element-kit.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("images/image_prompts.md") for path in result["generatedFiles"]))
+            codex_task = (Path(result["projectPath"]) / "codex-task.md").read_text(encoding="utf-8")
+            self.assertIn("asset-plan.md", codex_task)
+            self.assertIn("visual-element-kit.md", codex_task)
+            self.assertIn("audit_formal_delivery.py", codex_task)
+            self.assertIn("generate_visual_element_kit.py", codex_task)
+            self.assertIn("Needs-Manual", codex_task)
+            self.assertRegex(codex_task, r"ChatGPT|generated asset|生成素材")
+            self.assertRegex(codex_task, r"micro-assets|small element|小元素|元素素材")
 
     def test_run_job_creates_pptx_preview_manifest(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -134,9 +152,77 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertTrue(Path(result["projectPath"]).exists())
             self.assertTrue(any(path.endswith(".pptx") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("cover.svg") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("project-brief.json") for path in result["generatedFiles"]))
             self.assertIn("Editable Deck", result["previewSvg"])
             self.assertEqual(result["outputMode"], "pptx")
             self.assertTrue(result["thumbnailSvg"].startswith("<svg"))
+            manifest = json.loads((Path(result["projectPath"]) / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["qualityGate"]["level"], "formal-business")
+            self.assertIn("python3 scripts/audit_formal_delivery.py <project_path>", manifest["reviewCommands"])
+            asset_plan = (Path(result["projectPath"]) / "asset-plan.md").read_text(encoding="utf-8")
+            self.assertRegex(asset_plan, r"Public asset search|公开素材检索|素材检索")
+            self.assertRegex(asset_plan, r"ChatGPT|generated asset|生成素材")
+            self.assertRegex(asset_plan, r"license|授权|来源")
+            element_kit = (Path(result["projectPath"]) / "visual-element-kit.md").read_text(encoding="utf-8")
+            self.assertIn("chatgpt-generation-first", element_kit)
+            self.assertRegex(element_kit, r"section divider|metric badge|process node|connector")
+
+    def test_desktop_formal_business_outputs_pass_audit(self):
+        source = {
+            "kind": "markdown",
+            "value": "\n".join(
+                [
+                    "# 示例银行政务服务升级方案",
+                    "1、办理体验：网点、手机端和政务窗口协同",
+                    "客户等待时间下降 18%，线上预审覆盖 62%",
+                    "重点人群需要更清晰的办理提醒",
+                    "2、权益数字：服务触达与使用效率",
+                    "月均触达 32 万人次，重点权益核销率 41%",
+                    "3、流程页：申请、核验、开通、提醒",
+                    "每一步必须写清办理材料、责任窗口和风险提示",
+                    "4、对比表：原流程与新流程",
+                    "原流程跨渠道重复填报，新流程一次采集多端复用",
+                    "5、行动计划：三周上线、双周复盘",
+                    "设定 owner、截止时间和可追踪指标",
+                ]
+            ),
+            "name": "formal-bank-service.md",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            web_result = run_job(
+                {
+                    "source": source,
+                    "outputMode": "web",
+                    "stylePreset": "swiss",
+                    "projectDir": tmp,
+                },
+                ROOT,
+            )
+            pptx_result = run_job(
+                {
+                    "source": source,
+                    "outputMode": "pptx",
+                    "stylePreset": "business",
+                    "projectDir": tmp,
+                },
+                ROOT,
+            )
+
+            result = subprocess.run(
+                [
+                    "python3",
+                    "scripts/audit_formal_delivery.py",
+                    web_result["projectPath"],
+                    pptx_result["projectPath"],
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("Formal delivery audit passed", result.stdout)
 
     def test_run_job_creates_narration_handoff_when_enabled(self):
         with tempfile.TemporaryDirectory() as tmp:

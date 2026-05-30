@@ -127,6 +127,99 @@ test("handoff writes v2.5 quality contract into manifest and report", async () =
   await rm(outputDir, { recursive: true, force: true });
 });
 
+test("handoff writes formal business quality gate and workflow state", async () => {
+  const outputDir = await mkdtemp(join(tmpdir(), "upm-bridge-formal-"));
+  await withServer({ outputDir }, async (baseUrl) => {
+    const qualityGate = {
+      level: "formal-business",
+      requiredInputs: ["brand-assets-or-fallback", "evidence-sources", "image-or-no-image-strategy"],
+      acceptanceCriteria: ["brand expression is explicit", "layout rhythm is varied"],
+      artifactChecks: ["editable PPTX text objects", "web deck visual completeness"],
+      reviewCommands: ["python3 scripts/audit_formal_delivery.py <project_path>"]
+    };
+    const workflowState = {
+      currentStep: "handoff",
+      blockedReason: ""
+    };
+
+    const response = await fetch(`${baseUrl}/handoff`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        form: { title: "Formal Business Deck" },
+        sourceMarkdown: "# Source\n\nFormal business notes.",
+        agentPrompt: "Use the skill and read quality-checklist.md before producing.",
+        projectBrief: { title: "Formal Business Deck", qualityGate, workflowState },
+        enginePlanMarkdown: "# Engine",
+        qualityChecklist: "# Checklist\n\nRun formal delivery audit.",
+        qualityGate,
+        workflowState
+      })
+    });
+
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(payload.ok, true);
+    assert.deepEqual(payload.manifest.qualityGate, qualityGate);
+    assert.deepEqual(payload.manifest.workflowState, workflowState);
+
+    const manifest = JSON.parse(await readFile(join(payload.projectPath, "manifest.json"), "utf8"));
+    assert.deepEqual(manifest.qualityGate, qualityGate);
+    assert.deepEqual(manifest.workflowState, workflowState);
+
+    const brief = JSON.parse(await readFile(join(payload.projectPath, "project-brief.json"), "utf8"));
+    assert.deepEqual(brief.qualityGate, qualityGate);
+    assert.deepEqual(brief.workflowState, workflowState);
+
+    const report = JSON.parse(await readFile(join(payload.projectPath, "quality-report.json"), "utf8"));
+    assert.deepEqual(report.qualityGate, qualityGate);
+    assert.deepEqual(report.workflowState, workflowState);
+
+    assert.ok(payload.files.includes("codex-task.md"));
+    assert.ok(payload.files.includes("AGENTS.md"));
+    assert.ok(payload.files.includes("asset-plan.md"));
+    assert.ok(payload.files.includes("visual-element-kit.md"));
+
+    const codexTask = await readFile(join(payload.projectPath, "codex-task.md"), "utf8");
+    assert.match(codexTask, /quality-checklist\.md/);
+    assert.match(codexTask, /asset-plan\.md/);
+    assert.match(codexTask, /audit_formal_delivery\.py/);
+    assert.match(codexTask, /quality-report\.json/);
+    assert.match(codexTask, /ChatGPT|image generation|生成素材/i);
+    assert.match(codexTask, /visual-element-kit\.md/);
+    assert.match(codexTask, /generate_visual_element_kit\.py/);
+    assert.match(codexTask, /Needs-Manual|no image backend|no IMAGE_BACKEND|无 key/i);
+    assert.match(codexTask, /micro-assets|small element|小元素|元素素材/i);
+    assert.match(codexTask, /web search|联网|公开素材/i);
+
+    const codexGuide = await readFile(join(payload.projectPath, "AGENTS.md"), "utf8");
+    assert.match(codexGuide, /Codex/);
+    assert.match(codexGuide, /private source|敏感资料/i);
+    assert.match(codexGuide, /asset-plan\.md/);
+
+    const assetPlan = await readFile(join(payload.projectPath, "asset-plan.md"), "utf8");
+    assert.match(assetPlan, /Public asset search|公开素材检索|素材检索/);
+    assert.match(assetPlan, /ChatGPT|generated asset|生成素材/i);
+    assert.match(assetPlan, /source|来源|license|授权/i);
+
+    const visualElementKit = await readFile(join(payload.projectPath, "visual-element-kit.md"), "utf8");
+    assert.match(visualElementKit, /chatgpt-generation-first/i);
+    assert.match(visualElementKit, /micro-assets|small reusable elements|小元素|元素素材/i);
+    assert.match(visualElementKit, /section divider|metric badge|process node|connector/i);
+
+    const command = payload.suggestedCommands.codex;
+    assert.match(command, /AGENTS\.md/);
+    assert.match(command, /codex-task\.md/);
+    assert.match(command, /asset-plan\.md/);
+    assert.match(command, /visual-element-kit\.md/);
+    assert.match(command, /generate_visual_element_kit\.py/);
+    assert.match(command, /Needs-Manual/i);
+    assert.match(command, /quality-checklist\.md/);
+    assert.match(command, /formal delivery/i);
+  });
+  await rm(outputDir, { recursive: true, force: true });
+});
+
 test("agent launch is command-only unless allow launch is enabled", async () => {
   await withServer({ allowLaunch: false }, async (baseUrl) => {
     const response = await fetch(`${baseUrl}/agent/launch`, {

@@ -3,7 +3,7 @@
 > 本地优先 + 质量检查后交付 + 面向中文办公用户：把 PDF、Word、PPTX、Excel、URL 和零散笔记整理成 Agent 能直接接手的演示项目，再在本地生成可编辑 PowerPoint 或杂志风 Web Deck。
 
 <p align="center">
-  <strong>v2.5.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
+  <strong>v3.0.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -21,7 +21,7 @@
 </p>
 
 <p align="center">
-  <a href="./docs/zh-CN/release-notes-v2.5.0.md"><strong>v2.5.0 说明</strong></a>
+  <a href="./docs/zh-CN/release-notes-v3.0.0.md"><strong>v3.0.0 说明</strong></a>
   ·
   <a href="#60-秒开箱即用"><strong>60 秒开箱即用</strong></a>
   ·
@@ -31,7 +31,7 @@
 </p>
 
 <p align="center">
-  <img alt="Version 2.5.0" src="https://img.shields.io/badge/Version-2.5.0-172033?style=for-the-badge">
+  <img alt="Version 3.0.0" src="https://img.shields.io/badge/Version-3.0.0-172033?style=for-the-badge">
   <img alt="Web first" src="https://img.shields.io/badge/Primary-Web%20Experience-2563EB?style=for-the-badge">
   <img alt="Local bridge" src="https://img.shields.io/badge/Local-Agent%20Bridge-0F766E?style=for-the-badge">
   <img alt="Agent skill" src="https://img.shields.io/badge/Core-Agent%20Skill-10B981?style=for-the-badge">
@@ -115,24 +115,24 @@ Ultimate PPT Master 是一个 **本地优先的 AI 演示生产中枢**。它不
 
 ![Agent connect flow](assets/readme/agent-connect-flow.svg)
 
-## v2.5.0 发布重点
+## v3.0.0 发布重点
 
-v2.5.0 把 Ultimate PPT Master 定位成 **面向中文办公用户的 PPT 质量工作台**。它继续保持本地优先的 Web + Bridge + Skill 架构，不把项目变成黑盒云生成器。
+v3.0.0 把 Ultimate PPT Master 收口成 **正式商务 PPT 交付工作台**。它继续保持本地优先的 Web + Bridge + Skill 架构，但现在 handoff 可以直接照着执行，并把 ChatGPT/OpenAI 生图作为正式 deck 小元素素材的默认闭环。
 
 这次重点放在普通用户能不能更容易上手、Agent 产出能不能更可验收：
 
-- 经营复盘、咨询方案继续作为默认路径；培训课件、学术答辩在网页预设菜单里前移；
-- stable pack 新增 `userLevel`、`qualityProfile`、`proofArtifacts`、`notFor`，说明适合谁、不适合谁、要交付什么；
-- Design Doctor 把 SVG 检查、浏览器视觉复查、`workflows/visual-review.md`、`quality-report.json` 和中文摘要组合成一个用户能理解的步骤；
-- Bridge / handoff kit 会把 `qualityProfile`、`expectedArtifacts`、`reviewCommands` 写进 `manifest.json` 和 `project-brief.json`；
-- 新增 `scripts/audit_quality_proofs.py`，发布前检查 stable pack 的公开证明。
+- 面向真实汇报的商务、金融、政务、培训和咨询 deck 默认采用 `formal-business` 门禁；
+- handoff 文件夹新增 `asset-plan.md`、`visual-element-kit.md`、`codex-task.md`、`AGENTS.md` 和 `quality-report.json`；
+- Codex 收到固定执行顺序：先读 handoff 文件，再运行或处理 `scripts/generate_visual_element_kit.py`，然后生产 PPTX/Web Deck，最后更新资产记录并跑审计；
+- ChatGPT/OpenAI 小元素生成有了本地闭环：`assets/generated/element-manifest.json`、`images/image_prompts.json` 和 `images/image_prompts.md`；
+- 没有 image key 也不阻塞，会写出 `Needs-Manual` prompts，用户可以复制到 ChatGPT 生成素材。
 
-### v2.5.0 白话更新栏
+### v3.0.0 白话更新栏
 
-- 首页不再右侧空着：现在会显示当前任务、下一步、质量状态和交付门禁。
-- 预设不再只是方向建议：stable pack 必须有公开合成资料、生成输出、截图、质量报告和适用边界。
-- Agent 收到的不只是一段 prompt，而是一份可验收合同。
-- Design Doctor 默认先报告和建议，只有用户明确要求时才自动修 SVG。
+- 网页不再让用户猜下一步。handoff 面板会显示当前状态和下一条该复制的命令。
+- Codex 不再只拿到一大段 prompt，而是拿到项目文件夹、小元素素材清单、质量清单和审计命令。
+- ChatGPT 生图主要用于分隔符、指标徽章、流程节点、连接线、图标点缀等小素材，不承载正文和关键数字。
+- 没有生图 key 时仍能继续，项目会保留 `Needs-Manual` prompt。
 
 ## 质量证明
 
@@ -432,7 +432,7 @@ npm run desktop
 | 本地配置 provider key | [Model and Provider Setup](./docs/model-provider-setup.md) |
 | 理解它为什么不只是“多装一个 Skill” | [产品定位反思](./docs/zh-CN/product-positioning.md) |
 | 查看下一步内容 / 模板方向 | [下一步路线 - 内容与模板预设](./docs/zh-CN/next-roadmap.md) |
-| 查看 v2.5.0 发布重点 | [发布说明 - v2.5.0](./docs/zh-CN/release-notes-v2.5.0.md) |
+| 查看 v3.0.0 发布重点 | [发布说明 - v3.0.0](./docs/zh-CN/release-notes-v3.0.0.md) |
 | 查看质量证明矩阵 | [v2.5 质量工作台](./docs/zh-CN/quality-workbench-v2.5.md) |
 | 浏览公开案例墙 | [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) |
 | 准备 Skill 市场分发 | [Skill 市场分发](./docs/zh-CN/skill-market-distribution.md) |
@@ -460,14 +460,14 @@ git diff --check
 
 当前推送前验收也覆盖了 Web 首页、公开案例墙、4 个公开案例 deck 的桌面和移动宽度。
 
-## v2.5.0 重点变化
+## v3.0.0 重点变化
 
-- Web 第一屏升级为质量工作台，显示任务预览、下一步和质量状态。
-- 四个当前 pack 升级为 `stable-pack`，带质量元数据和公开证明产物。
-- 新增 Design Doctor 入口，并把 `quality-report.json` 写进 handoff kit。
-- 新增 `npm run audit:quality` 的质量证明审计。
-- 新增 `npm run audit:market` 的 Skill 市场分发审计。
-- Bridge manifest 和 project brief 增加质量目标、预期产物和检查命令。
+- Web、Bridge、Skill 和本地审计都加入正式商务质量门禁。
+- 新增 Codex + ChatGPT 小元素生成闭环，支持脚本生成和 `Needs-Manual` 降级。
+- Web handoff 面板按顺序显示 Bridge 状态、本地项目路径、元素生成命令和 Agent 命令。
+- handoff kit 新增 `asset-plan.md`、`visual-element-kit.md`、`codex-task.md` 和 `AGENTS.md`。
+- 新增 `scripts/audit_formal_delivery.py`，用脱敏 fixture 覆盖重复卡片、无图片、PPTX 文本稀疏和碎片 logo。
+- Desktop 不作为 v3.0.0 主发布面，但已同步 worker 资源副本，避免后续打包拿到旧逻辑。
 
 上游同步与本地适配策略见 [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md)。
 

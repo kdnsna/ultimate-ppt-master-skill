@@ -110,3 +110,59 @@ test("web experience surfaces v2.6 onboarding, design scoring, and benchmark wal
   assert.match(appSource, /案例墙/);
   assert.match(appSource, /Skill 市场分发/);
 });
+
+test("web experience exposes the formal business wizard contract", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+
+  assert.match(appSource, /type WorkflowStepId = "brief" \| "sources" \| "bridge" \| "agent" \| "handoff" \| "review"/);
+  assert.match(appSource, /type StepStatus = "locked" \| "ready" \| "active" \| "complete" \| "blocked"/);
+  assert.match(appSource, /type QualityGateLevel = "quick" \| "formal-business" \| "showcase"/);
+  assert.match(appSource, /buildWorkflowSteps/);
+  assert.match(appSource, /GuidedWorkflowPanel/);
+  assert.match(appSource, /qualityGate/);
+  assert.match(appSource, /formal-business/);
+  assert.match(appSource, /workflowState/);
+  assert.match(appSource, /正式商务交付/);
+});
+
+test("web experience avoids misleading default progress and command states", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+  const cssSource = await readFile("apps/web/src/styles.css", "utf8");
+
+  assert.doesNotMatch(appSource, /meta: `\$\{sourceCount\} files · \$\{readiness\}%`/);
+  assert.doesNotMatch(appSource, /id: "handoff", label: t\.navHandoff, meta: t\.commandReady/);
+  assert.match(appSource, /sourceProgressLabel/);
+  assert.match(appSource, /handoffProgressLabel/);
+  assert.match(appSource, /statusLabel = hasRealSources/);
+  assert.match(appSource, /readinessLabel = hasRealSources/);
+  assert.match(appSource, /AuxiliaryResources/);
+  assert.match(appSource, /className="auxiliary-resources"/);
+  assert.match(appSource, /guided-current-step/);
+  assert.match(appSource, /guided-step-rail/);
+  assert.match(appSource, /previewLayouts = \["narrative", "comparison", "timeline", "metrics", "decision"\]/);
+  assert.match(appSource, /data-layout="\$\{previewLayouts\[index % previewLayouts\.length\]\}"/);
+  assert.match(cssSource, /\.app:not\(\[data-view="start"\]\) \.auxiliary-resources/);
+  assert.match(appSource, /noRealSourcesYet/);
+  assert.match(appSource, /handoffNotCreated/);
+});
+
+test("web experience writes a Codex-specific handoff with asset sourcing instructions", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+
+  assert.match(appSource, /buildCodexTask/);
+  assert.match(appSource, /buildCodexAgentGuide/);
+  assert.match(appSource, /buildAssetPlan/);
+  assert.match(appSource, /buildVisualElementKit/);
+  assert.match(appSource, /codex-task\.md/);
+  assert.match(appSource, /AGENTS\.md/);
+  assert.match(appSource, /asset-plan\.md/);
+  assert.match(appSource, /visual-element-kit\.md/);
+  assert.match(appSource, /chatgpt-generation-first/);
+  assert.match(appSource, /generate_visual_element_kit\.py/);
+  assert.match(appSource, /Needs-Manual/);
+  assert.match(appSource, /micro-assets|small reusable elements|小元素|元素素材/i);
+  assert.match(appSource, /ChatGPT/);
+  assert.match(appSource, /联网|web search|public asset search/i);
+  assert.match(appSource, /generated-assets|assets\/generated|生成素材/i);
+  assert.match(appSource, /quality-report\.json/);
+});

@@ -1,6 +1,6 @@
 # Agent Connect Bridge
 
-Agent Connect Bridge is the v2.3 local companion for the static Web Experience. It lets the GitHub Pages app talk to a local service on `127.0.0.1`, stage real source files, run local source converters, inspect provider readiness, and hand a project folder to Codex or another Agent.
+Agent Connect Bridge is the v3.0 local companion for the static Web Experience. It lets the GitHub Pages app talk to a local service on `127.0.0.1`, stage real source files, run local source converters, inspect provider readiness, and hand a formal-business project folder to Codex or another Agent.
 
 ## Quick Start
 
@@ -40,6 +40,19 @@ The folder includes:
 - `preview-web-deck.html` - browser-local rough preview.
 - `engine-plan.md` - PPTX / Web Deck / Fusion route split.
 - `quality-checklist.md` - checks before delivery.
+- `asset-plan.md` - public references, ChatGPT generated assets, source/license notes, and insertion targets.
+- `visual-element-kit.md` - ChatGPT-generation-first micro-asset checklist.
+- `codex-task.md` - Codex-specific production sequence.
+- `AGENTS.md` - local Codex rules for privacy, assets, and quality gates.
+- `quality-report.json` - pending Design Doctor / formal-business review status.
+
+Codex should read `AGENTS.md`, `codex-task.md`, `visual-element-kit.md`, `asset-plan.md`, `quality-checklist.md`, `manifest.json`, and `project-brief.json` first. The expected next local command is:
+
+```bash
+cd <repoRoot> && python3 scripts/generate_visual_element_kit.py <projectPath>
+```
+
+If no image backend or OpenAI key is configured, the script writes `Needs-Manual` prompts to `images/image_prompts.md`; paste them into ChatGPT and save outputs to the listed paths.
 
 ## Source Parsing
 
@@ -65,7 +78,7 @@ The web page never stores API keys. Bridge checks these local sources:
 
 It returns provider status only: configured or missing, model name, base URL, and key source label. It never returns secret values.
 
-Supported status checks in v2.3:
+Supported status checks:
 
 - OpenAI / OpenAI-compatible: `OPENAI_API_KEY` or `LLM_API_KEY`
 - Gemini: `GEMINI_API_KEY` or `GOOGLE_API_KEY`
@@ -106,7 +119,7 @@ npm run bridge -- --allow-launch
 When auto-launch is disabled, the web page still returns a ready-to-copy command such as:
 
 ```bash
-cd ~/UltimatePPTMaster/handoffs/my-deck-... && codex "Read agent-prompt.md and follow the Ultimate PPT Master Skill..."
+cd ~/UltimatePPTMaster/handoffs/my-deck-... && codex "Read AGENTS.md, codex-task.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first..."
 ```
 
 ## Troubleshooting

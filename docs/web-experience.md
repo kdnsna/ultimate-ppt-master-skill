@@ -22,7 +22,11 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - generates a browser-local `preview-web-deck.html` and live iframe preview;
 - generates copy-ready Agent instructions, `source.md`, `extracted-source.md`, `manifest.json`, and `project-brief.json`;
 - downloads a full `handoff-kit.zip` or sends the task to the local Bridge;
-- includes `source.md`, `extracted-source.md`, `attachments/`, `manifest.json`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, and `README.md` in the handoff kit;
+- includes `source.md`, `extracted-source.md`, `attachments/`, `manifest.json`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, `AGENTS.md`, `quality-report.json`, and `README.md` in the handoff kit;
+- writes a `formal-business` quality gate into the handoff so Codex gets acceptance criteria, artifact checks, and review commands;
+- creates a ChatGPT-generation-first visual element plan for section dividers, metric badges, process nodes, connectors, icon accents, subtle patterns, and callout stickers;
+- shows the exact `generate_visual_element_kit.py` command after Bridge creates a local handoff folder;
+- explains the `Needs-Manual` path when no image backend or OpenAI key is configured;
 - opens the sanitized Agentic Developer Stack 2026 Web Deck demo;
 - keeps Skill installation visible as a second core path.
 
@@ -36,6 +40,8 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - no analytics requirement for MVP.
 
 Brief assembly is handled in the browser. If users run `npm run bridge`, source files are sent only to `127.0.0.1` for local parsing and project staging.
+
+v3.0.0 makes the Handoff page an execution guide. Bridge offline means the user sees only the Bridge startup command and zip download. Bridge online means the primary action is sending the task to Bridge. After handoff creation, the page shows the local project path, the element-generation command, the Agent command, and the `images/image_prompts.md` fallback location.
 
 ## Local Development
 
@@ -74,8 +80,9 @@ Use these checks before promoting a release:
 | Copy `source.md` | Clipboard receives the generated source markdown. |
 | Download `source.md` | Browser downloads a Markdown brief with current form values and outline. |
 | Download `preview-web-deck.html` | Browser downloads a standalone HTML preview with the current brief and storyboard. |
-| Download `handoff-kit.zip` | Browser downloads a zip containing source files, manifest, attachments, prompt, preview, engine plan, checklist, and README. |
+| Download `handoff-kit.zip` | Browser downloads a zip containing source files, manifest, attachments, prompt, preview, engine plan, checklist, asset plan, visual element kit, Codex task, AGENTS guide, quality report, and README. |
 | Send to Bridge | Bridge writes a local handoff folder and returns suggested Agent commands. |
+| Handoff execution panel | After Bridge writes a folder, the page shows `python3 scripts/generate_visual_element_kit.py <projectPath>`, the Agent command, and the `Needs-Manual` prompt fallback. |
 | Install Skill via Bridge | `POST /skill/install` links or updates an allowlisted local Skill target without accepting arbitrary paths. |
 | Open Web Deck demo | `examples/agentic-developer-tools-2026/web-demo.html` opens from the static build. |
 | Skill setup link | Opens the README Skill section or `docs/agent-setup.md`. |

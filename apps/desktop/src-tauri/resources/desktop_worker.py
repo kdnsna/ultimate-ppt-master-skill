@@ -437,6 +437,12 @@ def build_next_actions(project_path: Path, log_path: Path, generated_files: list
             "path": str(project_path / "README.md"),
         },
         {
+            "key": "formal-audit",
+            "label": "正式商务审计",
+            "detail": "运行 audit_formal_delivery.py，检查质量门禁、版式变化、素材策略和 PPTX 可编辑文本。",
+            "path": str(project_path / "quality-report.json"),
+        },
+        {
             "key": "open-log",
             "label": "查看生成日志",
             "detail": "排查依赖、路径和导出问题。",
@@ -1059,7 +1065,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
       </div>"""
         )
     cover_cards = "\n".join(cover_points)
-    sections.append(f"""<section class="slide hero light" data-animate="hero">
+    sections.append(f"""<section class="slide hero light" data-layout="cover" data-animate="hero">
   {chrome(deck_title, 1, total)}
   <div class="frame" style="display:grid;grid-template-columns:1.28fr .82fr;gap:5vw;align-items:center;min-height:80vh">
     <div style="display:grid;gap:3vh;align-content:center">
@@ -1091,7 +1097,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
       </div>"""
                 for n, bullet in enumerate(bullets[:6])
             )
-            sections.append(f"""<section class="slide light">
+            sections.append(f"""<section class="slide light" data-layout="metric-grid">
   {chrome(deck_title, idx, total)}
   <div class="frame" style="padding-top:5vh">
     <div class="kicker" data-anim>{html.escape(str(slide['eyebrow']))}</div>
@@ -1105,7 +1111,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
             right = bullets[3:6] or bullets[:3]
             left_html = "<br>".join(left)
             right_html = "".join(f"<div class=\"rowline\" data-anim><div class=\"k\">{n + 1:02d}</div><div class=\"v\">{bullet}</div><div class=\"m\">Action</div></div>" for n, bullet in enumerate(right))
-            sections.append(f"""<section class="slide dark" data-animate="directional">
+            sections.append(f"""<section class="slide dark" data-layout="decision-table" data-animate="directional">
   {chrome(deck_title, idx, total)}
   <div class="frame grid-2-7-5" style="padding-top:6vh">
     <div>
@@ -1126,7 +1132,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
         </div>"""
                 for n, bullet in enumerate(bullets[:5])
             )
-            sections.append(f"""<section class="slide light" data-animate="pipeline">
+            sections.append(f"""<section class="slide light" data-layout="timeline" data-animate="pipeline">
   {chrome(deck_title, idx, total)}
   <div class="frame">
     <div class="kicker">Pipeline · 推进路径</div>
@@ -1140,7 +1146,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
 </section>""")
         else:
             body = " ".join(bullets[:3])
-            sections.append(f"""<section class="slide hero {'light' if idx % 2 else 'dark'}" data-animate="quote">
+            sections.append(f"""<section class="slide hero {'light' if idx % 2 else 'dark'}" data-layout="narrative-quote" data-animate="quote">
   {chrome(deck_title, idx, total)}
   <div class="frame" style="display:grid;gap:5vh;align-content:center;min-height:80vh">
     <div class="kicker" data-anim>{html.escape(str(slide['eyebrow']))}</div>
@@ -1290,6 +1296,365 @@ def write_narration_handoff(project_path: Path, outline: list[dict[str, Any]], p
     return [settings_path, readme_path]
 
 
+def formal_quality_gate() -> dict[str, Any]:
+    return {
+        "level": "formal-business",
+        "requiredInputs": [
+            "brand assets or explicit fallback strategy",
+            "traceable source evidence",
+            "ChatGPT-generation-first visual asset plan with prompts, filenames, and insertion targets",
+            "small reusable element kit plan for section dividers, metric badges, process nodes, connectors, and icons",
+            "public asset search plan for evidence/official references or explicit no-search rationale",
+            "image/chart plan or explicit no-image strategy",
+            "page rhythm and infographic strategy",
+        ],
+        "acceptanceCriteria": [
+            "do not build the whole deck from headings and repeated cards only",
+            "ChatGPT/OpenAI is treated as the primary visual asset engine for custom supporting visuals",
+            "small generated micro-assets are planned in visual-element-kit.md and reused across the deck",
+            "generated assets are stored under assets/generated and listed in asset-plan.md",
+            "public web asset searches are limited to evidence, official references, or brand boundaries and record source URLs, licensing notes, and insertion targets",
+            "PPTX keeps real editable text, shapes, charts, and notes",
+            "Web Deck has a complete visual system, layout variety, and desktop/mobile readability",
+            "logo must not degrade into text fragments",
+            "run formal delivery audit before delivery",
+        ],
+        "artifactChecks": [
+            "manifest.json contains formal-business qualityGate",
+            "HTML/PPTX expose enough layout types",
+            "real image/brand assets are used or no-image strategy is explicit",
+            "asset-plan.md records public searches, generated assets, citations, and insert targets",
+            "visual-element-kit.md records the reusable ChatGPT-generated micro-assets",
+            "PPTX contains editable text objects",
+            "no b/c-style logo text fragments",
+        ],
+        "reviewCommands": [
+            "python3 scripts/audit_formal_delivery.py <project_path>",
+        ],
+        "assetStrategy": {
+            "mode": "chatgpt-generation-first",
+            "brand": "Desktop draft uses a clean text fallback plus style palette; replace with approved brand assets for final delivery.",
+            "primaryEngine": "For production, Codex should use ChatGPT/OpenAI image generation as the default visual asset engine for custom scenes and reusable micro-assets.",
+            "microAssets": "Generate visual-element-kit.md assets before final assembly: section dividers, metric badges, process nodes, connectors, icon accents, textures, and callouts.",
+            "publicSearch": "Use public web sources mainly for evidence, official references, and brand boundaries; record source URL, license note, and insertion target.",
+            "generatedAssets": "Store ChatGPT/OpenAI outputs under assets/generated/ and record prompts in asset-plan.md.",
+            "images": "Explicit no-image strategy for this local draft: use editable shapes, charts, and information architecture unless source/approved or generated images are supplied.",
+        },
+    }
+
+
+def formal_quality_profile(mode: str) -> dict[str, Any]:
+    expected = [
+        "sources/source.md",
+        "manifest.json",
+        "project-brief.json",
+        "quality-report.json",
+    ]
+    expected.append("outputs/ultimate-ppt-master-preview.pptx" if mode == "pptx" else "outputs/index.html")
+    return {
+        "label": "正式商务交付质量",
+        "userLevel": "中文办公用户 / formal business users",
+        "acceptanceCriteria": [
+            "核心结论清楚，页面节奏有变化",
+            "证据和资料边界可追溯",
+            "正式交付前通过 formal-business audit",
+            "输出文件保留可编辑结构或明确 Web Deck 视觉策略",
+        ],
+        "expectedArtifacts": expected,
+        "reviewCommands": [
+            "python3 scripts/audit_formal_delivery.py <project_path>",
+        ],
+        "notFor": [
+            "只需要快速标题草稿的场景",
+            "需要直接发布真实品牌资产但尚未提供授权素材的场景",
+        ],
+    }
+
+
+def codex_task_text(
+    title: str,
+    output_mode: str,
+    quality_gate: dict[str, Any],
+    workflow_state: dict[str, str],
+    expected_artifacts: list[str],
+) -> str:
+    gate_inputs = "\n".join(f"- {item}" for item in quality_gate["requiredInputs"])
+    gate_criteria = "\n".join(f"- {item}" for item in quality_gate["acceptanceCriteria"])
+    gate_checks = "\n".join(f"- {item}" for item in quality_gate["artifactChecks"])
+    artifacts = "\n".join(f"- {item}" for item in expected_artifacts)
+    commands = "\n".join(f"- {item}" for item in quality_gate["reviewCommands"])
+    return f"""# Codex Task
+
+Project: {title}
+Output mode: {output_mode}
+Current workflow step: {workflow_state["currentStep"]}
+Blocked reason: {workflow_state["blockedReason"] or "none"}
+
+## Read First
+1. AGENTS.md
+2. manifest.json
+3. project-brief.json
+4. quality-checklist.md if present
+5. asset-plan.md
+6. visual-element-kit.md
+7. sources/source.md
+
+## Formal Business Gate
+Required inputs:
+{gate_inputs}
+
+Acceptance criteria:
+{gate_criteria}
+
+Artifact checks:
+{gate_checks}
+
+## Asset Workflow
+1. Inspect sources/source.md and generated previews before searching.
+2. Treat ChatGPT/OpenAI as the primary visual asset engine: generate custom slide visuals and small reusable elements before final assembly.
+3. From the Ultimate PPT Master repository root, run: `python3 scripts/generate_visual_element_kit.py <project_path>`.
+4. If no IMAGE_BACKEND/OpenAI key is configured, do not block: use the Needs-Manual prompts in images/image_prompts.md with ChatGPT and save outputs to the listed outputPath.
+5. Generate the visual-element-kit.md micro-assets: section divider, metric badge, process node, connector, icon accent, subtle texture, and callout sticker.
+6. Save generated assets under assets/generated/ and insert them as real image objects, not full-slide screenshots.
+7. Use public web search mainly for factual evidence, official references, brand boundaries, or source citations.
+8. Record every generated prompt and every public source/license note in asset-plan.md.
+9. Keep PPTX text, charts, tables, and labels editable wherever possible.
+
+## Production Steps
+1. Lock brand/fallback strategy, evidence boundaries, page rhythm, infographic strategy, asset-plan.md, and visual-element-kit.md.
+2. Produce the requested {output_mode.upper()} delivery using the Ultimate PPT Master Skill workflow.
+3. Vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
+4. Do not let logos degrade into b/c-style text fragments.
+5. Run review commands and update quality-report.json before final response.
+
+## Expected Artifacts
+{artifacts}
+
+## Review Commands
+{commands}
+
+Final response: list generated files, ChatGPT micro-assets inserted, public references used, checks run, and remaining risks.
+"""
+
+
+def codex_agent_guide_text(quality_gate: dict[str, Any]) -> str:
+    return f"""# AGENTS.md
+
+## Codex Local Rules
+- Work in this desktop project and the Ultimate PPT Master repository scripts only.
+- Read codex-task.md before editing or generating deliverables.
+- Keep private source material, customer data, internal screenshots, and API keys local unless the user explicitly approves upload.
+- ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py first when the deck needs visual richness.
+- If no image backend/key is configured, use images/image_prompts.md Needs-Manual prompts with ChatGPT and save outputs under assets/generated/.
+- Public web search is allowed mainly for evidence, official references, and brand boundaries; record sources, usage notes, and insertion targets in asset-plan.md.
+- Save generated outputs under assets/generated/ and record prompts in asset-plan.md.
+- For level {quality_gate["level"]}, do not finish with repeated title-card slides, flat PPTX screenshots, broken logo fragments, or missing quality-report.json.
+- Run the formal delivery audit before final response whenever HTML or PPTX artifacts exist.
+"""
+
+
+def asset_plan_text(title: str, source_name: str, quality_gate: dict[str, Any]) -> str:
+    gate_inputs = "\n".join(f"- {item}" for item in quality_gate["requiredInputs"])
+    return f"""# Asset Plan
+
+Project: {title}
+Source: {source_name}
+
+## Required Inputs
+{gate_inputs}
+
+## ChatGPT Generated Assets / ChatGPT 生成素材
+- [ ] Treat ChatGPT/OpenAI as the primary visual asset engine: generate custom slide visuals and small reusable elements first, then use public search for evidence or official references.
+- [ ] Generate the visual-element-kit.md micro-assets: section dividers, metric badges, process nodes, connectors, icon accents, subtle textures, and callout stickers.
+- [ ] Store generated bitmap assets under assets/generated/ and generated SVG/icons under assets/generated/svg/.
+- [ ] Record prompt, filename, target slide, and any manual edits before insertion.
+
+## Public Asset Search / 公开素材检索
+- [ ] Inspect sources/source.md and existing outputs before searching.
+- [ ] Use public web search mainly for factual evidence, official references, brand boundaries, or source citations.
+- [ ] Record source URL, publisher, license/usage note, and intended slide or Web Deck section.
+- [ ] Do not upload private source files, customer data, or internal screenshots unless the user explicitly approves it.
+
+## Insertion Targets
+| Slide / Section | Need | Source or prompt | File path | Status |
+| --- | --- | --- | --- | --- |
+| Cover | brand-safe hero visual or approved logo treatment | pending | pending | pending |
+| Evidence page | image/screenshot/chart supporting a claim | pending | pending | pending |
+| Process page | editable diagram or generated scene | pending | pending | pending |
+
+## Delivery Rule
+Every inserted image, icon, logo, screenshot, or generated visual must be listed here before final delivery. If no imagery is used, keep the explicit no-image strategy in manifest.json / project-brief.json.
+"""
+
+
+def visual_element_kit_text(title: str, quality_gate: dict[str, Any]) -> str:
+    mode = quality_gate.get("assetStrategy", {}).get("mode", "chatgpt-generation-first")
+    return f"""# Visual Element Kit
+
+Project: {title}
+Mode: {mode}
+
+## Purpose
+Use ChatGPT/OpenAI as the primary visual asset engine. Generate small reusable elements before final slide production so the deck has a coherent visual language without relying on random stock imagery.
+
+## Micro-assets / small reusable elements
+| Asset type | Quantity target | Use | Output path | Status |
+| --- | ---: | --- | --- | --- |
+| section divider | 3 | chapter breaks and transition slides | assets/generated/dividers/ | pending |
+| metric badge | 6 | KPI callouts, rights/benefits numbers, scorecards | assets/generated/badges/ | pending |
+| process node | 5 | flow pages, timelines, service journey diagrams | assets/generated/process/ | pending |
+| connector | 6 | arrows, dotted links, handoff paths, causal chains | assets/generated/connectors/ | pending |
+| icon accent | 8 | small semantic markers for evidence, risk, action, user, channel | assets/generated/icons/ | pending |
+| subtle pattern or texture | 2 | cover, section backgrounds, low-contrast visual depth | assets/generated/patterns/ | pending |
+| callout sticker | 4 | reminders, caveats, delivery notes, decision highlights | assets/generated/callouts/ | pending |
+
+## Prompt Pattern
+- "Create a clean business presentation metric badge for [theme], flat vector-like style, transparent background, no text, colors aligned to [palette]."
+- "Create a small process node icon for [step], formal government/finance presentation style, isolated object, no text, editable-friendly shape language."
+- "Create a subtle abstract background texture for [theme], low contrast, no letters, no logos, widescreen presentation use."
+
+## Insertion Rules
+- Use micro-assets to enrich the visual system; keep body copy, numbers, and chart labels editable.
+- Insert generated assets into PPTX/Web Deck as real images or graphic objects, not full-slide screenshots.
+- Use public search for evidence, official references, and brand boundaries; use ChatGPT-generated micro-assets for the visual language.
+- Register every generated file in asset-plan.md with prompt, filename, target slide, and insertion status.
+"""
+
+
+def visual_element_prompt_fallback_text(title: str) -> str:
+    return f"""# ChatGPT Visual Element Prompts
+
+Project: {title}
+Status: Needs-Manual
+
+Run this from the Ultimate PPT Master repository root when Codex takes over:
+
+```bash
+python3 scripts/generate_visual_element_kit.py <project_path>
+```
+
+If no IMAGE_BACKEND/OpenAI key is configured, paste the prompts implied by visual-element-kit.md into ChatGPT and save outputs under assets/generated/ before final assembly.
+
+Required element types: section-divider, metric-badge, process-node, connector, icon-accent, subtle-pattern, callout-sticker.
+Do not embed body text, numbers, logos, or long labels inside generated images; keep those editable in PPTX/Web Deck.
+"""
+
+
+def write_formal_delivery_files(
+    project_path: Path,
+    job: dict[str, Any],
+    source_name: str,
+    outline: list[dict[str, Any]],
+    generated_files: list[str],
+    preview_html: str,
+    now: str,
+) -> list[Path]:
+    quality_gate = formal_quality_gate()
+    quality_profile = formal_quality_profile(job["outputMode"])
+    workflow_state = {
+        "currentStep": "review",
+        "blockedReason": "",
+    }
+    title = outline[0]["title"] if outline else source_name
+    manifest_path = project_path / "manifest.json"
+    brief_path = project_path / "project-brief.json"
+    report_path = project_path / "quality-report.json"
+    codex_task_path = project_path / "codex-task.md"
+    codex_guide_path = project_path / "AGENTS.md"
+    asset_plan_path = project_path / "asset-plan.md"
+    visual_element_kit_path = project_path / "visual-element-kit.md"
+    image_prompt_fallback_path = project_path / "images" / "image_prompts.md"
+    formal_file_paths = [
+        manifest_path,
+        brief_path,
+        report_path,
+        codex_task_path,
+        codex_guide_path,
+        asset_plan_path,
+        visual_element_kit_path,
+        image_prompt_fallback_path,
+    ]
+    brief = {
+        "version": "desktop-worker-formal-v1",
+        "title": title,
+        "sourceName": source_name,
+        "outputMode": job["outputMode"],
+        "stylePreset": job["stylePreset"],
+        "qualityProfile": quality_profile,
+        "qualityGate": quality_gate,
+        "workflowState": workflow_state,
+        "storyboard": outline,
+        "sourceStrategy": {
+            "source": "sources/source.md",
+            "privacy": "local-first; source files stay in the project folder",
+            "evidenceBoundary": "desktop draft reflects available local text; Agent refinement should verify all numbers and claims against source files",
+            "assetPlan": "asset-plan.md records public references, ChatGPT generated assets, prompts, source/license notes, and insertion targets",
+            "visualElementKit": "visual-element-kit.md defines the ChatGPT-generation-first micro-assets to reuse across pages",
+            "manualPromptFallback": "images/image_prompts.md records the Needs-Manual fallback until Codex runs generate_visual_element_kit.py",
+        },
+    }
+    manifest = {
+        "version": "desktop-worker-formal-v1",
+        "createdAt": now,
+        "app": "Ultimate PPT Master Desktop Worker",
+        "projectPath": str(project_path),
+        "sourceName": source_name,
+        "outputMode": job["outputMode"],
+        "stylePreset": job["stylePreset"],
+        "generatedFiles": [*generated_files, *(str(path) for path in formal_file_paths)],
+        "qualityProfile": quality_profile,
+        "qualityGate": quality_gate,
+        "workflowState": workflow_state,
+        "expectedArtifacts": quality_profile["expectedArtifacts"],
+        "reviewCommands": quality_gate["reviewCommands"],
+        "artifactChecks": quality_gate["artifactChecks"],
+        "preview": {
+            "hasHtml": bool(preview_html),
+            "layoutStrategy": "varied data-layout pages for Web Deck; varied editable slide structures for PPTX",
+        },
+    }
+    report = {
+        "version": "desktop-worker-formal-v1",
+        "status": "pending",
+        "createdAt": now,
+        "qualityProfile": quality_profile,
+        "qualityGate": quality_gate,
+        "workflowState": workflow_state,
+        "reviewCommands": quality_gate["reviewCommands"],
+        "summary": {
+            "zh": "桌面生成器已写入正式商务门禁。请运行 reviewCommands 中的正式商务审计；Design Doctor 默认只报告问题。",
+            "en": "Desktop worker wrote the formal-business gate. Run reviewCommands; Design Doctor remains report-only by default.",
+        },
+        "checks": [
+            {
+                "id": "formal-business-gate",
+                "status": "pending",
+                "summary": "等待 audit_formal_delivery.py 验证。",
+            }
+        ],
+    }
+    files = [
+        (manifest_path, manifest),
+        (brief_path, brief),
+        (report_path, report),
+    ]
+    written: list[Path] = []
+    for path, payload in files:
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        written.append(path)
+    codex_task_path.write_text(
+        codex_task_text(title, job["outputMode"], quality_gate, workflow_state, quality_profile["expectedArtifacts"]),
+        encoding="utf-8",
+    )
+    codex_guide_path.write_text(codex_agent_guide_text(quality_gate), encoding="utf-8")
+    asset_plan_path.write_text(asset_plan_text(title, source_name, quality_gate), encoding="utf-8")
+    visual_element_kit_path.write_text(visual_element_kit_text(title, quality_gate), encoding="utf-8")
+    image_prompt_fallback_path.parent.mkdir(parents=True, exist_ok=True)
+    image_prompt_fallback_path.write_text(visual_element_prompt_fallback_text(title), encoding="utf-8")
+    written.extend([codex_task_path, codex_guide_path, asset_plan_path, visual_element_kit_path, image_prompt_fallback_path])
+    return written
+
+
 def write_runbook(project_path: Path, job: dict[str, Any], source_name: str) -> Path:
     runbook = project_path / "README.md"
     provider_config = job["providerConfig"]
@@ -1312,7 +1677,18 @@ def write_runbook(project_path: Path, job: dict[str, Any], source_name: str) -> 
             f"{narration_line}\n"
             "This desktop MVP created immediate preview artifacts. For production-quality decks, "
             "open this project with an agent and follow the root `SKILL.md` workflow using the "
-            "`sources/source.md` file as the source material.\n"
+            "`sources/source.md` file as the source material.\n\n"
+            "## Formal business gate\n\n"
+            "This project writes `manifest.json`, `project-brief.json`, and `quality-report.json` "
+            "with `qualityGate.level = formal-business`. It also writes `codex-task.md`, "
+            "`AGENTS.md`, `asset-plan.md`, and `visual-element-kit.md` so Codex can use "
+            "ChatGPT-generation-first visual assets, run `scripts/generate_visual_element_kit.py`, "
+            "fall back to Needs-Manual prompts when no image key is configured, insert small "
+            "reusable elements, and record prompts/sources before delivery. "
+            "Validate before delivery:\n\n"
+            "```bash\n"
+            "python3 scripts/audit_formal_delivery.py <project_path>\n"
+            "```\n"
         ),
         encoding="utf-8",
     )
@@ -1386,6 +1762,8 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     )
 
     now = utc_now()
+    formal_files = write_formal_delivery_files(project_path, valid, source_name, outline, generated_files, preview_html, now)
+    generated_files.extend(str(path) for path in formal_files)
     recommendations = [recommend_settings(valid["source"])]
     checks = build_project_checks(env, valid, source_name)
     next_actions = build_next_actions(project_path, log_path, generated_files, valid["outputMode"])
