@@ -1,9 +1,9 @@
 # Ultimate PPT Master - Hybrid-Editable AI Presentation Workbench
 
-> Local-first presentation production for Chinese office work: turn source material into editable PPTX decks or magazine-style Web Decks, with v4.0 page recipes, no-text generated visual layers, and delivery audits that protect editability.
+> Local-first presentation production for Chinese office work: turn source material into editable PPTX decks or magazine-style Web Decks, with a v4.1 simplified Web console, v4.0 page recipes, no-text generated visual layers, and delivery audits that protect editability.
 
 <p align="center">
-  <strong>v4.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/guides/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v4.1.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/guides/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -15,13 +15,14 @@
   ·
   <a href="./docs/quality/hybrid-editable-visual-workflow-v4.0.md"><strong>v4.0 Workflow</strong></a>
   ·
-  <a href="./docs/release/release-notes-v4.0.0.md"><strong>v4.0.0 Notes</strong></a>
+  <a href="./docs/release/release-notes-v4.1.0.md"><strong>v4.1.0 Notes</strong></a>
   ·
   <a href="./docs/strategy/skill-market-distribution.md"><strong>Skill Market</strong></a>
 </p>
 
 <p align="center">
-  <img alt="Version 4.0.0" src="https://img.shields.io/badge/Version-4.0.0-172033?style=for-the-badge">
+  <img alt="Version 4.1.0" src="https://img.shields.io/badge/Version-4.1.0-172033?style=for-the-badge">
+  <img alt="Simplified console" src="https://img.shields.io/badge/4.1-Simplified%20Console-0F766E?style=for-the-badge">
   <img alt="Hybrid editable" src="https://img.shields.io/badge/4.0-Hybrid%20Editable-2563EB?style=for-the-badge">
   <img alt="Visual recipes" src="https://img.shields.io/badge/Page-Recipes-7C3AED?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
@@ -39,13 +40,26 @@ npm run doctor
 npm run bridge
 ```
 
-Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/). Use **No Bridge** for public demos and the benchmark wall; use **Bridge online** when you want local source parsing and a handoff folder for Codex or another Agent.
+Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/). v4.1 shows one primary next action at a time; use **No Bridge** for public demos and the benchmark wall, or connect locally when you want source parsing and a project folder for Codex or another AI helper.
 
 | Need | Best route | Output |
 |---|---|---|
 | Formal report, consulting deck, training deck, editable business material | Editable PPTX | PowerPoint deck with editable text, shapes, charts, tables, notes, and quality checks. |
 | Talk, showcase, demo day, editorial presentation | Web Deck | Single-file browser deck with stronger visual rhythm and shareable HTML. |
 | Both formal handoff and browser preview | Dual delivery | Separate PPTX and Web projects with shared source and aligned structure. |
+
+## What v4.1 Fixes
+
+v4.1 keeps the v4.0 generation contract, but makes the Web console easier to operate.
+
+| Problem | v4.1 answer |
+|---|---|
+| Five navigation tabs plus a workflow wizard compete for attention | One four-step console: prepare, add sources, connect locally, deliver. |
+| The screen repeats copy/send/launch/download buttons | One state-driven primary action plus a small "more actions" menu. |
+| Advanced setup, proof walls, and technical files crowd the first screen | Settings, proofs, glossary, and generated files are grouped behind drawers. |
+| Eleven preview tabs feel like implementation detail | Preview is grouped into user preview, AI-helper files, and quality report. |
+
+Release: [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md).
 
 ## What v4.0 Fixes
 
@@ -91,6 +105,7 @@ The [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmar
 | Stable proof matrix | [Quality Workbench v2.5](./docs/quality/quality-workbench-v2.5.md) |
 | Formal handoff release | [Release Notes - v3.0.0](./docs/release/release-notes-v3.0.0.md) |
 | Hybrid-editable release | [Release Notes - v4.0.0](./docs/release/release-notes-v4.0.0.md) |
+| Simplified Web console | [Release Notes - v4.1.0](./docs/release/release-notes-v4.1.0.md) |
 | Skill marketplace readiness | [Skill Market Distribution](./docs/strategy/skill-market-distribution.md) |
 
 ## Use As Agent Skill
@@ -118,6 +133,7 @@ Guide: [Agent Setup](./docs/guides/agent-setup.md). Local connector: [Agent Conn
 | Install and invoke the Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | Choose PPTX vs Web Deck vs Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
 | Configure provider keys locally | [Model and Provider Setup](./docs/guides/model-provider-setup.md) |
+| Understand the simplified Web console | [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md) |
 | Understand the v4.0 visual contract | [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) |
 | Review release maintenance | [Release and Maintenance](./docs/release/release-maintenance.md) |
 | Debug setup or generation issues | [Troubleshooting](./docs/guides/troubleshooting.md) |
@@ -128,6 +144,7 @@ Full map: [docs/README.md](./docs/README.md). Chinese map: [docs/zh-CN/README.md
 
 ```bash
 npm run audit:docs
+npm run audit:web-console
 npm run audit:presets
 npm run audit:quality
 npm run audit:market

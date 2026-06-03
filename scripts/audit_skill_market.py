@@ -122,7 +122,7 @@ def audit_marketplace_listing(errors: list[str]) -> None:
         require(bool(case.get("bestFor")), f"marketplace listing proof case missing bestFor: {case.get('id')}", errors)
 
     gates = listing.get("acceptanceGates", [])
-    for command in ("npm run audit:docs", "npm run audit:presets", "npm run audit:quality", "npm run audit:market", "npm run test:node", "npm run test:worker", "npm run build:web"):
+    for command in ("npm run audit:docs", "npm run audit:web-console", "npm run audit:presets", "npm run audit:quality", "npm run audit:market", "npm run test:node", "npm run test:worker", "npm run build:web"):
         require(command in gates, f"marketplace listing acceptance gate missing: {command}", errors)
 
 
@@ -149,7 +149,7 @@ def audit_readme_surfaces(errors: list[str]) -> None:
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
         "Skill Market Distribution",
         "./docs/strategy/skill-market-distribution.md",
-        "./docs/release/release-notes-v4.0.0.md",
+        "./docs/release/release-notes-v4.1.0.md",
     ):
         require(needle in readme, f"README.md missing marketplace surface: {needle}", errors)
 
@@ -159,7 +159,7 @@ def audit_readme_surfaces(errors: list[str]) -> None:
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
         "Skill 市场分发",
         "./docs/zh-CN/strategy/skill-market-distribution.md",
-        "./docs/zh-CN/release/release-notes-v4.0.0.md",
+        "./docs/zh-CN/release/release-notes-v4.1.0.md",
     ):
         require(needle in readme_zh, f"README.zh-CN.md missing marketplace surface: {needle}", errors)
 

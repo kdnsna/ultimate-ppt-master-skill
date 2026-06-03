@@ -1,9 +1,9 @@
 # Ultimate PPT Master - 混合可编辑 AI PPT 工作台
 
-> 面向中文办公场景的本地优先演示生产工具：把资料整理成可编辑 PPTX 或杂志风 Web Deck，并用 v4.0 页面配方、无文字生成式视觉层和交付审计守住可编辑性。
+> 面向中文办公场景的本地优先演示生产工具：把资料整理成可编辑 PPTX 或杂志风 Web Deck，并用 v4.1 精简网页控制台、v4.0 页面配方、无文字生成式视觉层和交付审计守住可编辑性。
 
 <p align="center">
-  <strong>v4.0.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/guides/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v4.1.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/guides/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -15,13 +15,14 @@
   ·
   <a href="./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md"><strong>v4.0 工作流</strong></a>
   ·
-  <a href="./docs/zh-CN/release/release-notes-v4.0.0.md"><strong>v4.0.0 说明</strong></a>
+  <a href="./docs/zh-CN/release/release-notes-v4.1.0.md"><strong>v4.1.0 说明</strong></a>
   ·
   <a href="./docs/zh-CN/strategy/skill-market-distribution.md"><strong>Skill 市场</strong></a>
 </p>
 
 <p align="center">
-  <img alt="Version 4.0.0" src="https://img.shields.io/badge/Version-4.0.0-172033?style=for-the-badge">
+  <img alt="Version 4.1.0" src="https://img.shields.io/badge/Version-4.1.0-172033?style=for-the-badge">
+  <img alt="Simplified console" src="https://img.shields.io/badge/4.1-Simplified%20Console-0F766E?style=for-the-badge">
   <img alt="Hybrid editable" src="https://img.shields.io/badge/4.0-Hybrid%20Editable-2563EB?style=for-the-badge">
   <img alt="Visual recipes" src="https://img.shields.io/badge/Page-Recipes-7C3AED?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
@@ -39,13 +40,26 @@ npm run doctor
 npm run bridge
 ```
 
-然后打开 [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/)。没有 Bridge 时先看公开 demo 和案例墙；Bridge 在线时，可以本地解析资料并生成交给 Codex 或其他 Agent 的 handoff 文件夹。
+然后打开 [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/)。v4.1 每次只显示一个主要下一步；没有 Bridge 时先看公开 demo 和案例墙，建立本机连接后，可以本地解析资料并生成交给 Codex 或其他 AI 助手的项目文件夹。
 
 | 需求 | 推荐路线 | 产出 |
 |---|---|---|
 | 正式汇报、咨询方案、培训课件、需要别人继续改的材料 | 可编辑 PPTX | 文字、形状、图表、表格、备注和质量检查都保留的 PowerPoint。 |
 | 演讲、展示、发布会、demo day、杂志化表达 | Web Deck | 单文件浏览器演示，视觉节奏更强，适合快速分享预览。 |
 | 同时要正式转发和现场演示 | 双版本交付 | PPTX 与 Web 项目分开生成，但共享资料和结构口径。 |
+
+## v4.1 解决什么
+
+v4.1 保留 v4.0 的生成质量契约，但把网页端控制台改得更像工具。
+
+| 问题 | v4.1 答法 |
+|---|---|
+| 五个导航页和六步向导同时出现 | 改成四步控制台：准备任务、添加资料、连接本机、生成交付。 |
+| 复制、发送、启动、下载按钮反复出现 | 改成一个状态驱动主按钮，加一个“更多操作”菜单。 |
+| 高级设置、证明材料、术语表挤在首屏 | 设置、案例、术语和生成文件默认折叠。 |
+| 11 个预览 tab 像工程文件清单 | 改成用户预览、AI 助手文件、质量报告三组。 |
+
+发布说明：[v4.1 精简网页控制台](./docs/zh-CN/release/release-notes-v4.1.0.md)。
 
 ## v4.0 解决什么
 
@@ -91,6 +105,7 @@ v4.0 关键产物：
 | 稳定证明矩阵 | [v2.5 质量工作台](./docs/zh-CN/quality/quality-workbench-v2.5.md) |
 | 正式 handoff 发布 | [发布说明 - v3.0.0](./docs/zh-CN/release/release-notes-v3.0.0.md) |
 | 混合可编辑发布 | [发布说明 - v4.0.0](./docs/zh-CN/release/release-notes-v4.0.0.md) |
+| 精简网页控制台 | [发布说明 - v4.1.0](./docs/zh-CN/release/release-notes-v4.1.0.md) |
 | Skill 市场准备 | [Skill 市场分发](./docs/zh-CN/strategy/skill-market-distribution.md) |
 
 ## 作为 Agent Skill 使用
@@ -118,6 +133,7 @@ bash -lc 'set -e; dir="$HOME/.codex/skills/ultimate-ppt-master"; if [ -d "$dir/.
 | 安装和调用 Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | 选择 PPTX / Web Deck / Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
 | 本地配置 provider key | [Model and Provider Setup](./docs/guides/model-provider-setup.md) |
+| 理解精简网页控制台 | [v4.1 精简网页控制台](./docs/zh-CN/release/release-notes-v4.1.0.md) |
 | 理解 v4.0 视觉契约 | [v4.0 混合可编辑视觉工作流](./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md) |
 | 查看发布维护 | [Release and Maintenance](./docs/release/release-maintenance.md) |
 | 排查安装或生成问题 | [Troubleshooting](./docs/guides/troubleshooting.md) |
@@ -128,6 +144,7 @@ bash -lc 'set -e; dir="$HOME/.codex/skills/ultimate-ppt-master"; if [ -d "$dir/.
 
 ```bash
 npm run audit:docs
+npm run audit:web-console
 npm run audit:presets
 npm run audit:quality
 npm run audit:market

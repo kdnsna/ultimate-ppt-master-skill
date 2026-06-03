@@ -56,11 +56,19 @@ test("web experience gives first-time users a Hermes-aware first step", async ()
   assert.match(appSource, /useHermes/);
 });
 
-test("web experience uses menu pages and generic agent setup actions", async () => {
+test("web experience uses the v4.1 console and generic agent setup actions", async () => {
   const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+  const flowSource = await readFile("apps/web/src/consoleFlow.ts", "utf8");
 
   assert.match(appSource, /type WorkspaceView/);
-  assert.match(appSource, /WorkspaceNav/);
+  assert.match(appSource, /ConsoleStepRail/);
+  assert.match(appSource, /PrimaryActionBar/);
+  assert.match(appSource, /QuickStartConsole/);
+  assert.match(appSource, /SettingsDrawer/);
+  assert.match(appSource, /GroupedPreviewTabs/);
+  assert.match(flowSource, /type ConsoleStepId = "start" \| "sources" \| "configuration" \| "handoff"/);
+  assert.match(flowSource, /getPrimaryActionId/);
+  assert.doesNotMatch(appSource, /function WorkspaceNav/);
   assert.match(appSource, /ConfigurationPage/);
   assert.match(appSource, /autoSelectAgent/);
   assert.match(appSource, /testAllProviders/);

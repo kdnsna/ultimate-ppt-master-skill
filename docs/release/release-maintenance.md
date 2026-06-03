@@ -9,6 +9,7 @@ npm run doctor
 npm --prefix apps/web ci
 npm run build:web
 npm run audit:docs
+npm run audit:web-console
 npm run audit:presets
 npm run audit:quality
 npm run audit:market
@@ -53,6 +54,7 @@ It should cover:
 - desktop frontend build;
 - dependency audit;
 - documentation link and version audit;
+- Web Experience console simplicity audit;
 - preset starter-pack audit;
 - stable pack quality proof audit;
 - skill marketplace metadata, public proof wall, and listing asset audit;
@@ -61,7 +63,7 @@ It should cover:
 - whitespace checks.
 
 CI should run on the current GitHub Actions JavaScript runtime generation. For
-v4.0.0 that means Node 24 in the workflows and current official action majors
+v4.1.0 that means Node 24 in the workflows and current official action majors
 for checkout, Node, and Python setup.
 
 The Pages workflow lives at:
@@ -139,9 +141,10 @@ When syncing upstream:
 
 ## Version Notes
 
-v4.0.0 positions this repository as:
+v4.1.0 positions this repository as:
 
 - a hybrid-editable presentation workbench for Chinese office users who need formal PPTX and high-impact Web Deck outputs;
+- a four-step Web Experience console with one primary next action and advanced controls behind drawers;
 - a page-recipe workflow that defines slide roles before page generation begins;
 - a generated-visual-layer workflow that improves visual quality without hiding body-slide text, numbers, tables, charts, logos, or QR codes inside raster images;
 - a web-first static experience for public discovery, source intake, current task preview, next-step guidance, Design Doctor, handoff-kit export, and demo viewing;

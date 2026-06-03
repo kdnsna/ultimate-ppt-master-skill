@@ -52,6 +52,9 @@ jobs:
       - name: Audit documentation links
         run: npm run audit:docs
 
+      - name: Audit Web Experience console
+        run: npm run audit:web-console
+
       - name: Audit preset starter packs
         run: npm run audit:presets
 

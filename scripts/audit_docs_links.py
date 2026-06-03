@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit repository documentation links and v4.0 release markers."""
+"""Audit repository documentation links and current release markers."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "4.0.0"
+VERSION = "4.1.0"
 
 MOVED_DOCS = {
     "docs/web-experience.md": "docs/guides/web-experience.md",
@@ -78,20 +78,22 @@ def audit_version_markers(errors: list[str]) -> None:
     hero = read(ROOT / "assets/readme/hero.svg")
     listing = load_json("agents/marketplace-listing.json")
 
-    require(package.get("version") == VERSION, "package.json version is not v4.0.0", errors)
-    require(web_package.get("version") == VERSION, "apps/web/package.json version is not v4.0.0", errors)
-    require(web_lock.get("version") == VERSION, "apps/web/package-lock.json root version is not v4.0.0", errors)
-    require(web_lock.get("packages", {}).get("", {}).get("version") == VERSION, "apps/web package-lock package version is not v4.0.0", errors)
-    require(listing.get("version") == VERSION, "agents/marketplace-listing.json version is not v4.0.0", errors)
-    require(f'appVersion = "{VERSION}"' in app, "apps/web/src/App.tsx appVersion is not v4.0.0", errors)
+    require(package.get("version") == VERSION, f"package.json version is not v{VERSION}", errors)
+    require(web_package.get("version") == VERSION, f"apps/web/package.json version is not v{VERSION}", errors)
+    require(web_lock.get("version") == VERSION, f"apps/web/package-lock.json root version is not v{VERSION}", errors)
+    require(web_lock.get("packages", {}).get("", {}).get("version") == VERSION, f"apps/web package-lock package version is not v{VERSION}", errors)
+    require(listing.get("version") == VERSION, f"agents/marketplace-listing.json version is not v{VERSION}", errors)
+    require(f'appVersion = "{VERSION}"' in app, f"apps/web/src/App.tsx appVersion is not v{VERSION}", errors)
 
     for label, text in (("README.md", readme), ("README.zh-CN.md", readme_zh), ("assets/readme/hero.svg", hero)):
-        require("v4.0.0" in text or "4.0.0" in text, f"{label} missing v4.0.0 marker", errors)
+        require(f"v{VERSION}" in text or VERSION in text, f"{label} missing v{VERSION} marker", errors)
 
-    require((ROOT / "docs/release/release-notes-v4.0.0.md").is_file(), "missing English v4 release notes", errors)
-    require((ROOT / "docs/zh-CN/release/release-notes-v4.0.0.md").is_file(), "missing Chinese v4 release notes", errors)
+    require((ROOT / f"docs/release/release-notes-v{VERSION}.md").is_file(), "missing English current release notes", errors)
+    require((ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md").is_file(), "missing Chinese current release notes", errors)
     require("Hybrid-Editable Visual Workflow v4.0" in readme, "README missing v4 hybrid workflow entry", errors)
     require("v4.0 混合可编辑视觉工作流" in readme_zh, "Chinese README missing v4 hybrid workflow entry", errors)
+    require("Simplified Web Console v4.1" in readme, "README missing v4.1 console entry", errors)
+    require("v4.1 精简网页控制台" in readme_zh, "Chinese README missing v4.1 console entry", errors)
 
 
 def audit_moved_stubs(errors: list[str]) -> None:
@@ -169,7 +171,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/guides/agent-connect-bridge.md",
         "./docs/guides/agent-setup.md",
         "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
-        "./docs/release/release-notes-v4.0.0.md",
+        "./docs/release/release-notes-v4.1.0.md",
         "./docs/strategy/skill-market-distribution.md",
     ]
     for link in required:
@@ -178,7 +180,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
     required_zh = [
         "./docs/zh-CN/guides/agent-connect-bridge.md",
         "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
-        "./docs/zh-CN/release/release-notes-v4.0.0.md",
+        "./docs/zh-CN/release/release-notes-v4.1.0.md",
         "./docs/zh-CN/strategy/skill-market-distribution.md",
     ]
     for link in required_zh:

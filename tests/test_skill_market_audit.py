@@ -26,6 +26,7 @@ class SkillMarketAuditTest(unittest.TestCase):
         package_json = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         scripts = package_json["scripts"]
         self.assertEqual(scripts.get("audit:docs"), "python3 scripts/audit_docs_links.py")
+        self.assertEqual(scripts.get("audit:web-console"), "python3 scripts/audit_web_console.py")
         self.assertEqual(scripts.get("audit:market"), "python3 scripts/audit_skill_market.py")
 
         release_doc = (ROOT / "docs" / "release" / "release-maintenance.md").read_text(encoding="utf-8")
@@ -38,6 +39,7 @@ class SkillMarketAuditTest(unittest.TestCase):
             self.assertIn("npm run audit:market", text)
 
         self.assertIn("npm run audit:docs", ci_workflow)
+        self.assertIn("npm run audit:web-console", ci_workflow)
         self.assertIn("npm run audit:quality", ci_workflow)
         self.assertIn("npm run audit:market", ci_workflow)
 
@@ -55,6 +57,7 @@ class SkillMarketAuditTest(unittest.TestCase):
         self.assertEqual(listing["metadata"]["distributionGuideZh"], "docs/zh-CN/strategy/skill-market-distribution.md")
         self.assertEqual(listing["links"]["agentSetup"], "docs/guides/agent-setup.md")
         self.assertIn("npm run audit:docs", listing["acceptanceGates"])
+        self.assertIn("npm run audit:web-console", listing["acceptanceGates"])
         self.assertIn("assets/skill-market/ultimate-ppt-master-icon.svg", listing["assets"]["iconSmall"])
         self.assertIn("apps/web/public/benchmark/index.html", listing["proof"]["benchmarkWall"])
         self.assertEqual(listing["proof"]["qualityWorkbench"], "docs/quality/quality-workbench-v2.5.md")

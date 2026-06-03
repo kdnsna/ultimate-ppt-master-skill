@@ -28,6 +28,17 @@ import type { LucideIcon } from "lucide-react";
 import JSZip from "jszip";
 import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, DragEvent, ReactNode } from "react";
+import {
+  getConsoleSteps,
+  getPrimaryActionId,
+  previewGroupFor,
+  previewGroupModes,
+  type ConsoleStep,
+  type ConsoleStepId,
+  type PreviewGroup,
+  type PreviewMode,
+  type PrimaryActionId
+} from "./consoleFlow";
 import { findPreset, presetCatalog, type PresetId, type WebPreset } from "./presetCatalog";
 
 type Language = "zh" | "en";
@@ -38,8 +49,7 @@ type StylePreset = "business" | "consulting" | "editorial" | "swiss" | "academic
 type AgentTool = "codex" | "claude" | "hermes" | "openclaw" | "generic";
 type SkillTarget = "codex" | "generic";
 type ModelPreference = "auto" | "openai" | "gemini" | "qwen" | "deepseek" | "custom";
-type PreviewMode = "prompt" | "source" | "extracted" | "manifest" | "brief" | "webdeck" | "checklist" | "qualityReport" | "codexTask" | "assetPlan" | "elementKit";
-type WorkspaceView = "start" | "sources" | "configuration" | "handoff" | "preview";
+type WorkspaceView = ConsoleStepId;
 type WorkflowStepId = "brief" | "sources" | "bridge" | "agent" | "handoff" | "review";
 type StepStatus = "locked" | "ready" | "active" | "complete" | "blocked";
 type QualityGateLevel = "quick" | "formal-business" | "showcase";
@@ -196,8 +206,8 @@ const demoUrl = `${baseUrl}examples/agentic-developer-tools-2026/web-demo.html`;
 const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
-const storageKey = "ultimate-ppt-master-web-brief-v3";
-const appVersion = "4.0.0";
+const storageKey = "ultimate-ppt-master-web-brief-v4";
+const appVersion = "4.1.0";
 
 const designDoctorScores = [
   {
@@ -269,15 +279,15 @@ const labels = {
   zh: {
     product: "Ultimate PPT Master",
     studio: "PPT 质量工作台",
-    route: `v${appVersion} · 中文办公默认路径 · 质量合同随 handoff 一起走`,
-    subtitle: "把经营复盘、咨询方案、培训课件和学术答辩这类中文办公任务先整理成可验收合同；网页降低门槛，本地 Skill 和 Agent 负责最终质量。",
-    whyTitle: "v3.0 最大提升是什么？",
-    whySubtitle: "把预设、公开样例、Design Doctor 视觉复查和 handoff 合同连起来，让普通办公用户知道适合谁、要交什么资料、交付前检查什么。",
+    route: `v${appVersion} · 四步控制台 · 质量合同随本地项目包一起走`,
+    subtitle: "把经营复盘、咨询方案、培训课件和学术答辩先整理成清晰任务；网页只保留下一步，本地 Skill 和 AI 助手负责最终质量。",
+    whyTitle: "v4.1 让控制台更像工具",
+    whySubtitle: "把案例、术语、检测和交付文件收进折叠区，主界面只回答一件事：现在下一步该做什么。",
     whyCards: [
       { title: "中文办公默认", text: "经营复盘、咨询方案、培训课件和学术答辩优先，产品路演和科技趋势作为展示型路线。" },
       { title: "质量可证明", text: "stable pack 必须有合成 source、输出、截图、quality-report 和适用边界。" },
       { title: "视觉可复查", text: "Design Doctor 把 SVG 检查、浏览器复查和中文摘要变成用户能理解的一步。" },
-      { title: "交付有合同", text: "Bridge 把质量目标、预期产物和检查命令写入 manifest 与 project-brief。" }
+      { title: "交付有合同", text: "本地项目包把质量目标、预期产物和检查命令写入 manifest 与 project-brief。" }
     ],
     plainGlossaryTitle: "先把几个词讲清楚",
     plainGlossaryText: "你可以先按中文名字理解；括号里的英文是项目里原本的技术名，后面文档和按钮会继续沿用。",
@@ -297,10 +307,10 @@ const labels = {
     firstStepBridge: "连接本机",
     bridgeOfflineHelp: "本机连接器（Bridge）还没启动，网页暂时不能查看你电脑上装了哪些 AI 助手。复制下面的启动命令即可，它会先寻找本机项目目录再启动。",
     bridgeOnlineHelp: "本机连接器（Bridge）已启动，网页可以识别本机 AI 助手并写入本地项目包（handoff）。",
-    copyBridgeCommand: "复制 Bridge 启动命令",
+    copyBridgeCommand: "复制本机连接命令",
     refreshBridge: "重新检测",
     firstStepHandoff: "生成本地项目包",
-    firstStepHandoffText: "点“发送到本机连接器（Bridge）”，再点“启动 / 复制 AI 助手命令”。",
+    firstStepHandoffText: "点“生成本地项目包”，再点“启动 / 复制 AI 助手命令”。",
     hermesDetected: "已识别 Hermes",
     hermesNotDetected: "暂未识别 Hermes",
     hermesWaiting: "启动本机连接器（Bridge）后这里会显示 Hermes 是否可用。",
@@ -311,10 +321,10 @@ const labels = {
     selectedAgentCommand: "命令",
     useHermes: "改用 Hermes",
     useDetectedAgent: "改用 {agent}",
-    navStart: "开始",
-    navSources: "资料与目标",
-    navConfig: "配置检测",
-    navHandoff: "交给 AI 助手",
+    navStart: "准备任务",
+    navSources: "添加资料",
+    navConfig: "连接本机",
+    navHandoff: "生成交付",
     navPreview: "预览与文件",
     startGuideTitle: "先跑通最短路径",
     startGuideText: "第一次不用理解全部面板：先确认本机连接器和 AI 助手状态，再改一句任务或拖入资料。",
@@ -326,12 +336,12 @@ const labels = {
     handoffGuideText: "这一页负责把网页里的任务说明、附件和执行要求写入本地项目包（handoff），再复制 AI 助手命令。",
     previewGuideTitle: "检查预览和交接文件",
     previewGuideText: "这里看浏览器预览、AI 助手任务说明、资料文件、文件清单和质量检查清单。",
-    setupTitle: "一键配置 / 检测",
+    setupTitle: "本机连接 / 设置",
     setupSubtitle: "网页不能绕过你的电脑权限直接动系统；Bridge 在线时可以一键把本仓库登记到 Codex / 通用 Agent Skill 目录，离线时会复制可执行命令。",
     oneClickDetect: "一键检测",
     oneClickConfig: "一键选择可用 AI 助手",
     autoSelectAgentOk: "已选择可用 AI 助手：{agent}",
-    autoSelectAgentMissing: "还没有检测到可用 AI 助手，请先启动本机连接器（Bridge）或安装 Codex / Hermes / OpenClaw / Claude。",
+    autoSelectAgentMissing: "还没有检测到可用 AI 助手，请先启动本机连接器或安装 Codex / Hermes / OpenClaw / Claude。",
     noProviderConfigured: "没有检测到已配置的模型 key。",
     bridgeStartTitle: "本机连接器（Bridge）",
     bridgeStartText: "只跑在你电脑上的连接服务。启动后网页才能读取 AI 助手命令、解析本地文件并写入本地项目包（handoff）。",
@@ -347,7 +357,7 @@ const labels = {
     copyGenericSkillCommand: "复制通用命令",
     skillInstallOk: "已处理 Skill 目标：{target}",
     skillInstallFail: "Skill 安装失败",
-    skillInstallNeedsBridge: "Bridge 未连接，已复制安装命令。先在终端运行它，再回到网页重新检测。",
+    skillInstallNeedsBridge: "本机连接未建立，已复制安装命令。先在终端运行它，再回到网页重新检测。",
     skillInstalled: "已安装",
     skillMissing: "未安装",
     skillManaged: "Bridge 可管理",
@@ -361,7 +371,7 @@ const labels = {
     downloadSource: "下载资料文件",
     downloadWebDeck: "下载 preview-web-deck.html",
     downloadKit: "下载本地项目包 zip",
-    sendBridge: "发送到本机连接器",
+    sendBridge: "生成本地项目包",
     launchAgent: "启动 / 复制 AI 助手命令",
     skillSetup: "AI 技能安装说明",
     bridgeSetup: "本机连接器说明",
@@ -369,8 +379,8 @@ const labels = {
     structurePanel: "目标与路线",
     handoffPanel: "交接给 AI 助手",
     handoffExecutionTitle: "下一步执行",
-    handoffExecutionBridgeOffline: "先启动 Bridge。离线时网页只能下载 zip，不能写入本地项目或检测 AI 助手。",
-    handoffExecutionBridgeOnline: "Bridge 已连接。下一步先发送到本地项目包，再交给 AI 助手执行。",
+    handoffExecutionBridgeOffline: "先启动本机连接。离线时网页只能下载 zip，不能写入本地项目或检测 AI 助手。",
+    handoffExecutionBridgeOnline: "本机已连接。下一步先生成本地项目包，再交给 AI 助手执行。",
     handoffExecutionReady: "本地项目包已生成。先复制元素生成命令，再复制 AI 助手命令继续生产。",
     elementGenerationCommand: "元素生成命令",
     needsManualHint: "如果没有 IMAGE_BACKEND / OpenAI key，脚本会写出 Needs-Manual prompts；打开 images/image_prompts.md，在 ChatGPT 生成后保存到列出的路径。",
@@ -388,6 +398,9 @@ const labels = {
     previewCodexTask: "codex-task.md",
     previewAssetPlan: "asset-plan.md",
     previewElementKit: "visual-element-kit.md",
+    previewGroupUser: "用户预览",
+    previewGroupAgent: "AI 助手文件",
+    previewGroupQuality: "质量报告",
     contentPreset: "内容预设",
     presetSummary: "预设说明",
     presetRoute: "推荐路线",
@@ -409,7 +422,7 @@ const labels = {
     scenario: "使用场景",
     outputMode: "输出形式",
     stylePreset: "视觉风格",
-    agentTool: "Agent 工具",
+    agentTool: "AI 助手",
     modelPreference: "模型偏好",
     titleField: "项目标题",
     audience: "目标听众",
@@ -434,7 +447,7 @@ const labels = {
     activeRoute: "启用",
     optionalRoute: "备用",
     demoTitle: "Web Deck 示例",
-    demoText: "v3.0 质量证明样板，展示输入材料、预设、输出、ChatGPT 小元素闭环和检查结果。",
+    demoText: "质量证明样板，展示输入材料、预设、输出、ChatGPT 小元素闭环和检查结果。",
     skillTitle: "AI 技能路线",
     skillText: "高质量生产路线，负责真实文件解析、生成、检查和导出。",
     desktopTitle: "Desktop Later",
@@ -449,14 +462,14 @@ const labels = {
     handoffNotCreated: "尚未生成项目包",
     formalBusinessQualityGate: "正式商务交付",
     wizardTitle: "一步步完成",
-    wizardSubtitle: "连接之后只看当前步骤：先把 brief 和资料准备好，再连接 Bridge、选择 AI 助手、生成项目包，最后做质量复查。",
+    wizardSubtitle: "连接之后只看当前步骤：先把任务和资料准备好，再连接本机、选择 AI 助手、生成项目包，最后做质量复查。",
     wizardPrimary: "当前动作",
     wizardCurrent: "当前步骤",
     workflowBrief: "准备 brief",
     workflowSources: "添加资料",
-    workflowBridge: "连接 Bridge",
+    workflowBridge: "连接本机",
     workflowAgent: "选择 AI 助手",
-    workflowHandoff: "生成 handoff",
+    workflowHandoff: "生成项目包",
     workflowReview: "质量复查",
     statusLocked: "未解锁",
     statusReady: "可执行",
@@ -465,6 +478,17 @@ const labels = {
     statusBlocked: "受阻",
     auxiliaryTitle: "辅助资料",
     auxiliaryText: "案例墙、术语和市场分发内容收在这里；主流程不需要先看这些。",
+    advancedSettings: "更多设置",
+    advancedSettingsText: "内容预设、输出形式、风格、AI 助手和模型偏好默认收起，需要时再调整。",
+    moreActions: "更多操作",
+    quickConsoleTitle: "今天只需要跟着一个按钮走",
+    quickConsoleText: "四步完成：准备任务、添加资料、连接本机、生成交付。案例和高级设置都在折叠区里，不会挡住主流程。",
+    primaryCompleteBrief: "完善任务说明",
+    primaryAddSources: "添加资料",
+    primaryConnectLocal: "复制本机连接命令",
+    primaryCreateProject: "生成本地项目包",
+    primaryLaunchAgent: "启动 / 复制 AI 助手命令",
+    primaryReviewDelivery: "查看质量报告",
     bridgeOnline: "本机连接器已连接",
     bridgeOffline: "本机连接器未连接",
     bridgeChecking: "检测本机连接器",
@@ -484,15 +508,15 @@ const labels = {
   en: {
     product: "Ultimate PPT Master",
     studio: "PPT Quality Workbench",
-    route: `v${appVersion} · Chinese-office default path · quality contract in every handoff`,
-    subtitle: "Turn business reviews, consulting proposals, training decks, and academic defenses into an inspectable local contract first. The web lowers the first step; the local Skill and Agent keep final quality high.",
-    whyTitle: "What is new in v3.0?",
-    whySubtitle: "The product connects presets, public proofs, Design Doctor visual review, and handoff contracts so non-technical office users can see who it is for, what to provide, and what to check before delivery.",
+    route: `v${appVersion} · Four-step console · quality contract in every local project`,
+    subtitle: "Turn business reviews, consulting proposals, training decks, and academic defenses into a clear task first. The page keeps one next step visible; the local Skill and AI helper keep final quality high.",
+    whyTitle: "v4.1 makes the console feel like a tool",
+    whySubtitle: "Proofs, glossary, checks, and generated files move into collapsible areas. The main screen answers one question: what should I do next?",
     whyCards: [
       { title: "Office defaults", text: "Business review, consulting, training, and academic defense come first; product pitch and tech trend stay as showcase routes." },
       { title: "Proof required", text: "Stable packs need synthetic source, output, screenshot, quality report, and suitability boundaries." },
       { title: "Visual review", text: "Design Doctor turns SVG checks, browser review, and Chinese summaries into a clear user step." },
-      { title: "Contract handoff", text: "Bridge writes quality goals, expected artifacts, and review commands into manifest and project brief." }
+      { title: "Contract delivery", text: "The local project writes quality goals, expected artifacts, and review commands into manifest and project brief." }
     ],
     plainGlossaryTitle: "A few words in plain English",
     plainGlossaryText: "Read the plain name first. The word in parentheses is the technical term used by the repo and docs.",
@@ -512,10 +536,10 @@ const labels = {
     firstStepBridge: "Connect this Mac",
     bridgeOfflineHelp: "The local connector (Bridge) is not running yet, so the page cannot see installed AI helpers. Copy the startup command below; it finds the local repo before starting Bridge.",
     bridgeOnlineHelp: "The local connector (Bridge) is running. The page can detect local AI helpers and write a local project folder (handoff).",
-    copyBridgeCommand: "Copy Bridge startup command",
+    copyBridgeCommand: "Copy local connection command",
     refreshBridge: "Check again",
     firstStepHandoff: "Create local project",
-    firstStepHandoffText: "Click Send to local connector, then Launch / copy AI-helper command.",
+    firstStepHandoffText: "Create the local project, then launch or copy the AI-helper command.",
     hermesDetected: "Hermes detected",
     hermesNotDetected: "Hermes not detected",
     hermesWaiting: "Start the local connector (Bridge) to show whether Hermes is available.",
@@ -526,10 +550,10 @@ const labels = {
     selectedAgentCommand: "Command",
     useHermes: "Use Hermes",
     useDetectedAgent: "Use {agent}",
-    navStart: "Start",
+    navStart: "Prepare",
     navSources: "Sources",
-    navConfig: "Config",
-    navHandoff: "AI helper",
+    navConfig: "Connect",
+    navHandoff: "Deliver",
     navPreview: "Preview",
     startGuideTitle: "Run the shortest path first",
     startGuideText: "You do not need to understand every panel. Check the local connector and AI helper, then edit one task or add files.",
@@ -541,12 +565,12 @@ const labels = {
     handoffGuideText: "This page writes the brief, attachments, and execution contract to a local project folder (handoff), then copies the AI-helper command.",
     previewGuideTitle: "Check preview and files",
     previewGuideText: "Review the browser preview, AI-helper task, source file, manifest, and quality checklist.",
-    setupTitle: "One-click setup / checks",
+    setupTitle: "Local connection / settings",
     setupSubtitle: "The page cannot bypass your computer permissions. When Bridge is online, it can register this repo in Codex / generic Agent Skill folders; offline, it copies an executable command.",
     oneClickDetect: "One-click check",
     oneClickConfig: "Choose available AI helper",
     autoSelectAgentOk: "Selected available AI helper: {agent}",
-    autoSelectAgentMissing: "No available AI helper detected yet. Start the local connector (Bridge) or install Codex / Hermes / OpenClaw / Claude.",
+    autoSelectAgentMissing: "No available AI helper detected yet. Start the local connector or install Codex / Hermes / OpenClaw / Claude.",
     noProviderConfigured: "No configured model key was detected.",
     bridgeStartTitle: "Local connector (Bridge)",
     bridgeStartText: "A connector service that runs on this computer. Start it so the page can read AI-helper commands, parse local files, and write local project folders (handoff).",
@@ -562,7 +586,7 @@ const labels = {
     copyGenericSkillCommand: "Copy generic command",
     skillInstallOk: "Skill target handled: {target}",
     skillInstallFail: "Skill install failed",
-    skillInstallNeedsBridge: "Bridge is offline, so the install command was copied. Run it in Terminal, then check again.",
+    skillInstallNeedsBridge: "Local connection is offline, so the install command was copied. Run it in Terminal, then check again.",
     skillInstalled: "Installed",
     skillMissing: "Not installed",
     skillManaged: "Bridge-managed",
@@ -576,7 +600,7 @@ const labels = {
     downloadSource: "Download source file",
     downloadWebDeck: "Download preview-web-deck.html",
     downloadKit: "Download local project zip",
-    sendBridge: "Send to local connector",
+    sendBridge: "Create local project",
     launchAgent: "Launch / copy AI-helper command",
     skillSetup: "AI Skill setup",
     bridgeSetup: "Local connector guide",
@@ -584,8 +608,8 @@ const labels = {
     structurePanel: "Target and route",
     handoffPanel: "Hand off to AI helper",
     handoffExecutionTitle: "Next execution step",
-    handoffExecutionBridgeOffline: "Start Bridge first. While offline, the page can download a zip but cannot write a local project or detect AI helpers.",
-    handoffExecutionBridgeOnline: "Bridge is connected. Send the brief to a local handoff folder before giving it to an AI helper.",
+    handoffExecutionBridgeOffline: "Start the local connection first. While offline, the page can download a zip but cannot write a local project or detect AI helpers.",
+    handoffExecutionBridgeOnline: "Local connection is ready. Create a local project before giving it to an AI helper.",
     handoffExecutionReady: "The local handoff folder is ready. Copy the element-generation command, then copy the AI-helper command for production.",
     elementGenerationCommand: "Element-generation command",
     needsManualHint: "If IMAGE_BACKEND / OpenAI key is not configured, the script writes Needs-Manual prompts; open images/image_prompts.md, generate in ChatGPT, and save outputs to the listed paths.",
@@ -603,6 +627,9 @@ const labels = {
     previewCodexTask: "codex-task.md",
     previewAssetPlan: "asset-plan.md",
     previewElementKit: "visual-element-kit.md",
+    previewGroupUser: "User preview",
+    previewGroupAgent: "AI-helper files",
+    previewGroupQuality: "Quality report",
     contentPreset: "Content preset",
     presetSummary: "Preset summary",
     presetRoute: "Recommended route",
@@ -624,7 +651,7 @@ const labels = {
     scenario: "Scenario",
     outputMode: "Output",
     stylePreset: "Visual style",
-    agentTool: "Agent tool",
+    agentTool: "AI helper",
     modelPreference: "Model preference",
     titleField: "Project title",
     audience: "Audience",
@@ -649,7 +676,7 @@ const labels = {
     activeRoute: "Active",
     optionalRoute: "Optional",
     demoTitle: "Web Deck demo",
-    demoText: "A v3.0 quality proof showing input, preset, output, the ChatGPT micro-asset loop, and review result.",
+    demoText: "A quality proof showing input, preset, output, the ChatGPT micro-asset loop, and review result.",
     skillTitle: "AI Skill path",
     skillText: "Production-grade route for real file parsing, generation, QA, and export.",
     desktopTitle: "Desktop Later",
@@ -664,14 +691,14 @@ const labels = {
     handoffNotCreated: "Handoff not created",
     formalBusinessQualityGate: "Formal business delivery",
     wizardTitle: "Step-by-step path",
-    wizardSubtitle: "After connecting, focus on the current step: prepare the brief and sources, connect Bridge, choose an AI helper, create the handoff, then run quality review.",
+    wizardSubtitle: "After connecting, focus on the current step: prepare the task and sources, connect locally, choose an AI helper, create the project, then run quality review.",
     wizardPrimary: "Current action",
     wizardCurrent: "Current step",
     workflowBrief: "Prepare brief",
     workflowSources: "Add sources",
-    workflowBridge: "Connect Bridge",
+    workflowBridge: "Connect local",
     workflowAgent: "Choose AI helper",
-    workflowHandoff: "Create handoff",
+    workflowHandoff: "Create project",
     workflowReview: "Quality review",
     statusLocked: "Locked",
     statusReady: "Ready",
@@ -680,6 +707,17 @@ const labels = {
     statusBlocked: "Blocked",
     auxiliaryTitle: "Auxiliary resources",
     auxiliaryText: "Benchmark wall, glossary, and distribution notes live here so the main workflow can stay focused.",
+    advancedSettings: "More settings",
+    advancedSettingsText: "Content preset, output mode, visual style, AI helper, and model preference stay hidden until needed.",
+    moreActions: "More actions",
+    quickConsoleTitle: "Follow one button today",
+    quickConsoleText: "Four steps: prepare the task, add sources, connect locally, and deliver. Examples and advanced settings stay folded away from the main path.",
+    primaryCompleteBrief: "Complete task brief",
+    primaryAddSources: "Add sources",
+    primaryConnectLocal: "Copy local connection command",
+    primaryCreateProject: "Create local project",
+    primaryLaunchAgent: "Launch / copy AI-helper command",
+    primaryReviewDelivery: "Review quality report",
     bridgeOnline: "Local connector connected",
     bridgeOffline: "Local connector offline",
     bridgeChecking: "Checking local connector",
@@ -763,7 +801,7 @@ const defaultForm: FormState = {
 export function App() {
   const [form, setForm] = useState<FormState>(() => loadSavedForm());
   const [activeView, setActiveView] = useState<WorkspaceView>("start");
-  const [previewMode, setPreviewMode] = useState<PreviewMode>("prompt");
+  const [previewMode, setPreviewMode] = useState<PreviewMode>("webdeck");
   const [copyState, setCopyState] = useState("");
   const [sources, setSources] = useState<UploadedSource[]>([]);
   const [urlInput, setUrlInput] = useState("");
@@ -799,6 +837,16 @@ export function App() {
   const selectedAgent = agents.find((agent) => agent.id === form.agentTool);
   const availableAgents = agents.filter((agent) => agent.available);
   const recommendedAgent = selectedAgent?.available ? selectedAgent : availableAgents[0];
+  const consoleInput = {
+    readiness: readiness.score,
+    sourceCount: sources.length,
+    localConnected: Boolean(bridge),
+    helperAvailable: Boolean(recommendedAgent?.available),
+    projectReady: Boolean(handoffResult)
+  };
+  const consoleSteps = useMemo(() => getConsoleSteps(consoleInput), [readiness.score, sources.length, bridge, recommendedAgent, handoffResult]);
+  const primaryActionId = useMemo(() => getPrimaryActionId(consoleInput), [readiness.score, sources.length, bridge, recommendedAgent, handoffResult]);
+  const previewGroup = previewGroupFor(previewMode);
   const workflowSteps = useMemo(() => buildWorkflowSteps({ form, sources, readiness, bridge, selectedAgent, handoffResult, labels: t }), [form, sources, readiness, bridge, selectedAgent, handoffResult, t]);
   const workflowState = useMemo(() => buildWorkflowState(workflowSteps), [workflowSteps]);
   const codexTask = useMemo(() => buildCodexTask(form, enginePlan, sources, qualityGate, workflowState, qualityContract), [form, enginePlan, sources, qualityGate, workflowState, qualityContract]);
@@ -962,6 +1010,31 @@ export function App() {
     } catch {
       setCopyState(t.copyFailed);
     }
+  }
+
+  function runPrimaryAction(actionId: PrimaryActionId) {
+    if (actionId === "completeBrief" || actionId === "addSources") {
+      setActiveView("sources");
+      return;
+    }
+    if (actionId === "connectLocal") {
+      setActiveView("configuration");
+      void copyText(bridgeCommand);
+      void checkBridge(false);
+      return;
+    }
+    if (actionId === "createProject") {
+      setActiveView("handoff");
+      void sendToBridge();
+      return;
+    }
+    if (actionId === "launchAgent") {
+      setActiveView("handoff");
+      void launchOrCopyAgent();
+      return;
+    }
+    setActiveView("handoff");
+    setPreviewMode("qualityReport");
   }
 
   function downloadText(filename: string, text: string, type = "text/markdown;charset=utf-8") {
@@ -1201,23 +1274,15 @@ export function App() {
               qualityContract={qualityContract}
               labels={t}
             />
-            <div className="header-actions">
-              {bridge ? (
-                <button className="primary-action" onClick={sendToBridge}>
-                  <PlugZap size={18} />
-                  {t.sendBridge}
-                </button>
-              ) : (
-                <button className="primary-action" onClick={() => void copyText(bridgeCommand)}>
-                  <Clipboard size={18} />
-                  {t.copyBridgeCommand}
-                </button>
-              )}
-              <button className="secondary-action" onClick={downloadHandoffKit}>
-                <Download size={18} />
-                {t.downloadKit}
-              </button>
-            </div>
+            <PrimaryActionBar
+              actionId={primaryActionId}
+              labels={t}
+              onPrimary={() => runPrimaryAction(primaryActionId)}
+              onDownload={downloadHandoffKit}
+              onCopyPrompt={() => void copyText(prompt)}
+              onCopySource={() => void copyText(sourceTemplate)}
+              onOpenSettings={() => setActiveView("configuration")}
+            />
           </div>
         </section>
 
@@ -1227,8 +1292,9 @@ export function App() {
           <span><KeyRound size={15} />{t.keySafe}</span>
         </section>
 
-        <WorkspaceNav
+        <ConsoleStepRail
           activeView={activeView}
+          steps={consoleSteps}
           labels={t}
           sourceCount={sources.length}
           readiness={readiness.score}
@@ -1239,16 +1305,17 @@ export function App() {
 
         <PageGuide activeView={activeView} labels={t} />
 
-        <GuidedWorkflowPanel
-          steps={workflowSteps}
+        <QuickStartConsole
+          actionId={primaryActionId}
+          steps={consoleSteps}
           labels={t}
-          onOpenSources={() => setActiveView("sources")}
-          onCopyBridgeCommand={() => void copyText(bridgeCommand)}
-          onCheckBridge={() => void checkBridge(false)}
-          onAutoSelectAgent={() => void autoSelectAgent()}
-          onSendBridge={() => void sendToBridge()}
-          onLaunchAgent={() => void launchOrCopyAgent()}
-          onOpenReview={() => setActiveView("preview")}
+          readiness={readiness.score}
+          sourceCount={sources.length}
+          bridge={bridge}
+          selectedAgent={selectedAgent}
+          handoffResult={handoffResult}
+          onPrimary={() => runPrimaryAction(primaryActionId)}
+          onOpenSettings={() => setActiveView("configuration")}
         />
 
         <AuxiliaryResources labels={t}>
@@ -1289,36 +1356,72 @@ export function App() {
           </section>
         </AuxiliaryResources>
 
-        <ConfigurationPage
-          bridge={bridge}
-          agents={agents}
-          providers={providers}
-          skillTargets={skillTargets}
-          bridgeCommand={bridgeCommand}
-          selectedAgent={selectedAgent}
-          labels={t}
-          testingProvider={testingProvider}
-          installingSkill={installingSkill}
-          bridgeMessage={bridgeMessage}
-          onCheckBridge={() => void checkBridge(false)}
-          onCopyBridgeCommand={() => void copyText(bridgeCommand)}
-          onAutoSelectAgent={() => void autoSelectAgent()}
-          onTestAllProviders={() => void testAllProviders()}
-          onSelectAgent={(agentId) => update("agentTool", agentId)}
-          onInstallSkill={(targetId) => void installSkill(targetId)}
-          onCopySkillCommand={(targetId) => void copySkillInstallCommand(targetId)}
-        />
+        <SettingsDrawer labels={t} open={activeView === "configuration"}>
+          <ConfigurationPage
+            bridge={bridge}
+            agents={agents}
+            providers={providers}
+            skillTargets={skillTargets}
+            bridgeCommand={bridgeCommand}
+            selectedAgent={selectedAgent}
+            labels={t}
+            testingProvider={testingProvider}
+            installingSkill={installingSkill}
+            bridgeMessage={bridgeMessage}
+            onCheckBridge={() => void checkBridge(false)}
+            onCopyBridgeCommand={() => void copyText(bridgeCommand)}
+            onAutoSelectAgent={() => void autoSelectAgent()}
+            onTestAllProviders={() => void testAllProviders()}
+            onSelectAgent={(agentId) => update("agentTool", agentId)}
+            onInstallSkill={(targetId) => void installSkill(targetId)}
+            onCopySkillCommand={(targetId) => void copySkillInstallCommand(targetId)}
+          />
+          <section className="panel provider-panel" aria-labelledby="provider-title">
+            <div className="preview-shell-heading">
+              <PanelTitle icon={Activity} id="provider-title" title={t.providerPanel} />
+              <div className="preview-meta">
+                <span>{bridge ? t.bridgeOnline : t.bridgeOffline}</span>
+                <span>{bridge?.allowLaunch ? t.allowLaunchOn : t.allowLaunchOff}</span>
+              </div>
+            </div>
+            <div className="provider-grid">
+              {providers.map((provider) => (
+                <article key={provider.id} className={`provider-card ${provider.configured ? "configured" : "missing"}`}>
+                  <div>
+                    <strong>{provider.label}</strong>
+                    <StatusPill
+                      ok={provider.configured}
+                      okText={t.providerConfigured}
+                      failText={t.providerMissing}
+                    />
+                  </div>
+                  <p>{provider.model || provider.baseUrl || provider.envKeys.join(" / ")}</p>
+                  <span>{provider.keySource || provider.envKeys.join(" / ")}</span>
+                  {provider.lastTest && (
+                    <em className={provider.lastTest.ok ? "ok" : "fail"}>{provider.lastTest.message}</em>
+                  )}
+                  <button className="secondary-action" disabled={!bridge || testingProvider === provider.id || testingProvider === "all"} onClick={() => void testProvider(provider.id)}>
+                    <RefreshCw size={16} />
+                    {testingProvider === provider.id ? t.bridgeChecking : t.testProvider}
+                  </button>
+                </article>
+              ))}
+            </div>
+            <div className="agent-grid">
+              {agents.map((agent) => (
+                <article key={agent.id} className="agent-card">
+                  <strong>{agent.label}</strong>
+                  <StatusPill ok={agent.available} okText={t.agentAvailable} failText={t.agentMissing} />
+                  <code>{agent.command}</code>
+                </article>
+              ))}
+            </div>
+          </section>
+        </SettingsDrawer>
 
         <section className="studio-grid">
           <section className="panel source-panel" aria-labelledby="source-title">
             <PanelTitle icon={UploadCloud} id="source-title" title={t.sourcePanel} />
-            <div className="control-grid">
-              <SelectField label={t.contentPreset} value={form.presetId} onChange={(value) => applyPreset(value as PresetId)} options={presetOptions(form.language)} />
-              <SelectField label={t.sourceType} value={form.sourceType} onChange={(value) => update("sourceType", value as SourceType)} options={toOptions(optionText.sourceType, form.language)} />
-              <SelectField label={t.scenario} value={form.scenario} onChange={(value) => update("scenario", value as Scenario)} options={toOptions(optionText.scenario, form.language)} />
-              <SelectField label={t.outputMode} value={form.outputMode} onChange={(value) => update("outputMode", value as OutputMode)} options={toOptions(optionText.outputMode, form.language)} />
-              <SelectField label={t.stylePreset} value={form.stylePreset} onChange={(value) => update("stylePreset", value as StylePreset)} options={toOptions(optionText.stylePreset, form.language)} />
-            </div>
             <div
               className="drop-zone"
               onDragOver={(event) => event.preventDefault()}
@@ -1353,16 +1456,23 @@ export function App() {
               {t.sourceNotes}
               <textarea className="large-input" value={form.sourceNotes} onChange={(event) => update("sourceNotes", event.target.value)} />
             </label>
+            <details className="advanced-settings">
+              <summary>
+                <strong>{t.advancedSettings}</strong>
+                <span>{t.advancedSettingsText}</span>
+              </summary>
+              <div className="control-grid">
+                <SelectField label={t.contentPreset} value={form.presetId} onChange={(value) => applyPreset(value as PresetId)} options={presetOptions(form.language)} />
+                <SelectField label={t.sourceType} value={form.sourceType} onChange={(value) => update("sourceType", value as SourceType)} options={toOptions(optionText.sourceType, form.language)} />
+                <SelectField label={t.scenario} value={form.scenario} onChange={(value) => update("scenario", value as Scenario)} options={toOptions(optionText.scenario, form.language)} />
+                <SelectField label={t.outputMode} value={form.outputMode} onChange={(value) => update("outputMode", value as OutputMode)} options={toOptions(optionText.outputMode, form.language)} />
+                <SelectField label={t.stylePreset} value={form.stylePreset} onChange={(value) => update("stylePreset", value as StylePreset)} options={toOptions(optionText.stylePreset, form.language)} />
+              </div>
+            </details>
           </section>
 
           <section className="panel structure-panel" aria-labelledby="structure-title">
             <PanelTitle icon={Sparkles} id="structure-title" title={t.structurePanel} />
-            <div className="control-grid">
-              <SelectField label={t.agentTool} value={form.agentTool} onChange={(value) => update("agentTool", value as AgentTool)} options={toOptions(optionText.agentTool, form.language)} />
-              <SelectField label={t.modelPreference} value={form.modelPreference} onChange={(value) => update("modelPreference", value as ModelPreference)} options={toOptions(optionText.modelPreference, form.language)} />
-            </div>
-            <PresetSummary preset={activePreset} language={form.language} labels={t} />
-            <DesignDoctorPanel qualityContract={qualityContract} labels={t} />
             <div className="field-stack">
               <label>
                 {t.titleField}
@@ -1396,32 +1506,44 @@ export function App() {
                 <span style={{ width: `${readiness.score}%` }} />
               </div>
             </div>
-            <div className="engine-section">
-              <strong>{t.enginePanel}</strong>
-              <div className="engine-grid">
-                <EngineCard
-                  icon={FileText}
-                  active={enginePlan.pptxActive}
-                  status={enginePlan.pptxActive ? t.activeRoute : t.optionalRoute}
-                  title={form.language === "zh" ? "Hugo He / PPTX 可编辑路线" : "Hugo He / editable PPTX route"}
-                  text={enginePlan.pptxRoute}
-                />
-                <EngineCard
-                  icon={MonitorPlay}
-                  active={enginePlan.webActive}
-                  status={enginePlan.webActive ? t.activeRoute : t.optionalRoute}
-                  title={form.language === "zh" ? "op7418 歸藏 / Web Deck 路线" : "op7418 Guizang / Web Deck route"}
-                  text={enginePlan.webRoute}
-                />
-                <EngineCard
-                  icon={Workflow}
-                  active
-                  status={t.activeRoute}
-                  title={form.language === "zh" ? "Ultimate Fusion / Agent Connect" : "Ultimate Fusion / Agent Connect"}
-                  text={enginePlan.fusionRoute}
-                />
+            <details className="advanced-settings">
+              <summary>
+                <strong>{t.advancedSettings}</strong>
+                <span>{t.advancedSettingsText}</span>
+              </summary>
+              <div className="control-grid">
+                <SelectField label={t.agentTool} value={form.agentTool} onChange={(value) => update("agentTool", value as AgentTool)} options={toOptions(optionText.agentTool, form.language)} />
+                <SelectField label={t.modelPreference} value={form.modelPreference} onChange={(value) => update("modelPreference", value as ModelPreference)} options={toOptions(optionText.modelPreference, form.language)} />
               </div>
-            </div>
+              <PresetSummary preset={activePreset} language={form.language} labels={t} />
+              <DesignDoctorPanel qualityContract={qualityContract} labels={t} />
+              <div className="engine-section">
+                <strong>{t.enginePanel}</strong>
+                <div className="engine-grid">
+                  <EngineCard
+                    icon={FileText}
+                    active={enginePlan.pptxActive}
+                    status={enginePlan.pptxActive ? t.activeRoute : t.optionalRoute}
+                    title={form.language === "zh" ? "Hugo He / PPTX 可编辑路线" : "Hugo He / editable PPTX route"}
+                    text={enginePlan.pptxRoute}
+                  />
+                  <EngineCard
+                    icon={MonitorPlay}
+                    active={enginePlan.webActive}
+                    status={enginePlan.webActive ? t.activeRoute : t.optionalRoute}
+                    title={form.language === "zh" ? "op7418 歸藏 / Web Deck 路线" : "op7418 Guizang / Web Deck route"}
+                    text={enginePlan.webRoute}
+                  />
+                  <EngineCard
+                    icon={Workflow}
+                    active
+                    status={t.activeRoute}
+                    title={form.language === "zh" ? "Ultimate Fusion / Agent Connect" : "Ultimate Fusion / Agent Connect"}
+                    text={enginePlan.fusionRoute}
+                  />
+                </div>
+              </div>
+            </details>
             {readiness.missing.length > 0 && (
               <div className="missing-box">
                 <strong>{t.missing}</strong>
@@ -1453,42 +1575,32 @@ export function App() {
               bridgeCommand={bridgeCommand}
               onRefresh={() => void checkBridge(false)}
             />
-            <HandoffExecutionPanel
-              bridge={bridge}
-              handoffResult={handoffResult}
-              agentCommand={agentCommand || handoffResult?.suggestedCommands?.[form.agentTool] || handoffResult?.suggestedCommands?.codex || ""}
-              bridgeCommand={bridgeCommand}
-              labels={t}
-              onCopy={copyText}
-            />
-            <div className="action-stack">
-              {bridge && handoffResult ? (
-                <>
-                  <button className="primary-action full" onClick={launchOrCopyAgent}>
-                    <Play size={18} />
-                    {t.launchAgent}
-                  </button>
-                  <button className="secondary-action full" onClick={() => copyText(prompt)}>
-                    <Clipboard size={18} />
-                    {copyState || t.copyPrompt}
-                  </button>
-                </>
-              ) : bridge ? (
-                <button className="primary-action full" onClick={sendToBridge}>
-                  <FolderOpen size={18} />
-                  {t.sendBridge}
-                </button>
-              ) : (
-                <button className="primary-action full" onClick={() => void copyText(bridgeCommand)}>
-                  <Clipboard size={18} />
-                  {t.copyBridgeCommand}
-                </button>
-              )}
+            <button className="primary-action full" onClick={() => runPrimaryAction(primaryActionId)}>
+              {primaryActionIcon(primaryActionId)}
+              {primaryActionLabel(primaryActionId, t)}
+            </button>
+            <details className="advanced-settings command-details">
+              <summary>
+                <strong>{t.moreActions}</strong>
+                <span>{t.handoffExecutionTitle}</span>
+              </summary>
+              <HandoffExecutionPanel
+                bridge={bridge}
+                handoffResult={handoffResult}
+                agentCommand={agentCommand || handoffResult?.suggestedCommands?.[form.agentTool] || handoffResult?.suggestedCommands?.codex || ""}
+                bridgeCommand={bridgeCommand}
+                labels={t}
+                onCopy={copyText}
+              />
+              <button className="secondary-action full" onClick={() => copyText(prompt)}>
+                <Clipboard size={18} />
+                {copyState || t.copyPrompt}
+              </button>
               <button className="secondary-action full" onClick={downloadHandoffKit}>
                 <FileArchive size={18} />
                 {t.downloadKit}
               </button>
-            </div>
+            </details>
             {bridgeMessage && <p className="bridge-message">{bridgeMessage}</p>}
             {handoffResult && (
               <div className="handoff-result">
@@ -1497,89 +1609,53 @@ export function App() {
                 <span>{handoffResult.files.length} files</span>
               </div>
             )}
-            <div className="kit-box">
-              <strong>{t.generatedNowTitle}</strong>
-              <span>source.md</span>
-              <span>extracted-source.md</span>
-              <span>attachments/</span>
-              <span>manifest.json</span>
-              <span>agent-prompt.md</span>
-              <span>project-brief.json</span>
-              <span>preview-web-deck.html</span>
-              <span>engine-plan.md</span>
-              <span>quality-checklist.md</span>
-              <span>asset-plan.md</span>
-              <span>visual-element-kit.md</span>
-              <span>codex-task.md</span>
-              <span>AGENTS.md</span>
-              <span>quality-report.json</span>
-            </div>
-            <div className="kit-box">
-              <strong>{t.codexNextTitle}</strong>
-              <span>assets/generated/element-manifest.json</span>
-              <span>images/image_prompts.json</span>
-              <span>images/image_prompts.md</span>
-              <span>final PPTX / Web Deck outputs</span>
-              <span>updated asset-plan.md</span>
-              <span>updated quality-report.json</span>
-            </div>
-            <div className="route-list">
-              <InfoRow icon={MonitorPlay} title={t.demoTitle} text={t.demoText} />
-              <InfoRow icon={BookOpen} title={t.skillTitle} text={t.skillText} />
-              <InfoRow icon={FileText} title={t.desktopTitle} text={t.desktopText} />
-            </div>
-            <a className="primary-action full" href={demoUrl}>
-              <ExternalLink size={18} />
-              {t.openDemo}
-            </a>
-            <a className="secondary-action full" href={skillDocUrl}>
-              <BookOpen size={18} />
-              {t.skillSetup}
-            </a>
+            <details className="advanced-settings kit-details">
+              <summary>
+                <strong>{t.kitIncludes}</strong>
+                <span>{handoffResult ? `${handoffResult.files.length} files` : t.handoffNotCreated}</span>
+              </summary>
+              <div className="kit-box">
+                <strong>{t.generatedNowTitle}</strong>
+                <span>source.md</span>
+                <span>extracted-source.md</span>
+                <span>attachments/</span>
+                <span>manifest.json</span>
+                <span>agent-prompt.md</span>
+                <span>project-brief.json</span>
+                <span>preview-web-deck.html</span>
+                <span>engine-plan.md</span>
+                <span>quality-checklist.md</span>
+                <span>asset-plan.md</span>
+                <span>visual-element-kit.md</span>
+                <span>codex-task.md</span>
+                <span>AGENTS.md</span>
+                <span>quality-report.json</span>
+              </div>
+              <div className="kit-box">
+                <strong>{t.codexNextTitle}</strong>
+                <span>assets/generated/element-manifest.json</span>
+                <span>images/image_prompts.json</span>
+                <span>images/image_prompts.md</span>
+                <span>final PPTX / Web Deck outputs</span>
+                <span>updated asset-plan.md</span>
+                <span>updated quality-report.json</span>
+              </div>
+              <div className="route-list">
+                <InfoRow icon={MonitorPlay} title={t.demoTitle} text={t.demoText} />
+                <InfoRow icon={BookOpen} title={t.skillTitle} text={t.skillText} />
+                <InfoRow icon={FileText} title={t.desktopTitle} text={t.desktopText} />
+              </div>
+              <a className="secondary-action full" href={demoUrl}>
+                <ExternalLink size={18} />
+                {t.openDemo}
+              </a>
+              <a className="secondary-action full" href={skillDocUrl}>
+                <BookOpen size={18} />
+                {t.skillSetup}
+              </a>
+            </details>
             <p className="hint">{t.privacyNote}</p>
           </section>
-        </section>
-
-        <section className="panel provider-panel" aria-labelledby="provider-title">
-          <div className="preview-shell-heading">
-            <PanelTitle icon={Activity} id="provider-title" title={t.providerPanel} />
-            <div className="preview-meta">
-              <span>{bridge ? t.bridgeOnline : t.bridgeOffline}</span>
-              <span>{bridge?.allowLaunch ? t.allowLaunchOn : t.allowLaunchOff}</span>
-            </div>
-          </div>
-          <div className="provider-grid">
-            {providers.map((provider) => (
-              <article key={provider.id} className={`provider-card ${provider.configured ? "configured" : "missing"}`}>
-                <div>
-                  <strong>{provider.label}</strong>
-                  <StatusPill
-                    ok={provider.configured}
-                    okText={t.providerConfigured}
-                    failText={t.providerMissing}
-                  />
-                </div>
-                <p>{provider.model || provider.baseUrl || provider.envKeys.join(" / ")}</p>
-                <span>{provider.keySource || provider.envKeys.join(" / ")}</span>
-                {provider.lastTest && (
-                  <em className={provider.lastTest.ok ? "ok" : "fail"}>{provider.lastTest.message}</em>
-                )}
-                <button className="secondary-action" disabled={!bridge || testingProvider === provider.id || testingProvider === "all"} onClick={() => void testProvider(provider.id)}>
-                  <RefreshCw size={16} />
-                  {testingProvider === provider.id ? t.bridgeChecking : t.testProvider}
-                </button>
-              </article>
-            ))}
-          </div>
-          <div className="agent-grid">
-            {agents.map((agent) => (
-              <article key={agent.id} className="agent-card">
-                <strong>{agent.label}</strong>
-                <StatusPill ok={agent.available} okText={t.agentAvailable} failText={t.agentMissing} />
-                <code>{agent.command}</code>
-              </article>
-            ))}
-          </div>
         </section>
 
         <section className="panel web-preview-panel" aria-labelledby="web-preview-title">
@@ -1597,19 +1673,13 @@ export function App() {
         </section>
 
         <section className="panel preview-panel" aria-label="Generated outputs">
-          <div className="preview-tabs" role="tablist">
-            <button className={previewMode === "prompt" ? "active" : ""} onClick={() => setPreviewMode("prompt")}>{t.previewPrompt}</button>
-            <button className={previewMode === "source" ? "active" : ""} onClick={() => setPreviewMode("source")}>{t.previewSource}</button>
-            <button className={previewMode === "extracted" ? "active" : ""} onClick={() => setPreviewMode("extracted")}>{t.previewExtracted}</button>
-            <button className={previewMode === "manifest" ? "active" : ""} onClick={() => setPreviewMode("manifest")}>{t.previewManifest}</button>
-            <button className={previewMode === "brief" ? "active" : ""} onClick={() => setPreviewMode("brief")}>{t.previewBrief}</button>
-            <button className={previewMode === "webdeck" ? "active" : ""} onClick={() => setPreviewMode("webdeck")}>{t.previewWebDeck}</button>
-            <button className={previewMode === "checklist" ? "active" : ""} onClick={() => setPreviewMode("checklist")}>{t.previewChecklist}</button>
-            <button className={previewMode === "codexTask" ? "active" : ""} onClick={() => setPreviewMode("codexTask")}>{t.previewCodexTask}</button>
-            <button className={previewMode === "assetPlan" ? "active" : ""} onClick={() => setPreviewMode("assetPlan")}>{t.previewAssetPlan}</button>
-            <button className={previewMode === "elementKit" ? "active" : ""} onClick={() => setPreviewMode("elementKit")}>{t.previewElementKit}</button>
-            <button className={previewMode === "qualityReport" ? "active" : ""} onClick={() => setPreviewMode("qualityReport")}>{t.previewQualityReport}</button>
-          </div>
+          <GroupedPreviewTabs
+            activeGroup={previewGroup}
+            activeMode={previewMode}
+            labels={t}
+            onSelectGroup={(group) => setPreviewMode(previewGroupModes[group][0])}
+            onSelectMode={setPreviewMode}
+          />
           <div className="preview-actions">
             <button className="secondary-action" onClick={() => copyText(visiblePreview)}>
               <Clipboard size={17} />
@@ -1640,8 +1710,79 @@ function PanelTitle({ icon: Icon, title, id }: { icon: LucideIcon; title: string
   );
 }
 
-function WorkspaceNav({
+function PrimaryActionBar({
+  actionId,
+  labels: t,
+  onPrimary,
+  onDownload,
+  onCopyPrompt,
+  onCopySource,
+  onOpenSettings
+}: {
+  actionId: PrimaryActionId;
+  labels: typeof labels.zh;
+  onPrimary: () => void;
+  onDownload: () => void;
+  onCopyPrompt: () => void;
+  onCopySource: () => void;
+  onOpenSettings: () => void;
+}) {
+  return (
+    <div className="primary-action-bar">
+      <button className="primary-action" onClick={onPrimary}>
+        {primaryActionIcon(actionId)}
+        {primaryActionLabel(actionId, t)}
+      </button>
+      <details className="more-actions-menu">
+        <summary>{t.moreActions}</summary>
+        <button onClick={onOpenSettings}>
+          <Server size={16} />
+          {t.navConfig}
+        </button>
+        <button onClick={onDownload}>
+          <Download size={16} />
+          {t.downloadKit}
+        </button>
+        <button onClick={onCopyPrompt}>
+          <Clipboard size={16} />
+          {t.copyPrompt}
+        </button>
+        <button onClick={onCopySource}>
+          <FileText size={16} />
+          {t.copySource}
+        </button>
+      </details>
+    </div>
+  );
+}
+
+function primaryActionLabel(actionId: PrimaryActionId, t: typeof labels.zh) {
+  const copy: Record<PrimaryActionId, string> = {
+    completeBrief: t.primaryCompleteBrief,
+    addSources: t.primaryAddSources,
+    connectLocal: t.primaryConnectLocal,
+    createProject: t.primaryCreateProject,
+    launchAgent: t.primaryLaunchAgent,
+    reviewDelivery: t.primaryReviewDelivery
+  };
+  return copy[actionId];
+}
+
+function primaryActionIcon(actionId: PrimaryActionId) {
+  const icons: Record<PrimaryActionId, ReactNode> = {
+    completeBrief: <Sparkles size={18} />,
+    addSources: <UploadCloud size={18} />,
+    connectLocal: <Clipboard size={18} />,
+    createProject: <FolderOpen size={18} />,
+    launchAgent: <Play size={18} />,
+    reviewDelivery: <ShieldCheck size={18} />
+  };
+  return icons[actionId];
+}
+
+function ConsoleStepRail({
   activeView,
+  steps,
   labels: t,
   sourceCount,
   readiness,
@@ -1650,6 +1791,7 @@ function WorkspaceNav({
   onChange
 }: {
   activeView: WorkspaceView;
+  steps: ConsoleStep[];
   labels: typeof labels.zh;
   sourceCount: number;
   readiness: number;
@@ -1660,17 +1802,19 @@ function WorkspaceNav({
   const items: Array<{ id: WorkspaceView; label: string; meta: string; icon: LucideIcon }> = [
     { id: "start", label: t.navStart, meta: bridge ? t.bridgeOnline : t.bridgeOffline, icon: Sparkles },
     { id: "sources", label: t.navSources, meta: sourceProgressLabel(sourceCount, readiness, t), icon: UploadCloud },
-    { id: "configuration", label: t.navConfig, meta: t.oneClickDetect, icon: Server },
-    { id: "handoff", label: t.navHandoff, meta: handoffProgressLabel(handoffResult, t), icon: PlugZap },
-    { id: "preview", label: t.navPreview, meta: "HTML / JSON", icon: MonitorPlay }
+    { id: "configuration", label: t.navConfig, meta: bridge ? t.bridgeOnline : t.bridgeOffline, icon: Server },
+    { id: "handoff", label: t.navHandoff, meta: handoffProgressLabel(handoffResult, t), icon: PlugZap }
   ];
+  const statusById = new Map(steps.map((step) => [step.id, step.status]));
 
   return (
-    <nav className="workspace-nav" aria-label="Workspace sections">
-      {items.map((item) => {
+    <nav className="console-step-rail" aria-label="Workspace sections">
+      {items.map((item, index) => {
         const Icon = item.icon;
+        const status = statusById.get(item.id) || "ready";
         return (
-          <button key={item.id} className={activeView === item.id ? "active" : ""} onClick={() => onChange(item.id)}>
+          <button key={item.id} className={`${activeView === item.id ? "active" : ""} ${status}`} onClick={() => onChange(item.id)}>
+            <b>{String(index + 1).padStart(2, "0")}</b>
             <Icon size={17} />
             <span>{item.label}</span>
             <small>{item.meta}</small>
@@ -1681,13 +1825,152 @@ function WorkspaceNav({
   );
 }
 
+function QuickStartConsole({
+  actionId,
+  steps,
+  labels: t,
+  readiness,
+  sourceCount,
+  bridge,
+  selectedAgent,
+  handoffResult,
+  onPrimary,
+  onOpenSettings
+}: {
+  actionId: PrimaryActionId;
+  steps: ConsoleStep[];
+  labels: typeof labels.zh;
+  readiness: number;
+  sourceCount: number;
+  bridge: BridgeHealth | null;
+  selectedAgent?: AgentStatus;
+  handoffResult: HandoffResult | null;
+  onPrimary: () => void;
+  onOpenSettings: () => void;
+}) {
+  return (
+    <section className="quick-console" aria-label={t.quickConsoleTitle}>
+      <div className="quick-console-main">
+        <p className="eyebrow">Quick start</p>
+        <h2>{t.quickConsoleTitle}</h2>
+        <p>{t.quickConsoleText}</p>
+        <button className="primary-action" onClick={onPrimary}>
+          {primaryActionIcon(actionId)}
+          {primaryActionLabel(actionId, t)}
+        </button>
+      </div>
+      <div className="quick-console-status">
+        <InfoRow icon={Sparkles} title={t.readiness} text={`${readiness}%`} />
+        <InfoRow icon={UploadCloud} title={t.navSources} text={sourceCount > 0 ? `${sourceCount} files` : t.noRealSourcesYet} />
+        <InfoRow icon={Server} title={t.navConfig} text={bridge ? t.bridgeOnline : t.bridgeOffline} />
+        <InfoRow icon={PlugZap} title={t.selectedAgent} text={selectedAgent?.available ? selectedAgent.label : t.agentNotDetected} />
+        <InfoRow icon={FolderOpen} title={t.openFolder} text={handoffResult?.projectPath || t.handoffNotCreated} />
+      </div>
+      <ol className="quick-step-list">
+        {steps.map((step, index) => (
+          <li key={step.id} className={step.status}>
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <strong>{stepLabel(step.id, t)}</strong>
+            <em>{workflowStatusLabel(step.status, t)}</em>
+          </li>
+        ))}
+      </ol>
+      <button className="secondary-action quick-settings" onClick={onOpenSettings}>
+        <Server size={17} />
+        {t.navConfig}
+      </button>
+    </section>
+  );
+}
+
+function stepLabel(stepId: ConsoleStepId, t: typeof labels.zh) {
+  const copy: Record<ConsoleStepId, string> = {
+    start: t.navStart,
+    sources: t.navSources,
+    configuration: t.navConfig,
+    handoff: t.navHandoff
+  };
+  return copy[stepId];
+}
+
+function SettingsDrawer({ labels: t, open, children }: { labels: typeof labels.zh; open: boolean; children: ReactNode }) {
+  return (
+    <details className="settings-drawer" open={open}>
+      <summary>
+        <span>{t.setupTitle}</span>
+        <p>{t.setupSubtitle}</p>
+      </summary>
+      <div className="settings-drawer-body">{children}</div>
+    </details>
+  );
+}
+
+function GroupedPreviewTabs({
+  activeGroup,
+  activeMode,
+  labels: t,
+  onSelectGroup,
+  onSelectMode
+}: {
+  activeGroup: PreviewGroup;
+  activeMode: PreviewMode;
+  labels: typeof labels.zh;
+  onSelectGroup: (group: PreviewGroup) => void;
+  onSelectMode: (mode: PreviewMode) => void;
+}) {
+  const groups: PreviewGroup[] = ["user", "agent", "quality"];
+  return (
+    <div className="grouped-preview-tabs">
+      <div className="preview-group-tabs" role="tablist">
+        {groups.map((group) => (
+          <button key={group} className={activeGroup === group ? "active" : ""} onClick={() => onSelectGroup(group)}>
+            {previewGroupLabel(group, t)}
+          </button>
+        ))}
+      </div>
+      <div className="preview-tabs compact" role="tablist">
+        {previewGroupModes[activeGroup].map((mode) => (
+          <button key={mode} className={activeMode === mode ? "active" : ""} onClick={() => onSelectMode(mode)}>
+            {previewModeLabel(mode, t)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function previewGroupLabel(group: PreviewGroup, t: typeof labels.zh) {
+  const copy: Record<PreviewGroup, string> = {
+    user: t.previewGroupUser,
+    agent: t.previewGroupAgent,
+    quality: t.previewGroupQuality
+  };
+  return copy[group];
+}
+
+function previewModeLabel(mode: PreviewMode, t: typeof labels.zh) {
+  const copy: Record<PreviewMode, string> = {
+    webdeck: t.previewWebDeck,
+    source: t.previewSource,
+    prompt: t.previewPrompt,
+    brief: t.previewBrief,
+    extracted: t.previewExtracted,
+    manifest: t.previewManifest,
+    codexTask: t.previewCodexTask,
+    assetPlan: t.previewAssetPlan,
+    elementKit: t.previewElementKit,
+    checklist: t.previewChecklist,
+    qualityReport: t.previewQualityReport
+  };
+  return copy[mode];
+}
+
 function PageGuide({ activeView, labels: t }: { activeView: WorkspaceView; labels: typeof labels.zh }) {
   const copy = {
     start: { title: t.startGuideTitle, text: t.startGuideText },
     sources: { title: t.sourceGuideTitle, text: t.sourceGuideText },
     configuration: { title: t.configGuideTitle, text: t.configGuideText },
-    handoff: { title: t.handoffGuideTitle, text: t.handoffGuideText },
-    preview: { title: t.previewGuideTitle, text: t.previewGuideText }
+    handoff: { title: t.handoffGuideTitle, text: t.handoffGuideText }
   }[activeView];
 
   return (
@@ -2055,7 +2338,7 @@ function OneClickRunbookPanel({
   return (
     <section className="one-click-runbook" aria-label={zh ? "开箱跑通" : "One-click runbook"}>
       <div className="runbook-intro">
-        <p className="eyebrow">{zh ? "v3.0 direction" : "v3.0 direction"}</p>
+        <p className="eyebrow">{zh ? "v4.1 console path" : "v4.1 console path"}</p>
         <h2>{zh ? "从第一眼到可交付，只保留一条默认路" : "One default path from first click to delivery"}</h2>
         <p>
           {zh

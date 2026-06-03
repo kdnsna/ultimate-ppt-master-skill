@@ -171,9 +171,64 @@ h2 {
 }
 
 .header-actions,
-.action-stack {
+.action-stack,
+.primary-action-bar {
   display: grid;
   gap: 10px;
+}
+
+.primary-action-bar {
+  position: relative;
+}
+
+.more-actions-menu {
+  position: relative;
+}
+
+.more-actions-menu summary {
+  min-height: 40px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: #fff;
+  font-size: 13px;
+  font-weight: 850;
+  cursor: pointer;
+  list-style: none;
+}
+
+.more-actions-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.more-actions-menu[open] {
+  z-index: 8;
+}
+
+.more-actions-menu[open] > button {
+  display: flex;
+}
+
+.more-actions-menu button {
+  width: 100%;
+  min-height: 38px;
+  margin-top: 8px;
+  padding: 0 10px;
+  display: none;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 850;
 }
 
 .header-rail {
@@ -361,19 +416,19 @@ h2 {
   flex: 0 0 auto;
 }
 
-.workspace-nav {
+.console-step-rail {
   margin-top: 14px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
-.workspace-nav button {
+.console-step-rail button {
   min-width: 0;
-  min-height: 64px;
+  min-height: 66px;
   padding: 10px 12px;
   display: grid;
-  grid-template-columns: 20px minmax(0, 1fr);
+  grid-template-columns: 34px 20px minmax(0, 1fr);
   gap: 4px 8px;
   align-items: center;
   border: 1px solid var(--line);
@@ -384,19 +439,50 @@ h2 {
   text-align: left;
 }
 
-.workspace-nav button.active {
+.console-step-rail button.active {
   color: var(--ink);
   border-color: rgba(37, 99, 235, 0.44);
   background: #f8fbff;
   box-shadow: var(--shadow);
 }
 
-.workspace-nav svg {
+.console-step-rail button.complete {
+  border-color: rgba(16, 185, 129, 0.28);
+}
+
+.console-step-rail button.blocked {
+  border-color: rgba(245, 158, 11, 0.36);
+  background: #fffbeb;
+}
+
+.console-step-rail b {
+  grid-row: span 2;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--ink);
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.console-step-rail button.complete b {
+  background: var(--green);
+}
+
+.console-step-rail button.blocked b {
+  background: var(--amber);
+}
+
+.console-step-rail svg {
   grid-row: span 2;
   color: var(--blue);
 }
 
-.workspace-nav span {
+.console-step-rail span {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -405,7 +491,7 @@ h2 {
   font-weight: 900;
 }
 
-.workspace-nav small {
+.console-step-rail small {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -436,6 +522,161 @@ h2 {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.55;
+}
+
+.quick-console {
+  margin-top: 14px;
+  padding: 18px;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(280px, 1fr);
+  gap: 16px;
+  align-items: stretch;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.quick-console-main {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.quick-console-main h2 {
+  color: var(--ink);
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 950;
+}
+
+.quick-console-main p:not(.eyebrow) {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.quick-console-status {
+  display: grid;
+  gap: 10px;
+}
+
+.quick-step-list {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  list-style: none;
+}
+
+.quick-step-list li {
+  min-width: 0;
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.quick-step-list li.complete {
+  border-color: rgba(16, 185, 129, 0.34);
+  background: #f0fdf4;
+}
+
+.quick-step-list li.active {
+  border-color: rgba(37, 99, 235, 0.34);
+  background: #f8fbff;
+}
+
+.quick-step-list li.blocked {
+  border-color: rgba(245, 158, 11, 0.36);
+  background: #fffbeb;
+}
+
+.quick-step-list span {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.quick-step-list strong {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.quick-step-list em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 850;
+}
+
+.quick-settings {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+.settings-drawer,
+.advanced-settings {
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.settings-drawer > summary,
+.advanced-settings > summary {
+  padding: 14px 16px;
+  display: grid;
+  gap: 4px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.settings-drawer > summary::-webkit-details-marker,
+.advanced-settings > summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-drawer > summary span,
+.advanced-settings > summary strong {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.settings-drawer > summary p,
+.advanced-settings > summary span {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.settings-drawer-body {
+  padding: 0 16px 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.advanced-settings[open] {
+  background: #fff;
+}
+
+.advanced-settings[open] > .control-grid,
+.advanced-settings[open] > .preset-summary,
+.advanced-settings[open] > .design-doctor-panel,
+.advanced-settings[open] > .engine-section,
+.advanced-settings[open] > .handoff-execution,
+.advanced-settings[open] > .kit-box,
+.advanced-settings[open] > .route-list,
+.advanced-settings[open] > .secondary-action {
+  margin: 0 14px 14px;
 }
 
 .guided-workflow {
@@ -737,6 +978,8 @@ h2 {
 }
 
 .app:not([data-view="start"]) .auxiliary-resources,
+.app:not([data-view="start"]) .quick-console,
+.app:not([data-view="configuration"]) .settings-drawer,
 .app[data-view="start"] .configuration-page,
 .app[data-view="start"] .studio-grid,
 .app[data-view="start"] .provider-panel,
@@ -768,17 +1011,7 @@ h2 {
 .app[data-view="handoff"] .configuration-page,
 .app[data-view="handoff"] .source-panel,
 .app[data-view="handoff"] .structure-panel,
-.app[data-view="handoff"] .provider-panel,
-.app[data-view="handoff"] .web-preview-panel,
-.app[data-view="handoff"] .preview-panel,
-.app[data-view="preview"] .beginner-guide,
-.app[data-view="preview"] .one-click-runbook,
-.app[data-view="preview"] .benchmark-wall,
-.app[data-view="preview"] .plain-glossary,
-.app[data-view="preview"] .value-strip,
-.app[data-view="preview"] .configuration-page,
-.app[data-view="preview"] .studio-grid,
-.app[data-view="preview"] .provider-panel {
+.app[data-view="handoff"] .provider-panel {
   display: none;
 }
 
@@ -788,6 +1021,11 @@ h2 {
 
 .app[data-view="handoff"] .studio-grid {
   grid-template-columns: minmax(320px, 560px);
+}
+
+.app[data-view="handoff"] .web-preview-panel,
+.app[data-view="handoff"] .preview-panel {
+  margin-top: 16px;
 }
 
 .beginner-guide {
@@ -1935,6 +2173,39 @@ textarea {
   margin-bottom: 12px;
 }
 
+.grouped-preview-tabs {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.preview-group-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.preview-group-tabs button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: #fff;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.preview-group-tabs button.active {
+  color: #fff;
+  border-color: var(--blue);
+  background: var(--blue);
+}
+
+.preview-tabs.compact {
+  margin-bottom: 0;
+}
+
 .preview-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2070,6 +2341,7 @@ pre {
 @media (max-width: 1180px) {
   .studio-header,
   .studio-grid,
+  .quick-console,
   .value-strip,
   .beginner-guide,
   .one-click-runbook,
@@ -2104,7 +2376,7 @@ pre {
   .plain-glossary-grid,
   .beginner-steps,
   .guided-step-rail,
-  .workspace-nav,
+  .console-step-rail,
   .setup-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2154,6 +2426,7 @@ pre {
   }
 
   .header-actions,
+  .primary-action-bar,
   .quality-workbench-grid,
   .configuration-actions,
   .beginner-steps,
@@ -2168,7 +2441,9 @@ pre {
   .benchmark-grid,
   .plain-glossary-grid,
   .guided-step-rail,
-  .workspace-nav,
+  .console-step-rail,
+  .quick-step-list,
+  .preview-group-tabs,
   .setup-grid {
     grid-template-columns: 1fr;
   }

@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "4.0.0"
+VERSION = "4.1.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -43,6 +43,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         self.assertIn("npm --prefix apps/web run build", scripts["build:web"])
         self.assertEqual(scripts["audit:docs"], "python3 scripts/audit_docs_links.py")
+        self.assertEqual(scripts["audit:web-console"], "python3 scripts/audit_web_console.py")
         self.assertEqual(scripts["bridge"], "node apps/bridge/server.mjs")
         self.assertTrue((ROOT / "scripts/bootstrap.sh").is_file())
         self.assertTrue((ROOT / "scripts/doctor.sh").is_file())
@@ -67,11 +68,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/guides/web-experience.md",
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/quality-workbench-v2.5.md",
+            "docs/release/release-notes-v4.1.0.md",
             "docs/release/release-notes-v4.0.0.md",
             "docs/release/release-maintenance.md",
             "docs/strategy/skill-market-distribution.md",
             "docs/zh-CN/guides/agent-connect-bridge.md",
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
+            "docs/zh-CN/release/release-notes-v4.1.0.md",
             "docs/zh-CN/release/release-notes-v4.0.0.md",
             "docs/zh-CN/strategy/skill-market-distribution.md",
         ):
@@ -98,15 +101,18 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         for expected in (
             "60-second quickstart",
+            "Simplified Web Console v4.1",
             "Hybrid-Editable Visual Workflow v4.0",
+            "one primary next action",
             "page recipes",
             "no-text generated visual layers",
+            "npm run audit:web-console",
             "scripts/audit_visual_recipes.py",
             "Benchmark Wall",
             "Skill Market Distribution",
             "npm run audit:docs",
             "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
-            "./docs/release/release-notes-v4.0.0.md",
+            "./docs/release/release-notes-v4.1.0.md",
             "./docs/strategy/skill-market-distribution.md",
             marketplace_prompt,
         ):
@@ -114,15 +120,18 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         for expected in (
             "60 秒开箱即用",
+            "v4.1 精简网页控制台",
             "v4.0 混合可编辑视觉工作流",
+            "一个状态驱动主按钮",
             "页面配方",
             "无文字生成式视觉层",
+            "npm run audit:web-console",
             "scripts/audit_visual_recipes.py",
             "公开案例墙",
             "Skill 市场分发",
             "npm run audit:docs",
             "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
-            "./docs/zh-CN/release/release-notes-v4.0.0.md",
+            "./docs/zh-CN/release/release-notes-v4.1.0.md",
             "./docs/zh-CN/strategy/skill-market-distribution.md",
             marketplace_prompt,
         ):
@@ -147,6 +156,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertEqual(listing["links"]["agentSetup"], "docs/guides/agent-setup.md")
         self.assertEqual(listing["proof"]["qualityWorkbench"], "docs/quality/quality-workbench-v2.5.md")
         self.assertIn("npm run audit:docs", listing["acceptanceGates"])
+        self.assertIn("npm run audit:web-console", listing["acceptanceGates"])
         self.assertIn('brand_color: "#0F766E"', openai_yaml)
         self.assertIn('icon_small: "./assets/skill-market/ultimate-ppt-master-icon.svg"', openai_yaml)
         self.assertIn('icon_large: "./assets/skill-market/ultimate-ppt-master-card.svg"', openai_yaml)
@@ -188,8 +198,11 @@ class ReleaseIntegrityTest(unittest.TestCase):
         release_v3_zh = (ROOT / "docs/zh-CN/release/release-notes-v3.0.0.md").read_text(encoding="utf-8")
         release_v4 = (ROOT / "docs/release/release-notes-v4.0.0.md").read_text(encoding="utf-8")
         release_v4_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.0.0.md").read_text(encoding="utf-8")
+        release_v41 = (ROOT / "docs/release/release-notes-v4.1.0.md").read_text(encoding="utf-8")
+        release_v41_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.1.0.md").read_text(encoding="utf-8")
 
         self.assertIn("npm run audit:docs", release_maintenance)
+        self.assertIn("npm run audit:web-console", release_maintenance)
         self.assertIn("npm run audit:quality", release_maintenance)
         self.assertIn("npm run audit:market", release_maintenance)
         self.assertIn("Skill Market Distribution", completion_audit)
@@ -214,6 +227,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
             self.assertIn("audit_visual_recipes.py", text)
             self.assertIn("page", text.lower())
 
+        self.assertIn("audit_web_console.py", release_v41)
+        self.assertIn("npm run audit:web-console", release_v41)
+        self.assertIn("four-step", release_v41.lower())
+        self.assertIn("audit_web_console.py", release_v41_zh)
+        self.assertIn("npm run audit:web-console", release_v41_zh)
+        self.assertIn("四步", release_v41_zh)
+
     def test_web_handoff_panel_has_executable_next_step_ui(self):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
 
@@ -236,8 +256,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v4.0.0", hero)
-        self.assertIn("Local connector", hero)
+        self.assertIn("v4.1.0", hero)
+        self.assertIn("Simplified Web console", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)
         self.assertNotIn("v2.3.0", combined)
