@@ -41,9 +41,9 @@ brew install cairo pkg-config
 ## Docs And Traceability
 
 - Human docs start at `docs/README.md`.
-- Agent setup details live in `docs/agent-setup.md`.
-- Provider/model configuration lives in `docs/model-provider-setup.md`.
-- Troubleshooting evidence paths live in `docs/troubleshooting.md`.
+- Agent setup details live in `docs/guides/agent-setup.md`.
+- Provider/model configuration lives in `docs/guides/model-provider-setup.md`.
+- Troubleshooting evidence paths live in `docs/guides/troubleshooting.md`.
 - Public issue templates live in `.github/ISSUE_TEMPLATE/`.
 
 When reporting or fixing issues, preserve the trace path: command run, project path, `desktop-manifest.json`, `sourceExtraction`, `sources/source.md`, `logs/desktop-worker.log`, and generated file paths. Do not commit private source documents, raw business outputs, `.env`, or API keys.

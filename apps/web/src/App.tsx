@@ -194,10 +194,10 @@ const baseUrl = import.meta.env.BASE_URL;
 const repoUrl = "https://github.com/kdnsna/ultimate-ppt-master-skill";
 const demoUrl = `${baseUrl}examples/agentic-developer-tools-2026/web-demo.html`;
 const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
-const bridgeDocUrl = `${repoUrl}/blob/main/docs/agent-connect-bridge.md`;
+const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v3";
-const appVersion = "3.0.0";
+const appVersion = "4.0.0";
 
 const designDoctorScores = [
   {
@@ -2096,7 +2096,7 @@ function BenchmarkWall({ language }: { language: Language }) {
         </p>
         <div className="benchmark-actions">
           <a href={`${baseUrl}benchmark/`}>{zh ? "打开公开案例墙" : "Open public benchmark"}</a>
-          <a href={`${repoUrl}/blob/main/docs/skill-market-distribution.md`}>{zh ? "Skill 市场清单" : "Skill market checklist"}</a>
+          <a href={`${repoUrl}/blob/main/docs/strategy/skill-market-distribution.md`}>{zh ? "Skill 市场清单" : "Skill market checklist"}</a>
         </div>
       </div>
       <div className="benchmark-grid">

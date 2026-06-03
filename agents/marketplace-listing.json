@@ -2,7 +2,7 @@
   "id": "ultimate-ppt-master",
   "name": "Ultimate PPT Master",
   "displayName": "终极融合PPT大师",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "invocation": "$ultimate-ppt-master",
   "category": [
     "presentation generation",
@@ -16,8 +16,8 @@
   "metadata": {
     "openai": "agents/openai.yaml",
     "skillEntrypoint": "SKILL.md",
-    "distributionGuide": "docs/skill-market-distribution.md",
-    "distributionGuideZh": "docs/zh-CN/skill-market-distribution.md"
+    "distributionGuide": "docs/strategy/skill-market-distribution.md",
+    "distributionGuideZh": "docs/zh-CN/strategy/skill-market-distribution.md"
   },
   "assets": {
     "iconSmall": "assets/skill-market/ultimate-ppt-master-icon.svg",
@@ -29,11 +29,11 @@
     "webExperience": "https://kdnsna.github.io/ultimate-ppt-master-skill/",
     "benchmarkWall": "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
     "quickstart": "README.md#60-second-quickstart",
-    "agentSetup": "docs/agent-setup.md"
+    "agentSetup": "docs/guides/agent-setup.md"
   },
   "proof": {
     "benchmarkWall": "apps/web/public/benchmark/index.html",
-    "qualityWorkbench": "docs/quality-workbench-v2.5.md",
+    "qualityWorkbench": "docs/quality/quality-workbench-v2.5.md",
     "repairPolicy": "report-only by default; automatic SVG repair only when the user explicitly asks",
     "cases": [
       {
@@ -71,6 +71,7 @@
     ]
   },
   "acceptanceGates": [
+    "npm run audit:docs",
     "npm run audit:presets",
     "npm run audit:quality",
     "npm run audit:market",

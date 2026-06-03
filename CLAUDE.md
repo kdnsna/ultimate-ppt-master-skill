@@ -17,7 +17,7 @@ Read `SKILL.md` first. Load extra files only as needed:
 
 - Editable PPTX mode: `references/`, `templates/`, `scripts/`
 - Magazine web deck mode: `assets/magazine-web/`, `references/magazine-web/`, and `scripts/validate-swiss-deck.mjs` for Swiss Style decks
-- Public docs: `docs/README.md`, `docs/agent-setup.md`, `docs/model-provider-setup.md`, and `docs/troubleshooting.md`
+- Public docs: `docs/README.md`, `docs/guides/agent-setup.md`, `docs/guides/model-provider-setup.md`, and `docs/guides/troubleshooting.md`
 
 ## Installation
 

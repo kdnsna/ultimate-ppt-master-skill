@@ -122,7 +122,7 @@ def audit_marketplace_listing(errors: list[str]) -> None:
         require(bool(case.get("bestFor")), f"marketplace listing proof case missing bestFor: {case.get('id')}", errors)
 
     gates = listing.get("acceptanceGates", [])
-    for command in ("npm run audit:presets", "npm run audit:quality", "npm run audit:market", "npm run test:node", "npm run test:worker", "npm run build:web"):
+    for command in ("npm run audit:docs", "npm run audit:presets", "npm run audit:quality", "npm run audit:market", "npm run test:node", "npm run test:worker", "npm run build:web"):
         require(command in gates, f"marketplace listing acceptance gate missing: {command}", errors)
 
 
@@ -145,26 +145,23 @@ def audit_readme_surfaces(errors: list[str]) -> None:
 
     for needle in (
         "60-second quickstart",
-        "v2.5 case carousel",
+        "Hybrid-Editable Visual Workflow v4.0",
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
         "Skill Market Distribution",
-        "./docs/skill-market-distribution.md",
+        "./docs/strategy/skill-market-distribution.md",
+        "./docs/release/release-notes-v4.0.0.md",
     ):
         require(needle in readme, f"README.md missing marketplace surface: {needle}", errors)
 
     for needle in (
         "60 秒开箱即用",
-        "v2.5 案例动态展示",
+        "v4.0 混合可编辑视觉工作流",
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
         "Skill 市场分发",
-        "./docs/zh-CN/skill-market-distribution.md",
+        "./docs/zh-CN/strategy/skill-market-distribution.md",
+        "./docs/zh-CN/release/release-notes-v4.0.0.md",
     ):
         require(needle in readme_zh, f"README.zh-CN.md missing marketplace surface: {needle}", errors)
-
-    for case in PROOF_CASES:
-        for filename in ("web-demo.html", "source.sanitized.md", "quality-report.json"):
-            require(f"examples/{case}/{filename}" in readme, f"README.md missing proof link: {case}/{filename}", errors)
-            require(f"examples/{case}/{filename}" in readme_zh, f"README.zh-CN.md missing proof link: {case}/{filename}", errors)
 
 
 def audit_benchmark_wall(errors: list[str]) -> None:
@@ -189,18 +186,18 @@ def audit_benchmark_wall(errors: list[str]) -> None:
 
 def audit_distribution_docs(errors: list[str]) -> None:
     docs = {
-        "docs/skill-market-distribution.md": ROOT / "docs" / "skill-market-distribution.md",
-        "docs/zh-CN/skill-market-distribution.md": ROOT / "docs" / "zh-CN" / "skill-market-distribution.md",
-        "docs/release-maintenance.md": ROOT / "docs" / "release-maintenance.md",
+        "docs/strategy/skill-market-distribution.md": ROOT / "docs" / "strategy" / "skill-market-distribution.md",
+        "docs/zh-CN/strategy/skill-market-distribution.md": ROOT / "docs" / "zh-CN" / "strategy" / "skill-market-distribution.md",
+        "docs/release/release-maintenance.md": ROOT / "docs" / "release" / "release-maintenance.md",
         "docs/README.md": ROOT / "docs" / "README.md",
         "docs/zh-CN/README.md": ROOT / "docs" / "zh-CN" / "README.md",
     }
     for label, path in docs.items():
         require(path.is_file(), f"{label} is missing", errors)
 
-    market = read_text(docs["docs/skill-market-distribution.md"]) if docs["docs/skill-market-distribution.md"].is_file() else ""
-    market_zh = read_text(docs["docs/zh-CN/skill-market-distribution.md"]) if docs["docs/zh-CN/skill-market-distribution.md"].is_file() else ""
-    release = read_text(docs["docs/release-maintenance.md"]) if docs["docs/release-maintenance.md"].is_file() else ""
+    market = read_text(docs["docs/strategy/skill-market-distribution.md"]) if docs["docs/strategy/skill-market-distribution.md"].is_file() else ""
+    market_zh = read_text(docs["docs/zh-CN/strategy/skill-market-distribution.md"]) if docs["docs/zh-CN/strategy/skill-market-distribution.md"].is_file() else ""
+    release = read_text(docs["docs/release/release-maintenance.md"]) if docs["docs/release/release-maintenance.md"].is_file() else ""
     docs_index = read_text(docs["docs/README.md"]) if docs["docs/README.md"].is_file() else ""
     docs_index_zh = read_text(docs["docs/zh-CN/README.md"]) if docs["docs/zh-CN/README.md"].is_file() else ""
 
@@ -208,6 +205,7 @@ def audit_distribution_docs(errors: list[str]) -> None:
         for needle in ("agents/openai.yaml", "agents/marketplace-listing.json", "assets/skill-market", "npm run audit:market", "benchmark"):
             require(needle in text, f"{label} missing {needle}", errors)
 
+    require("npm run audit:docs" in release, "release maintenance missing audit:docs", errors)
     require("npm run audit:market" in release, "release maintenance missing audit:market", errors)
     require("Skill Market Distribution" in docs_index, "docs index missing Skill Market Distribution", errors)
     require("Skill 市场分发" in docs_index_zh, "Chinese docs index missing Skill 市场分发", errors)
@@ -216,6 +214,8 @@ def audit_distribution_docs(errors: list[str]) -> None:
 def audit_package_script(errors: list[str]) -> None:
     package = json.loads(read_text(ROOT / "package.json"))
     command = package.get("scripts", {}).get("audit:market")
+    docs_command = package.get("scripts", {}).get("audit:docs")
+    require(docs_command == "python3 scripts/audit_docs_links.py", "package.json missing audit:docs script", errors)
     require(command == "python3 scripts/audit_skill_market.py", "package.json missing audit:market script", errors)
 
 

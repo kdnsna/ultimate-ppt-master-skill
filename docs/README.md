@@ -1,69 +1,56 @@
 # Documentation Map
 
-Ultimate PPT Master now has a web-first public direction and three important user routes:
+Ultimate PPT Master v4.0 uses a categorized documentation structure. Start with the route that matches the work you are doing.
 
-1. **Web Experience** is the main front door for discovery, lightweight trial, source intake, live Web Deck preview, dual-engine planning, handoff-kit export, and demo viewing.
-2. **Agent Connect Bridge** is the local connector for real source parsing, provider status checks, and one-folder handoff to Codex or another Agent.
-3. **Agent Skill** is the high-quality local production route with Codex, Claude Code, Hermes, OpenClaw, Cursor-style IDEs, and other agents.
+## Guides
 
-The desktop app remains available as an advanced local preview and future distribution path, but it is not the near-term acquisition path.
+| Need | Read |
+|---|---|
+| Understand the web front door | [Web Experience](./guides/web-experience.md) |
+| Connect the web page to local files and Agents | [Agent Connect Bridge](./guides/agent-connect-bridge.md) |
+| Install and invoke the Skill | [Agent Setup](./guides/agent-setup.md) |
+| Choose PPTX, Web Deck, dual delivery, or desktop preview | [Choosing a Workflow](./guides/choosing-a-workflow.md) |
+| Configure provider keys locally | [Model and Provider Setup](./guides/model-provider-setup.md) |
+| Use the desktop preview path | [Quickstart Desktop](./guides/quickstart-desktop.md) |
+| Debug setup, parsing, output, provider, or Agent issues | [Troubleshooting](./guides/troubleshooting.md) |
 
-## Start Here
+## Quality
 
-| Need | Best entry | Read |
-|---|---|---|
-| I want to understand and try the product quickly. | Web Experience | [Web Experience](./web-experience.md) |
-| I want the web page to parse local PDF/Word/PPTX/Excel sources without uploading them. | Agent Connect Bridge | [Agent Connect Bridge](./agent-connect-bridge.md) |
-| I want Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf to generate decks. | Agent Skill | [Agent Setup](./agent-setup.md) |
-| I want to know which workflow gives better results. | Decision guide | [Choosing a Workflow](./choosing-a-workflow.md) |
-| I want to know why this exists beside direct Skill install. | Product positioning | [Product Positioning](./product-positioning.md) |
-| I want to improve public GitHub exposure. | Growth checklist | [Public Growth Playbook](./public-growth-playbook.md) |
-| I want to prepare the skill for marketplaces and agent directories. | Skill Market Distribution | [Skill Market Distribution](./skill-market-distribution.md) |
-| I want to audit whether the v2.5 optimization is actually complete. | Completion audit | [Completion Audit - v2.5 Quality Workbench and Skill Market Distribution](./completion-audit-v2.5-quality-workbench.md) |
-| I want to see the next content/template direction. | Roadmap | [Next Roadmap - Content and Template Presets](./next-roadmap.md) |
-| I want to see the stable proof matrix. | Quality workbench | [Quality Workbench v2.5](./quality-workbench-v2.5.md) |
-| I want to know what changed in v3.0.0. | Release notes | [Release Notes - v3.0.0](./release-notes-v3.0.0.md) |
-| I want to see which GitHub trends influenced the roadmap. | Technology scan | [GitHub Technology Scan - May 2026](./github-tech-scan-2026-05.md) |
-| I want to see the local upstream comparison. | Benchmark | [Upstream Benchmark - May 2026](./upstream-benchmark-2026-05.md) |
-| I need model/API/provider keys. | Provider setup | [Model and Provider Setup](./model-provider-setup.md) |
-| I want the local desktop preview. | Desktop Later | [Quickstart Desktop](./quickstart-desktop.md) |
-| I maintain release packaging, signing, notarization, or Homebrew. | Distribution | [Release and Maintenance](./release-maintenance.md) |
-| Something failed. | Traceable debugging | [Troubleshooting](./troubleshooting.md) |
-| 中文用户想快速定位。 | 中文索引 | [中文文档索引](./zh-CN/README.md) |
+| Need | Read |
+|---|---|
+| Understand the v4.0 visual contract | [Hybrid-Editable Visual Workflow v4.0](./quality/hybrid-editable-visual-workflow-v4.0.md) |
+| Review the stable proof matrix | [Quality Workbench v2.5](./quality/quality-workbench-v2.5.md) |
+| Audit the v2.5 quality-workbench completion evidence | [Completion Audit v2.5](./quality/completion-audit-v2.5.md) |
+| Compare with upstream presentation tooling | [Upstream Benchmark - May 2026](./quality/upstream-benchmark-2026-05.md) |
+| Review technology signals that influenced the roadmap | [GitHub Technology Scan - May 2026](./quality/github-tech-scan-2026-05.md) |
 
-## Current Recommendation
+## Release
 
-| User type | Recommended path | Why |
-|---|---|---|
-| Curious visitor | Open the Web Experience | Fastest path: no install, no backend account, no model key, no local environment setup. |
-| GitHub/agent user | Run Bridge, then hand the folder to Codex or install as a Skill | Best quality today because the agent can inspect source files, run the pipeline, preview, fix, and export. |
-| Team maintaining polished decks | Web Experience + Bridge for intake + Agent Skill for production | Keeps the front door simple while preserving deep local control. |
-| Skill marketplace maintainer | README first screen + `agents/openai.yaml` + `agents/marketplace-listing.json` + benchmark wall | Proves the skill can be discovered, invoked, and accepted before distribution. |
-| Desktop user or maintainer | Use desktop as an advanced local preview | Native distribution still depends on signing, notarization, and packaging maturity. |
-| API integrator | Use Bridge/provider dashboard for local key checks | The browser never stores keys; Bridge can test configured providers locally. |
+| Need | Read |
+|---|---|
+| See the latest release | [Release Notes - v4.0.0](./release/release-notes-v4.0.0.md) |
+| Review the formal handoff release | [Release Notes - v3.0.0](./release/release-notes-v3.0.0.md) |
+| Maintain release checks, Pages, Homebrew, signing, and privacy | [Release and Maintenance](./release/release-maintenance.md) |
+| Prepare Homebrew distribution | [Homebrew Distribution Plan](./release/homebrew-distribution.md) |
+
+## Strategy
+
+| Need | Read |
+|---|---|
+| Understand product positioning | [Product Positioning](./strategy/product-positioning.md) |
+| Improve public GitHub exposure | [Public Growth Playbook](./strategy/public-growth-playbook.md) |
+| Prepare marketplace or agent-directory distribution | [Skill Market Distribution](./strategy/skill-market-distribution.md) |
+| Review content and template direction | [Next Roadmap - Content and Template Presets](./strategy/next-roadmap.md) |
+| Review optimization backlog | [Next Optimization Directions](./strategy/next-optimization-directions.md) |
 
 ## Trace Map
-
-Every public support path should point to an inspectable artifact:
 
 | Question | First check | Evidence to keep |
 |---|---|---|
 | Does the web app build? | `npm run build:web` | `apps/web/dist`, Pages workflow logs. |
-| Does the Agent Connect Studio work? | Web Experience file intake, Bridge status, outline, live Web Deck preview, preview tabs, Design Doctor, and handoff buttons | Generated Agent prompt, `source.md`, `extracted-source.md`, `manifest.json`, `attachments/`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, `AGENTS.md`, `quality-report.json`, and `handoff-kit.zip`. |
-| Did source extraction work in a local project? | Bridge `manifest.json` | `attachments[].parseStatus`, `extracted-source.md`, original files in `attachments/`. |
-| Where did the output go? | Workbench export panel or manifest | `generatedFiles`, `outputs/`, `previews/`. |
-| Why does a deck look wrong? | Project log and source markdown | `logs/desktop-worker.log`, redacted source excerpt. |
-| Which agent instructions are active? | `AGENTS.md`, `CLAUDE.md`, `PROMPT.md` | Agent prompt and local skill path. |
-| Is CI healthy? | `.github/workflows/ci.yml` | Web build, desktop build, worker tests, audit, whitespace check. |
-| Is Pages healthy? | `.github/workflows/pages.yml` | Static artifact upload and deploy logs. |
+| Did the local handoff work? | Bridge manifest and generated folder | `source.md`, `extracted-source.md`, `manifest.json`, `quality-report.json`, `codex-task.md`. |
+| Did v4.0 visual governance run? | `npm run audit:docs` and visual recipe commands | `spec_lock.md`, `assets/generated/page-visuals/manifest.json`, audit output. |
+| Is marketplace readiness still true? | `npm run audit:market` | `agents/openai.yaml`, `agents/marketplace-listing.json`, benchmark page. |
+| Is CI healthy? | `.github/workflows/ci.yml` | Web build, desktop build, worker tests, Node tests, audits, whitespace check. |
 
-## External References
-
-These docs informed the repository guidance:
-
-- [OpenAI Codex CLI](https://developers.openai.com/codex/cli): Codex can run locally, read/change code, and run commands in the selected directory.
-- [OpenAI AGENTS.md guide](https://developers.openai.com/codex/guides/agents-md): Codex reads `AGENTS.md` before work.
-- [Claude Code settings](https://code.claude.com/docs/en/settings): Claude Code uses `CLAUDE.md`, settings, skills, and MCP configuration.
-- [Claude Code memory](https://code.claude.com/docs/en/memory): project-level `CLAUDE.md` is the shared place for build commands and project conventions.
-- [GitHub Pages](https://docs.github.com/en/pages): static site deployment from GitHub Actions.
-- [Tauri distribution](https://v2.tauri.app/distribute/): native desktop distribution uses Tauri build and bundle commands.
+中文用户请从 [中文文档索引](./zh-CN/README.md) 开始。

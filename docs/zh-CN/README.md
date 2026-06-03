@@ -1,51 +1,52 @@
 # 中文文档索引
 
-终极融合 PPT 大师现在采用“网页端优先 + 本地 Bridge + Skill 重要生产入口”的方向：
+Ultimate PPT Master v4.0 采用分类文档结构。先按你当前要做的事情选择入口。
 
-1. **Web Experience**：主推广入口，用于低门槛体验、解释产品、导入资料、组装 Deck Brief、实时预览 Web Deck、生成双引擎计划、导出 handoff kit、查看 Web Deck 示例。
-2. **Agent Connect Bridge**：本地连接入口，让网页连接 `127.0.0.1`，本地解析 PDF/Word/PPTX/Excel/URL、检查 provider 状态、生成 handoff 项目。
-3. **Agent Skill**：高质量生产入口，用于 Codex、Claude Code、Hermes、OpenClaw、Cursor / Cline / Roo / Windsurf 等工具执行生产级 PPT 工作流。
+## 使用指南
 
-桌面端继续保留，但归为高级本地预览和后续发布维护路线，不再作为近期获客主路径。
+| 需求 | 阅读 |
+|---|---|
+| 理解网页入口 | [Web Experience](./guides/web-experience.md) |
+| 连接网页、本地资料和 Agent | [Agent Connect Bridge](./guides/agent-connect-bridge.md) |
+| 安装和调用 Skill | [Agent Setup](../guides/agent-setup.md) |
+| 选择 PPTX、Web Deck、双版本或桌面预览 | [Choosing a Workflow](../guides/choosing-a-workflow.md) |
+| 本地配置 provider key | [Model and Provider Setup](../guides/model-provider-setup.md) |
+| 使用桌面预览路径 | [Quickstart Desktop](../guides/quickstart-desktop.md) |
+| 排查安装、解析、输出、provider 或 Agent 问题 | [Troubleshooting](../guides/troubleshooting.md) |
 
-## 怎么选
+## 质量与审计
 
-| 你是谁 | 推荐入口 | 原因 |
-|---|---|---|
-| 新用户 / 普通访客 | Web Experience | 不用安装、不用账号、不用模型 key，先快速整理 brief、预览 Web Deck 并导出 handoff kit。 |
-| GitHub / Agent 用户 | Bridge + Skill | 效果最好，网页能落盘真实项目，Agent 可以读资料、跑脚本、预览、修正、导出。 |
-| 团队要稳定交付 | Web Experience + Bridge + Skill | 网页端做导入和交付包，Bridge 做本地解析，Skill 做最终生产。 |
-| Skill 市场维护者 | README 首屏 + `agents/openai.yaml` + `agents/marketplace-listing.json` + 案例墙 | 先证明能被发现、能被调用、能被验收，再去市场分发。 |
-| 想看桌面端 | Desktop Later | 可源码运行，但签名、公证、Homebrew 后续再做主推。 |
-| 想接自己的大模型 API | Bridge / Provider Dashboard | 浏览器不保存 key，Bridge 从本地环境读取并测试 provider。 |
+| 需求 | 阅读 |
+|---|---|
+| 理解 v4.0 视觉契约 | [v4.0 混合可编辑视觉工作流](./quality/hybrid-editable-visual-workflow-v4.0.md) |
+| 查看稳定证明矩阵 | [v2.5 质量工作台](./quality/quality-workbench-v2.5.md) |
+| 查看 v2.5 完成审计 | [Completion Audit v2.5](../quality/completion-audit-v2.5.md) |
+| 查看本机上游基准测试 | [上游基准测试 - 2026 年 5 月](./quality/upstream-benchmark-2026-05.md) |
+| 查看 GitHub 技术趋势 | [GitHub 技术扫描 - 2026 年 5 月](./quality/github-tech-scan-2026-05.md) |
 
-## 常用文档
+## 发布
 
-- Web Experience：[Web Experience](./web-experience.md)
-- Agent Connect Bridge：[Agent Connect Bridge](./agent-connect-bridge.md)
-- Agent 配置：[Agent Setup](../agent-setup.md)
-- 工作流选择：[Choosing a Workflow](../choosing-a-workflow.md)
-- 产品定位反思：[产品定位反思](./product-positioning.md)
-- GitHub 曝光运营清单：[Public Growth Playbook](../public-growth-playbook.md)
-- Skill 市场分发：[Skill 市场分发](./skill-market-distribution.md)
-- v2.5 优化完成审计：[Completion Audit - v2.5 Quality Workbench and Skill Market Distribution](../completion-audit-v2.5-quality-workbench.md)
-- 下一步内容 / 模板方向：[下一步路线 - 内容与模板预设](./next-roadmap.md)
-- v2.5 质量工作台：[v2.5 质量工作台](./quality-workbench-v2.5.md)
-- v3.0.0 发布说明：[发布说明 - v3.0.0](./release-notes-v3.0.0.md)
-- GitHub 技术扫描：[GitHub 技术扫描 - 2026 年 5 月](./github-tech-scan-2026-05.md)
-- 上游基准测试：[上游基准测试 - 2026 年 5 月](./upstream-benchmark-2026-05.md)
-- 桌面端源码预览：[Quickstart Desktop](../quickstart-desktop.md)
-- Homebrew 分发方案：[Homebrew Distribution Plan](../homebrew-distribution.md)
-- 模型和 Provider 配置：[Model and Provider Setup](../model-provider-setup.md)
-- 问题排查：[Troubleshooting](../troubleshooting.md)
-- 发布维护：[Release and Maintenance](../release-maintenance.md)
+| 需求 | 阅读 |
+|---|---|
+| 查看最新发布 | [发布说明 - v4.0.0](./release/release-notes-v4.0.0.md) |
+| 查看正式 handoff 发布 | [发布说明 - v3.0.0](./release/release-notes-v3.0.0.md) |
+| 发布、Pages、Homebrew、签名、公证、隐私和维护 | [Release and Maintenance](../release/release-maintenance.md) |
+| 准备 Homebrew 分发 | [Homebrew Distribution Plan](../release/homebrew-distribution.md) |
 
-## 最推荐的效果路线
+## 策略
 
-目前最适合推广的路线是：
+| 需求 | 阅读 |
+|---|---|
+| 理解产品定位 | [产品定位反思](./strategy/product-positioning.md) |
+| 改善 GitHub 公开曝光 | [Public Growth Playbook](../strategy/public-growth-playbook.md) |
+| 准备 Skill 市场分发 | [Skill 市场分发](./strategy/skill-market-distribution.md) |
+| 查看内容和模板方向 | [下一步路线 - 内容与模板预设](./strategy/next-roadmap.md) |
+| 查看优化 backlog | [Next Optimization Directions](../strategy/next-optimization-directions.md) |
+
+## 推荐路线
 
 ```text
-打开 Web Experience -> 拖入资料或粘贴摘要 -> 启动 npm run bridge -> 发送到本地 Bridge -> 把生成的 handoff 项目交给 Codex / Claude Code / Hermes / OpenClaw 深加工
+打开 Web Experience -> 拖入资料或粘贴摘要 -> 启动 npm run bridge -> 发送到本地 Bridge -> 把 handoff 项目交给 Codex / Claude Code / Hermes / OpenClaw 深加工
 ```
 
-原因很简单：网页端把“我要什么”“资料是什么”“走 PPTX 还是 Web Deck 路线”整理成可执行 brief；Bridge 把真实资料留在本机并尽量解析成 `extracted-source.md`；Skill 让 Agent 在本地读文件、运行脚本、检查输出、修正失败页面。这比让普通用户一上来安装桌面端、配置系统依赖，更适合传播。
+v4.0 的新增重点是：先用 page recipes 锁定页面结构，再用无文字 visual layers 增强观感，最后用审计阻止重复模板和正式正文页整页图片化。

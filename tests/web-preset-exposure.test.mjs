@@ -38,7 +38,7 @@ test("preset catalog exposes office-user quality metadata", async () => {
 });
 
 test("docs include the GitHub technology scan used for v2.4 direction", async () => {
-  const scan = await readFile("docs/github-tech-scan-2026-05.md", "utf8");
+  const scan = await readFile("docs/quality/github-tech-scan-2026-05.md", "utf8");
 
   assert.match(scan, /microsoft\/markitdown/);
   assert.match(scan, /modelcontextprotocol\/servers/);

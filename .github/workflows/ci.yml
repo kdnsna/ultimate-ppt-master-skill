@@ -49,6 +49,9 @@ jobs:
       - name: Build web experience
         run: npm run build:web
 
+      - name: Audit documentation links
+        run: npm run audit:docs
+
       - name: Audit preset starter packs
         run: npm run audit:presets
 

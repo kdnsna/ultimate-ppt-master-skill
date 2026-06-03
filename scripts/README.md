@@ -1,6 +1,6 @@
 # PPT Master Toolset
 
-This directory contains user-facing scripts for conversion, project setup, SVG processing, export, recorded narration, image generation, and formal delivery audits.
+This directory contains user-facing scripts for conversion, project setup, SVG processing, export, recorded narration, image generation, documentation audits, and formal delivery audits.
 
 ## Directory Layout
 
@@ -45,6 +45,7 @@ python3 scripts/update_repo.py
 | SVG pipeline | `finalize_svg.py`, `svg_to_pptx.py`, `total_md_split.py`, `svg_quality_checker.py`, `animation_config.py`, `notes_to_audio.py` | [docs/svg-pipeline.md](./docs/svg-pipeline.md) |
 | Spec maintenance | `update_spec.py` | [docs/update_spec.md](./docs/update_spec.md) |
 | Image tools | `image_gen.py`, `analyze_images.py`, `gemini_watermark_remover.py` | [docs/image.md](./docs/image.md) |
+| Documentation audits | `audit_docs_links.py` | v4.0 version markers, canonical docs links, and moved-stub checks |
 | Delivery audits | `audit_formal_delivery.py`, `audit_design_completion.py`, `audit_visual_recipes.py`, `visual_review.py` | Formal-business gate, visual-completion gate, 4.0 visual recipe gate, and report-only visual review |
 | Repo maintenance | `update_repo.py` | README install/update section |
 | Troubleshooting | validation, preview, export, dependency issues | [docs/troubleshooting.md](./docs/troubleshooting.md) |
@@ -88,6 +89,7 @@ python3 scripts/svg_to_pptx.py <project_path>
 Formal delivery audit:
 
 ```bash
+python3 scripts/audit_docs_links.py
 python3 scripts/audit_formal_delivery.py <project_path>
 python3 scripts/audit_design_completion.py <project_path>
 python3 scripts/audit_visual_recipes.py <project_path>

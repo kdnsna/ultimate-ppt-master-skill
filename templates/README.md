@@ -26,7 +26,7 @@ The `layouts/` directory contains pre-built page layout templates organized by d
 The `presets/` directory is the v2.4 seed for scenario-level content packs. Presets sit above raw templates: they define what the user should provide, the default narrative, the recommended slide roster, and which layout / brand / chart candidates should be considered.
 
 - **Seed catalog**: [presets/preset-directions.json](./presets/preset-directions.json)
-- **Roadmap**: [../docs/next-roadmap.md](../docs/next-roadmap.md)
+- **Roadmap**: [../docs/strategy/next-roadmap.md](../docs/strategy/next-roadmap.md)
 
 ## Brand Identity Presets
 

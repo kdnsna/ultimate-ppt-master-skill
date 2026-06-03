@@ -104,7 +104,7 @@ export const presetCatalog: WebPreset[] = [
       generatedOutput: "examples/executive-business-review-starter/web-demo.html",
       screenshot: "examples/executive-business-review-starter/cover.svg",
       qualityReport: "examples/executive-business-review-starter/quality-report.json",
-      benchmarkNote: "docs/quality-workbench-v2.5.md"
+      benchmarkNote: "docs/quality/quality-workbench-v2.5.md"
     },
     notFor: [
       { zh: "缺少经营数据的纯营销路演", en: "pure marketing launches with little operating data" },
@@ -207,7 +207,7 @@ export const presetCatalog: WebPreset[] = [
       generatedOutput: "examples/consulting-proposal-starter/web-demo.html",
       screenshot: "examples/consulting-proposal-starter/cover.svg",
       qualityReport: "examples/consulting-proposal-starter/quality-report.json",
-      benchmarkNote: "docs/quality-workbench-v2.5.md"
+      benchmarkNote: "docs/quality/quality-workbench-v2.5.md"
     },
     notFor: [
       { zh: "需要强品牌艺术指导的创意 campaign", en: "creative campaigns that need heavy brand art direction" },
@@ -309,7 +309,7 @@ export const presetCatalog: WebPreset[] = [
       generatedOutput: "examples/product-pitch-starter/web-demo.html",
       screenshot: "examples/product-pitch-starter/cover.svg",
       qualityReport: "examples/product-pitch-starter/quality-report.json",
-      benchmarkNote: "docs/quality-workbench-v2.5.md"
+      benchmarkNote: "docs/quality/quality-workbench-v2.5.md"
     },
     notFor: [
       { zh: "需要密集 KPI 表的例行状态汇报", en: "routine status reports that need dense KPI tables" },
@@ -641,7 +641,7 @@ export const presetCatalog: WebPreset[] = [
       generatedOutput: "examples/tech-trend-web-deck-starter/web-demo.html",
       screenshot: "examples/tech-trend-web-deck-starter/cover.svg",
       qualityReport: "examples/tech-trend-web-deck-starter/quality-report.json",
-      benchmarkNote: "docs/quality-workbench-v2.5.md"
+      benchmarkNote: "docs/quality/quality-workbench-v2.5.md"
     },
     notFor: [
       { zh: "不能引用公开资料的机密战略汇报", en: "confidential strategy decks that cannot cite public material" },

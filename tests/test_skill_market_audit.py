@@ -25,16 +25,19 @@ class SkillMarketAuditTest(unittest.TestCase):
     def test_package_and_release_docs_include_market_gate(self):
         package_json = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
         scripts = package_json["scripts"]
+        self.assertEqual(scripts.get("audit:docs"), "python3 scripts/audit_docs_links.py")
         self.assertEqual(scripts.get("audit:market"), "python3 scripts/audit_skill_market.py")
 
-        release_doc = (ROOT / "docs" / "release-maintenance.md").read_text(encoding="utf-8")
-        market_doc = (ROOT / "docs" / "skill-market-distribution.md").read_text(encoding="utf-8")
-        market_doc_zh = (ROOT / "docs" / "zh-CN" / "skill-market-distribution.md").read_text(encoding="utf-8")
+        release_doc = (ROOT / "docs" / "release" / "release-maintenance.md").read_text(encoding="utf-8")
+        market_doc = (ROOT / "docs" / "strategy" / "skill-market-distribution.md").read_text(encoding="utf-8")
+        market_doc_zh = (ROOT / "docs" / "zh-CN" / "strategy" / "skill-market-distribution.md").read_text(encoding="utf-8")
         ci_workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
 
         for text in (release_doc, market_doc, market_doc_zh):
+            self.assertIn("npm run audit:docs", text)
             self.assertIn("npm run audit:market", text)
 
+        self.assertIn("npm run audit:docs", ci_workflow)
         self.assertIn("npm run audit:quality", ci_workflow)
         self.assertIn("npm run audit:market", ci_workflow)
 
@@ -48,8 +51,13 @@ class SkillMarketAuditTest(unittest.TestCase):
         self.assertIn("quality-checked", listing["shortDescription"])
         self.assertIn("local-first", listing["positioning"].lower())
         self.assertIn("agents/openai.yaml", listing["metadata"]["openai"])
+        self.assertEqual(listing["metadata"]["distributionGuide"], "docs/strategy/skill-market-distribution.md")
+        self.assertEqual(listing["metadata"]["distributionGuideZh"], "docs/zh-CN/strategy/skill-market-distribution.md")
+        self.assertEqual(listing["links"]["agentSetup"], "docs/guides/agent-setup.md")
+        self.assertIn("npm run audit:docs", listing["acceptanceGates"])
         self.assertIn("assets/skill-market/ultimate-ppt-master-icon.svg", listing["assets"]["iconSmall"])
         self.assertIn("apps/web/public/benchmark/index.html", listing["proof"]["benchmarkWall"])
+        self.assertEqual(listing["proof"]["qualityWorkbench"], "docs/quality/quality-workbench-v2.5.md")
         self.assertGreaterEqual(len(listing["proof"]["cases"]), 4)
         for case in listing["proof"]["cases"]:
             self.assertIn("id", case)
