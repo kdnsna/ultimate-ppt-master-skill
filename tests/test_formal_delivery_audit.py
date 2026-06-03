@@ -29,6 +29,82 @@ def write_good_artifacts(project: Path) -> None:
             ["办理流程", "步骤一", "步骤二"],
         ],
     )
+    (project / "design_spec.md").write_text(
+        """
+# Design Specification
+
+## III. Visual Theme
+- Visual Direction: finance_internal_report
+- Benchmark Sentence: formal banking report with source-grounded evidence pages
+
+## V. Layout Principles
+### Page Role / Visual Weight Contract
+| page | page_role | visual_weight | layout_family | page_recipe_id | asset_requirement | visual_layer | raster_policy | anti_patterns |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| P01 | anchor | hero | cover_brand | cover_brand.hero_left_visual | real-logo-or-text-fallback | generated-background | allowed-cover | fake-logo |
+| P02 | context | medium | statement_plus_evidence | statement_plus_evidence.left_rule_panel | none | subtle-pattern | prohibited-formal-body | 2x2-card-grid |
+| P03 | process | high | process_flow | process_flow.horizontal_steps | schematic | generated-process-accent | prohibited-formal-body | disconnected-icons |
+| P04 | benefit | high | metric_panel | metric_panel.large_number_strip | none | generated-metric-accent | prohibited-formal-body | repeated-card-grid |
+""",
+        encoding="utf-8",
+    )
+    (project / "spec_lock.md").write_text(
+        """
+## visual_direction
+- id: finance_internal_report
+- benchmark: Formal banking report with source-grounded evidence pages.
+- release_boundary: internal-review
+
+## page_roles
+- P01: anchor
+- P02: context
+- P03: process
+- P04: benefit
+
+## visual_weight
+- P01: hero
+- P02: medium
+- P03: high
+- P04: high
+
+## layout_family
+- P01: cover_brand
+- P02: statement_plus_evidence
+- P03: process_flow
+- P04: metric_panel
+
+## page_recipes
+- P01: cover_brand.hero_left_visual
+- P02: statement_plus_evidence.left_rule_panel
+- P03: process_flow.horizontal_steps
+- P04: metric_panel.large_number_strip
+
+## visual_layers
+- P01: generated-background | no-text | 16:9 | assets/generated/page-visuals/P01-background.png
+- P02: subtle-pattern | no-text | 16:9 | assets/generated/page-visuals/P02-pattern.png
+- P03: generated-process-accent | no-text | 16:9 | assets/generated/page-visuals/P03-process.png
+- P04: generated-metric-accent | no-text | 16:9 | assets/generated/page-visuals/P04-metric.png
+
+## raster_policy
+- P01: allowed-cover
+- P02: prohibited-formal-body
+- P03: prohibited-formal-body
+- P04: prohibited-formal-body
+
+## asset_requirements
+- P01: real-logo-or-text-fallback
+- P02: none
+- P03: schematic
+- P04: none
+
+## anti_patterns
+- P01: fake-logo
+- P02: 2x2-card-grid
+- P03: disconnected-icons
+- P04: repeated-card-grid
+""",
+        encoding="utf-8",
+    )
 
 
 def write_formal_manifest(project: Path, *, chatgpt_first: bool = False) -> None:

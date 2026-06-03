@@ -1,0 +1,65 @@
+{
+  "cover_brand.hero_left_visual": {
+    "role": "anchor",
+    "layoutFamily": "cover_brand",
+    "visualLayer": "generated-background",
+    "rasterPolicy": "allowed-cover",
+    "summary": "Brand-led cover with editable title and a controlled no-text visual background."
+  },
+  "statement_plus_evidence.left_rule_panel": {
+    "role": "context",
+    "layoutFamily": "statement_plus_evidence",
+    "visualLayer": "subtle-pattern",
+    "rasterPolicy": "prohibited-formal-body",
+    "summary": "One clear judgment with supporting evidence, using a strong rule and light visual texture."
+  },
+  "evidence_board.source_table": {
+    "role": "evidence",
+    "layoutFamily": "evidence_board",
+    "visualLayer": "none",
+    "rasterPolicy": "prohibited-formal-body",
+    "summary": "Source-grounded evidence page with editable rows, captions, and takeaway hierarchy."
+  },
+  "comparison_matrix.two_column_delta": {
+    "role": "comparison",
+    "layoutFamily": "comparison_matrix",
+    "visualLayer": "none-or-schematic",
+    "rasterPolicy": "prohibited-formal-body",
+    "summary": "Editable comparison page with two sides, delta markers, and explicit conclusion."
+  },
+  "process_flow.horizontal_steps": {
+    "role": "process",
+    "layoutFamily": "process_flow",
+    "visualLayer": "generated-process-accent",
+    "rasterPolicy": "prohibited-formal-body",
+    "summary": "Horizontal service flow with editable steps and generated no-text process accents."
+  },
+  "metric_panel.large_number_strip": {
+    "role": "benefit",
+    "layoutFamily": "metric_panel",
+    "visualLayer": "generated-metric-accent",
+    "rasterPolicy": "prohibited-formal-body",
+    "summary": "Editable benefit or KPI panel with large numbers, units, and supporting conditions."
+  },
+  "risk_callout.qa_stack": {
+    "role": "risk",
+    "layoutFamily": "risk_callout",
+    "visualLayer": "none",
+    "rasterPolicy": "prohibited-formal-body",
+    "summary": "Risk, caveat, or FAQ page with clear conditions and action-safe wording."
+  },
+  "action_roadmap.owner_timeline": {
+    "role": "action",
+    "layoutFamily": "action_roadmap",
+    "visualLayer": "schematic",
+    "rasterPolicy": "prohibited-formal-body",
+    "summary": "Editable action roadmap with timeline, owner, status, and next move."
+  },
+  "closing_commitment.brand_tail": {
+    "role": "closing",
+    "layoutFamily": "closing_commitment",
+    "visualLayer": "generated-background",
+    "rasterPolicy": "allowed-section-tail",
+    "summary": "Brand-tail closing page with editable closing statement and controlled background."
+  }
+}

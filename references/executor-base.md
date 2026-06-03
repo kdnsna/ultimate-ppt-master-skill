@@ -117,6 +117,37 @@ Before drawing each page, look up its entry in `page_rhythm` (key format `P<NN>`
 
 **Tag not found for current page** → fall back to `dense` silently. Do not invent a tag.
 
+**Per-page role and visual-completion contract**:
+
+Before drawing each page, also look up these sections in `spec_lock.md`:
+
+| Section | Required use |
+|---|---|
+| `page_roles` | Determine why the page exists; do not change the page's semantic job during drawing. |
+| `visual_weight` | Decide the dominance of the primary element: `hero`, `high`, `medium`, or `low`. |
+| `layout_family` | Choose the page's structural family; avoid accidental repetition. |
+| `page_recipes` | Choose the page's exact structural builder recipe; do not substitute a generic card grid. |
+| `visual_layers` | Decide whether a no-text generated or schematic support layer is required. |
+| `raster_policy` | Decide whether full-page raster is prohibited or allowed for this page. |
+| `asset_requirements` | Decide whether a real/generated/schematic/labeled-placeholder asset is required. |
+| `anti_patterns` | List page-specific failure modes to avoid before drawing. |
+
+Missing sections are allowed only for legacy decks. New formal-business decks MUST include them. If any section is missing, emit one warning: `visual completion contract incomplete — audit_design_completion.py may fail`.
+
+Hard rule: three consecutive non-anchor pages must not share the same `layout_family` unless the matching `anti_patterns` row contains `intentional-repeat:<reason>`. When a repeat would happen, change the structure before drawing the next page: switch from card grid to table, timeline, chart+takeaway, split image, negative-space statement, or process flow as the content supports.
+
+Hard rule: three consecutive non-anchor pages must not share the same `page_recipes` value unless the matching `anti_patterns` row contains `intentional-repeat:<reason>`.
+
+Hard rule: if `raster_policy` is `prohibited-formal-body`, do not use a full-page generated image as the slide. Generated images may appear only as no-text support layers while editable text, charts, tables, numbers, QR codes, and official assets remain separate.
+
+Use `asset_requirements` literally:
+
+- `real`: insert a real provided/sourced asset; if absent, use a clearly labeled placeholder and block external release in the quality report.
+- `generated`: use a generated asset from the project image folder; if absent, mark `Needs-Manual`.
+- `schematic`: draw or insert a schematic and label it as示意图 when the content could be mistaken for official imagery.
+- `placeholder-labeled`: placeholder is acceptable only with visible replacement text.
+- `none`: do not add decorative images just to satisfy a visual quota.
+
 **Per-page template lookup — `page_layouts` section**:
 
 Before drawing each page, look up its entry in `page_layouts` to decide which basename to inherit (the SVG itself was loaded in §1.0):

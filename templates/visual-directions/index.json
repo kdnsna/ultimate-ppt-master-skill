@@ -1,0 +1,32 @@
+{
+  "finance_internal_report": {
+    "summary": "Banking, insurance, wealth, social-card, and internal operating reports. Formal, dense, source-grounded, low-decoration.",
+    "defaultMode": "General Consulting",
+    "requiredRhythm": ["anchor", "dense", "evidence", "process", "risk", "closing"],
+    "forbidden": ["internet SaaS card deck", "fake logo", "decorative gradient blobs", "all pages as 2x2 cards"]
+  },
+  "government_soe_report": {
+    "summary": "Government, SOE, policy, infrastructure, and formal work reports. Authoritative, restrained, evidence-first.",
+    "defaultMode": "General Consulting",
+    "requiredRhythm": ["anchor", "context", "evidence", "workstream", "timeline", "risk", "closing"],
+    "forbidden": ["startup pitch style", "unverified claims", "oversized decorative icons", "thin evidence pages"]
+  },
+  "consulting_analysis": {
+    "summary": "Executive consulting, diagnosis, recommendation, and business review. Conclusion-first, structured, chart-led.",
+    "defaultMode": "Top Consulting",
+    "requiredRhythm": ["anchor", "tldr", "evidence", "diagnosis", "options", "roadmap", "closing"],
+    "forbidden": ["image-only proof", "generic feature cards", "weak recommendation", "chart without takeaway"]
+  },
+  "launch_promotion": {
+    "summary": "Product launch, campaign, venue, cultural tourism, and external promotional decks. Visual-first, asset-led.",
+    "defaultMode": "General Versatile",
+    "requiredRhythm": ["anchor", "hero", "scene", "proof", "offer", "action"],
+    "forbidden": ["text-only pages", "generic business template", "no real product/place/state visual", "dense report pages"]
+  },
+  "training_courseware": {
+    "summary": "Training, onboarding, workshop, and teaching decks. Clear modules, examples, practice, and speaker support.",
+    "defaultMode": "General Versatile",
+    "requiredRhythm": ["anchor", "agenda", "concept", "example", "practice", "checklist", "closing"],
+    "forbidden": ["unbroken dense theory", "no examples", "no learner action", "visuals unrelated to task"]
+  }
+}

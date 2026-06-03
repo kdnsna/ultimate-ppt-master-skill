@@ -122,17 +122,29 @@ v3.0.0 turns Ultimate PPT Master into a **formal-business PPT delivery workbench
 This release focuses on practical office delivery:
 
 - Formal-business quality gates are the default for stakeholder-facing business, finance, government, training, and consulting decks.
-- Handoff folders now include `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, `AGENTS.md`, and `quality-report.json`.
-- Codex receives one execution order: read the handoff files, run or handle `scripts/generate_visual_element_kit.py`, produce PPTX/Web Deck outputs, update asset records, then run the formal delivery audit.
+- Handoff folders now include `design_spec.md`, `spec_lock.md`, `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, `AGENTS.md`, and `quality-report.json`.
+- Codex receives one execution order: read the handoff files, lock the visual direction and page-role contract, run or handle `scripts/generate_visual_element_kit.py`, produce PPTX/Web Deck outputs, update asset records, then run the delivery and design-completion audits.
 - ChatGPT/OpenAI-generated micro-assets now have a real local loop: `assets/generated/element-manifest.json`, `images/image_prompts.json`, and `images/image_prompts.md`.
 - No image key is still a supported path: the workflow writes `Needs-Manual` prompts that can be pasted into ChatGPT.
+- Visual direction packs now define context-specific aesthetic guardrails before slide generation, so business decks are not judged only by file completeness.
 
 ### v3.0.0 In Plain Words
 
 - The web page does not ask users to understand every technical file. It shows the current handoff step and the next command to run.
 - Codex no longer receives only a big prompt. It receives a structured folder, a micro-asset checklist, a quality checklist, and a review command.
+- The strategist must declare what each page is doing: anchor, context, evidence, comparison, process, metric, risk, action, or closing.
 - ChatGPT image generation is used for small reusable elements, not for flattening whole slides or hiding editable text.
 - If image generation is not configured, the project still moves forward with `Needs-Manual` prompts.
+
+## 4.0 Capability Track
+
+The next capability layer is **hybrid-editable visual generation**. It keeps formal PPTX pages editable while using ChatGPT/OpenAI for no-text visual support layers.
+
+- Page recipes from `templates/page-recipes/index.json` now define the intended structure before a page is drawn.
+- `spec_lock.md` can lock `page_recipes`, `visual_layers`, and `raster_policy` so the generator does not drift back to repeated card grids.
+- `scripts/generate_visual_layers.py` writes page-level ChatGPT prompts and `assets/generated/page-visuals/manifest.json`.
+- `scripts/audit_visual_recipes.py` blocks repeated page recipes and full-page raster use on formal body pages.
+- Full-page generated images are reserved for cover, section/tail, poster/KV, Web showcase, or explicit override; formal body pages keep editable copy, numbers, tables, charts, logos, and QR codes.
 
 ## Quality Proofs
 
@@ -463,11 +475,12 @@ The latest push-prep pass also verified the Web homepage, Benchmark Wall, and fo
 ## v3.0.0 Highlights
 
 - Added the formal-business quality gate to Web, Bridge, Skill, and local audit paths.
+- Added visual direction packs plus `design_spec.md` / `spec_lock.md` page-role contracts for formal-business decks.
 - Added the Codex + ChatGPT micro-asset generation loop with scriptable and `Needs-Manual` modes.
 - Made the Web handoff panel show Bridge state, local project path, element-generation command, and Agent command in order.
 - Added `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, and `AGENTS.md` to handoff kits.
-- Added `scripts/audit_formal_delivery.py` and regression fixtures for repeated-card, no-image, sparse PPTX, and logo-fragment failures.
-- Kept Desktop out of the v3.0.0 release surface while synchronizing its worker resource copy.
+- Added `scripts/audit_formal_delivery.py`, `scripts/audit_design_completion.py`, and regression fixtures for repeated-card, repeated-layout, no-image, sparse PPTX, visual-lock, and logo-fragment failures.
+- Synchronized the Desktop worker so local draft projects also emit the visual contract and both audit commands.
 
 See [UPSTREAM_SYNC.md](./UPSTREAM_SYNC.md) for upstream baselines and adaptation policy.
 

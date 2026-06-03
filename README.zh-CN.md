@@ -134,6 +134,16 @@ v3.0.0 把 Ultimate PPT Master 收口成 **正式商务 PPT 交付工作台**。
 - ChatGPT 生图主要用于分隔符、指标徽章、流程节点、连接线、图标点缀等小素材，不承载正文和关键数字。
 - 没有生图 key 时仍能继续，项目会保留 `Needs-Manual` prompt。
 
+## 4.0 能力层
+
+下一层能力是 **混合可编辑视觉生成**：正式 PPTX 页面继续保留可编辑文字、图表、表格和形状，ChatGPT/OpenAI 负责无文字视觉支撑层。
+
+- `templates/page-recipes/index.json` 会先规定每页的结构配方，再进入页面生成。
+- `spec_lock.md` 可以锁定 `page_recipes`、`visual_layers` 和 `raster_policy`，防止页面退回重复卡片。
+- `scripts/generate_visual_layers.py` 会写出页面级 ChatGPT prompts 和 `assets/generated/page-visuals/manifest.json`。
+- `scripts/audit_visual_recipes.py` 会拦截重复页面配方，以及正式正文页整页图片化。
+- 整页生图只保留给封面、章节/尾页、海报/KV、Web showcase 或明确用户 override；正式正文页的文字、数字、表格、图表、logo、二维码必须保持可编辑或可溯源。
+
 ## 质量证明
 
 公开案例墙不是一句链接，而是这个项目证明自己“能交付”的第一现场。打开 [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/)，可以直接看到“输入 -> 预设 -> 输出 -> 复查”的完整链路。

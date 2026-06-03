@@ -37,6 +37,12 @@
 - **Style**: {design_style}
 - **Theme**: [Light theme / Dark theme]
 - **Tone**: [Filled by Strategist, e.g., tech, professional, modern, innovative]
+- **Visual Direction**: [direction id from `templates/visual-directions/index.json`, or `custom`]
+- **Benchmark Sentence**: [one concrete sentence describing what this deck should visually resemble]
+- **Top Aesthetic Risks**: [3 concise risks, e.g., "too many generic cards", "fake brand assets", "text-only proof"]
+- **External Release Boundary**: [what must be replaced or verified before formal external release]
+- **Visual Strategy Mode**: [default `hybrid-editable`; generated no-text visual layers support editable PPTX structure]
+- **Raster Slide Mode**: [default `disabled_for_formal_body`; full-page raster only for cover/section/poster/showcase pages]
 
 ### Color Scheme
 
@@ -201,6 +207,29 @@ Two views on the same font decisions — fill both, keep them consistent:
 - **Full-bleed text placement**: inset text away from the image's focal points; legibility over photographic backgrounds typically needs a gradient or opacity overlay.
 - **Content width** is driven by reading comfort and image composition, not a card grid slot — don't back-compute "column width" when there's no column.
 
+### Page Role / Visual Weight Contract
+
+Every page must have one role and one primary visual job. These values must be copied into `spec_lock.md`.
+
+| Page | page_role | visual_weight | layout_family | page_recipe_id | asset_requirement | visual_layer | raster_policy | anti_patterns |
+| ---- | --------- | ------------- | ------------- | -------------- | ----------------- | ------------ | ------------- | ------------- |
+| P01 | anchor | hero | cover_brand | cover_brand.hero_left_visual | real-logo-or-text-fallback | generated-background | allowed-cover | fake-logo; generic-gradient |
+| P02 | context | medium | statement_plus_evidence | statement_plus_evidence.left_rule_panel | none-or-schematic | subtle-pattern | prohibited-formal-body | 2x2-card-grid |
+
+Definitions:
+
+- **page_role**: semantic role such as `anchor`, `context`, `evidence`, `process`, `risk`, `benefit`, `tldr`, `closing`, `hero`, `practice`.
+- **visual_weight**: `hero`, `high`, `medium`, or `low`; determines what should dominate the viewer's eye.
+- **layout_family**: a stable family name such as `cover_brand`, `chart_plus_takeaway`, `timeline`, `process_flow`, `faq_grid`, `image_hero`, `table_evidence`, `negative_space`.
+- **page_recipe_id**: a structural recipe from `templates/page-recipes/index.json`, or a documented custom recipe.
+- **asset_requirement**: `real`, `generated`, `schematic`, `placeholder-labeled`, `none`, or a short custom requirement.
+- **visual_layer**: generated/schematic support layer; must be no-text and must not replace editable content.
+- **raster_policy**: full-page raster policy. Formal body pages default to `prohibited-formal-body`.
+- **anti_patterns**: semicolon-separated page-specific failure modes. Do not leave blank.
+
+Hard rule: three consecutive non-anchor pages must not share the same `layout_family` unless this table explicitly states the reason in the anti-patterns cell as `intentional-repeat:<reason>`.
+Hard rule: three consecutive non-anchor pages must not share the same `page_recipe_id` unless this table explicitly states the reason in the anti-patterns cell as `intentional-repeat:<reason>`.
+
 ---
 
 ## VI. Icon Usage Specification
@@ -281,6 +310,15 @@ Catalog read: 71 templates
 #### Slide 01 - Cover
 
 - **Layout**: Full-screen background image + centered title
+- **page_role**: anchor
+- **visual_weight**: hero
+- **layout_family**: cover_brand
+- **page_recipe_id**: cover_brand.hero_left_visual
+- **asset_requirement**: real-logo-or-text-fallback
+- **visual_layer**: generated-background | no-text | 16:9
+- **raster_policy**: allowed-cover
+- **anti_patterns**: fake-logo; generic-gradient; title-too-small
+- **Primary judgment**: [one sentence this page must make obvious]
 - **Title**: [Main title]
 - **Subtitle**: [Subtitle]
 - **Info**: [Author / Date / Organization]
@@ -288,6 +326,15 @@ Catalog read: 71 templates
 #### Slide 02 - [Page Name]
 
 - **Layout**: [Choose a pattern from §V, combine two, or break the grid as the content demands]
+- **page_role**: [context / evidence / process / risk / benefit / tldr / etc.]
+- **visual_weight**: [hero / high / medium / low]
+- **layout_family**: [chart_plus_takeaway / process_flow / table_evidence / negative_space / etc.]
+- **page_recipe_id**: [recipe id from `templates/page-recipes/index.json`, or custom]
+- **asset_requirement**: [real / generated / schematic / placeholder-labeled / none]
+- **visual_layer**: [none / subtle-pattern / generated-background / generated-process-accent / generated-metric-accent]
+- **raster_policy**: [prohibited-formal-body / allowed-cover / allowed-section-tail / allowed-poster-or-showcase]
+- **anti_patterns**: [semicolon-separated failure modes]
+- **Primary judgment**: [one sentence this page must deliver]
 - **Title**: [Page title]
 - **Visualization**: [visualization_type] (see VII. Visualization Reference List)
 - **Content**:

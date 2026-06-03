@@ -439,7 +439,7 @@ def build_next_actions(project_path: Path, log_path: Path, generated_files: list
         {
             "key": "formal-audit",
             "label": "正式商务审计",
-            "detail": "运行 audit_formal_delivery.py，检查质量门禁、版式变化、素材策略和 PPTX 可编辑文本。",
+            "detail": "运行 audit_formal_delivery.py、audit_design_completion.py 和 audit_visual_recipes.py，检查交付门槛、页面角色、页面配方和视觉完成度。",
             "path": str(project_path / "quality-report.json"),
         },
         {
@@ -946,8 +946,12 @@ def generate_pptx(outline: list[dict[str, Any]], project_path: Path, style: str)
     accent2 = palette["accent2"]
     soft = palette["soft"]
     card = palette["card"]
+    contracts = page_contract_for_outline(outline)
 
     for idx, item in enumerate(outline):
+        contract = contracts[idx]
+        role = contract["page_role"]
+        recipe = contract["page_recipe_id"]
         slide = prs.slides.add_slide(blank)
         bg = slide.background.fill
         bg.solid()
@@ -969,41 +973,80 @@ def generate_pptx(outline: list[dict[str, Any]], project_path: Path, style: str)
             add_text_box(slide, 0.66, 4.2, 6.8, 0.76, lead, 18, muted)
             add_text_box(slide, 9.04, 1.05, 3.38, 0.55, "Editable PowerPoint", 24, (255, 255, 255), True)
             add_text_box(slide, 9.08, 1.82, 3.25, 1.5, "真实文字、形状、结构和本地项目链路。桌面端先给出可审阅草稿，完整精修交给 Agent 工作流。", 15, (255, 245, 238))
-            add_text_box(slide, 9.08, 6.28, 3.25, 0.32, "Ultimate PPT Master · v2.1.0", 10, (255, 245, 238), font_name="Aptos Mono")
+            add_text_box(slide, 9.08, 6.28, 3.25, 0.32, "Ultimate PPT Master · hybrid-editable", 10, (255, 245, 238), font_name="Aptos Mono")
             continue
 
-        if idx % 5 == 0:
+        if role == "closing":
             bg.fore_color.rgb = RGBColor(*ink)
             add_filled_rect(slide, 0, 0, 13.333, 0.18, accent)
-            add_text_box(slide, 0.72, 0.62, 1.7, 0.4, f"{idx:02d}", 26, accent, True, font_name="Aptos Display")
+            add_text_box(slide, 0.72, 0.62, 1.7, 0.4, f"{idx + 1:02d}", 26, accent, True, font_name="Aptos Display")
             add_text_box(slide, 0.72, 2.04, 10.8, 1.25, slide_title(str(item["title"]), 28), 38, (255, 255, 255), True, font_name="Aptos Display")
             add_text_box(slide, 0.76, 4.0, 8.8, 0.9, " / ".join(slide_body(b, 22) for b in item["bullets"][:3]), 17, (221, 226, 235))
-            add_text_box(slide, 9.5, 5.85, 2.55, 0.3, "SECTION BREAK", 10, (221, 226, 235), True, PP_ALIGN.RIGHT if PP_ALIGN else None, "Aptos Mono")
+            add_text_box(slide, 9.5, 5.85, 2.55, 0.3, "HYBRID EDITABLE", 10, (221, 226, 235), True, PP_ALIGN.RIGHT if PP_ALIGN else None, "Aptos Mono")
             continue
 
         add_text_box(slide, 0.68, 0.96, 11.2, 0.72, slide_title(str(item["title"])), 27, ink, True, font_name="Aptos Display")
         bullets = [slide_body(bullet) for bullet in item["bullets"][:6]]
 
-        if len(bullets) <= 3:
+        if recipe == "process_flow.horizontal_steps":
+            add_filled_rect(slide, 0.72, 3.08, 11.3, 0.04, accent)
+            for bullet_idx, bullet in enumerate(bullets[:5]):
+                left = 0.86 + bullet_idx * 2.22
+                add_filled_rect(slide, left, 2.38, 1.72, 1.5, card, soft)
+                add_text_box(slide, left + 0.16, 2.58, 0.5, 0.28, f"{bullet_idx + 1:02d}", 13, accent, True, font_name="Aptos Mono")
+                add_text_box(slide, left + 0.16, 3.0, 1.32, 0.54, bullet, 12, ink, bullet_idx == 0)
+            add_text_box(slide, 0.78, 5.42, 9.2, 0.5, "流程页采用可编辑节点，ChatGPT 只提供无文字流程氛围层。", 13, muted)
+        elif recipe == "metric_panel.large_number_strip":
+            for bullet_idx, bullet in enumerate(bullets[:4]):
+                left = 0.74 + bullet_idx * 2.92
+                add_filled_rect(slide, left, 2.18, 2.42, 2.28, card, soft)
+                add_text_box(slide, left + 0.22, 2.5, 0.72, 0.44, f"{bullet_idx + 1}", 28, accent, True, font_name="Aptos Display")
+                add_text_box(slide, left + 0.22, 3.34, 1.84, 0.72, bullet, 13, ink)
+            add_filled_rect(slide, 0.74, 5.32, 8.8, 0.08, accent2)
+            add_text_box(slide, 0.74, 5.58, 8.2, 0.48, "数字、金额和单位必须保留为可编辑文本。", 13, muted)
+        elif recipe == "comparison_matrix.two_column_delta":
+            add_filled_rect(slide, 0.78, 2.02, 5.25, 3.9, card, soft)
+            add_filled_rect(slide, 6.42, 2.02, 5.25, 3.9, card, soft)
+            add_text_box(slide, 1.08, 2.34, 2.8, 0.34, "原状态 / Before", 15, accent, True)
+            add_text_box(slide, 6.72, 2.34, 2.8, 0.34, "升级后 / After", 15, accent2, True)
+            for bullet_idx, bullet in enumerate(bullets[:3]):
+                add_text_box(slide, 1.08, 3.02 + bullet_idx * 0.72, 4.1, 0.42, bullet, 14, ink)
+            for bullet_idx, bullet in enumerate((bullets[3:6] or bullets[:3])):
+                add_text_box(slide, 6.72, 3.02 + bullet_idx * 0.72, 4.1, 0.42, bullet, 14, ink)
+        elif recipe == "risk_callout.qa_stack":
+            add_filled_rect(slide, 0.78, 2.02, 10.9, 0.56, soft)
+            add_text_box(slide, 1.04, 2.15, 6.2, 0.28, "办理条件 / 风险边界 / 客户疑问", 14, accent, True)
+            for bullet_idx, bullet in enumerate(bullets[:4]):
+                top = 2.92 + bullet_idx * 0.78
+                add_text_box(slide, 0.98, top, 0.52, 0.3, "Q", 15, accent, True, font_name="Aptos Mono")
+                add_text_box(slide, 1.48, top, 8.6, 0.35, bullet, 14, ink)
+        elif recipe == "action_roadmap.owner_timeline":
+            for bullet_idx, bullet in enumerate(bullets[:5]):
+                top = 2.08 + bullet_idx * 0.76
+                add_filled_rect(slide, 0.84, top + 0.12, 0.28, 0.28, accent)
+                add_text_box(slide, 1.38, top, 1.2, 0.3, f"T+{bullet_idx}", 12, accent, True, font_name="Aptos Mono")
+                add_text_box(slide, 2.58, top, 7.8, 0.36, bullet, 14, ink)
+            add_filled_rect(slide, 0.96, 2.32, 0.04, 3.28, soft)
+        elif recipe == "evidence_board.source_table":
+            add_filled_rect(slide, 0.76, 2.02, 10.8, 0.44, soft)
+            add_text_box(slide, 1.0, 2.13, 2.0, 0.22, "证据", 11, accent, True)
+            add_text_box(slide, 5.6, 2.13, 2.0, 0.22, "口径", 11, accent, True)
+            for bullet_idx, bullet in enumerate(bullets[:5]):
+                top = 2.62 + bullet_idx * 0.68
+                add_filled_rect(slide, 0.76, top, 10.8, 0.48, card, soft)
+                add_text_box(slide, 1.0, top + 0.12, 0.5, 0.22, f"{bullet_idx + 1:02d}", 10, accent, True, font_name="Aptos Mono")
+                add_text_box(slide, 1.58, top + 0.08, 8.6, 0.28, bullet, 12, ink)
+        else:
             add_filled_rect(slide, 0.72, 2.3, 7.2, 2.7, card)
             add_filled_rect(slide, 0.72, 2.3, 0.12, 2.7, accent)
-            for bullet_idx, bullet in enumerate(bullets):
-                add_text_box(slide, 1.06, 2.64 + bullet_idx * 0.68, 6.28, 0.42, bullet, 18, ink, bullet_idx == 0)
+            for bullet_idx, bullet in enumerate(bullets[:4]):
+                add_text_box(slide, 1.06, 2.64 + bullet_idx * 0.58, 6.28, 0.36, bullet, 15, ink, bullet_idx == 0)
             add_filled_rect(slide, 8.6, 2.28, 3.42, 2.72, soft)
-            add_text_box(slide, 9.0, 2.64, 2.62, 0.45, "交付信号", 18, accent, True)
-            add_text_box(slide, 9.0, 3.24, 2.52, 1.0, "将信息收束为可以审阅、继续改、继续交付的页面结构。", 14, muted)
-        else:
-            for bullet_idx, bullet in enumerate(bullets):
-                col = bullet_idx % 2
-                row = bullet_idx // 2
-                left = 0.72 + col * 6.0
-                top = 2.03 + row * 1.42
-                add_filled_rect(slide, left, top, 5.36, 1.02, card, soft)
-                add_text_box(slide, left + 0.25, top + 0.18, 0.46, 0.34, f"{bullet_idx + 1:02d}", 13, accent, True, font_name="Aptos Mono")
-                add_text_box(slide, left + 0.82, top + 0.16, 4.28, 0.56, bullet, 14, ink)
+            add_text_box(slide, 9.0, 2.64, 2.62, 0.45, "页面配方", 18, accent, True)
+            add_text_box(slide, 9.0, 3.24, 2.52, 1.0, recipe, 12, muted, font_name="Aptos Mono")
 
         add_filled_rect(slide, 0.72, 6.72, 9.5, 0.02, soft)
-        add_text_box(slide, 0.72, 6.86, 7.4, 0.26, "Production draft · open in PowerPoint for editable review", 8, muted, font_name="Aptos Mono")
+        add_text_box(slide, 0.72, 6.86, 7.4, 0.26, f"Hybrid editable · {recipe}", 8, muted, font_name="Aptos Mono")
         add_text_box(slide, 10.8, 6.82, 1.4, 0.28, f"{idx + 1:02d}", 10, accent, True, PP_ALIGN.RIGHT if PP_ALIGN else None, "Aptos Mono")
     output = project_path / "outputs" / "ultimate-ppt-master-preview.pptx"
     prs.save(output)
@@ -1049,6 +1092,7 @@ def foot(label: str) -> str:
 def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> str:
     total = len(outline)
     sections: list[str] = []
+    contracts = page_contract_for_outline(outline)
     title_lines = cover_title_lines(str(outline[0]["title"]), 10, 3)
     title = "<br>".join(html.escape(line) for line in title_lines)
     title_size = "min(4.5vw,8.2vh)" if len(str(outline[0]["title"])) > 24 else "min(6.4vw,11vh)"
@@ -1065,7 +1109,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
       </div>"""
         )
     cover_cards = "\n".join(cover_points)
-    sections.append(f"""<section class="slide hero light" data-layout="cover" data-animate="hero">
+    sections.append(f"""<section class="slide hero light" data-layout="{html.escape(contracts[0]['page_recipe_id'])}" data-animate="hero">
   {chrome(deck_title, 1, total)}
   <div class="frame" style="display:grid;grid-template-columns:1.28fr .82fr;gap:5vw;align-items:center;min-height:80vh">
     <div style="display:grid;gap:3vh;align-content:center">
@@ -1086,9 +1130,11 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
 </section>""")
 
     for idx, slide in enumerate(outline[1:], start=2):
+        contract = contracts[idx - 1]
+        recipe = contract["page_recipe_id"]
         bullets = [html.escape(slide_body(item, 48)) for item in slide["bullets"][:6]]
         title_html = html.escape(slide_title(str(slide["title"]), 32))
-        if idx == 2:
+        if recipe == "metric_panel.large_number_strip":
             cards = "\n".join(
                 f"""<div class="stat-card" data-anim>
         <div class="stat-label">Signal {n + 1:02d}</div>
@@ -1097,7 +1143,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
       </div>"""
                 for n, bullet in enumerate(bullets[:6])
             )
-            sections.append(f"""<section class="slide light" data-layout="metric-grid">
+            sections.append(f"""<section class="slide light" data-layout="{html.escape(recipe)}">
   {chrome(deck_title, idx, total)}
   <div class="frame" style="padding-top:5vh">
     <div class="kicker" data-anim>{html.escape(str(slide['eyebrow']))}</div>
@@ -1106,12 +1152,12 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
   </div>
   {foot("核心信号")}
 </section>""")
-        elif idx % 3 == 0:
+        elif recipe in {"comparison_matrix.two_column_delta", "risk_callout.qa_stack"}:
             left = bullets[:3]
             right = bullets[3:6] or bullets[:3]
             left_html = "<br>".join(left)
             right_html = "".join(f"<div class=\"rowline\" data-anim><div class=\"k\">{n + 1:02d}</div><div class=\"v\">{bullet}</div><div class=\"m\">Action</div></div>" for n, bullet in enumerate(right))
-            sections.append(f"""<section class="slide dark" data-layout="decision-table" data-animate="directional">
+            sections.append(f"""<section class="slide dark" data-layout="{html.escape(recipe)}" data-animate="directional">
   {chrome(deck_title, idx, total)}
   <div class="frame grid-2-7-5" style="padding-top:6vh">
     <div>
@@ -1123,7 +1169,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
   </div>
   {foot("结构化安排")}
 </section>""")
-        elif idx % 4 == 0:
+        elif recipe in {"process_flow.horizontal_steps", "action_roadmap.owner_timeline"}:
             steps = "\n".join(
                 f"""<div class="step" data-anim="step">
           <div class="step-nb">{n + 1:02d}</div>
@@ -1132,7 +1178,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
         </div>"""
                 for n, bullet in enumerate(bullets[:5])
             )
-            sections.append(f"""<section class="slide light" data-layout="timeline" data-animate="pipeline">
+            sections.append(f"""<section class="slide light" data-layout="{html.escape(recipe)}" data-animate="pipeline">
   {chrome(deck_title, idx, total)}
   <div class="frame">
     <div class="kicker">Pipeline · 推进路径</div>
@@ -1146,7 +1192,7 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
 </section>""")
         else:
             body = " ".join(bullets[:3])
-            sections.append(f"""<section class="slide hero {'light' if idx % 2 else 'dark'}" data-layout="narrative-quote" data-animate="quote">
+            sections.append(f"""<section class="slide hero {'light' if idx % 2 else 'dark'}" data-layout="{html.escape(recipe)}" data-animate="quote">
   {chrome(deck_title, idx, total)}
   <div class="frame" style="display:grid;gap:5vh;align-content:center;min-height:80vh">
     <div class="kicker" data-anim>{html.escape(str(slide['eyebrow']))}</div>
@@ -1161,10 +1207,11 @@ def build_editorial_sections(outline: list[dict[str, Any]], deck_title: str) -> 
 def build_swiss_sections(outline: list[dict[str, Any]], deck_title: str) -> str:
     total = len(outline)
     sections: list[str] = []
+    contracts = page_contract_for_outline(outline)
     title = "<br>".join(html.escape(line) for line in cover_title_lines(str(outline[0]["title"]), 10, 3))
     lead_items = outline[1]["bullets"][:2] if len(outline) > 1 else outline[0]["bullets"][:2]
     lead = " · ".join(html.escape(slide_body(item, 30)) for item in lead_items)
-    sections.append(f"""<section class="slide accent" data-layout="SWISS-COVER-ASCII" data-animate="hero">
+    sections.append(f"""<section class="slide accent" data-layout="{html.escape(contracts[0]['page_recipe_id'])}" data-animate="hero">
   <div class="canvas-card">
     <canvas class="ascii-bg" aria-hidden="true"></canvas>
     <div class="chrome-min"><div class="l">{html.escape(deck_title)} · Field Note</div><div class="r">SS · 01 / {total:02d}</div></div>
@@ -1181,6 +1228,8 @@ def build_swiss_sections(outline: list[dict[str, Any]], deck_title: str) -> str:
 
     layouts = ["S02", "S08", "S14", "S19", "S11", "S16", "S03"]
     for idx, slide in enumerate(outline[1:], start=2):
+        contract = contracts[idx - 1]
+        recipe = contract["page_recipe_id"]
         layout = layouts[(idx - 2) % len(layouts)]
         bullets = [html.escape(slide_body(item, 48)) for item in slide["bullets"][:6]]
         title_html = html.escape(slide_title(str(slide["title"]), 28))
@@ -1214,7 +1263,7 @@ def build_swiss_sections(outline: list[dict[str, Any]], deck_title: str) -> str:
                 for n, bullet in enumerate(bullets[:4])
             )
             body = f"""<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:4vh">{cards}</div>"""
-        sections.append(f"""<section class="slide {'dark' if idx % 3 == 0 else 'grey'}" data-layout="{layout}" data-animate="grid-reveal">
+        sections.append(f"""<section class="slide {'dark' if idx % 3 == 0 else 'grey'}" data-layout="{html.escape(recipe)}" data-template-layout="{layout}" data-animate="grid-reveal">
   <div class="canvas-card">
     <div class="chrome-min"><div class="l">{html.escape(deck_title)}</div><div class="r">{idx:02d} / {total:02d}</div></div>
     <div style="flex:1;padding:0;display:grid;grid-template-rows:auto 1fr auto;gap:3vh">
@@ -1300,18 +1349,25 @@ def formal_quality_gate() -> dict[str, Any]:
     return {
         "level": "formal-business",
         "requiredInputs": [
+            "visual direction pack or documented custom benchmark",
             "brand assets or explicit fallback strategy",
             "traceable source evidence",
+            "page role and recipe contract with visual weight, layout family, page recipe, visual layer, raster policy, asset requirement, and anti-patterns",
             "ChatGPT-generation-first visual asset plan with prompts, filenames, and insertion targets",
             "small reusable element kit plan for section dividers, metric badges, process nodes, connectors, and icons",
+            "page visual layer plan for no-text backgrounds, patterns, process accents, and metric accents",
             "public asset search plan for evidence/official references or explicit no-search rationale",
             "image/chart plan or explicit no-image strategy",
             "page rhythm and infographic strategy",
         ],
         "acceptanceCriteria": [
             "do not build the whole deck from headings and repeated cards only",
+            "each page has a declared narrative role, layout family, and page recipe before generation",
+            "three consecutive non-anchor pages must not share the same layout family or page recipe unless intentionally documented",
+            "formal PPTX body pages remain editable and must not be replaced by full-page generated images",
             "ChatGPT/OpenAI is treated as the primary visual asset engine for custom supporting visuals",
             "small generated micro-assets are planned in visual-element-kit.md and reused across the deck",
+            "page visual layers are no-text support assets and are not allowed to contain policy wording, numbers, logos, QR codes, or body copy",
             "generated assets are stored under assets/generated and listed in asset-plan.md",
             "public web asset searches are limited to evidence, official references, or brand boundaries and record source URLs, licensing notes, and insertion targets",
             "PPTX keeps real editable text, shapes, charts, and notes",
@@ -1321,21 +1377,28 @@ def formal_quality_gate() -> dict[str, Any]:
         ],
         "artifactChecks": [
             "manifest.json contains formal-business qualityGate",
+            "design_spec.md and spec_lock.md contain visual direction, page role, recipe, visual layer, and raster policy contracts",
             "HTML/PPTX expose enough layout types",
             "real image/brand assets are used or no-image strategy is explicit",
             "asset-plan.md records public searches, generated assets, citations, and insert targets",
             "visual-element-kit.md records the reusable ChatGPT-generated micro-assets",
+            "assets/generated/page-visuals/manifest.json records no-text page visual layers",
             "PPTX contains editable text objects",
             "no b/c-style logo text fragments",
         ],
         "reviewCommands": [
             "python3 scripts/audit_formal_delivery.py <project_path>",
+            "python3 scripts/audit_design_completion.py <project_path>",
+            "python3 scripts/audit_visual_recipes.py <project_path>",
         ],
         "assetStrategy": {
             "mode": "chatgpt-generation-first",
+            "visualStrategyMode": "hybrid-editable",
+            "rasterSlideMode": "disabled_for_formal_body",
             "brand": "Desktop draft uses a clean text fallback plus style palette; replace with approved brand assets for final delivery.",
             "primaryEngine": "For production, Codex should use ChatGPT/OpenAI image generation as the default visual asset engine for custom scenes and reusable micro-assets.",
             "microAssets": "Generate visual-element-kit.md assets before final assembly: section dividers, metric badges, process nodes, connectors, icon accents, textures, and callouts.",
+            "pageVisualLayers": "Generate no-text page visual layers for backgrounds, patterns, process accents, and metric accents; keep text, numbers, charts, tables, and official assets editable.",
             "publicSearch": "Use public web sources mainly for evidence, official references, and brand boundaries; record source URL, license note, and insertion target.",
             "generatedAssets": "Store ChatGPT/OpenAI outputs under assets/generated/ and record prompts in asset-plan.md.",
             "images": "Explicit no-image strategy for this local draft: use editable shapes, charts, and information architecture unless source/approved or generated images are supplied.",
@@ -1346,9 +1409,14 @@ def formal_quality_gate() -> dict[str, Any]:
 def formal_quality_profile(mode: str) -> dict[str, Any]:
     expected = [
         "sources/source.md",
+        "design_spec.md",
+        "spec_lock.md",
         "manifest.json",
         "project-brief.json",
         "quality-report.json",
+        "design-quality-report.md",
+        "assets/generated/page-visuals/manifest.json",
+        "images/page_visual_prompts.md",
     ]
     expected.append("outputs/ultimate-ppt-master-preview.pptx" if mode == "pptx" else "outputs/index.html")
     return {
@@ -1363,6 +1431,8 @@ def formal_quality_profile(mode: str) -> dict[str, Any]:
         "expectedArtifacts": expected,
         "reviewCommands": [
             "python3 scripts/audit_formal_delivery.py <project_path>",
+            "python3 scripts/audit_design_completion.py <project_path>",
+            "python3 scripts/audit_visual_recipes.py <project_path>",
         ],
         "notFor": [
             "只需要快速标题草稿的场景",
@@ -1394,10 +1464,13 @@ Blocked reason: {workflow_state["blockedReason"] or "none"}
 1. AGENTS.md
 2. manifest.json
 3. project-brief.json
-4. quality-checklist.md if present
-5. asset-plan.md
-6. visual-element-kit.md
-7. sources/source.md
+4. design_spec.md
+5. spec_lock.md
+6. quality-checklist.md if present
+7. asset-plan.md
+8. visual-element-kit.md
+9. images/page_visual_prompts.md
+10. sources/source.md
 
 ## Formal Business Gate
 Required inputs:
@@ -1413,19 +1486,22 @@ Artifact checks:
 1. Inspect sources/source.md and generated previews before searching.
 2. Treat ChatGPT/OpenAI as the primary visual asset engine: generate custom slide visuals and small reusable elements before final assembly.
 3. From the Ultimate PPT Master repository root, run: `python3 scripts/generate_visual_element_kit.py <project_path>`.
-4. If no IMAGE_BACKEND/OpenAI key is configured, do not block: use the Needs-Manual prompts in images/image_prompts.md with ChatGPT and save outputs to the listed outputPath.
-5. Generate the visual-element-kit.md micro-assets: section divider, metric badge, process node, connector, icon accent, subtle texture, and callout sticker.
-6. Save generated assets under assets/generated/ and insert them as real image objects, not full-slide screenshots.
-7. Use public web search mainly for factual evidence, official references, brand boundaries, or source citations.
-8. Record every generated prompt and every public source/license note in asset-plan.md.
-9. Keep PPTX text, charts, tables, and labels editable wherever possible.
+4. From the Ultimate PPT Master repository root, run: `python3 scripts/generate_visual_layers.py <project_path>`.
+5. If no IMAGE_BACKEND/OpenAI key is configured, do not block: use the Needs-Manual prompts in images/image_prompts.md and images/page_visual_prompts.md with ChatGPT and save outputs to the listed outputPath.
+6. Generate the visual-element-kit.md micro-assets: section divider, metric badge, process node, connector, icon accent, subtle texture, and callout sticker.
+7. Generate only no-text page visual layers: backgrounds, patterns, process accents, metric accents, or schematic atmosphere.
+8. Save generated assets under assets/generated/ and insert them as real image objects, not full-slide screenshots.
+9. Use public web search mainly for factual evidence, official references, brand boundaries, or source citations.
+10. Record every generated prompt and every public source/license note in asset-plan.md.
+11. Keep PPTX text, charts, tables, and labels editable wherever possible.
 
 ## Production Steps
-1. Lock brand/fallback strategy, evidence boundaries, page rhythm, infographic strategy, asset-plan.md, and visual-element-kit.md.
+1. Lock visual direction, brand/fallback strategy, evidence boundaries, page roles, page recipes, visual layers, raster policy, page rhythm, layout families, infographic strategy, asset-plan.md, and visual-element-kit.md.
 2. Produce the requested {output_mode.upper()} delivery using the Ultimate PPT Master Skill workflow.
 3. Vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
 4. Do not let logos degrade into b/c-style text fragments.
-5. Run review commands and update quality-report.json before final response.
+5. Do not use full-page generated images for formal PPTX body pages unless explicitly approved and recorded in raster_policy.
+6. Run review commands and update quality-report.json plus design-quality-report.md before final response.
 
 ## Expected Artifacts
 {artifacts}
@@ -1445,11 +1521,12 @@ def codex_agent_guide_text(quality_gate: dict[str, Any]) -> str:
 - Read codex-task.md before editing or generating deliverables.
 - Keep private source material, customer data, internal screenshots, and API keys local unless the user explicitly approves upload.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py first when the deck needs visual richness.
-- If no image backend/key is configured, use images/image_prompts.md Needs-Manual prompts with ChatGPT and save outputs under assets/generated/.
+- Use scripts/generate_visual_layers.py for no-text page visual layers. Body-page text, numbers, charts, tables, QR codes, and logos must stay editable or sourced.
+- If no image backend/key is configured, use images/image_prompts.md and images/page_visual_prompts.md Needs-Manual prompts with ChatGPT and save outputs under assets/generated/.
 - Public web search is allowed mainly for evidence, official references, and brand boundaries; record sources, usage notes, and insertion targets in asset-plan.md.
 - Save generated outputs under assets/generated/ and record prompts in asset-plan.md.
 - For level {quality_gate["level"]}, do not finish with repeated title-card slides, flat PPTX screenshots, broken logo fragments, or missing quality-report.json.
-- Run the formal delivery audit before final response whenever HTML or PPTX artifacts exist.
+- Run the formal delivery audit, design completion audit, and visual recipe audit before final response whenever HTML or PPTX artifacts exist.
 """
 
 
@@ -1540,6 +1617,322 @@ Do not embed body text, numbers, logos, or long labels inside generated images; 
 """
 
 
+def visual_direction_for_style(style: str, output_mode: str) -> dict[str, str]:
+    if style == "consulting":
+        direction_id = "consulting_analysis"
+        benchmark = "Top-tier consulting analysis deck with varied evidence, process, and decision pages."
+    elif style == "academic":
+        direction_id = "training_courseware"
+        benchmark = "Structured courseware deck with clear learning rhythm and diagram-first explanation pages."
+    elif style in {"editorial", "swiss"} or output_mode == "web":
+        direction_id = "launch_promotion"
+        benchmark = "High-rhythm web presentation with strong anchors, metric moments, and controlled visual contrast."
+    else:
+        direction_id = "finance_internal_report"
+        benchmark = "Formal internal business report with source-grounded evidence pages and restrained brand expression."
+    return {
+        "id": direction_id,
+        "benchmark": benchmark,
+        "release_boundary": "desktop-draft; replace fallback brand assets before formal external release",
+    }
+
+
+def infer_page_role(index: int, total: int, title: str, bullets: list[Any]) -> str:
+    if index == 0:
+        return "anchor"
+    text = f"{title} {' '.join(str(item) for item in bullets)}".lower()
+    if index == total - 1:
+        return "closing"
+    if re.search(r"流程|路径|步骤|办理|申请|开通|推进|workflow|process|step|pipeline", text):
+        return "process"
+    if re.search(r"权益|数字|指标|数据|结果|kpi|metric|benefit|output", text):
+        return "benefit"
+    if re.search(r"风险|提醒|边界|问题|疑问|注意|risk|issue|question|caveat", text):
+        return "risk"
+    if re.search(r"对比|比较|不同|差异|comparison|compare|matrix", text):
+        return "comparison"
+    if re.search(r"计划|行动|下一步|落地|安排|next|action|roadmap", text):
+        return "action"
+    if index == 1:
+        return "context"
+    return "evidence"
+
+
+def page_contract_for_outline(outline: list[dict[str, Any]]) -> list[dict[str, str]]:
+    role_recipes = {
+        "anchor": ("cover_brand", "cover_brand.hero_left_visual"),
+        "context": ("statement_plus_evidence", "statement_plus_evidence.left_rule_panel"),
+        "comparison": ("comparison_matrix", "comparison_matrix.two_column_delta"),
+        "process": ("process_flow", "process_flow.horizontal_steps"),
+        "benefit": ("metric_panel", "metric_panel.large_number_strip"),
+        "risk": ("risk_callout", "risk_callout.qa_stack"),
+        "action": ("action_roadmap", "action_roadmap.owner_timeline"),
+        "closing": ("closing_commitment", "closing_commitment.brand_tail"),
+        "evidence": ("evidence_board", "evidence_board.source_table"),
+    }
+    fallback_recipes = [
+        ("statement_plus_evidence", "statement_plus_evidence.left_rule_panel"),
+        ("comparison_matrix", "comparison_matrix.two_column_delta"),
+        ("process_flow", "process_flow.horizontal_steps"),
+        ("metric_panel", "metric_panel.large_number_strip"),
+        ("evidence_board", "evidence_board.source_table"),
+        ("action_roadmap", "action_roadmap.owner_timeline"),
+        ("risk_callout", "risk_callout.qa_stack"),
+    ]
+    anti_by_layout = {
+        "cover_brand": "fake-logo, generic-gradient-cover",
+        "statement_plus_evidence": "plain-title-bullets, oversized-empty-card",
+        "comparison_matrix": "unlabeled-columns, weak-contrast-table",
+        "process_flow": "disconnected-icons, unclear-step-order",
+        "metric_panel": "random-big-number, no-unit-metric",
+        "decision_table": "dense-table-without-hierarchy",
+        "action_roadmap": "timeline-without-owner-or-next-step",
+        "risk_callout": "risk-hidden-in-footnote",
+        "evidence_board": "2x2-card-grid, source-free-claim",
+        "closing_commitment": "generic-thank-you-only",
+    }
+    layer_by_recipe = {
+        "cover_brand.hero_left_visual": "generated-background | no-text | 16:9",
+        "statement_plus_evidence.left_rule_panel": "subtle-pattern | no-text | 16:9",
+        "comparison_matrix.two_column_delta": "none",
+        "process_flow.horizontal_steps": "generated-process-accent | no-text | 16:9",
+        "metric_panel.large_number_strip": "generated-metric-accent | no-text | 16:9",
+        "risk_callout.qa_stack": "none",
+        "action_roadmap.owner_timeline": "schematic | no-text | 16:9",
+        "closing_commitment.brand_tail": "generated-background | no-text | 16:9",
+        "evidence_board.source_table": "none",
+    }
+    contracts: list[dict[str, str]] = []
+    recent_layouts: list[str] = []
+    recent_recipes: list[str] = []
+    total = len(outline)
+
+    for index, slide in enumerate(outline):
+        page = f"P{index + 1:02d}"
+        role = infer_page_role(index, total, str(slide.get("title", "")), list(slide.get("bullets", [])))
+        layout, recipe = role_recipes.get(role) or fallback_recipes[(index - 1) % len(fallback_recipes)]
+        if index > 0 and len(recent_layouts) >= 2 and recent_layouts[-1] == layout and recent_layouts[-2] == layout:
+            layout, recipe = fallback_recipes[index % len(fallback_recipes)]
+        if index > 0 and len(recent_recipes) >= 2 and recent_recipes[-1] == recipe and recent_recipes[-2] == recipe:
+            layout, recipe = fallback_recipes[(index + 1) % len(fallback_recipes)]
+        recent_layouts.append(layout)
+        recent_recipes.append(recipe)
+        if role == "anchor":
+            visual_weight = "hero"
+            asset_requirement = "real-logo-or-text-fallback"
+            raster_policy = "allowed-cover"
+        elif role in {"process", "benefit", "comparison"}:
+            visual_weight = "high"
+            asset_requirement = "schematic"
+            raster_policy = "prohibited-formal-body"
+        elif role in {"risk", "action"}:
+            visual_weight = "medium-high"
+            asset_requirement = "none-or-schematic"
+            raster_policy = "prohibited-formal-body"
+        elif role == "closing":
+            visual_weight = "medium"
+            asset_requirement = "real-logo-or-text-fallback"
+            raster_policy = "allowed-section-tail"
+        else:
+            visual_weight = "medium"
+            asset_requirement = "none"
+            raster_policy = "prohibited-formal-body"
+        visual_layer = layer_by_recipe.get(recipe, "none")
+        if visual_layer != "none":
+            layer_name = visual_layer.split("|", 1)[0].strip()
+            visual_layer = f"{visual_layer} | assets/generated/page-visuals/{page}-{layer_name}.png"
+        contracts.append(
+            {
+                "page": page,
+                "title": str(slide.get("title", "")),
+                "page_role": role,
+                "visual_weight": visual_weight,
+                "layout_family": layout,
+                "page_recipe_id": recipe,
+                "asset_requirement": asset_requirement,
+                "visual_layer": visual_layer,
+                "raster_policy": raster_policy,
+                "anti_patterns": anti_by_layout.get(layout, "repeated-card-grid"),
+            }
+        )
+    return contracts
+
+
+def design_spec_text(title: str, style: str, output_mode: str, direction: dict[str, str], contracts: list[dict[str, str]]) -> str:
+    rows = "\n".join(
+        "| {page} | {page_role} | {visual_weight} | {layout_family} | {page_recipe_id} | {asset_requirement} | {visual_layer} | {raster_policy} | {anti_patterns} |".format(**item)
+        for item in contracts
+    )
+    outline_rows = "\n".join(
+        "- {page}: {title} | role={page_role} | recipe={page_recipe_id} | layer={visual_layer} | raster={raster_policy}".format(**item)
+        for item in contracts
+    )
+    return f"""# Design Specification
+
+## I. Project Info
+- Title: {title}
+- Output Mode: {output_mode}
+- Style Preset: {style}
+
+## II. Canvas
+- Aspect Ratio: 16:9
+- Delivery: desktop draft handoff for full Ultimate PPT Master refinement
+
+## III. Visual Theme
+- Visual Direction: {direction["id"]}
+- Benchmark Sentence: {direction["benchmark"]}
+- Top Aesthetic Risks: repeated card grids, fake logo fragments, text-only pages, weak evidence hierarchy
+- External Release Boundary: {direction["release_boundary"]}
+- Visual Strategy Mode: hybrid-editable
+- Raster Slide Mode: disabled_for_formal_body
+
+## IV. Typography
+- Body baseline: 18 px equivalent
+- Title/body split: display title plus readable dense body text
+
+## V. Layout Principles
+### Page Role / Visual Weight Contract
+| page | page_role | visual_weight | layout_family | page_recipe_id | asset_requirement | visual_layer | raster_policy | anti_patterns |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+{rows}
+
+## VI. Icon System
+- Use restrained line icons only when they clarify a process, risk, or action.
+
+## VII. Visualization Plan
+- Use process flows, comparison matrices, metric panels, and evidence boards based on the page contract.
+- Page recipes come from templates/page-recipes/index.json and drive PPTX/HTML builders.
+
+## VIII. Image Resource List
+- Default draft strategy: explicit no-image strategy unless approved, official, or generated assets are supplied.
+- Cover uses real-logo-or-text-fallback until approved brand assets are available.
+- Generated page visual layers must be no-text support assets and must not replace editable content.
+
+## IX. Content Outline
+{outline_rows}
+
+## X. Speaker Notes
+- Add speaker notes during full Agent refinement for risk, process, and benefit pages.
+
+## XI. Technical Constraints
+- Keep PPTX text editable.
+- Avoid full-slide screenshots.
+- Run audit_formal_delivery.py and audit_design_completion.py before handoff.
+"""
+
+
+def spec_lock_text(direction: dict[str, str], contracts: list[dict[str, str]]) -> str:
+    def section(name: str, key: str) -> str:
+        lines = [f"## {name}"]
+        for item in contracts:
+            lines.append(f"- {item['page']}: {item[key]}")
+        return "\n".join(lines)
+
+    return "\n\n".join(
+        [
+            "\n".join(
+                [
+                    "## visual_direction",
+                    f"- id: {direction['id']}",
+                    f"- benchmark: {direction['benchmark']}",
+                    f"- release_boundary: {direction['release_boundary']}",
+                ]
+            ),
+            section("page_roles", "page_role"),
+            section("visual_weight", "visual_weight"),
+            section("layout_family", "layout_family"),
+            section("page_recipes", "page_recipe_id"),
+            section("visual_layers", "visual_layer"),
+            section("raster_policy", "raster_policy"),
+            section("asset_requirements", "asset_requirement"),
+            section("anti_patterns", "anti_patterns"),
+        ]
+    ) + "\n"
+
+
+def page_visual_prompt(title: str, contract: dict[str, str]) -> str:
+    return (
+        f"Create a no-text visual support layer for page {contract['page']} of a formal business presentation titled "
+        f"'{title}'. Page role: {contract['page_role']}. Page recipe: {contract['page_recipe_id']}. "
+        f"Layer type: {contract['visual_layer'].split('|', 1)[0].strip()}. Use a polished official finance/service "
+        "visual language. The image must contain no readable text, no numbers, no letters, no brand logos, no QR codes, "
+        "no UI screenshots, no policy wording, and no watermark. It should support editable PPTX text, charts, tables, "
+        "and shapes rather than replace them."
+    )
+
+
+def page_visual_layer_records(title: str, contracts: list[dict[str, str]]) -> tuple[dict[str, Any], dict[str, Any], str]:
+    items: list[dict[str, Any]] = []
+    prompt_items: list[dict[str, Any]] = []
+    markdown_lines = [
+        "# ChatGPT Page Visual Layer Prompts",
+        "",
+        "Status: Needs-Manual",
+        "",
+        "Use these prompts only for no-text support layers. Keep business copy, numbers, charts, tables, QR codes, and logos editable or sourced.",
+        "",
+    ]
+    for contract in contracts:
+        layer = contract["visual_layer"]
+        if not layer or layer == "none":
+            continue
+        parts = [part.strip() for part in layer.split("|")]
+        layer_type = parts[0]
+        aspect = next((part for part in parts if re.fullmatch(r"\d+:\d+", part)), "16:9")
+        output_path = next((part for part in parts if part.startswith("assets/") or part.startswith("images/")), f"assets/generated/page-visuals/{contract['page']}-{layer_type}.png")
+        prompt = page_visual_prompt(title, contract)
+        items.append(
+            {
+                "page": contract["page"],
+                "layerType": layer_type,
+                "textPolicy": "no-text",
+                "aspectRatio": aspect,
+                "prompt": prompt,
+                "outputPath": output_path,
+                "targetUse": "hybrid-editable page support layer",
+                "status": "Needs-Manual",
+                "backend": "manual-chatgpt",
+                "insertedTargets": [],
+            }
+        )
+        prompt_items.append(
+            {
+                "page": contract["page"],
+                "layer_type": layer_type,
+                "aspect_ratio": aspect,
+                "image_size": "1K",
+                "prompt": prompt,
+                "output_path": output_path,
+                "status": "Needs-Manual",
+            }
+        )
+        markdown_lines.extend(
+            [
+                f"## {contract['page']} - {layer_type}",
+                "",
+                f"- Output path: `{output_path}`",
+                f"- Aspect ratio: `{aspect}`",
+                "- Status: `Needs-Manual`",
+                "",
+                prompt,
+                "",
+            ]
+        )
+    return (
+        {
+            "version": "page-visual-layers-v1",
+            "mode": "hybrid-editable",
+            "items": items,
+        },
+        {
+            "version": "page-visual-prompts-v1",
+            "status": "Needs-Manual",
+            "items": prompt_items,
+        },
+        "\n".join(markdown_lines),
+    )
+
+
 def write_formal_delivery_files(
     project_path: Path,
     job: dict[str, Any],
@@ -1556,6 +1949,11 @@ def write_formal_delivery_files(
         "blockedReason": "",
     }
     title = outline[0]["title"] if outline else source_name
+    visual_direction = visual_direction_for_style(job["stylePreset"], job["outputMode"])
+    page_contracts = page_contract_for_outline(outline)
+    page_visual_manifest, page_visual_prompts, page_visual_prompt_md = page_visual_layer_records(str(title), page_contracts)
+    design_spec_path = project_path / "design_spec.md"
+    spec_lock_path = project_path / "spec_lock.md"
     manifest_path = project_path / "manifest.json"
     brief_path = project_path / "project-brief.json"
     report_path = project_path / "quality-report.json"
@@ -1563,8 +1961,13 @@ def write_formal_delivery_files(
     codex_guide_path = project_path / "AGENTS.md"
     asset_plan_path = project_path / "asset-plan.md"
     visual_element_kit_path = project_path / "visual-element-kit.md"
+    page_visual_manifest_path = project_path / "assets" / "generated" / "page-visuals" / "manifest.json"
+    page_visual_prompt_json_path = project_path / "images" / "page_visual_prompts.json"
+    page_visual_prompt_md_path = project_path / "images" / "page_visual_prompts.md"
     image_prompt_fallback_path = project_path / "images" / "image_prompts.md"
     formal_file_paths = [
+        design_spec_path,
+        spec_lock_path,
         manifest_path,
         brief_path,
         report_path,
@@ -1572,6 +1975,9 @@ def write_formal_delivery_files(
         codex_guide_path,
         asset_plan_path,
         visual_element_kit_path,
+        page_visual_manifest_path,
+        page_visual_prompt_json_path,
+        page_visual_prompt_md_path,
         image_prompt_fallback_path,
     ]
     brief = {
@@ -1584,6 +1990,14 @@ def write_formal_delivery_files(
         "qualityGate": quality_gate,
         "workflowState": workflow_state,
         "storyboard": outline,
+        "visualDirection": visual_direction,
+        "pageContract": page_contracts,
+        "visualStrategy": {
+            "mode": "hybrid-editable",
+            "rasterSlideMode": "disabled_for_formal_body",
+            "benchmark": "bocom_social_card_private",
+            "pageVisualManifest": "assets/generated/page-visuals/manifest.json",
+        },
         "sourceStrategy": {
             "source": "sources/source.md",
             "privacy": "local-first; source files stay in the project folder",
@@ -1608,6 +2022,18 @@ def write_formal_delivery_files(
         "expectedArtifacts": quality_profile["expectedArtifacts"],
         "reviewCommands": quality_gate["reviewCommands"],
         "artifactChecks": quality_gate["artifactChecks"],
+        "visualDirection": visual_direction,
+        "pageContractSummary": {
+            "pages": len(page_contracts),
+            "layoutFamilies": sorted({item["layout_family"] for item in page_contracts}),
+            "pageRecipes": sorted({item["page_recipe_id"] for item in page_contracts}),
+            "roles": sorted({item["page_role"] for item in page_contracts}),
+        },
+        "visualStrategy": {
+            "mode": "hybrid-editable",
+            "rasterSlideMode": "disabled_for_formal_body",
+            "pageVisualManifest": "assets/generated/page-visuals/manifest.json",
+        },
         "preview": {
             "hasHtml": bool(preview_html),
             "layoutStrategy": "varied data-layout pages for Web Deck; varied editable slide structures for PPTX",
@@ -1621,9 +2047,16 @@ def write_formal_delivery_files(
         "qualityGate": quality_gate,
         "workflowState": workflow_state,
         "reviewCommands": quality_gate["reviewCommands"],
+        "visualDirection": visual_direction,
+        "pageContractSummary": {
+            "pages": len(page_contracts),
+            "layoutFamilies": sorted({item["layout_family"] for item in page_contracts}),
+            "pageRecipes": sorted({item["page_recipe_id"] for item in page_contracts}),
+            "roles": sorted({item["page_role"] for item in page_contracts}),
+        },
         "summary": {
-            "zh": "桌面生成器已写入正式商务门禁。请运行 reviewCommands 中的正式商务审计；Design Doctor 默认只报告问题。",
-            "en": "Desktop worker wrote the formal-business gate. Run reviewCommands; Design Doctor remains report-only by default.",
+            "zh": "桌面生成器已写入正式商务门禁、页面角色合约和页面配方合约。请运行 reviewCommands 中的正式商务审计、设计完成度审计和视觉配方审计；Design Doctor 默认只报告问题。",
+            "en": "Desktop worker wrote the formal-business gate, page role contract, and page recipe contract. Run reviewCommands for delivery, design-completion, and visual-recipe audits; Design Doctor remains report-only by default.",
         },
         "checks": [
             {
@@ -1642,6 +2075,15 @@ def write_formal_delivery_files(
     for path, payload in files:
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         written.append(path)
+    design_spec_path.write_text(design_spec_text(title, job["stylePreset"], job["outputMode"], visual_direction, page_contracts), encoding="utf-8")
+    spec_lock_path.write_text(spec_lock_text(visual_direction, page_contracts), encoding="utf-8")
+    written.extend([design_spec_path, spec_lock_path])
+    page_visual_manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    page_visual_manifest_path.write_text(json.dumps(page_visual_manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    page_visual_prompt_json_path.parent.mkdir(parents=True, exist_ok=True)
+    page_visual_prompt_json_path.write_text(json.dumps(page_visual_prompts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    page_visual_prompt_md_path.write_text(page_visual_prompt_md, encoding="utf-8")
+    written.extend([page_visual_manifest_path, page_visual_prompt_json_path, page_visual_prompt_md_path])
     codex_task_path.write_text(
         codex_task_text(title, job["outputMode"], quality_gate, workflow_state, quality_profile["expectedArtifacts"]),
         encoding="utf-8",

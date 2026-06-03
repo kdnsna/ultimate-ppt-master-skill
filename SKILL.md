@@ -20,6 +20,8 @@ description: >
 
 **Core Pipeline**: `Request → Output Mode Selection → Source Document → Project Setup → Design Workflow → Generate → Verify → Export/Preview`
 
+**Quality Pipeline Add-on**: stakeholder-facing decks must also pass `Visual Direction Audit → Page Role Contract → Visual Completion Audit`.
+
 ## Output Mode Selection (MANDATORY FIRST STEP)
 
 When the user makes a generic PPT request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", or "turn this into slides", first present the two 终极融合PPT大师 modes and wait for the user's choice. Do not start content conversion, project creation, outline writing, or slide generation before this choice.
@@ -51,6 +53,8 @@ Selection rules:
 Default to `qualityGate.level = "formal-business"` for business/report/consulting/training/government/finance decks and for any deliverable expected to be handed to a real stakeholder. This is the default quality bar unless the user explicitly asks for a quick draft.
 
 Before generating final PPTX or Web Deck files, lock these items in `manifest.json`, `project-brief.json`, `agent-prompt.md`, and `quality-checklist.md`:
+- Visual direction selection from `templates/visual-directions/`, or a documented `custom` benchmark when no direction fits.
+- Page role and recipe contract: every page has `page_role`, `visual_weight`, `layout_family`, `page_recipe_id`, `asset_requirement`, `visual_layer`, `raster_policy`, and `anti_patterns` in `design_spec.md` / `spec_lock.md`.
 - Brand assets or a documented fallback strategy.
 - Traceable evidence sources and data interpretation boundaries.
 - ChatGPT/OpenAI as the primary visual asset engine for custom visuals; record prompts, filenames, target slides, and manual edits in `asset-plan.md`.
@@ -59,11 +63,17 @@ Before generating final PPTX or Web Deck files, lock these items in `manifest.js
 - Public asset search plan for evidence, official references, and brand boundaries, or explicit no-search rationale; record source URL, publisher, license/usage note, and insertion target for each selected public asset.
 - Image, chart, and infographic plan, or an explicit no-image strategy.
 - Page rhythm, layout variety, and the role of each slide.
+- 4.0 hybrid-editable visual strategy: generated visuals support the page as no-text layers; formal body pages remain editable.
+- Visual completion status: screenshots/PNGs rendered, repeated-layout risk checked, placeholder assets labeled, and design-quality-report written.
 - Artifact checks for editable PPTX objects and complete Web Deck visual rendering.
 
 Formal delivery rules:
 - Do not build a whole deck from repeated title-and-card pages.
+- Do not let three consecutive content pages use the same layout family unless the Design Spec records a deliberate reason.
+- Do not let three consecutive content pages use the same page recipe unless the Design Spec records a deliberate reason.
+- Do not use full-page generated images for formal PPTX body pages. Full-page raster is allowed only for covers, section/tail pages, poster/KV pages, Web showcase pages, or explicit user override recorded in `raster_policy`.
 - Do not proceed with only slide titles unless the deck is clearly marked as a draft and the user accepts that limitation.
+- Do not use a generic "free design" look when a visual direction pack matches the deck context. Select the direction pack first, then adapt.
 - Treat ChatGPT/OpenAI as the primary visual asset engine when visuals can improve the deck. Generate custom supporting visuals and small reusable micro-assets before final slide assembly.
 - Generate and reuse a coherent element kit (`visual-element-kit.md`) rather than relying on random stock imagery: small section dividers, metric badges, process nodes, connectors, icon accents, subtle patterns, and callout stickers.
 - Run `python3 scripts/generate_visual_element_kit.py <project_path>` before final slide assembly. If no image backend/key is configured, continue with `Needs-Manual` prompts in `images/image_prompts.md`; do not block the whole deck.
@@ -79,6 +89,8 @@ Run the formal audit when project artifacts exist:
 
 ```bash
 python3 scripts/audit_formal_delivery.py <project_path_or_artifact>
+python3 scripts/audit_design_completion.py <project_path_or_artifact>
+python3 scripts/audit_visual_recipes.py <project_path_or_artifact>
 ```
 
 If the audit fails, report the concrete issues and fix the deck before final delivery unless the user explicitly chooses to ship with known risks.
@@ -142,6 +154,9 @@ If the audit fails, report the concrete issues and fix the deck before final del
 | `${SKILL_DIR}/scripts/notes_to_audio.py` | Optional recorded narration audio generation |
 | `${SKILL_DIR}/scripts/update_spec.py` | Propagate a `spec_lock.md` color / font_family change across all generated SVGs |
 | `${SKILL_DIR}/scripts/visual_review.py` | Optional rubric-based visual review pass for generated SVG pages |
+| `${SKILL_DIR}/scripts/audit_design_completion.py` | Visual-completion audit for page roles, layout repetition, assets, notes, and handoff readiness |
+| `${SKILL_DIR}/scripts/generate_visual_layers.py` | Prepare no-text page visual layer prompts/manifests for hybrid-editable decks |
+| `${SKILL_DIR}/scripts/audit_visual_recipes.py` | Audit page recipes, visual layers, and raster policy for 4.0 hybrid-editable decks |
 
 For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 
@@ -151,6 +166,8 @@ For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 |-------|------|---------|
 | Layout templates | `${SKILL_DIR}/templates/layouts/layouts_index.json` | Query available page layout templates |
 | Scenario preset directions | `${SKILL_DIR}/templates/presets/preset-directions.json` | Seed common deck structures, source requirements, template candidates, and QA checks |
+| Visual direction packs | `${SKILL_DIR}/templates/visual-directions/index.json` | Select context-specific aesthetic guardrails before Strategist writes `design_spec.md` |
+| Page recipes | `${SKILL_DIR}/templates/page-recipes/index.json` | Select per-page structural recipes before generating PPTX/Web pages |
 | Brand presets | `${SKILL_DIR}/templates/brands/brands_index.json` | Query available brand identity presets (color / typography / logo / voice) |
 | Visualization templates | `${SKILL_DIR}/templates/charts/charts_index.json` | Query available visualization SVG templates (charts, infographics, diagrams, frameworks) |
 | Icon library | `${SKILL_DIR}/templates/icons/` | See `${SKILL_DIR}/templates/icons/README.md`; search icons on demand with `ls templates/icons/<library>/ \| grep <keyword>` |
@@ -364,6 +381,8 @@ Read references/strategist.md
 
 > ⚠️ **Mandatory gate in `strategist.md`**: Before writing `design_spec.md`, Strategist MUST `read_file templates/design_spec_reference.md` and produce the spec following its full I–XI section structure. See `strategist.md` Section 1 for the explicit gate rule.
 
+> ⚠️ **Visual Direction Audit gate**: Before the Eight Confirmations, Strategist MUST read `templates/visual-directions/index.json`, select the closest visual direction pack (or `custom`), and state the selected pack, why it fits, top aesthetic risks, required page roles, and anti-patterns. This is a recommendation inside the Eight Confirmations bundle, not an extra blocking step.
+
 **Must complete the Eight Confirmations** (full template structure in `templates/design_spec_reference.md`):
 
 ⛔ **BLOCKING**: The Eight Confirmations MUST be presented to the user as a bundled set of recommendations, and you MUST **wait for the user to confirm or modify** before outputting the Design Specification & Content Outline. This is the single core confirmation point in the workflow. Once confirmed, all subsequent script execution and slide generation should proceed fully automatically.
@@ -389,6 +408,7 @@ python3 ${SKILL_DIR}/scripts/analyze_images.py <project_path>/images
 **Output**:
 - `<project_path>/design_spec.md` — human-readable design narrative
 - `<project_path>/spec_lock.md` — machine-readable execution contract (distilled from the decisions in design_spec.md; Executor re-reads this before every page). See `templates/spec_lock_reference.md` for the skeleton.
+- `<project_path>/design-quality-report.md` — created or updated during verification; summarizes visual direction fit, page role coverage, assets, repeated-layout risk, and remaining blockers.
 
 **✅ Checkpoint — Phase deliverables complete, auto-proceed to next step**:
 ```markdown
@@ -524,6 +544,14 @@ python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path>
 # Optional conversion diagnostics:
 # python3 ${SKILL_DIR}/scripts/svg_to_pptx.py <project_path> --trace-conversion
 ```
+
+**Step 7.4** — Visual completion audit:
+```bash
+python3 ${SKILL_DIR}/scripts/visual_review.py <project_path>
+python3 ${SKILL_DIR}/scripts/audit_design_completion.py <project_path>
+```
+- `visual_review.py` may fail if browser rendering dependencies are unavailable; if so, record the blocker in `design-quality-report.md` rather than silently skipping visual QA.
+- `audit_design_completion.py` must pass before formal delivery unless the user explicitly accepts the listed visual blockers.
 
 > ❌ **NEVER** use `cp` as a substitute for `finalize_svg.py` — it performs multiple critical processing steps
 > ❌ **NEVER** add extra flags like `--only`

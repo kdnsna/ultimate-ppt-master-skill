@@ -120,14 +120,23 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertIn("no-image strategy", json.dumps(manifest, ensure_ascii=False))
             self.assertTrue(any(path.endswith("codex-task.md") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("AGENTS.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("design_spec.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("spec_lock.md") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("asset-plan.md") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("visual-element-kit.md") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("images/image_prompts.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("images/page_visual_prompts.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.endswith("assets/generated/page-visuals/manifest.json") for path in result["generatedFiles"]))
             codex_task = (Path(result["projectPath"]) / "codex-task.md").read_text(encoding="utf-8")
+            self.assertIn("design_spec.md", codex_task)
+            self.assertIn("spec_lock.md", codex_task)
             self.assertIn("asset-plan.md", codex_task)
             self.assertIn("visual-element-kit.md", codex_task)
             self.assertIn("audit_formal_delivery.py", codex_task)
+            self.assertIn("audit_design_completion.py", codex_task)
+            self.assertIn("audit_visual_recipes.py", codex_task)
             self.assertIn("generate_visual_element_kit.py", codex_task)
+            self.assertIn("generate_visual_layers.py", codex_task)
             self.assertIn("Needs-Manual", codex_task)
             self.assertRegex(codex_task, r"ChatGPT|generated asset|生成素材")
             self.assertRegex(codex_task, r"micro-assets|small element|小元素|元素素材")
@@ -159,6 +168,17 @@ class DesktopWorkerTest(unittest.TestCase):
             manifest = json.loads((Path(result["projectPath"]) / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["qualityGate"]["level"], "formal-business")
             self.assertIn("python3 scripts/audit_formal_delivery.py <project_path>", manifest["reviewCommands"])
+            self.assertIn("python3 scripts/audit_design_completion.py <project_path>", manifest["reviewCommands"])
+            self.assertIn("python3 scripts/audit_visual_recipes.py <project_path>", manifest["reviewCommands"])
+            self.assertIn("visualDirection", manifest)
+            self.assertIn("pageContractSummary", manifest)
+            self.assertIn("visualStrategy", manifest)
+            spec_lock = (Path(result["projectPath"]) / "spec_lock.md").read_text(encoding="utf-8")
+            self.assertIn("## page_roles", spec_lock)
+            self.assertIn("## layout_family", spec_lock)
+            self.assertIn("## page_recipes", spec_lock)
+            self.assertIn("## visual_layers", spec_lock)
+            self.assertIn("## raster_policy", spec_lock)
             asset_plan = (Path(result["projectPath"]) / "asset-plan.md").read_text(encoding="utf-8")
             self.assertRegex(asset_plan, r"Public asset search|公开素材检索|素材检索")
             self.assertRegex(asset_plan, r"ChatGPT|generated asset|生成素材")
@@ -220,9 +240,23 @@ class DesktopWorkerTest(unittest.TestCase):
                 capture_output=True,
                 text=True,
             )
+            visual_result = subprocess.run(
+                [
+                    "python3",
+                    "scripts/audit_visual_recipes.py",
+                    web_result["projectPath"],
+                    pptx_result["projectPath"],
+                ],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("Formal delivery audit passed", result.stdout)
+        self.assertEqual(visual_result.returncode, 0, visual_result.stdout + visual_result.stderr)
+        self.assertIn('"status": "pass"', visual_result.stdout)
 
     def test_run_job_creates_narration_handoff_when_enabled(self):
         with tempfile.TemporaryDirectory() as tmp:

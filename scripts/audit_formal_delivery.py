@@ -140,6 +140,51 @@ REQUIRED_ELEMENT_TYPES = {
 
 TERMINAL_ELEMENT_STATUSES = {"Generated", "Needs-Manual", "Inserted"}
 
+REQUIRED_DESIGN_LOCK_SECTIONS = {
+    "visual_direction",
+    "page_roles",
+    "visual_weight",
+    "layout_family",
+    "page_recipes",
+    "visual_layers",
+    "raster_policy",
+    "asset_requirements",
+    "anti_patterns",
+}
+
+
+def parse_spec_lock(path: Path) -> dict[str, dict[str, str]]:
+    sections: dict[str, dict[str, str]] = {}
+    current: str | None = None
+    for raw in read_text(path).splitlines():
+        line = raw.strip()
+        if line.startswith("## "):
+            current = line[3:].strip()
+            sections.setdefault(current, {})
+            continue
+        if not current or not line.startswith("- ") or ":" not in line:
+            continue
+        key, value = line[2:].split(":", 1)
+        sections[current][key.strip()] = value.strip()
+    return sections
+
+
+def discover_design_contracts(paths: list[Path]) -> tuple[list[Path], list[Path]]:
+    design_specs: list[Path] = []
+    spec_locks: list[Path] = []
+    for input_path in paths:
+        path = input_path.expanduser().resolve()
+        candidates = [path] if path.is_file() else [
+            file_path for file_path in path.rglob("*")
+            if file_path.is_file() and not any(part in SKIP_DIRS for part in file_path.parts)
+        ] if path.exists() else []
+        for file_path in candidates:
+            if file_path.name == "design_spec.md":
+                design_specs.append(file_path)
+            elif file_path.name == "spec_lock.md":
+                spec_locks.append(file_path)
+    return unique_paths(design_specs), unique_paths(spec_locks)
+
 
 def audit_element_manifests(element_manifests: list[Path]) -> tuple[list[str], bool]:
     errors: list[str] = []
@@ -219,13 +264,38 @@ def has_logo_fragments(text: str) -> bool:
     return "b" in token_set and "c" in token_set
 
 
+def audit_design_contract(design_specs: list[Path], spec_locks: list[Path]) -> list[str]:
+    errors: list[str] = []
+    if not design_specs:
+        errors.append("design_spec.md is required for formal-business deliveries.")
+    else:
+        combined = "\n".join(read_text(path) for path in design_specs)
+        for token in ("Visual Direction", "Page Role / Visual Weight Contract", "page_recipe_id", "visual_layer", "raster_policy"):
+            if token not in combined:
+                errors.append(f"design_spec.md must include {token}.")
+    if not spec_locks:
+        errors.append("spec_lock.md is required for formal-business deliveries.")
+    else:
+        lock = parse_spec_lock(spec_locks[0])
+        missing_sections = sorted(REQUIRED_DESIGN_LOCK_SECTIONS - set(lock))
+        if missing_sections:
+            errors.append("spec_lock.md is missing visual-completion section(s): " + ", ".join(missing_sections))
+        for section in REQUIRED_DESIGN_LOCK_SECTIONS - {"visual_direction"}:
+            if section in lock and not any(re.fullmatch(r"P\d{2}", key) for key in lock[section]):
+                errors.append(f"spec_lock.md section {section} must contain PNN page entries.")
+    return errors
+
+
 def audit(paths: list[Path]) -> list[str]:
     errors: list[str] = []
     manifests, html_files, pptx_files, visual_kit_files, element_manifests, prompt_files = discover_files(paths)
+    design_specs, spec_locks = discover_design_contracts(paths)
     quality_gate = find_quality_gate(manifests)
 
     if not quality_gate:
         errors.append("qualityGate.level must be formal-business in manifest.json or project-brief.json.")
+    else:
+        errors.extend(audit_design_contract(design_specs, spec_locks))
 
     chatgpt_first = requires_chatgpt_generation_first(quality_gate, manifests)
     if chatgpt_first and not visual_kit_files and not element_manifests:

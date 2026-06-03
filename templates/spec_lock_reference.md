@@ -12,6 +12,15 @@
 
 > Strategist: fill viewBox and format for the chosen canvas. Common values: `0 0 1280 720` (PPT 16:9), `0 0 1024 768` (PPT 4:3), `0 0 1242 1660` (Xiaohongshu), `0 0 1080 1080` (WeChat Moments), `0 0 1080 1920` (Story).
 
+## visual_direction
+- id: finance_internal_report
+- benchmark: Formal banking report with source-grounded evidence pages and restrained brand-color structure.
+- release_boundary: Replace temporary logo and schematic assets before external release.
+
+> `id` must match `templates/visual-directions/index.json`, or be `custom`.
+> `benchmark` is a one-sentence visual target.
+> `release_boundary` records asset or brand blockers for formal external use.
+
 ## colors
 - bg: #FFFFFF
 - primary: #......
@@ -95,6 +104,78 @@
 > **Rhythm follows narrative**: `breathing` pages appear where narrative genuinely pauses — section transitions, a single argument worth standalone emphasis, a deliberate stop after a dense sequence. A data briefing or consulting analysis may legitimately be nearly all `dense` — **do not invent filler pages** to pad rhythm. Validation: every `breathing` page must answer "what independent thing is this page saying?".
 >
 > **Missing or empty section** → Executor falls back to `dense` for every page (legacy pre-rhythm behavior). Remove the section only for legacy decks; new decks MUST fill it.
+
+## page_roles
+- P01: anchor
+- P02: context
+- P03: evidence
+- P04: process
+- P05: risk
+
+> One entry per page. Values describe why the page exists, not how it is drawn. Use the vocabulary from the active visual direction pack where possible.
+
+## visual_weight
+- P01: hero
+- P02: medium
+- P03: high
+- P04: medium
+- P05: medium
+
+> One entry per page. Allowed common values: `hero`, `high`, `medium`, `low`. This guides hierarchy: the primary judgment, chart, image, or process must visibly dominate according to the weight.
+
+## layout_family
+- P01: cover_brand
+- P02: statement_plus_evidence
+- P03: table_evidence
+- P04: process_flow
+- P05: faq_grid
+
+> One entry per page. Use concise stable names. Three consecutive non-anchor pages MUST NOT share the same value unless `anti_patterns` records `intentional-repeat:<reason>`.
+
+## page_recipes
+- P01: cover_brand.hero_left_visual
+- P02: statement_plus_evidence.left_rule_panel
+- P03: evidence_board.source_table
+- P04: process_flow.horizontal_steps
+- P05: risk_callout.qa_stack
+
+> One entry per page. Values should match `templates/page-recipes/index.json`, or be a documented custom recipe. A recipe is the structural builder contract for the page, not just a visual label.
+
+## visual_layers
+- P01: generated-background | no-text | 16:9 | assets/generated/page-visuals/P01-background.png
+- P02: subtle-pattern | no-text | 16:9 | assets/generated/page-visuals/P02-pattern.png
+- P03: none
+- P04: generated-process-accent | no-text | 16:9 | assets/generated/page-visuals/P04-process.png
+- P05: none
+
+> One entry per page. Generated layers must be no-text support assets. They may provide background, pattern, device mockup, process accent, or symbolic visual support, but must not replace editable text, numbers, charts, tables, QR codes, or official logos.
+
+## raster_policy
+- P01: allowed-cover
+- P02: prohibited-formal-body
+- P03: prohibited-formal-body
+- P04: prohibited-formal-body
+- P05: prohibited-formal-body
+
+> One entry per page. Full-page raster is prohibited for formal body pages unless the user explicitly requested poster/showcase mode and the quality report flags the editability risk.
+
+## asset_requirements
+- P01: real-logo-or-text-fallback
+- P02: none-or-schematic
+- P03: data-table
+- P04: schematic
+- P05: none
+
+> One entry per page. Common values: `real`, `generated`, `schematic`, `placeholder-labeled`, `none`, plus short custom values. If an asset is not available, the page must show a labeled placeholder or the quality report must block external release.
+
+## anti_patterns
+- P01: fake-logo; generic-gradient
+- P02: 2x2-card-grid; vague-context
+- P03: table-without-takeaway
+- P04: disconnected-icons; no-flow-direction
+- P05: buried-risk; overconfident-policy-claim
+
+> One entry per page. Semicolon-separated failure modes. Executor must check this before drawing each page. Use `intentional-repeat:<reason>` only when repeating the same `layout_family` across three or more non-anchor pages is deliberate.
 
 ## page_layouts
 - P01: 01_cover
