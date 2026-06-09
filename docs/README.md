@@ -1,6 +1,6 @@
 # Documentation Map
 
-Ultimate PPT Master v4.0 uses a categorized documentation structure. Start with the route that matches the work you are doing.
+Ultimate PPT Master v4.2 uses a categorized documentation structure. Start with the route that matches the work you are doing.
 
 ## Guides
 
@@ -18,6 +18,8 @@ Ultimate PPT Master v4.0 uses a categorized documentation structure. Start with 
 
 | Need | Read |
 |---|---|
+| Turn rendered issues into safe revision briefs | [Rendered Review Loop v4.3](./quality/rendered-review-loop-v4.3.md) |
+| Plan AI-generated decks with DeckIR, page maps, and rendered review | [DeckIR AI Planning Workflow v4.2](./quality/deckir-ai-planning-workflow-v4.2.md) |
 | Understand the v4.0 visual contract | [Hybrid-Editable Visual Workflow v4.0](./quality/hybrid-editable-visual-workflow-v4.0.md) |
 | Review the stable proof matrix | [Quality Workbench v2.5](./quality/quality-workbench-v2.5.md) |
 | Audit the v2.5 quality-workbench completion evidence | [Completion Audit v2.5](./quality/completion-audit-v2.5.md) |
@@ -28,7 +30,8 @@ Ultimate PPT Master v4.0 uses a categorized documentation structure. Start with 
 
 | Need | Read |
 |---|---|
-| See the latest release | [Release Notes - v4.1.0](./release/release-notes-v4.1.0.md) |
+| See the latest release | [Release Notes - v4.2.0](./release/release-notes-v4.2.0.md) |
+| Review the AI planning release | [Release Notes - v4.2.0](./release/release-notes-v4.2.0.md) |
 | Review the hybrid-editable release | [Release Notes - v4.0.0](./release/release-notes-v4.0.0.md) |
 | Review the formal handoff release | [Release Notes - v3.0.0](./release/release-notes-v3.0.0.md) |
 | Maintain release checks, Pages, Homebrew, signing, and privacy | [Release and Maintenance](./release/release-maintenance.md) |
@@ -49,7 +52,7 @@ Ultimate PPT Master v4.0 uses a categorized documentation structure. Start with 
 | Question | First check | Evidence to keep |
 |---|---|---|
 | Does the web app build? | `npm run build:web` | `apps/web/dist`, Pages workflow logs. |
-| Did the local handoff work? | Bridge manifest and generated folder | `source.md`, `extracted-source.md`, `manifest.json`, `quality-report.json`, `codex-task.md`. |
+| Did the local handoff work? | Bridge manifest and generated folder | `source.md`, `extracted-source.md`, `storyboard.json`, `source-map.json`, `manifest.json`, `quality-report.json`, `codex-task.md`. |
 | Did v4.0 visual governance run? | `npm run audit:docs` and visual recipe commands | `spec_lock.md`, `assets/generated/page-visuals/manifest.json`, audit output. |
 | Is marketplace readiness still true? | `npm run audit:market` | `agents/openai.yaml`, `agents/marketplace-listing.json`, benchmark page. |
 | Is CI healthy? | `.github/workflows/ci.yml` | Web build, desktop build, worker tests, Node tests, audits, whitespace check. |

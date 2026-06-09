@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "apps/web/src/App.tsx"
 FLOW = ROOT / "apps/web/src/consoleFlow.ts"
 CSS = ROOT / "apps/web/src/styles.css"
-VERSION = "4.1.0"
+VERSION = "4.2.0"
 
 
 def read(path: Path) -> str:
@@ -30,7 +30,7 @@ def main() -> int:
     css = read(CSS)
     combined = "\n".join([app, flow, css])
 
-    require(f'appVersion = "{VERSION}"' in app, "Web app version marker is not v4.1.0", errors)
+    require(f'appVersion = "{VERSION}"' in app, "Web app version marker is not v4.2.0", errors)
     require('storageKey = "ultimate-ppt-master-web-brief-v4"' in app, "Web storage key should use v4", errors)
     require("v3.0" not in combined, "Web console still contains v3.0 copy", errors)
 

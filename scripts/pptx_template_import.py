@@ -25,6 +25,79 @@ from pathlib import Path
 from template_import.manifest import build_manifest
 
 
+def infer_functional_type(slide: dict) -> str:
+    """Infer a presentation functional type from imported PPTX metadata."""
+    text = " ".join(
+        str(slide.get(key, ""))
+        for key in ("name", "layoutName", "title", "notes")
+    ).lower()
+    if "cover" in text or "title slide" in text or "封面" in text:
+        return "cover"
+    if "process" in text or "timeline" in text or "流程" in text or slide.get("connectorCount", 0):
+        return "process"
+    if "evidence" in text or "table" in text or "数据" in text or slide.get("tableCount", 0):
+        return "evidence"
+    if "compare" in text or "comparison" in text or "对比" in text:
+        return "comparison"
+    if "metric" in text or "kpi" in text or "指标" in text:
+        return "benefit"
+    return "context"
+
+
+def layout_family_for_functional_type(functional_type: str) -> str:
+    return {
+        "cover": "cover_brand",
+        "process": "process_flow",
+        "evidence": "evidence_board",
+        "comparison": "comparison_matrix",
+        "benefit": "metric_panel",
+        "context": "statement_plus_evidence",
+    }.get(functional_type, "statement_plus_evidence")
+
+
+def build_reference_style_from_manifest(manifest: dict, mode: str = "style-only") -> dict:
+    """Build a compact reference-style contract from a PPTX import manifest."""
+    slides = manifest.get("slides", [])
+    functional_types: list[str] = []
+    layout_families: list[str] = []
+    slide_schemas: list[dict] = []
+    for index, slide in enumerate(slides if isinstance(slides, list) else [], start=1):
+        if not isinstance(slide, dict):
+            continue
+        functional_type = infer_functional_type(slide)
+        layout_family = layout_family_for_functional_type(functional_type)
+        if functional_type not in functional_types:
+            functional_types.append(functional_type)
+        if layout_family not in layout_families:
+            layout_families.append(layout_family)
+        slide_schemas.append(
+            {
+                "page": f"P{index:02d}",
+                "functionalType": functional_type,
+                "layoutFamily": layout_family,
+                "sourceLayout": slide.get("layoutName") or slide.get("layout") or "",
+                "shapeCount": slide.get("shapeCount", 0),
+                "textCount": slide.get("textCount", 0),
+                "imageCount": slide.get("imageCount", 0),
+                "tableCount": slide.get("tableCount", 0),
+            }
+        )
+
+    theme = manifest.get("theme", {}) if isinstance(manifest.get("theme", {}), dict) else {}
+    return {
+        "version": "reference-style-v1",
+        "mode": mode,
+        "functionalTypes": functional_types,
+        "layoutFamilies": layout_families,
+        "brandConstraints": {
+            "colors": theme.get("colors", {}),
+            "fonts": theme.get("fonts", {}),
+        },
+        "slideSchemas": slide_schemas,
+        "reusePolicy": "Reuse structure, functional type, layout rhythm, and brand constraints; do not copy private content.",
+    }
+
+
 def parse_args() -> argparse.Namespace:
     """Build the CLI argument parser for the import entry point."""
     parser = argparse.ArgumentParser(
@@ -69,6 +142,12 @@ def parse_args() -> argparse.Namespace:
             "SVGs in svg/, the round-trip view used by svg_to_pptx."
         ),
     )
+    parser.add_argument(
+        "--reference-style-mode",
+        choices=("follow-reference", "style-only"),
+        default="style-only",
+        help="Write reference-style.json describing functional types, layout families, and brand constraints.",
+    )
     return parser.parse_args()
 
 
@@ -105,6 +184,11 @@ def main() -> int:
 
         manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        reference_style = build_reference_style_from_manifest(manifest, mode=args.reference_style_mode)
+        (output_dir / "reference-style.json").write_text(
+            json.dumps(reference_style, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
 

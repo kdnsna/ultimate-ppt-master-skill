@@ -174,3 +174,21 @@ test("web experience writes a Codex-specific handoff with asset sourcing instruc
   assert.match(appSource, /generated-assets|assets\/generated|生成素材/i);
   assert.match(appSource, /quality-report\.json/);
 });
+
+test("web experience exposes AI best route and DeckIR page map", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+  const flowSource = await readFile("apps/web/src/consoleFlow.ts", "utf8");
+
+  assert.match(appSource, /AIPageMapPanel/);
+  assert.match(appSource, /BestRoutePanel/);
+  assert.match(appSource, /storyboard\.json/);
+  assert.match(appSource, /source-map\.json/);
+  assert.match(appSource, /planning-report\.json/);
+  assert.match(appSource, /review-findings\.json/);
+  assert.match(appSource, /repair-plan\.json/);
+  assert.match(appSource, /一键最佳路线|best route/i);
+  assert.match(appSource, /页面地图|page map/i);
+  assert.match(appSource, /RenderedReviewLoopPanel/);
+  assert.match(appSource, /apply_review_plan\.py/);
+  assert.match(flowSource, /deckIR/);
+});

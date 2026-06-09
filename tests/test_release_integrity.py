@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "4.1.0"
+VERSION = "4.2.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -67,13 +67,17 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/guides/agent-setup.md",
             "docs/guides/web-experience.md",
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
+            "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/quality-workbench-v2.5.md",
+            "docs/release/release-notes-v4.2.0.md",
             "docs/release/release-notes-v4.1.0.md",
             "docs/release/release-notes-v4.0.0.md",
             "docs/release/release-maintenance.md",
             "docs/strategy/skill-market-distribution.md",
             "docs/zh-CN/guides/agent-connect-bridge.md",
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
+            "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
+            "docs/zh-CN/release/release-notes-v4.2.0.md",
             "docs/zh-CN/release/release-notes-v4.1.0.md",
             "docs/zh-CN/release/release-notes-v4.0.0.md",
             "docs/zh-CN/strategy/skill-market-distribution.md",
@@ -102,8 +106,11 @@ class ReleaseIntegrityTest(unittest.TestCase):
         for expected in (
             "60-second quickstart",
             "Simplified Web Console v4.1",
+            "DeckIR AI Planning Workflow v4.2",
             "Hybrid-Editable Visual Workflow v4.0",
             "one primary next action",
+            "storyboard.json",
+            "scripts/ai_storyboard.py",
             "page recipes",
             "no-text generated visual layers",
             "npm run audit:web-console",
@@ -112,7 +119,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "Skill Market Distribution",
             "npm run audit:docs",
             "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
-            "./docs/release/release-notes-v4.1.0.md",
+            "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
+            "./docs/release/release-notes-v4.2.0.md",
             "./docs/strategy/skill-market-distribution.md",
             marketplace_prompt,
         ):
@@ -121,8 +129,11 @@ class ReleaseIntegrityTest(unittest.TestCase):
         for expected in (
             "60 秒开箱即用",
             "v4.1 精简网页控制台",
+            "v4.2 DeckIR AI 策划工作流",
             "v4.0 混合可编辑视觉工作流",
             "一个状态驱动主按钮",
+            "storyboard.json",
+            "scripts/ai_storyboard.py",
             "页面配方",
             "无文字生成式视觉层",
             "npm run audit:web-console",
@@ -131,7 +142,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "Skill 市场分发",
             "npm run audit:docs",
             "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
-            "./docs/zh-CN/release/release-notes-v4.1.0.md",
+            "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
+            "./docs/zh-CN/release/release-notes-v4.2.0.md",
             "./docs/zh-CN/strategy/skill-market-distribution.md",
             marketplace_prompt,
         ):
@@ -200,6 +212,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         release_v4_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.0.0.md").read_text(encoding="utf-8")
         release_v41 = (ROOT / "docs/release/release-notes-v4.1.0.md").read_text(encoding="utf-8")
         release_v41_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.1.0.md").read_text(encoding="utf-8")
+        release_v42 = (ROOT / "docs/release/release-notes-v4.2.0.md").read_text(encoding="utf-8")
+        release_v42_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.2.0.md").read_text(encoding="utf-8")
 
         self.assertIn("npm run audit:docs", release_maintenance)
         self.assertIn("npm run audit:web-console", release_maintenance)
@@ -233,6 +247,14 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("audit_web_console.py", release_v41_zh)
         self.assertIn("npm run audit:web-console", release_v41_zh)
         self.assertIn("四步", release_v41_zh)
+        self.assertIn("ai_storyboard.py", release_v42)
+        self.assertIn("audit_storyboard.py", release_v42)
+        self.assertIn("review_rendered_deck.py", release_v42)
+        self.assertIn("Plain-Language Update Notes", release_v42)
+        self.assertIn("ai_storyboard.py", release_v42_zh)
+        self.assertIn("audit_storyboard.py", release_v42_zh)
+        self.assertIn("review_rendered_deck.py", release_v42_zh)
+        self.assertIn("白话更新栏", release_v42_zh)
 
     def test_web_handoff_panel_has_executable_next_step_ui(self):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
@@ -256,8 +278,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v4.1.0", hero)
-        self.assertIn("Simplified Web console", hero)
+        self.assertIn("v4.2.0", hero)
+        self.assertIn("DeckIR AI planning", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)
         self.assertNotIn("v2.3.0", combined)

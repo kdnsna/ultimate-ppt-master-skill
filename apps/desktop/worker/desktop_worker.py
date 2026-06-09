@@ -1387,9 +1387,12 @@ def formal_quality_gate() -> dict[str, Any]:
             "no b/c-style logo text fragments",
         ],
         "reviewCommands": [
+            "python3 scripts/audit_storyboard.py <project_path>",
             "python3 scripts/audit_formal_delivery.py <project_path>",
             "python3 scripts/audit_design_completion.py <project_path>",
             "python3 scripts/audit_visual_recipes.py <project_path>",
+            "python3 scripts/review_rendered_deck.py <project_path>",
+            "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
         ],
         "assetStrategy": {
             "mode": "chatgpt-generation-first",
@@ -1414,6 +1417,11 @@ def formal_quality_profile(mode: str) -> dict[str, Any]:
         "manifest.json",
         "project-brief.json",
         "quality-report.json",
+        "storyboard.json",
+        "source-map.json",
+        "planning-report.json",
+        "review-findings.json",
+        "repair-plan.json",
         "design-quality-report.md",
         "assets/generated/page-visuals/manifest.json",
         "images/page_visual_prompts.md",
@@ -1430,9 +1438,12 @@ def formal_quality_profile(mode: str) -> dict[str, Any]:
         ],
         "expectedArtifacts": expected,
         "reviewCommands": [
+            "python3 scripts/audit_storyboard.py <project_path>",
             "python3 scripts/audit_formal_delivery.py <project_path>",
             "python3 scripts/audit_design_completion.py <project_path>",
             "python3 scripts/audit_visual_recipes.py <project_path>",
+            "python3 scripts/review_rendered_deck.py <project_path>",
+            "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
         ],
         "notFor": [
             "只需要快速标题草稿的场景",
@@ -1466,11 +1477,16 @@ Blocked reason: {workflow_state["blockedReason"] or "none"}
 3. project-brief.json
 4. design_spec.md
 5. spec_lock.md
-6. quality-checklist.md if present
-7. asset-plan.md
-8. visual-element-kit.md
-9. images/page_visual_prompts.md
-10. sources/source.md
+6. storyboard.json
+7. source-map.json
+8. planning-report.json
+9. review-findings.json when present
+10. repair-plan.json when present
+11. quality-checklist.md if present
+12. asset-plan.md
+13. visual-element-kit.md
+14. images/page_visual_prompts.md
+15. sources/source.md
 
 ## Formal Business Gate
 Required inputs:
@@ -1497,11 +1513,13 @@ Artifact checks:
 
 ## Production Steps
 1. Lock visual direction, brand/fallback strategy, evidence boundaries, page roles, page recipes, visual layers, raster policy, page rhythm, layout families, infographic strategy, asset-plan.md, and visual-element-kit.md.
-2. Produce the requested {output_mode.upper()} delivery using the Ultimate PPT Master Skill workflow.
-3. Vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
-4. Do not let logos degrade into b/c-style text fragments.
-5. Do not use full-page generated images for formal PPTX body pages unless explicitly approved and recorded in raster_policy.
-6. Run review commands and update quality-report.json plus design-quality-report.md before final response.
+2. Use storyboard.json as the DeckIR page map and source-map.json as the evidence boundary before generating or revising slides.
+3. Produce the requested {output_mode.upper()} delivery using the Ultimate PPT Master Skill workflow.
+4. Vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
+5. Do not let logos degrade into b/c-style text fragments.
+6. Do not use full-page generated images for formal PPTX body pages unless explicitly approved and recorded in raster_policy.
+7. Run review commands, including audit_storyboard.py and review_rendered_deck.py; run apply_review_plan.py in --dry-run mode first and only apply safe planning hints after explicit user confirmation.
+8. Update quality-report.json plus design-quality-report.md before final response.
 
 ## Expected Artifacts
 {artifacts}
@@ -1519,6 +1537,7 @@ def codex_agent_guide_text(quality_gate: dict[str, Any]) -> str:
 ## Codex Local Rules
 - Work in this desktop project and the Ultimate PPT Master repository scripts only.
 - Read codex-task.md before editing or generating deliverables.
+- Read storyboard.json and source-map.json before final slide generation; they define the DeckIR page map and source evidence boundary.
 - Keep private source material, customer data, internal screenshots, and API keys local unless the user explicitly approves upload.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py first when the deck needs visual richness.
 - Use scripts/generate_visual_layers.py for no-text page visual layers. Body-page text, numbers, charts, tables, QR codes, and logos must stay editable or sourced.
@@ -1527,6 +1546,8 @@ def codex_agent_guide_text(quality_gate: dict[str, Any]) -> str:
 - Save generated outputs under assets/generated/ and record prompts in asset-plan.md.
 - For level {quality_gate["level"]}, do not finish with repeated title-card slides, flat PPTX screenshots, broken logo fragments, or missing quality-report.json.
 - Run the formal delivery audit, design completion audit, and visual recipe audit before final response whenever HTML or PPTX artifacts exist.
+- Run audit_storyboard.py before final generation and review_rendered_deck.py after preview/export.
+- Run apply_review_plan.py with --dry-run first; --apply may only write planning hints and must not rewrite source facts.
 """
 
 
@@ -1933,6 +1954,94 @@ def page_visual_layer_records(title: str, contracts: list[dict[str, str]]) -> tu
     )
 
 
+def run_ai_storyboard(
+    repo_root: Path,
+    project_path: Path,
+    job: dict[str, Any],
+    source_extraction: dict[str, str],
+    outline: list[dict[str, Any]],
+) -> list[Path]:
+    script_path = repo_root / "scripts" / "ai_storyboard.py"
+    source_path = Path(source_extraction.get("generatedMarkdownPath") or project_path / "sources" / "source.md")
+    title = str(outline[0].get("title", "")) if outline else project_path.name
+    if not script_path.exists() or not source_path.exists():
+        return []
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(script_path),
+            "--source",
+            str(source_path),
+            "--project",
+            str(project_path),
+            "--output-mode",
+            job["outputMode"],
+            "--style-preset",
+            job["stylePreset"],
+            "--preset",
+            job["stylePreset"],
+            "--title",
+            title,
+            "--quality-gate",
+            "formal-business",
+            "--no-llm",
+        ],
+        cwd=repo_root,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=120000,
+    )
+    if result.returncode != 0:
+        (project_path / "logs").mkdir(parents=True, exist_ok=True)
+        (project_path / "logs" / "ai-storyboard.log").write_text(
+            (result.stdout or "") + (result.stderr or ""),
+            encoding="utf-8",
+        )
+        return []
+    return [project_path / "storyboard.json", project_path / "source-map.json", project_path / "planning-report.json"]
+
+
+def run_rendered_review(repo_root: Path, project_path: Path) -> list[Path]:
+    script_path = repo_root / "scripts" / "review_rendered_deck.py"
+    if not script_path.exists():
+        return []
+    result = subprocess.run(
+        [sys.executable, str(script_path), str(project_path)],
+        cwd=repo_root,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=120000,
+    )
+    (project_path / "logs").mkdir(parents=True, exist_ok=True)
+    (project_path / "logs" / "rendered-review.log").write_text(
+        (result.stdout or "") + (result.stderr or ""),
+        encoding="utf-8",
+    )
+    review_path = project_path / "review-findings.json"
+    repair_path = project_path / "repair-plan.json"
+    return [path for path in (review_path, repair_path) if path.exists()]
+
+
+def append_manifest_generated_file(project_path: Path, path: Path) -> None:
+    manifest_path = project_path / "manifest.json"
+    if not manifest_path.exists():
+        return
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return
+    generated = manifest.get("generatedFiles")
+    if not isinstance(generated, list):
+        generated = []
+    path_text = str(path)
+    if path_text not in generated:
+        generated.append(path_text)
+    manifest["generatedFiles"] = generated
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
 def write_formal_delivery_files(
     project_path: Path,
     job: dict[str, Any],
@@ -1998,6 +2107,13 @@ def write_formal_delivery_files(
             "benchmark": "bocom_social_card_private",
             "pageVisualManifest": "assets/generated/page-visuals/manifest.json",
         },
+        "deckIR": {
+            "storyboard": "storyboard.json",
+            "sourceMap": "source-map.json",
+            "planningReport": "planning-report.json",
+            "renderedReview": "review-findings.json",
+            "repairPlan": "repair-plan.json",
+        },
         "sourceStrategy": {
             "source": "sources/source.md",
             "privacy": "local-first; source files stay in the project folder",
@@ -2034,6 +2150,13 @@ def write_formal_delivery_files(
             "rasterSlideMode": "disabled_for_formal_body",
             "pageVisualManifest": "assets/generated/page-visuals/manifest.json",
         },
+        "deckIR": {
+            "storyboard": "storyboard.json",
+            "sourceMap": "source-map.json",
+            "planningReport": "planning-report.json",
+            "renderedReview": "review-findings.json",
+            "repairPlan": "repair-plan.json",
+        },
         "preview": {
             "hasHtml": bool(preview_html),
             "layoutStrategy": "varied data-layout pages for Web Deck; varied editable slide structures for PPTX",
@@ -2057,6 +2180,26 @@ def write_formal_delivery_files(
         "summary": {
             "zh": "桌面生成器已写入正式商务门禁、页面角色合约和页面配方合约。请运行 reviewCommands 中的正式商务审计、设计完成度审计和视觉配方审计；Design Doctor 默认只报告问题。",
             "en": "Desktop worker wrote the formal-business gate, page role contract, and page recipe contract. Run reviewCommands for delivery, design-completion, and visual-recipe audits; Design Doctor remains report-only by default.",
+        },
+        "deckIR": {
+            "storyboard": "storyboard.json",
+            "sourceMap": "source-map.json",
+            "planningReport": "planning-report.json",
+            "renderedReview": "review-findings.json",
+            "repairPlan": "repair-plan.json",
+        },
+        "reviewFindings": {
+            "status": "pending",
+            "path": "review-findings.json",
+            "findingCount": 0,
+            "repairCandidateCount": 0,
+            "repairPlan": "repair-plan.json",
+        },
+        "reviewRepairPlan": {
+            "status": "pending",
+            "path": "repair-plan.json",
+            "candidateCount": 0,
+            "dryRunCommand": "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
         },
         "checks": [
             {
@@ -2189,6 +2332,9 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     narration_files = write_narration_handoff(project_path, outline, valid["providerConfig"])
     generated_files.extend(str(path) for path in narration_files)
 
+    deckir_files = run_ai_storyboard(repo_root, project_path, valid, source_extraction, outline)
+    generated_files.extend(str(path) for path in deckir_files)
+
     runbook = write_runbook(project_path, valid, source_name)
     generated_files.append(str(runbook))
 
@@ -2206,6 +2352,10 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     now = utc_now()
     formal_files = write_formal_delivery_files(project_path, valid, source_name, outline, generated_files, preview_html, now)
     generated_files.extend(str(path) for path in formal_files)
+    review_paths = run_rendered_review(repo_root, project_path)
+    for review_path in review_paths:
+        generated_files.append(str(review_path))
+        append_manifest_generated_file(project_path, review_path)
     recommendations = [recommend_settings(valid["source"])]
     checks = build_project_checks(env, valid, source_name)
     next_actions = build_next_actions(project_path, log_path, generated_files, valid["outputMode"])

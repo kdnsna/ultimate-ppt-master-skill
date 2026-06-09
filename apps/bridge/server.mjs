@@ -578,13 +578,20 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
       : Array.isArray(qualityGate.reviewCommands)
         ? qualityGate.reviewCommands
         : [];
+  const deckIR = {
+    storyboard: "storyboard.json",
+    sourceMap: "source-map.json",
+    planningReport: "planning-report.json",
+    renderedReview: "review-findings.json"
+  };
   const enrichedProjectBrief = {
     ...projectBrief,
     qualityProfile,
     qualityGate,
     workflowState,
     expectedArtifacts,
-    reviewCommands
+    reviewCommands,
+    deckIR
   };
   const slug = slugify(title);
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
@@ -635,6 +642,19 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     }
   }
 
+  const extractedSource = `${extractedSections.join("\n")}\n`;
+  const deckIRPayload = buildDeckIR({
+    title,
+    sourceText: extractedSource,
+    outputMode: payload?.form?.outputMode || projectBrief.outputMode || "both",
+    qualityGate
+  });
+  await writeProjectFile("storyboard.json", JSON.stringify(deckIRPayload.storyboard, null, 2));
+  await writeProjectFile("source-map.json", JSON.stringify(deckIRPayload.sourceMap, null, 2));
+  await writeProjectFile("planning-report.json", JSON.stringify(deckIRPayload.planningReport, null, 2));
+  await writeProjectFile("review-findings.json", JSON.stringify(createPendingReviewFindings({ title, storyboard: deckIRPayload.storyboard }), null, 2));
+  await writeProjectFile("repair-plan.json", JSON.stringify(createPendingRepairPlan({ title }), null, 2));
+
   const manifest = {
     version: BRIDGE_VERSION,
     createdAt: new Date().toISOString(),
@@ -646,12 +666,13 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     workflowState,
     expectedArtifacts,
     reviewCommands,
+    deckIR,
     attachments: attachmentResults.map(({ markdown, ...item }) => item),
     suggestedCommands: suggestedCommands(projectPath)
   };
 
-  await writeProjectFile("extracted-source.md", `${extractedSections.join("\n")}\n`);
-  await writeProjectFile("quality-report.json", JSON.stringify(createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands }), null, 2));
+  await writeProjectFile("extracted-source.md", extractedSource);
+  await writeProjectFile("quality-report.json", JSON.stringify(createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands, deckIR }), null, 2));
   await writeProjectFile("manifest.json", JSON.stringify(manifest, null, 2));
 
   return {
@@ -669,6 +690,195 @@ function parseJsonMaybe(value) {
   } catch {
     return {};
   }
+}
+
+const roleRecipeMap = {
+  anchor: ["cover_brand", "cover_brand.hero_left_visual", "generated-background | no-text | 16:9"],
+  context: ["statement_plus_evidence", "statement_plus_evidence.left_rule_panel", "subtle-pattern | no-text | 16:9"],
+  evidence: ["evidence_board", "evidence_board.source_table", "none"],
+  comparison: ["comparison_matrix", "comparison_matrix.two_column_delta", "none"],
+  process: ["process_flow", "process_flow.horizontal_steps", "generated-process-accent | no-text | 16:9"],
+  benefit: ["metric_panel", "metric_panel.large_number_strip", "generated-metric-accent | no-text | 16:9"],
+  risk: ["risk_callout", "risk_callout.qa_stack", "none"],
+  action: ["action_roadmap", "action_roadmap.owner_timeline", "schematic | no-text | 16:9"],
+  closing: ["closing_commitment", "closing_commitment.brand_tail", "generated-background | no-text | 16:9"]
+};
+
+function cleanSourceLine(value) {
+  return String(value || "")
+    .trim()
+    .replace(/^#{1,6}\s*/, "")
+    .replace(/^[-*+]\s*/, "")
+    .replace(/^\d+[、.)．]\s*/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function buildSourceClaims(sourceText) {
+  const claims = [];
+  String(sourceText || "").split(/\r?\n/).forEach((raw, index) => {
+    const line = cleanSourceLine(raw);
+    if (!line) return;
+    claims.push({
+      id: `S${String(claims.length + 1).padStart(3, "0")}`,
+      sourceLine: index + 1,
+      text: line.slice(0, 180)
+    });
+  });
+  if (!claims.length) claims.push({ id: "S001", sourceLine: 1, text: "Ultimate PPT Master handoff" });
+  return claims.slice(0, 80);
+}
+
+function inferDeckRole(index, total, text) {
+  const value = String(text || "").toLowerCase();
+  if (index === 0) return "anchor";
+  if (index === total - 1) return "closing";
+  if (/流程|路径|步骤|办理|申请|开通|推进|process|workflow|step/.test(value)) return "process";
+  if (/权益|数字|指标|数据|结果|kpi|metric|benefit|效率|触达/.test(value)) return "benefit";
+  if (/风险|提醒|边界|问题|疑问|注意|risk|issue|caveat/.test(value)) return "risk";
+  if (/对比|比较|差异|原流程|新流程|compare|comparison|before|after/.test(value)) return "comparison";
+  if (/计划|行动|下一步|落地|安排|owner|action|roadmap|复盘/.test(value)) return "action";
+  if (index === 1) return "context";
+  return "evidence";
+}
+
+function chunkClaims(claims, target) {
+  const body = claims.slice(1);
+  const usableBody = body.length ? body : claims;
+  const bodySlots = Math.max(1, target - 2);
+  const chunkSize = Math.max(1, Math.ceil(usableBody.length / bodySlots));
+  const chunks = [claims.slice(0, 1)];
+  for (let index = 0; index < usableBody.length && chunks.length < target - 1; index += chunkSize) {
+    chunks.push(usableBody.slice(index, index + chunkSize));
+  }
+  while (chunks.length < target - 1) chunks.push(usableBody.slice(-1));
+  chunks.push(claims.slice(-1));
+  return chunks.slice(0, target);
+}
+
+function roleIntent(role) {
+  return {
+    anchor: "Set the first-page signal and delivery context.",
+    context: "State the main judgment and frame the problem.",
+    evidence: "Tie claims to source-backed evidence.",
+    comparison: "Make the before/after or option tradeoff explicit.",
+    process: "Show the service or execution flow as editable steps.",
+    benefit: "Surface editable numbers, units, and conditions.",
+    risk: "Keep caveats and operating boundaries visible.",
+    action: "Convert analysis into owners, timing, and next moves.",
+    closing: "Close with the delivery check and next step."
+  }[role] || "Clarify the page job.";
+}
+
+function buildDeckIR({ title, sourceText, outputMode, qualityGate }) {
+  const claims = buildSourceClaims(sourceText);
+  const target = Math.max(4, Math.min(8, claims.length + 2));
+  const chunks = chunkClaims(claims, target);
+  const slides = chunks.map((chunk, index) => {
+    const role = inferDeckRole(index, chunks.length, chunk.map((item) => item.text).join(" "));
+    const [layoutFamily, recipeId, visualLayer] = roleRecipeMap[role] || roleRecipeMap.evidence;
+    const bodyRole = ["context", "evidence", "comparison", "process", "benefit", "risk", "action"].includes(role);
+    return {
+      page: `P${String(index + 1).padStart(2, "0")}`,
+      role,
+      title: role === "anchor" ? title : role === "closing" ? "Delivery review and next step" : String(chunk[0]?.text || title).slice(0, 44),
+      intent: roleIntent(role),
+      recipeId,
+      layoutFamily,
+      evidenceRefs: chunk.map((item) => item.id),
+      visualLayer,
+      rasterPolicy: bodyRole ? "prohibited-formal-body" : role === "anchor" ? "allowed-cover" : "allowed-section-tail",
+      editabilityTarget: role === "process" ? "editable process nodes, connectors, labels, and notes" : "editable text, shapes, evidence captions, and speaker notes",
+      speakerIntent: roleIntent(role)
+    };
+  });
+  const createdAt = new Date().toISOString();
+  const storyboard = {
+    deckIRVersion: "1.0",
+    createdAt,
+    planningMode: "fallback-rule-planner",
+    delivery: {
+      outputMode,
+      qualityGate: qualityGate?.level || "formal-business"
+    },
+    referenceStyle: {
+      mode: "none",
+      functionalTypes: [],
+      layoutFamilies: []
+    },
+    pipeline: [
+      "source.md/extracted-source.md",
+      "DeckIR/storyboard",
+      "page recipes/reference style",
+      "editable PPTX or Web Deck",
+      "rendered review",
+      "human/agent revision"
+    ],
+    slides
+  };
+  const sourceMap = {
+    version: "source-map-v1",
+    createdAt,
+    source: "extracted-source.md",
+    claims,
+    slideEvidence: slides.map((slide) => ({ page: slide.page, evidenceRefs: slide.evidenceRefs }))
+  };
+  const planningReport = {
+    version: "planning-report-v1",
+    status: "planned",
+    createdAt,
+    provider: {
+      configured: false,
+      mode: "fallback-rule-planner",
+      fallbackReason: "Bridge handoff wrote deterministic DeckIR without requiring model credentials."
+    },
+    summary: {
+      slides: slides.length,
+      roles: [...new Set(slides.map((slide) => slide.role))].sort(),
+      layoutFamilies: [...new Set(slides.map((slide) => slide.layoutFamily))].sort(),
+      evidenceClaims: claims.length
+    }
+  };
+  return { storyboard, sourceMap, planningReport };
+}
+
+function createPendingReviewFindings({ title, storyboard }) {
+  return {
+    version: "rendered-review-v1",
+    title,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+    summary: {
+      findingCount: 0,
+      autoFixableCount: 0,
+      repairCandidateCount: 0,
+      slidesPlanned: Array.isArray(storyboard?.slides) ? storyboard.slides.length : 0
+    },
+    findings: [],
+    repairCandidates: []
+  };
+}
+
+function createPendingRepairPlan({ title }) {
+  return {
+    version: "review-repair-plan-v1",
+    title,
+    status: "pending",
+    createdAt: new Date().toISOString(),
+    mode: "safe-only",
+    dryRunDefault: true,
+    candidates: [],
+    summary: {
+      candidateCount: 0,
+      safeCandidateCount: 0,
+      targetArtifacts: []
+    },
+    guardrails: [
+      "Do not change source.md, extracted-source.md, or factual slide claims automatically.",
+      "Only write DeckIR, project brief, quality report, and Agent instruction hints.",
+      "Require an explicit --apply invocation for any mutation."
+    ]
+  };
 }
 
 function defaultQualityGate() {
@@ -696,6 +906,7 @@ function defaultQualityGate() {
     ],
     artifactChecks: [
       "manifest.json contains formal-business qualityGate",
+      "storyboard.json and source-map.json contain DeckIR page roles, recipes, evidence refs, raster policy, and editability targets",
       "HTML/PPTX expose enough layout types",
       "real image/brand assets are used or no-image strategy is explicit",
       "asset-plan.md records public searches, generated assets, citations, and insert targets",
@@ -704,7 +915,10 @@ function defaultQualityGate() {
       "no b/c-style logo text fragments"
     ],
     reviewCommands: [
-      "python3 scripts/audit_formal_delivery.py <project_path>"
+      "python3 scripts/audit_storyboard.py <project_path>",
+      "python3 scripts/audit_formal_delivery.py <project_path>",
+      "python3 scripts/review_rendered_deck.py <project_path>",
+      "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run"
     ],
     assetStrategy: {
       mode: "chatgpt-generation-first",
@@ -718,7 +932,7 @@ function defaultQualityGate() {
   };
 }
 
-function createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands }) {
+function createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands, deckIR }) {
   return {
     version: BRIDGE_VERSION,
     title,
@@ -729,6 +943,20 @@ function createPendingQualityReport({ title, qualityProfile, qualityGate, workfl
     workflowState,
     expectedArtifacts,
     reviewCommands,
+    deckIR,
+    reviewFindings: {
+      status: "pending",
+      path: "review-findings.json",
+      findingCount: 0,
+      repairCandidateCount: 0,
+      repairPlan: "repair-plan.json"
+    },
+    reviewRepairPlan: {
+      status: "pending",
+      path: "repair-plan.json",
+      candidateCount: 0,
+      dryRunCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run"
+    },
     summary: {
       zh: "Design Doctor / 视觉复查尚未运行。请先生成预览和最终文件，再按 reviewCommands 运行检查；默认只报告问题和建议，只有明确要求时才自动修 SVG。",
       en: "Design Doctor has not run yet. Generate the preview and final files, then run reviewCommands. By default it reports issues and suggestions before automatic repair."
@@ -820,11 +1048,16 @@ Blocked reason: ${workflowState?.blockedReason || "none"}
 1. AGENTS.md
 2. manifest.json
 3. project-brief.json
-4. quality-checklist.md
-5. asset-plan.md
-6. visual-element-kit.md
-7. agent-prompt.md
-8. extracted-source.md and attachments/
+4. storyboard.json
+5. source-map.json
+6. planning-report.json
+7. review-findings.json when present
+8. repair-plan.json when present
+9. quality-checklist.md
+10. asset-plan.md
+11. visual-element-kit.md
+12. agent-prompt.md
+13. extracted-source.md and attachments/
 
 ## Formal Business Gate
 Required inputs:
@@ -849,11 +1082,13 @@ ${gateChecks}
 
 ## Production Steps
 1. Lock brand/fallback strategy, evidence boundaries, page rhythm, infographic strategy, asset-plan.md, and visual-element-kit.md.
-2. Produce the requested PPTX/Web Deck using the Ultimate PPT Master Skill workflow.
-3. Avoid repeated title-card pages; vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
-4. Do not let logos degrade into b/c-style text fragments.
-5. Run review commands and repair obvious layout, text overflow, image, and editability issues.
-6. Update quality-report.json with checks run, issues found, repairs made, and remaining risk.
+2. Use storyboard.json as the DeckIR page map and source-map.json as the evidence boundary before generating or revising slides.
+3. Produce the requested PPTX/Web Deck using the Ultimate PPT Master Skill workflow.
+4. Avoid repeated title-card pages; vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
+5. Do not let logos degrade into b/c-style text fragments.
+6. Run audit_storyboard.py before final generation and review_rendered_deck.py after preview/export.
+7. Run apply_review_plan.py in --dry-run mode first; only apply safe planning hints after explicit user confirmation.
+8. Update quality-report.json with checks run, issues found, repairs made, and remaining risk.
 
 ## Expected Artifacts
 ${artifacts}
@@ -872,6 +1107,7 @@ function defaultCodexAgentGuide({ qualityGate }) {
 ## Codex Local Rules
 - Work in this handoff folder and the Ultimate PPT Master repository scripts only.
 - Read codex-task.md before editing or generating deliverables.
+- Read storyboard.json and source-map.json before final slide generation; they define the DeckIR page map and source evidence boundary.
 - Keep private source material local. Do not upload private files, customer data, internal screenshots, or API keys unless the user explicitly approves.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py before final slide assembly when the deck needs visual richness.
 - If no image backend/key is configured, use images/image_prompts.md Needs-Manual prompts with ChatGPT and save outputs under assets/generated/.
@@ -879,6 +1115,8 @@ function defaultCodexAgentGuide({ qualityGate }) {
 - Store generated outputs under assets/generated/ and record prompts in asset-plan.md.
 - For level ${level}, do not finish with repeated title/card slides, flat PPTX screenshots, broken logo fragments, or missing quality-report.json.
 - Run the formal delivery audit before final response whenever an HTML or PPTX artifact exists.
+- Run audit_storyboard.py before final generation and review_rendered_deck.py after preview/export.
+- Run apply_review_plan.py with --dry-run first; --apply may only write planning hints and must not rewrite source facts.
 `;
 }
 
@@ -996,7 +1234,7 @@ function relativeFromProject(filePath) {
 
 function suggestedCommands(projectPath) {
   const quotedPath = shellQuote(projectPath);
-  const instruction = "Read AGENTS.md, codex-task.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, insert reusable micro-assets when useful, run the formal delivery audit, update quality-report.json, then list final files.";
+  const instruction = "Read AGENTS.md, codex-task.md, storyboard.json, source-map.json, planning-report.json, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, keep DeckIR evidence/editability constraints, insert reusable micro-assets when useful, run audit_storyboard.py, formal delivery audit, review_rendered_deck.py, and apply_review_plan.py --safe-only --dry-run, update quality-report.json, then list final files.";
   return {
     codex: `cd ${quotedPath} && codex "${instruction}"`,
     claude: `cd ${quotedPath} && claude "${instruction}"`,

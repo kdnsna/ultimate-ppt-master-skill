@@ -179,8 +179,20 @@ test("handoff writes formal business quality gate and workflow state", async () 
     assert.ok(payload.files.includes("AGENTS.md"));
     assert.ok(payload.files.includes("asset-plan.md"));
     assert.ok(payload.files.includes("visual-element-kit.md"));
+    assert.ok(payload.files.includes("storyboard.json"));
+    assert.ok(payload.files.includes("source-map.json"));
+    assert.ok(payload.files.includes("planning-report.json"));
+    assert.ok(payload.files.includes("review-findings.json"));
+    assert.ok(payload.files.includes("repair-plan.json"));
 
     const codexTask = await readFile(join(payload.projectPath, "codex-task.md"), "utf8");
+    assert.match(codexTask, /storyboard\.json/);
+    assert.match(codexTask, /source-map\.json/);
+    assert.match(codexTask, /planning-report\.json/);
+    assert.match(codexTask, /review-findings\.json/);
+    assert.match(codexTask, /audit_storyboard\.py/);
+    assert.match(codexTask, /review_rendered_deck\.py/);
+    assert.match(codexTask, /apply_review_plan\.py/);
     assert.match(codexTask, /quality-checklist\.md/);
     assert.match(codexTask, /asset-plan\.md/);
     assert.match(codexTask, /audit_formal_delivery\.py/);
@@ -210,12 +222,26 @@ test("handoff writes formal business quality gate and workflow state", async () 
     const command = payload.suggestedCommands.codex;
     assert.match(command, /AGENTS\.md/);
     assert.match(command, /codex-task\.md/);
+    assert.match(command, /storyboard\.json/);
+    assert.match(command, /source-map\.json/);
     assert.match(command, /asset-plan\.md/);
     assert.match(command, /visual-element-kit\.md/);
     assert.match(command, /generate_visual_element_kit\.py/);
     assert.match(command, /Needs-Manual/i);
     assert.match(command, /quality-checklist\.md/);
     assert.match(command, /formal delivery/i);
+    assert.match(command, /apply_review_plan\.py/);
+
+    const storyboard = JSON.parse(await readFile(join(payload.projectPath, "storyboard.json"), "utf8"));
+    assert.equal(storyboard.deckIRVersion, "1.0");
+    assert.ok(storyboard.slides.length >= 4);
+    const sourceMap = JSON.parse(await readFile(join(payload.projectPath, "source-map.json"), "utf8"));
+    assert.ok(sourceMap.claims.length > 0);
+    const reviewFindings = JSON.parse(await readFile(join(payload.projectPath, "review-findings.json"), "utf8"));
+    assert.equal(reviewFindings.version, "rendered-review-v1");
+    const repairPlan = JSON.parse(await readFile(join(payload.projectPath, "repair-plan.json"), "utf8"));
+    assert.equal(repairPlan.version, "review-repair-plan-v1");
+    assert.equal(repairPlan.status, "pending");
   });
   await rm(outputDir, { recursive: true, force: true });
 });

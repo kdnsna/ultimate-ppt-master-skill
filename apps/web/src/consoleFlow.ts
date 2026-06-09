@@ -15,6 +15,7 @@ export type PreviewMode =
   | "brief"
   | "extracted"
   | "manifest"
+  | "deckIR"
   | "codexTask"
   | "assetPlan"
   | "elementKit"
@@ -61,7 +62,7 @@ export function getConsoleSteps(input: ConsoleFlowInput): ConsoleStep[] {
 
 export const previewGroupModes: Record<PreviewGroup, PreviewMode[]> = {
   user: ["webdeck", "source", "prompt"],
-  agent: ["brief", "extracted", "manifest", "codexTask"],
+  agent: ["brief", "extracted", "manifest", "deckIR", "codexTask"],
   quality: ["assetPlan", "elementKit", "checklist", "qualityReport"]
 };
 

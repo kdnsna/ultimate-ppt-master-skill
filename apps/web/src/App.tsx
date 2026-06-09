@@ -197,6 +197,13 @@ interface HandoffResult {
     workflowState?: WorkflowState;
     expectedArtifacts?: string[];
     reviewCommands?: string[];
+    deckIR?: {
+      storyboard: string;
+      sourceMap: string;
+      planningReport: string;
+      renderedReview: string;
+      repairPlan?: string;
+    };
   };
 }
 
@@ -207,7 +214,7 @@ const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v4";
-const appVersion = "4.1.0";
+const appVersion = "4.2.0";
 
 const designDoctorScores = [
   {
@@ -391,6 +398,7 @@ const labels = {
     previewSource: "source.md",
     previewExtracted: "extracted-source.md",
     previewManifest: "manifest.json",
+    previewDeckIR: "DeckIR 页面地图",
     previewBrief: "brief.json",
     previewWebDeck: "preview-web-deck.html",
     previewChecklist: "quality-checklist.md",
@@ -620,6 +628,7 @@ const labels = {
     previewSource: "source.md",
     previewExtracted: "extracted-source.md",
     previewManifest: "manifest.json",
+    previewDeckIR: "DeckIR page map",
     previewBrief: "brief.json",
     previewWebDeck: "preview-web-deck.html",
     previewChecklist: "quality-checklist.md",
@@ -829,6 +838,7 @@ export function App() {
   const qualityChecklist = useMemo(() => buildQualityChecklist(form, enginePlan, sources, qualityContract, qualityGate), [form, enginePlan, sources, qualityContract, qualityGate]);
   const assetPlan = useMemo(() => buildAssetPlan(form, sources, qualityGate), [form, sources, qualityGate]);
   const visualElementKit = useMemo(() => buildVisualElementKit(form, qualityGate), [form, qualityGate]);
+  const deckIRPreview = useMemo(() => buildDeckIRPreview(form, storyboard, sources, enginePlan, qualityGate), [form, storyboard, sources, enginePlan, qualityGate]);
   const webDeckHtml = useMemo(() => buildWebDeckHtml(form, storyboard, enginePlan, sources), [form, storyboard, enginePlan, sources]);
   const providers = useMemo(() => mergeProviderTests(bridge?.providers || fallbackProviders(form.language), providerTests), [bridge, form.language, providerTests]);
   const agents = bridge?.agents || fallbackAgents();
@@ -865,6 +875,8 @@ export function App() {
           ? extractedSource
           : previewMode === "manifest"
             ? manifestJson
+            : previewMode === "deckIR"
+              ? deckIRPreview
             : previewMode === "brief"
               ? briefJson
               : previewMode === "webdeck"
@@ -1057,6 +1069,7 @@ export function App() {
       enginePlanMarkdown: buildEnginePlanMarkdown(form, enginePlan),
       qualityChecklist,
       qualityReport,
+      deckIRPreview,
       assetPlan,
       visualElementKit,
       codexTask,
@@ -1091,6 +1104,7 @@ export function App() {
         enginePlanMarkdown: buildEnginePlanMarkdown(form, enginePlan),
         qualityChecklist,
         qualityReport,
+        deckIRPreview,
         assetPlan,
         visualElementKit,
         codexTask,
@@ -1565,6 +1579,10 @@ export function App() {
             </div>
           </section>
 
+          <BestRoutePanel form={form} enginePlan={enginePlan} qualityGate={qualityGate} labels={t} />
+          <AIPageMapPanel deckIRPreview={deckIRPreview} labels={t} />
+          <RenderedReviewLoopPanel form={form} qualityGate={qualityGate} labels={t} />
+
           <section className="panel handoff-panel" aria-labelledby="handoff-title">
             <PanelTitle icon={PlugZap} id="handoff-title" title={t.handoffPanel} />
             <BridgeStatusCard
@@ -1620,6 +1638,11 @@ export function App() {
                 <span>extracted-source.md</span>
                 <span>attachments/</span>
                 <span>manifest.json</span>
+                <span>storyboard.json</span>
+                <span>source-map.json</span>
+                <span>planning-report.json</span>
+                <span>review-findings.json</span>
+                <span>repair-plan.json</span>
                 <span>agent-prompt.md</span>
                 <span>project-brief.json</span>
                 <span>preview-web-deck.html</span>
@@ -1708,6 +1731,90 @@ function PanelTitle({ icon: Icon, title, id }: { icon: LucideIcon; title: string
       <h2 id={id}>{title}</h2>
     </div>
   );
+}
+
+function BestRoutePanel({ form, enginePlan, qualityGate, labels: t }: { form: FormState; enginePlan: EnginePlan; qualityGate: QualityGate; labels: typeof labels.zh }) {
+  const zh = form.language === "zh";
+  const route = enginePlan.pptxActive && enginePlan.webActive
+    ? (zh ? "PPTX + Web Deck 双版本" : "PPTX + Web Deck")
+    : enginePlan.pptxActive
+      ? (zh ? "可编辑 PPTX" : "Editable PPTX")
+      : "Web Deck";
+  return (
+    <section className="panel route-panel" aria-labelledby="best-route-title">
+      <PanelTitle icon={Sparkles} id="best-route-title" title={zh ? "一键最佳路线" : "AI best route"} />
+      <div className="route-list">
+        <InfoRow icon={Workflow} title={route} text={enginePlan.fusionRoute} />
+        <InfoRow icon={ShieldCheck} title={qualityGate.level} text={zh ? "DeckIR 先锁页面角色、证据、页面配方和可编辑边界，再交给本地 AI 助手生产。" : "DeckIR locks page roles, evidence, recipes, and editability before local AI-helper production."} />
+        <InfoRow icon={FileText} title={t.reviewCommands} text={qualityGate.reviewCommands.join(" / ")} />
+      </div>
+    </section>
+  );
+}
+
+function AIPageMapPanel({ deckIRPreview, labels: t }: { deckIRPreview: string; labels: typeof labels.zh }) {
+  const parsed = safeJson(deckIRPreview) as {
+    "storyboard.json"?: { slides?: Array<{ page: string; role: string; title: string; recipeId: string; evidenceRefs: string[]; rasterPolicy: string }> };
+    "planning-report.json"?: { summary?: { roles?: string[]; layoutFamilies?: string[] } };
+  };
+  const slides = parsed["storyboard.json"]?.slides || [];
+  const summary = parsed["planning-report.json"]?.summary;
+  return (
+    <section className="panel page-map-panel" aria-labelledby="ai-page-map-title">
+      <PanelTitle icon={Workflow} id="ai-page-map-title" title={t.previewDeckIR} />
+      <div className="preview-meta">
+        <span>storyboard.json</span>
+        <span>source-map.json</span>
+        <span>planning-report.json</span>
+        <span>review-findings.json</span>
+        <span>repair-plan.json</span>
+      </div>
+      <div className="story-list">
+        {slides.slice(0, 8).map((slide) => (
+          <article key={slide.page} className="story-row">
+            <span>{slide.page}</span>
+            <div>
+              <strong>{slide.title}</strong>
+              <p>{slide.role} / {slide.recipeId} / {slide.rasterPolicy} / evidence {slide.evidenceRefs.join(", ")}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+      {summary && (
+        <p className="hint">
+          {summary.roles?.join(", ")} · {summary.layoutFamilies?.join(", ")}
+        </p>
+      )}
+    </section>
+  );
+}
+
+function RenderedReviewLoopPanel({ form, qualityGate, labels: t }: { form: FormState; qualityGate: QualityGate; labels: typeof labels.zh }) {
+  const zh = form.language === "zh";
+  const dryRun = "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run";
+  return (
+    <section className="panel page-map-panel" aria-labelledby="rendered-review-loop-title">
+      <PanelTitle icon={RefreshCw} id="rendered-review-loop-title" title={zh ? "渲染审阅闭环" : "Rendered review loop"} />
+      <p className="panel-copy">
+        {zh
+          ? "预览或导出后，先用 review_rendered_deck.py 生成问题和低风险修复候选；默认只 dry-run，用户确认后才写入规划提示。"
+          : "After preview or export, review_rendered_deck.py creates findings and low-risk repair candidates; repair stays dry-run until the user confirms."}
+      </p>
+      <div className="quality-chip-row">
+        <InfoRow icon={AlertCircle} title="review-findings.json" text={zh ? "记录问题、建议、风险等级和修复候选。" : "Records findings, suggestions, risk levels, and repair candidates."} />
+        <InfoRow icon={FileText} title="repair-plan.json" text={zh ? "只包含低风险规划修复，不自动改事实内容。" : "Contains low-risk planning repairs only; source facts stay unchanged."} />
+        <InfoRow icon={ShieldCheck} title={qualityGate.level} text={dryRun} />
+      </div>
+    </section>
+  );
+}
+
+function safeJson(value: string): unknown {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return {};
+  }
 }
 
 function PrimaryActionBar({
@@ -1956,6 +2063,7 @@ function previewModeLabel(mode: PreviewMode, t: typeof labels.zh) {
     brief: t.previewBrief,
     extracted: t.previewExtracted,
     manifest: t.previewManifest,
+    deckIR: t.previewDeckIR,
     codexTask: t.previewCodexTask,
     assetPlan: t.previewAssetPlan,
     elementKit: t.previewElementKit,
@@ -3037,6 +3145,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
     ? [
       "品牌资产或明确替代策略",
       "可追溯资料来源和证据口径",
+      "DeckIR 页面地图：页面角色、证据引用、页面配方、可编辑目标和 raster 策略",
       "ChatGPT 生图优先的视觉素材计划：prompt、文件名和插入页面",
       "小元素素材包计划：分隔符、指标徽章、流程节点、连接线、图标和纹理",
       "公开素材检索计划用于证据/官方参考，或明确不联网检索的理由",
@@ -3046,6 +3155,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
     : [
       "brand assets or explicit fallback strategy",
       "traceable source evidence",
+      "DeckIR page map with page roles, evidence refs, recipes, editability targets, and raster policy",
       "ChatGPT-generation-first visual asset plan with prompts, filenames, and insertion targets",
       "small reusable element kit plan for dividers, metric badges, process nodes, connectors, icons, and textures",
       "public asset search plan for evidence/official references or explicit no-search rationale",
@@ -3076,6 +3186,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
   const artifactChecks = zh
     ? [
       "manifest.json 包含 formal-business qualityGate",
+      "storyboard.json / source-map.json 包含 DeckIR 页面角色、证据、配方和可编辑边界",
       "HTML/PPTX 有足够布局类型",
       "使用真实图片/品牌素材或写明无图策略",
       "asset-plan.md 记录公开检索、ChatGPT 生成素材、来源/授权和插入目标",
@@ -3085,6 +3196,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
     ]
     : [
       "manifest.json contains formal-business qualityGate",
+      "storyboard.json and source-map.json contain DeckIR roles, evidence, recipes, and editability boundaries",
       "HTML/PPTX expose enough layout types",
       "real image/brand assets are used or no-image strategy is explicit",
       "asset-plan.md records public searches, ChatGPT generated assets, source/license notes, and insert targets",
@@ -3099,8 +3211,11 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
     acceptanceCriteria: [...formalCriteria, ...qualityContract.acceptanceCriteria],
     artifactChecks,
     reviewCommands: [
+      "python3 scripts/audit_storyboard.py <project_path>",
       "python3 scripts/audit_formal_delivery.py <project_path>",
       ...qualityContract.reviewCommands,
+      "python3 scripts/review_rendered_deck.py <project_path>",
+      "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
       ...(enginePlan.webActive ? ["node scripts/validate-swiss-deck.mjs <project_path>/ppt/index.html # only for Swiss Style Web Decks"] : [])
     ],
     assetStrategy: zh
@@ -3137,6 +3252,26 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract, q
     workflowState,
     expectedArtifacts: qualityContract.expectedArtifacts,
     reviewCommands: qualityGate.reviewCommands,
+    deckIR: {
+      storyboard: "storyboard.json",
+      sourceMap: "source-map.json",
+      planningReport: "planning-report.json",
+      renderedReview: "review-findings.json",
+      repairPlan: "repair-plan.json"
+    },
+    reviewFindings: {
+      status: "pending",
+      path: "review-findings.json",
+      findingCount: 0,
+      repairCandidateCount: 0,
+      repairPlan: "repair-plan.json"
+    },
+    reviewRepairPlan: {
+      status: "pending",
+      path: "repair-plan.json",
+      candidateCount: 0,
+      dryRunCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run"
+    },
     summary: {
       zh: "Design Doctor / 视觉复查尚未运行。请先生成预览和最终文件，再按 reviewCommands 运行检查；默认只报告问题和建议。",
       en: "Design Doctor has not run yet. Generate preview and final files, then run reviewCommands. It reports issues and suggestions by default."
@@ -3149,6 +3284,162 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract, q
       }
     ]
   }, null, 2);
+}
+
+function buildDeckIRPreview(form: FormState, storyboard: StoryItem[], sources: UploadedSource[], enginePlan: EnginePlan, qualityGate: QualityGate) {
+  const claims = buildSourceClaimsForDeckIR(form, sources);
+  const slides = storyboard.map((item, index) => {
+    const role = inferDeckIRRole(index, storyboard.length, `${item.title} ${item.intent}`);
+    const recipe = recipeForDeckIRRole(role);
+    const evidence = claims.length > 0 ? [claims[index % claims.length].id] : ["S001"];
+    const bodyRole = ["context", "evidence", "comparison", "process", "benefit", "risk", "action"].includes(role);
+    return {
+      page: `P${String(index + 1).padStart(2, "0")}`,
+      role,
+      title: item.title,
+      intent: item.intent,
+      recipeId: recipe.recipeId,
+      layoutFamily: recipe.layoutFamily,
+      evidenceRefs: evidence,
+      visualLayer: recipe.visualLayer,
+      rasterPolicy: bodyRole ? "prohibited-formal-body" : role === "anchor" ? "allowed-cover" : "allowed-section-tail",
+      editabilityTarget: role === "process" ? "editable process nodes, connectors, labels, and notes" : "editable text, shapes, evidence captions, and speaker notes",
+      speakerIntent: item.intent
+    };
+  });
+  const storyboardJson = {
+    deckIRVersion: "1.0",
+    planningMode: "fallback-rule-planner",
+    delivery: {
+      outputMode: form.outputMode,
+      stylePreset: form.stylePreset,
+      preset: form.presetId,
+      audience: form.audience,
+      qualityGate: qualityGate.level
+    },
+    referenceStyle: {
+      mode: "none",
+      functionalTypes: [],
+      layoutFamilies: []
+    },
+    pipeline: [
+      "source.md",
+      "DeckIR/storyboard",
+      "page recipes/reference style",
+      "editable PPTX or Web Deck",
+      "rendered review",
+      "human/agent revision"
+    ],
+    slides
+  };
+  const sourceMap = {
+    version: "source-map-v1",
+    source: "source.md",
+    claims,
+    slideEvidence: slides.map((slide) => ({ page: slide.page, evidenceRefs: slide.evidenceRefs }))
+  };
+  const planningReport = {
+    version: "planning-report-v1",
+    status: "planned",
+    provider: {
+      configured: form.modelPreference !== "auto" && form.modelPreference !== "custom",
+      mode: "fallback-rule-planner",
+      fallbackReason: "Web Experience writes a deterministic DeckIR preview; Bridge/Desktop can rewrite it from local source material."
+    },
+    summary: {
+      slides: slides.length,
+      roles: Array.from(new Set(slides.map((slide) => slide.role))).sort(),
+      layoutFamilies: Array.from(new Set(slides.map((slide) => slide.layoutFamily))).sort(),
+      output: enginePlan.pptxActive && enginePlan.webActive ? "both" : enginePlan.pptxActive ? "pptx" : "web"
+    }
+  };
+  const reviewFindings = {
+    version: "rendered-review-v1",
+    status: "pending",
+    findings: [],
+    repairCandidates: [],
+    summary: {
+      findingCount: 0,
+      autoFixableCount: 0,
+      repairCandidateCount: 0,
+      note: "review_rendered_deck.py fills this after preview/export."
+    }
+  };
+  const repairPlan = {
+    version: "review-repair-plan-v1",
+    status: "pending",
+    mode: "safe-only",
+    dryRunDefault: true,
+    candidates: [],
+    summary: {
+      candidateCount: 0,
+      safeCandidateCount: 0,
+      targetArtifacts: []
+    },
+    guardrails: [
+      "Do not change source.md, extracted-source.md, or factual slide claims automatically.",
+      "Only write DeckIR, project brief, quality report, and Agent instruction hints.",
+      "Require an explicit --apply invocation for any mutation."
+    ]
+  };
+  return JSON.stringify(
+    {
+      "storyboard.json": storyboardJson,
+      "source-map.json": sourceMap,
+      "planning-report.json": planningReport,
+      "review-findings.json": reviewFindings,
+      "repair-plan.json": repairPlan
+    },
+    null,
+    2
+  );
+}
+
+function buildSourceClaimsForDeckIR(form: FormState, sources: UploadedSource[]) {
+  const lines = [
+    form.title,
+    form.coreMessage,
+    form.sourceNotes,
+    ...sources.map((source) => source.text || source.url || source.name)
+  ].join("\n").split(/\r?\n/);
+  const claims = lines
+    .map((line) => line.trim().replace(/^[-*+]\s*/, "").replace(/^\d+[、.)．]\s*/, ""))
+    .filter(Boolean)
+    .slice(0, 40)
+    .map((line, index) => ({
+      id: `S${String(index + 1).padStart(3, "0")}`,
+      sourceLine: index + 1,
+      text: line.slice(0, 180)
+    }));
+  return claims.length ? claims : [{ id: "S001", sourceLine: 1, text: form.title || "Ultimate PPT Master handoff" }];
+}
+
+function inferDeckIRRole(index: number, total: number, text: string) {
+  const value = text.toLowerCase();
+  if (index === 0) return "anchor";
+  if (index === total - 1) return "closing";
+  if (/流程|路径|步骤|办理|申请|开通|推进|process|workflow|step/.test(value)) return "process";
+  if (/权益|数字|指标|数据|结果|kpi|metric|benefit|效率|触达/.test(value)) return "benefit";
+  if (/风险|提醒|边界|问题|疑问|注意|risk|issue|caveat/.test(value)) return "risk";
+  if (/对比|比较|差异|原流程|新流程|compare|comparison|before|after/.test(value)) return "comparison";
+  if (/计划|行动|下一步|落地|安排|owner|action|roadmap|复盘/.test(value)) return "action";
+  if (index === 1) return "context";
+  return "evidence";
+}
+
+function recipeForDeckIRRole(role: string) {
+  const map: Record<string, { layoutFamily: string; recipeId: string; visualLayer: string }> = {
+    anchor: { layoutFamily: "cover_brand", recipeId: "cover_brand.hero_left_visual", visualLayer: "generated-background | no-text | 16:9" },
+    context: { layoutFamily: "statement_plus_evidence", recipeId: "statement_plus_evidence.left_rule_panel", visualLayer: "subtle-pattern | no-text | 16:9" },
+    evidence: { layoutFamily: "evidence_board", recipeId: "evidence_board.source_table", visualLayer: "none" },
+    comparison: { layoutFamily: "comparison_matrix", recipeId: "comparison_matrix.two_column_delta", visualLayer: "none" },
+    process: { layoutFamily: "process_flow", recipeId: "process_flow.horizontal_steps", visualLayer: "generated-process-accent | no-text | 16:9" },
+    benefit: { layoutFamily: "metric_panel", recipeId: "metric_panel.large_number_strip", visualLayer: "generated-metric-accent | no-text | 16:9" },
+    risk: { layoutFamily: "risk_callout", recipeId: "risk_callout.qa_stack", visualLayer: "none" },
+    action: { layoutFamily: "action_roadmap", recipeId: "action_roadmap.owner_timeline", visualLayer: "schematic | no-text | 16:9" },
+    closing: { layoutFamily: "closing_commitment", recipeId: "closing_commitment.brand_tail", visualLayer: "generated-background | no-text | 16:9" }
+  };
+  return map[role] || map.evidence;
 }
 
 function buildStoryboard(form: FormState): StoryItem[] {
@@ -3498,11 +3789,16 @@ function buildCodexTask(
 1. AGENTS.md
 2. manifest.json
 3. project-brief.json
-4. quality-checklist.md
-5. asset-plan.md
-6. visual-element-kit.md
-7. agent-prompt.md
-8. extracted-source.md 和 attachments/
+4. storyboard.json
+5. source-map.json
+6. planning-report.json
+7. review-findings.json
+8. repair-plan.json
+9. quality-checklist.md
+10. asset-plan.md
+11. visual-element-kit.md
+12. agent-prompt.md
+13. extracted-source.md 和 attachments/
 
 ## 正式商务门禁
 必须输入：
@@ -3526,12 +3822,14 @@ ${gateChecks}
 9. 图表、表格、标签和 PPTX 文字尽量保留可编辑结构。
 
 ## 生产步骤
-1. 锁定品牌/替代策略、证据边界、页面节奏、信息图策略、asset-plan.md 和 visual-element-kit.md。
-2. 按 Ultimate PPT Master Skill 生产 ${enginePlan.pptxActive ? "PPTX" : "Web Deck"}${enginePlan.webActive && enginePlan.pptxActive ? " + Web Deck" : ""}。
-3. 版式需要覆盖叙事、对比、流程/时间线、指标、决策和收束页，不能重复标题卡片。
-4. logo 不得退化成 b/c 这类碎片文字。
-5. 运行检查命令，修复明显的溢出、遮挡、图片、图表和可编辑性问题。
-6. 更新 quality-report.json，写清检查项、修复项和剩余风险。
+1. 先读 storyboard.json 作为 DeckIR 页面地图，读 source-map.json 作为证据边界。
+2. 锁定品牌/替代策略、证据边界、页面节奏、信息图策略、asset-plan.md 和 visual-element-kit.md。
+3. 按 Ultimate PPT Master Skill 生产 ${enginePlan.pptxActive ? "PPTX" : "Web Deck"}${enginePlan.webActive && enginePlan.pptxActive ? " + Web Deck" : ""}。
+4. 版式需要覆盖叙事、对比、流程/时间线、指标、决策和收束页，不能重复标题卡片。
+5. logo 不得退化成 b/c 这类碎片文字。
+6. 运行 audit_storyboard.py 和 review_rendered_deck.py。
+7. 先运行 apply_review_plan.py --safe-only --dry-run；只有用户确认后才允许 --apply 写入安全规划提示，不得自动改事实内容。
+8. 更新 quality-report.json，写清检查项、修复项和剩余风险。
 
 ## 预期产物
 ${expectedArtifacts}
@@ -3555,11 +3853,16 @@ Blocked reason: ${workflowState.blockedReason || "none"}
 1. AGENTS.md
 2. manifest.json
 3. project-brief.json
-4. quality-checklist.md
-5. asset-plan.md
-6. visual-element-kit.md
-7. agent-prompt.md
-8. extracted-source.md and attachments/
+4. storyboard.json
+5. source-map.json
+6. planning-report.json
+7. review-findings.json
+8. repair-plan.json
+9. quality-checklist.md
+10. asset-plan.md
+11. visual-element-kit.md
+12. agent-prompt.md
+13. extracted-source.md and attachments/
 
 ## Formal business gate
 Required inputs:
@@ -3583,12 +3886,14 @@ ${gateChecks}
 9. Keep charts, tables, labels, and PPTX text editable wherever possible.
 
 ## Production steps
-1. Lock brand/fallback strategy, evidence boundaries, page rhythm, infographic strategy, asset-plan.md, and visual-element-kit.md.
-2. Produce the requested PPTX/Web Deck using the Ultimate PPT Master Skill workflow.
-3. Vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
-4. Do not let logos degrade into b/c-style text fragments.
-5. Run review commands and repair layout, text overflow, image, chart, and editability issues.
-6. Update quality-report.json with checks run, issues found, repairs made, and remaining risk.
+1. Read storyboard.json as the DeckIR page map and source-map.json as the evidence boundary.
+2. Lock brand/fallback strategy, evidence boundaries, page rhythm, infographic strategy, asset-plan.md, and visual-element-kit.md.
+3. Produce the requested PPTX/Web Deck using the Ultimate PPT Master Skill workflow.
+4. Vary layouts across narrative, comparison, timeline/process, metric, decision, and closing pages.
+5. Do not let logos degrade into b/c-style text fragments.
+6. Run audit_storyboard.py and review_rendered_deck.py.
+7. Run apply_review_plan.py --safe-only --dry-run first; only use --apply after user confirmation, and never rewrite facts automatically.
+8. Update quality-report.json with checks run, issues found, repairs made, and remaining risk.
 
 ## Expected artifacts
 ${expectedArtifacts}
@@ -3610,6 +3915,7 @@ function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate) {
 ## Codex 本地规则
 - 工作范围限于这个 handoff 文件夹和 Ultimate PPT Master 仓库脚本。
 - 编辑或生成前先读 codex-task.md。
+- 生成最终页面前先读 storyboard.json 和 source-map.json；它们定义 DeckIR 页面地图、证据边界和可编辑要求。
 - 私有资料、客户数据、内部截图和 API key 默认不上传；除非用户明确同意。
 - ChatGPT/OpenAI 生图是主要视觉素材引擎。先读 visual-element-kit.md，需要视觉丰富度时先运行或处理 scripts/generate_visual_element_kit.py。
 - 如果没有配置 image backend/key，使用 images/image_prompts.md 里的 Needs-Manual prompts，在 ChatGPT 生成后保存到 assets/generated/。
@@ -3617,6 +3923,8 @@ function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate) {
 - 生成文件放到 assets/generated/，prompt 写入 asset-plan.md。
 - ${qualityGate.level} 交付不得以重复标题卡、整页截图 PPTX、碎片 logo 或缺失 quality-report.json 收尾。
 - 存在 HTML 或 PPTX 产物时，最终回复前运行正式商务审计。
+- 生成前运行 audit_storyboard.py，预览/导出后运行 review_rendered_deck.py。
+- 先用 apply_review_plan.py --dry-run 查看修复计划；--apply 只能写规划提示，不得改写来源事实。
 `;
   }
   return `# AGENTS.md
@@ -3624,6 +3932,7 @@ function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate) {
 ## Codex local rules
 - Work only in this handoff folder and the Ultimate PPT Master repository scripts.
 - Read codex-task.md before editing or generating deliverables.
+- Read storyboard.json and source-map.json before final slide generation; they define the DeckIR page map, evidence boundary, and editability requirements.
 - Keep private source material, customer data, internal screenshots, and API keys local unless the user explicitly approves upload.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py first when the deck needs visual richness.
 - If no image backend/key is configured, use images/image_prompts.md Needs-Manual prompts with ChatGPT and save outputs under assets/generated/.
@@ -3631,6 +3940,8 @@ function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate) {
 - Save generated outputs under assets/generated/ and record prompts in asset-plan.md.
 - ${qualityGate.level} delivery must not finish with repeated title-card slides, flat PPTX screenshots, broken logo fragments, or missing quality-report.json.
 - Run the formal delivery audit before final response whenever HTML or PPTX artifacts exist.
+- Run audit_storyboard.py before generation and review_rendered_deck.py after preview/export.
+- Run apply_review_plan.py with --dry-run first; --apply may only write planning hints and must not rewrite source facts.
 `;
 }
 
@@ -3794,6 +4105,13 @@ function buildBriefObject(
     workflowState,
     expectedArtifacts: qualityContract.expectedArtifacts,
     reviewCommands: qualityGate.reviewCommands,
+    deckIR: {
+      storyboard: "storyboard.json",
+      sourceMap: "source-map.json",
+      planningReport: "planning-report.json",
+      renderedReview: "review-findings.json",
+      repairPlan: "repair-plan.json"
+    },
     scenario: form.scenario,
     outputMode: form.outputMode,
     stylePreset: form.stylePreset,
@@ -3861,6 +4179,13 @@ function buildManifest(
     workflowState,
     expectedArtifacts: qualityContract.expectedArtifacts,
     reviewCommands: qualityGate.reviewCommands,
+    deckIR: {
+      storyboard: "storyboard.json",
+      sourceMap: "source-map.json",
+      planningReport: "planning-report.json",
+      renderedReview: "review-findings.json",
+      repairPlan: "repair-plan.json"
+    },
     readiness,
     enginePlan,
     attachments: sources.map(sourceForManifest)
@@ -3890,6 +4215,7 @@ async function buildHandoffZip({
   enginePlanMarkdown,
   qualityChecklist,
   qualityReport,
+  deckIRPreview,
   assetPlan,
   visualElementKit,
   codexTask,
@@ -3906,6 +4232,7 @@ async function buildHandoffZip({
   enginePlanMarkdown: string;
   qualityChecklist: string;
   qualityReport: string;
+  deckIRPreview: string;
   assetPlan: string;
   visualElementKit: string;
   codexTask: string;
@@ -3922,6 +4249,12 @@ async function buildHandoffZip({
   zip.file("preview-web-deck.html", webDeckHtml);
   zip.file("engine-plan.md", enginePlanMarkdown);
   zip.file("quality-checklist.md", qualityChecklist);
+  const deckIR = safeJson(deckIRPreview) as Record<string, unknown>;
+  zip.file("storyboard.json", JSON.stringify(deckIR["storyboard.json"] || {}, null, 2));
+  zip.file("source-map.json", JSON.stringify(deckIR["source-map.json"] || {}, null, 2));
+  zip.file("planning-report.json", JSON.stringify(deckIR["planning-report.json"] || {}, null, 2));
+  zip.file("review-findings.json", JSON.stringify(deckIR["review-findings.json"] || {}, null, 2));
+  zip.file("repair-plan.json", JSON.stringify(deckIR["repair-plan.json"] || {}, null, 2));
   zip.file("asset-plan.md", assetPlan);
   zip.file("visual-element-kit.md", visualElementKit);
   zip.file("codex-task.md", codexTask);
@@ -3951,6 +4284,7 @@ function buildBridgePayload({
   enginePlanMarkdown,
   qualityChecklist,
   qualityReport,
+  deckIRPreview,
   assetPlan,
   visualElementKit,
   codexTask,
@@ -3970,6 +4304,7 @@ function buildBridgePayload({
   enginePlanMarkdown: string;
   qualityChecklist: string;
   qualityReport: string;
+  deckIRPreview: string;
   assetPlan: string;
   visualElementKit: string;
   codexTask: string;
@@ -3990,6 +4325,7 @@ function buildBridgePayload({
     enginePlanMarkdown,
     qualityChecklist,
     qualityReport,
+    deckIRPreview,
     assetPlan,
     visualElementKit,
     codexTask,

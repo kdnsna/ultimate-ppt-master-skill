@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master v4.1.0 simplified Web console</title>
-  <desc id="desc">A simplified four-step Web Experience showing one primary action, local connector, AI helper, and generated local project folder.</desc>
+  <title id="title">Ultimate PPT Master v4.2.0 DeckIR AI planning pack</title>
+  <desc id="desc">A simplified four-step Web Experience showing DeckIR AI planning, one primary action, local connector, AI helper, and generated local project folder.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#F8FAFC"/>
@@ -29,20 +29,20 @@
     <circle cx="30" cy="24" r="8" fill="#2563EB"/>
     <circle cx="56" cy="24" r="8" fill="#10B981"/>
     <circle cx="82" cy="24" r="8" fill="#EF5B3F"/>
-    <text x="112" y="30" fill="#526173" font-size="15" font-weight="850">v4.1.0 Simplified Web console</text>
+    <text x="112" y="30" fill="#526173" font-size="15" font-weight="850">v4.2.0 DeckIR AI planning</text>
 
     <text x="0" y="122" fill="#172033" font-size="66" font-weight="950">Ultimate PPT Master</text>
-    <text x="0" y="174" fill="#2563EB" font-size="34" font-weight="900">One next step. Four-step delivery.</text>
+    <text x="0" y="174" fill="#2563EB" font-size="34" font-weight="900">Plan first. Then generate.</text>
     <text x="0" y="224" fill="#5F6F84" font-size="22" font-weight="650">把资料整理成本地项目包，再交给 Codex / Hermes / OpenClaw / Claude Code 深加工。</text>
   </g>
 
   <g transform="translate(1032 102)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" filter="url(#softShadow)">
     <rect width="362" height="172" rx="14" fill="#172033"/>
-    <text x="28" y="42" fill="#FFFFFF" font-size="17" font-weight="900">Console first</text>
-    <text x="28" y="72" fill="#B9C6D6" font-size="15" font-weight="720">一个主按钮</text>
-    <text x="28" y="100" fill="#B9C6D6" font-size="15" font-weight="720">四步操作条</text>
-    <text x="28" y="128" fill="#B9C6D6" font-size="15" font-weight="720">设置默认折叠</text>
-    <text x="28" y="156" fill="#B9C6D6" font-size="15" font-weight="720">预览三组归类</text>
+    <text x="28" y="42" fill="#FFFFFF" font-size="17" font-weight="900">DeckIR first</text>
+    <text x="28" y="72" fill="#B9C6D6" font-size="15" font-weight="720">页面地图</text>
+    <text x="28" y="100" fill="#B9C6D6" font-size="15" font-weight="720">证据边界</text>
+    <text x="28" y="128" fill="#B9C6D6" font-size="15" font-weight="720">可编辑目标</text>
+    <text x="28" y="156" fill="#B9C6D6" font-size="15" font-weight="720">渲染审阅</text>
   </g>
 
   <g transform="translate(124 332)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" filter="url(#softShadow)">
@@ -88,9 +88,9 @@
       <circle cx="34" cy="36" r="18" fill="#F97316"/>
       <text x="34" y="43" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">3</text>
       <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Deliver</text>
-      <text x="24" y="116" fill="#8A4B17" font-size="16" font-weight="720">source.md</text>
-      <text x="24" y="142" fill="#8A4B17" font-size="16" font-weight="720">manifest.json</text>
-      <text x="24" y="168" fill="#8A4B17" font-size="16" font-weight="720">preview + QA</text>
+      <text x="24" y="116" fill="#8A4B17" font-size="16" font-weight="720">storyboard.json</text>
+      <text x="24" y="142" fill="#8A4B17" font-size="16" font-weight="720">source-map.json</text>
+      <text x="24" y="168" fill="#8A4B17" font-size="16" font-weight="720">preview + review</text>
       <rect x="24" y="212" width="176" height="38" rx="8" fill="#EA580C"/>
       <text x="112" y="237" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="900">Local project</text>
     </g>
@@ -114,6 +114,6 @@
   <g transform="translate(182 790)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
     <rect width="1236" height="56" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
     <rect x="28" y="20" width="160" height="16" rx="8" fill="url(#brand)"/>
-    <text x="214" y="35" fill="#172033" font-size="17" font-weight="850">Web shows one next step · local connector writes files · Agent Skill handles final quality</text>
+    <text x="214" y="35" fill="#172033" font-size="17" font-weight="850">DeckIR page map · local connector writes files · Agent Skill handles final quality</text>
   </g>
 </svg>

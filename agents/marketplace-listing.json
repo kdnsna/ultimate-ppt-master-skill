@@ -2,7 +2,7 @@
   "id": "ultimate-ppt-master",
   "name": "Ultimate PPT Master",
   "displayName": "终极融合PPT大师",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "invocation": "$ultimate-ppt-master",
   "category": [
     "presentation generation",
