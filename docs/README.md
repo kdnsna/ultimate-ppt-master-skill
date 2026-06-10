@@ -1,6 +1,6 @@
 # Documentation Map
 
-Ultimate PPT Master v4.2 uses a categorized documentation structure. Start with the route that matches the work you are doing.
+Ultimate PPT Master v4.3 uses a categorized documentation structure. Start with the route that matches the work you are doing.
 
 ## Guides
 
@@ -30,7 +30,8 @@ Ultimate PPT Master v4.2 uses a categorized documentation structure. Start with 
 
 | Need | Read |
 |---|---|
-| See the latest release | [Release Notes - v4.2.0](./release/release-notes-v4.2.0.md) |
+| See the latest release | [Release Notes - v4.3.0](./release/release-notes-v4.3.0.md) |
+| Review the rendered-review loop release | [Release Notes - v4.3.0](./release/release-notes-v4.3.0.md) |
 | Review the AI planning release | [Release Notes - v4.2.0](./release/release-notes-v4.2.0.md) |
 | Review the hybrid-editable release | [Release Notes - v4.0.0](./release/release-notes-v4.0.0.md) |
 | Review the formal handoff release | [Release Notes - v3.0.0](./release/release-notes-v3.0.0.md) |

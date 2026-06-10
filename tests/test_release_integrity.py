@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "4.2.0"
+VERSION = "4.3.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -68,6 +68,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/guides/web-experience.md",
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
+            "docs/quality/rendered-review-loop-v4.3.md",
+            "docs/release/release-notes-v4.3.0.md",
             "docs/quality/quality-workbench-v2.5.md",
             "docs/release/release-notes-v4.2.0.md",
             "docs/release/release-notes-v4.1.0.md",
@@ -77,6 +79,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/guides/agent-connect-bridge.md",
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
+            "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "docs/zh-CN/release/release-notes-v4.3.0.md",
             "docs/zh-CN/release/release-notes-v4.2.0.md",
             "docs/zh-CN/release/release-notes-v4.1.0.md",
             "docs/zh-CN/release/release-notes-v4.0.0.md",
@@ -95,7 +99,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             self.assertTrue("Document Moved" in text or "文档已迁移" in text)
             self.assertIn(canonical, text)
 
-    def test_v4_readmes_surface_hybrid_editable_workflow(self):
+    def test_v43_readmes_are_refactored_as_product_homepages(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
         marketplace_prompt = (
@@ -105,12 +109,18 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         for expected in (
             "60-second quickstart",
+            "Why Teams Use It",
+            "Product Loop",
+            "v4.3 Rendered Review Loop",
+            "revision-brief.md",
+            "repair-plan.json",
             "Simplified Web Console v4.1",
             "DeckIR AI Planning Workflow v4.2",
             "Hybrid-Editable Visual Workflow v4.0",
             "one primary next action",
             "storyboard.json",
             "scripts/ai_storyboard.py",
+            "scripts/apply_review_plan.py",
             "page recipes",
             "no-text generated visual layers",
             "npm run audit:web-console",
@@ -120,7 +130,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "npm run audit:docs",
             "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
-            "./docs/release/release-notes-v4.2.0.md",
+            "./docs/quality/rendered-review-loop-v4.3.md",
+            "./docs/release/release-notes-v4.3.0.md",
             "./docs/strategy/skill-market-distribution.md",
             marketplace_prompt,
         ):
@@ -128,12 +139,18 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         for expected in (
             "60 秒开箱即用",
+            "为什么团队会用它",
+            "产品闭环",
+            "v4.3 渲染审阅闭环",
+            "revision-brief.md",
+            "repair-plan.json",
             "v4.1 精简网页控制台",
             "v4.2 DeckIR AI 策划工作流",
             "v4.0 混合可编辑视觉工作流",
             "一个状态驱动主按钮",
             "storyboard.json",
             "scripts/ai_storyboard.py",
+            "scripts/apply_review_plan.py",
             "页面配方",
             "无文字生成式视觉层",
             "npm run audit:web-console",
@@ -143,7 +160,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "npm run audit:docs",
             "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
-            "./docs/zh-CN/release/release-notes-v4.2.0.md",
+            "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "./docs/zh-CN/release/release-notes-v4.3.0.md",
             "./docs/zh-CN/strategy/skill-market-distribution.md",
             marketplace_prompt,
         ):
@@ -214,6 +232,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         release_v41_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.1.0.md").read_text(encoding="utf-8")
         release_v42 = (ROOT / "docs/release/release-notes-v4.2.0.md").read_text(encoding="utf-8")
         release_v42_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.2.0.md").read_text(encoding="utf-8")
+        release_v43 = (ROOT / "docs/release/release-notes-v4.3.0.md").read_text(encoding="utf-8")
+        release_v43_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.3.0.md").read_text(encoding="utf-8")
 
         self.assertIn("npm run audit:docs", release_maintenance)
         self.assertIn("npm run audit:web-console", release_maintenance)
@@ -255,6 +275,12 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("audit_storyboard.py", release_v42_zh)
         self.assertIn("review_rendered_deck.py", release_v42_zh)
         self.assertIn("白话更新栏", release_v42_zh)
+        self.assertIn("apply_review_plan.py", release_v43)
+        self.assertIn("revision-brief.md", release_v43)
+        self.assertIn("Plain-Language Update Notes", release_v43)
+        self.assertIn("apply_review_plan.py", release_v43_zh)
+        self.assertIn("revision-brief.md", release_v43_zh)
+        self.assertIn("白话更新栏", release_v43_zh)
 
     def test_web_handoff_panel_has_executable_next_step_ui(self):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
@@ -278,8 +304,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v4.2.0", hero)
-        self.assertIn("DeckIR AI planning", hero)
+        self.assertIn("v4.3.0", hero)
+        self.assertIn("Rendered review loop", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)
         self.assertNotIn("v2.3.0", combined)

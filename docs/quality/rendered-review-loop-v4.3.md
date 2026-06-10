@@ -4,10 +4,11 @@ v4.3 turns rendered-review output into a safer revision workflow. It keeps the e
 
 ## What Changes
 
-The review loop now writes two files:
+The review loop now writes three files across review and approved apply:
 
 - `review-findings.json`: rendered issues plus `riskLevel`, `autoFixable`, `targetArtifact`, `suggestedCommand`, and `repairCandidates`.
-- `repair-plan.json`: a proposed safe-only repair plan with candidate actions, affected artifacts, and an approval status.
+- `repair-plan.json`: a proposed safe-only repair plan with candidate actions, affected artifacts, candidate counts, commands, `revision-brief.md` path, and approval status.
+- `revision-brief.md`: a second-generation brief written only by explicit `--apply`; it summarizes safe planning hints without copying or rewriting source facts.
 
 The same summary is merged into `quality-report.json` so Web, Bridge, Desktop Worker, and CI-style audits can show one consistent status.
 
@@ -33,6 +34,7 @@ The apply mode can update planning and instruction artifacts only:
 - `codex-task.md`
 - `AGENTS.md`
 - `repair-plan.json`
+- `revision-brief.md`
 
 It must not rewrite `source.md`, source facts, business conclusions, or final body copy. Allowed safe candidates are layout variety hints, density warnings, visual prompt reinforcement, evidence placeholders for human review, raster-policy hints, and a second-generation revision brief.
 
@@ -48,4 +50,3 @@ python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run
 ## Non-goals
 
 v4.3 does not make DOM/HTML-to-PPTX the main route. `dom-to-pptx` remains an experimental adapter candidate until it can pass editable text, editable charts, gradient/shadow fidelity, image-crop fidelity, and PowerPoint compatibility checks.
-

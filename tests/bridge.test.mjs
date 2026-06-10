@@ -184,12 +184,14 @@ test("handoff writes formal business quality gate and workflow state", async () 
     assert.ok(payload.files.includes("planning-report.json"));
     assert.ok(payload.files.includes("review-findings.json"));
     assert.ok(payload.files.includes("repair-plan.json"));
+    assert.ok(payload.files.includes("revision-brief.md"));
 
     const codexTask = await readFile(join(payload.projectPath, "codex-task.md"), "utf8");
     assert.match(codexTask, /storyboard\.json/);
     assert.match(codexTask, /source-map\.json/);
     assert.match(codexTask, /planning-report\.json/);
     assert.match(codexTask, /review-findings\.json/);
+    assert.match(codexTask, /revision-brief\.md/);
     assert.match(codexTask, /audit_storyboard\.py/);
     assert.match(codexTask, /review_rendered_deck\.py/);
     assert.match(codexTask, /apply_review_plan\.py/);
@@ -242,6 +244,9 @@ test("handoff writes formal business quality gate and workflow state", async () 
     const repairPlan = JSON.parse(await readFile(join(payload.projectPath, "repair-plan.json"), "utf8"));
     assert.equal(repairPlan.version, "review-repair-plan-v1");
     assert.equal(repairPlan.status, "pending");
+    assert.equal(repairPlan.revisionBrief, "revision-brief.md");
+    const revisionBrief = await readFile(join(payload.projectPath, "revision-brief.md"), "utf8");
+    assert.match(revisionBrief, /pending/i);
   });
   await rm(outputDir, { recursive: true, force: true });
 });

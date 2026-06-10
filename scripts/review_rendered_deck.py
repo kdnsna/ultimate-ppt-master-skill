@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+import argparse
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -136,6 +137,11 @@ def build_repair_plan(project: Path, review: dict[str, Any]) -> dict[str, Any]:
         "projectPath": str(project),
         "mode": "safe-only",
         "dryRunDefault": True,
+        "candidateCount": len(candidates),
+        "safeCandidateCount": sum(1 for item in candidates if item.get("autoFixable") and item.get("riskLevel") == "low"),
+        "revisionBrief": "revision-brief.md",
+        "dryRunCommand": "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
+        "applyCommand": review_command(),
         "candidates": candidates,
         "summary": {
             "candidateCount": len(candidates),
@@ -291,11 +297,20 @@ def merge_quality_report(project: Path, review: dict[str, Any]) -> None:
     write_json(report_path, report)
 
 
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Review rendered PPT/Web artifacts and write review-findings.json plus repair-plan.json."
+    )
+    parser.add_argument("project_path", help="Project folder containing storyboard.json, manifest.json, rendered HTML, or PPTX artifacts.")
+    return parser.parse_args(argv)
+
+
 def main(argv: list[str]) -> int:
-    if not argv:
-        print("Usage: python3 scripts/review_rendered_deck.py <project_path>", file=sys.stderr)
+    args = parse_args(argv)
+    project = Path(args.project_path).expanduser().resolve()
+    if not project.exists() or not project.is_dir():
+        print(f"Project path does not exist or is not a directory: {project}", file=sys.stderr)
         return 2
-    project = Path(argv[0]).expanduser().resolve()
     review = review_project(project)
     write_json(project / "review-findings.json", review)
     write_json(project / "repair-plan.json", build_repair_plan(project, review))

@@ -203,6 +203,7 @@ interface HandoffResult {
       planningReport: string;
       renderedReview: string;
       repairPlan?: string;
+      revisionBrief?: string;
     };
   };
 }
@@ -214,7 +215,7 @@ const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v4";
-const appVersion = "4.2.0";
+const appVersion = "4.3.0";
 
 const designDoctorScores = [
   {
@@ -1768,6 +1769,7 @@ function AIPageMapPanel({ deckIRPreview, labels: t }: { deckIRPreview: string; l
         <span>planning-report.json</span>
         <span>review-findings.json</span>
         <span>repair-plan.json</span>
+        <span>revision-brief.md</span>
       </div>
       <div className="story-list">
         {slides.slice(0, 8).map((slide) => (
@@ -1803,6 +1805,7 @@ function RenderedReviewLoopPanel({ form, qualityGate, labels: t }: { form: FormS
       <div className="quality-chip-row">
         <InfoRow icon={AlertCircle} title="review-findings.json" text={zh ? "记录问题、建议、风险等级和修复候选。" : "Records findings, suggestions, risk levels, and repair candidates."} />
         <InfoRow icon={FileText} title="repair-plan.json" text={zh ? "只包含低风险规划修复，不自动改事实内容。" : "Contains low-risk planning repairs only; source facts stay unchanged."} />
+        <InfoRow icon={FileText} title="revision-brief.md" text={zh ? "用户确认 safe apply 后生成二次修订 brief。" : "Generated after confirmed safe apply for the second pass."} />
         <InfoRow icon={ShieldCheck} title={qualityGate.level} text={dryRun} />
       </div>
     </section>
@@ -3257,7 +3260,8 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract, q
       sourceMap: "source-map.json",
       planningReport: "planning-report.json",
       renderedReview: "review-findings.json",
-      repairPlan: "repair-plan.json"
+      repairPlan: "repair-plan.json",
+      revisionBrief: "revision-brief.md"
     },
     reviewFindings: {
       status: "pending",
@@ -3270,7 +3274,8 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract, q
       status: "pending",
       path: "repair-plan.json",
       candidateCount: 0,
-      dryRunCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run"
+      dryRunCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
+      revisionBrief: "revision-brief.md"
     },
     summary: {
       zh: "Design Doctor / 视觉复查尚未运行。请先生成预览和最终文件，再按 reviewCommands 运行检查；默认只报告问题和建议。",
@@ -3370,6 +3375,11 @@ function buildDeckIRPreview(form: FormState, storyboard: StoryItem[], sources: U
     status: "pending",
     mode: "safe-only",
     dryRunDefault: true,
+    candidateCount: 0,
+    safeCandidateCount: 0,
+    revisionBrief: "revision-brief.md",
+    dryRunCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
+    applyCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --apply",
     candidates: [],
     summary: {
       candidateCount: 0,
@@ -3388,7 +3398,8 @@ function buildDeckIRPreview(form: FormState, storyboard: StoryItem[], sources: U
       "source-map.json": sourceMap,
       "planning-report.json": planningReport,
       "review-findings.json": reviewFindings,
-      "repair-plan.json": repairPlan
+      "repair-plan.json": repairPlan,
+      "revision-brief.md": pendingRevisionBrief(form.title)
     },
     null,
     2
@@ -3412,6 +3423,20 @@ function buildSourceClaimsForDeckIR(form: FormState, sources: UploadedSource[]) 
       text: line.slice(0, 180)
     }));
   return claims.length ? claims : [{ id: "S001", sourceLine: 1, text: form.title || "Ultimate PPT Master handoff" }];
+}
+
+function pendingRevisionBrief(title: string) {
+  return `# v4.3 Rendered Review Revision Brief
+
+Project: ${title}
+Status: pending
+
+Run \`python3 scripts/review_rendered_deck.py <project_path>\` after preview/export, then inspect \`repair-plan.json\`.
+
+Use \`python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run\` first. This file is replaced with actionable low-risk planning hints only after explicit \`--apply\`.
+
+Do not rewrite source facts, business conclusions, or final body copy automatically.
+`;
 }
 
 function inferDeckIRRole(index: number, total: number, text: string) {
@@ -3794,11 +3819,12 @@ function buildCodexTask(
 6. planning-report.json
 7. review-findings.json
 8. repair-plan.json
-9. quality-checklist.md
-10. asset-plan.md
-11. visual-element-kit.md
-12. agent-prompt.md
-13. extracted-source.md 和 attachments/
+9. revision-brief.md
+10. quality-checklist.md
+11. asset-plan.md
+12. visual-element-kit.md
+13. agent-prompt.md
+14. extracted-source.md 和 attachments/
 
 ## 正式商务门禁
 必须输入：
@@ -3858,11 +3884,12 @@ Blocked reason: ${workflowState.blockedReason || "none"}
 6. planning-report.json
 7. review-findings.json
 8. repair-plan.json
-9. quality-checklist.md
-10. asset-plan.md
-11. visual-element-kit.md
-12. agent-prompt.md
-13. extracted-source.md and attachments/
+9. revision-brief.md
+10. quality-checklist.md
+11. asset-plan.md
+12. visual-element-kit.md
+13. agent-prompt.md
+14. extracted-source.md and attachments/
 
 ## Formal business gate
 Required inputs:
@@ -4110,7 +4137,8 @@ function buildBriefObject(
       sourceMap: "source-map.json",
       planningReport: "planning-report.json",
       renderedReview: "review-findings.json",
-      repairPlan: "repair-plan.json"
+      repairPlan: "repair-plan.json",
+      revisionBrief: "revision-brief.md"
     },
     scenario: form.scenario,
     outputMode: form.outputMode,
@@ -4184,7 +4212,8 @@ function buildManifest(
       sourceMap: "source-map.json",
       planningReport: "planning-report.json",
       renderedReview: "review-findings.json",
-      repairPlan: "repair-plan.json"
+      repairPlan: "repair-plan.json",
+      revisionBrief: "revision-brief.md"
     },
     readiness,
     enginePlan,
@@ -4255,6 +4284,7 @@ async function buildHandoffZip({
   zip.file("planning-report.json", JSON.stringify(deckIR["planning-report.json"] || {}, null, 2));
   zip.file("review-findings.json", JSON.stringify(deckIR["review-findings.json"] || {}, null, 2));
   zip.file("repair-plan.json", JSON.stringify(deckIR["repair-plan.json"] || {}, null, 2));
+  zip.file("revision-brief.md", typeof deckIR["revision-brief.md"] === "string" ? String(deckIR["revision-brief.md"]) : pendingRevisionBrief("Ultimate PPT Master handoff"));
   zip.file("asset-plan.md", assetPlan);
   zip.file("visual-element-kit.md", visualElementKit);
   zip.file("codex-task.md", codexTask);

@@ -1422,6 +1422,7 @@ def formal_quality_profile(mode: str) -> dict[str, Any]:
         "planning-report.json",
         "review-findings.json",
         "repair-plan.json",
+        "revision-brief.md",
         "design-quality-report.md",
         "assets/generated/page-visuals/manifest.json",
         "images/page_visual_prompts.md",
@@ -1482,11 +1483,12 @@ Blocked reason: {workflow_state["blockedReason"] or "none"}
 8. planning-report.json
 9. review-findings.json when present
 10. repair-plan.json when present
-11. quality-checklist.md if present
-12. asset-plan.md
-13. visual-element-kit.md
-14. images/page_visual_prompts.md
-15. sources/source.md
+11. revision-brief.md when present
+12. quality-checklist.md if present
+13. asset-plan.md
+14. visual-element-kit.md
+15. images/page_visual_prompts.md
+16. sources/source.md
 
 ## Formal Business Gate
 Required inputs:
@@ -2068,6 +2070,7 @@ def write_formal_delivery_files(
     report_path = project_path / "quality-report.json"
     codex_task_path = project_path / "codex-task.md"
     codex_guide_path = project_path / "AGENTS.md"
+    revision_brief_path = project_path / "revision-brief.md"
     asset_plan_path = project_path / "asset-plan.md"
     visual_element_kit_path = project_path / "visual-element-kit.md"
     page_visual_manifest_path = project_path / "assets" / "generated" / "page-visuals" / "manifest.json"
@@ -2082,6 +2085,7 @@ def write_formal_delivery_files(
         report_path,
         codex_task_path,
         codex_guide_path,
+        revision_brief_path,
         asset_plan_path,
         visual_element_kit_path,
         page_visual_manifest_path,
@@ -2113,6 +2117,7 @@ def write_formal_delivery_files(
             "planningReport": "planning-report.json",
             "renderedReview": "review-findings.json",
             "repairPlan": "repair-plan.json",
+            "revisionBrief": "revision-brief.md",
         },
         "sourceStrategy": {
             "source": "sources/source.md",
@@ -2156,6 +2161,7 @@ def write_formal_delivery_files(
             "planningReport": "planning-report.json",
             "renderedReview": "review-findings.json",
             "repairPlan": "repair-plan.json",
+            "revisionBrief": "revision-brief.md",
         },
         "preview": {
             "hasHtml": bool(preview_html),
@@ -2187,6 +2193,7 @@ def write_formal_delivery_files(
             "planningReport": "planning-report.json",
             "renderedReview": "review-findings.json",
             "repairPlan": "repair-plan.json",
+            "revisionBrief": "revision-brief.md",
         },
         "reviewFindings": {
             "status": "pending",
@@ -2200,6 +2207,7 @@ def write_formal_delivery_files(
             "path": "repair-plan.json",
             "candidateCount": 0,
             "dryRunCommand": "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
+            "revisionBrief": "revision-brief.md",
         },
         "checks": [
             {
@@ -2232,11 +2240,23 @@ def write_formal_delivery_files(
         encoding="utf-8",
     )
     codex_guide_path.write_text(codex_agent_guide_text(quality_gate), encoding="utf-8")
+    revision_brief_path.write_text(
+        (
+            "# v4.3 Rendered Review Revision Brief\n\n"
+            f"Project: {title}\n"
+            "Status: pending\n\n"
+            "Run `python3 scripts/review_rendered_deck.py <project_path>` after preview/export, then inspect `repair-plan.json`.\n\n"
+            "Use `python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run` first. "
+            "This file is replaced with actionable low-risk planning hints only after explicit `--apply`.\n\n"
+            "Do not rewrite source facts, business conclusions, or final body copy automatically.\n"
+        ),
+        encoding="utf-8",
+    )
     asset_plan_path.write_text(asset_plan_text(title, source_name, quality_gate), encoding="utf-8")
     visual_element_kit_path.write_text(visual_element_kit_text(title, quality_gate), encoding="utf-8")
     image_prompt_fallback_path.parent.mkdir(parents=True, exist_ok=True)
     image_prompt_fallback_path.write_text(visual_element_prompt_fallback_text(title), encoding="utf-8")
-    written.extend([codex_task_path, codex_guide_path, asset_plan_path, visual_element_kit_path, image_prompt_fallback_path])
+    written.extend([codex_task_path, codex_guide_path, revision_brief_path, asset_plan_path, visual_element_kit_path, image_prompt_fallback_path])
     return written
 
 

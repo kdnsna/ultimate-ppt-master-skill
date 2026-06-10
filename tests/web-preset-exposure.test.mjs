@@ -186,6 +186,7 @@ test("web experience exposes AI best route and DeckIR page map", async () => {
   assert.match(appSource, /planning-report\.json/);
   assert.match(appSource, /review-findings\.json/);
   assert.match(appSource, /repair-plan\.json/);
+  assert.match(appSource, /revision-brief\.md/);
   assert.match(appSource, /一键最佳路线|best route/i);
   assert.match(appSource, /页面地图|page map/i);
   assert.match(appSource, /RenderedReviewLoopPanel/);

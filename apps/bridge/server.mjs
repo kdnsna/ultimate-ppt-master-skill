@@ -582,7 +582,9 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     storyboard: "storyboard.json",
     sourceMap: "source-map.json",
     planningReport: "planning-report.json",
-    renderedReview: "review-findings.json"
+    renderedReview: "review-findings.json",
+    repairPlan: "repair-plan.json",
+    revisionBrief: "revision-brief.md"
   };
   const enrichedProjectBrief = {
     ...projectBrief,
@@ -654,6 +656,7 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   await writeProjectFile("planning-report.json", JSON.stringify(deckIRPayload.planningReport, null, 2));
   await writeProjectFile("review-findings.json", JSON.stringify(createPendingReviewFindings({ title, storyboard: deckIRPayload.storyboard }), null, 2));
   await writeProjectFile("repair-plan.json", JSON.stringify(createPendingRepairPlan({ title }), null, 2));
+  await writeProjectFile("revision-brief.md", pendingRevisionBrief({ title }));
 
   const manifest = {
     version: BRIDGE_VERSION,
@@ -867,6 +870,11 @@ function createPendingRepairPlan({ title }) {
     createdAt: new Date().toISOString(),
     mode: "safe-only",
     dryRunDefault: true,
+    candidateCount: 0,
+    safeCandidateCount: 0,
+    revisionBrief: "revision-brief.md",
+    dryRunCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
+    applyCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --apply",
     candidates: [],
     summary: {
       candidateCount: 0,
@@ -879,6 +887,20 @@ function createPendingRepairPlan({ title }) {
       "Require an explicit --apply invocation for any mutation."
     ]
   };
+}
+
+function pendingRevisionBrief({ title }) {
+  return `# v4.3 Rendered Review Revision Brief
+
+Project: ${title}
+Status: pending
+
+Run \`python3 scripts/review_rendered_deck.py <project_path>\` after preview/export, then inspect \`repair-plan.json\`.
+
+Use \`python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run\` first. This file is replaced with actionable low-risk planning hints only after explicit \`--apply\`.
+
+Do not rewrite source facts, business conclusions, or final body copy automatically.
+`;
 }
 
 function defaultQualityGate() {
@@ -955,7 +977,8 @@ function createPendingQualityReport({ title, qualityProfile, qualityGate, workfl
       status: "pending",
       path: "repair-plan.json",
       candidateCount: 0,
-      dryRunCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run"
+      dryRunCommand: "python3 scripts/apply_review_plan.py <project_path> --safe-only --dry-run",
+      revisionBrief: "revision-brief.md"
     },
     summary: {
       zh: "Design Doctor / 视觉复查尚未运行。请先生成预览和最终文件，再按 reviewCommands 运行检查；默认只报告问题和建议，只有明确要求时才自动修 SVG。",
@@ -1053,11 +1076,12 @@ Blocked reason: ${workflowState?.blockedReason || "none"}
 6. planning-report.json
 7. review-findings.json when present
 8. repair-plan.json when present
-9. quality-checklist.md
-10. asset-plan.md
-11. visual-element-kit.md
-12. agent-prompt.md
-13. extracted-source.md and attachments/
+9. revision-brief.md when present
+10. quality-checklist.md
+11. asset-plan.md
+12. visual-element-kit.md
+13. agent-prompt.md
+14. extracted-source.md and attachments/
 
 ## Formal Business Gate
 Required inputs:
@@ -1234,7 +1258,7 @@ function relativeFromProject(filePath) {
 
 function suggestedCommands(projectPath) {
   const quotedPath = shellQuote(projectPath);
-  const instruction = "Read AGENTS.md, codex-task.md, storyboard.json, source-map.json, planning-report.json, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, keep DeckIR evidence/editability constraints, insert reusable micro-assets when useful, run audit_storyboard.py, formal delivery audit, review_rendered_deck.py, and apply_review_plan.py --safe-only --dry-run, update quality-report.json, then list final files.";
+  const instruction = "Read AGENTS.md, codex-task.md, storyboard.json, source-map.json, planning-report.json, review-findings.json, repair-plan.json, revision-brief.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, keep DeckIR evidence/editability constraints, insert reusable micro-assets when useful, run audit_storyboard.py, formal delivery audit, review_rendered_deck.py, and apply_review_plan.py --safe-only --dry-run, update quality-report.json, then list final files.";
   return {
     codex: `cd ${quotedPath} && codex "${instruction}"`,
     claude: `cd ${quotedPath} && claude "${instruction}"`,
@@ -1278,7 +1302,7 @@ function launchAgent(payload, { allowLaunch }) {
 }
 
 function defaultHandoffReadme() {
-  return "# Ultimate PPT Master handoff\n\nFor Codex, open `AGENTS.md`, `codex-task.md`, and `visual-element-kit.md` first. Then review `asset-plan.md`, `agent-prompt.md`, and `extracted-source.md`, run or handle `scripts/generate_visual_element_kit.py` for ChatGPT-first visual micro-assets, use `Needs-Manual` prompts when no image key is configured, and run the suggested local Agent command from `manifest.json`.\n";
+  return "# Ultimate PPT Master handoff\n\nFor Codex, open `AGENTS.md`, `codex-task.md`, `storyboard.json`, `repair-plan.json`, `revision-brief.md`, and `visual-element-kit.md` first. Then review `asset-plan.md`, `agent-prompt.md`, and `extracted-source.md`, run or handle `scripts/generate_visual_element_kit.py` for ChatGPT-first visual micro-assets, use `Needs-Manual` prompts when no image key is configured, and run the suggested local Agent command from `manifest.json`.\n";
 }
 
 function hasValue(value) {

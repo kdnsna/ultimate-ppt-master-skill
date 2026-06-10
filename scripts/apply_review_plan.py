@@ -16,8 +16,9 @@ from pathlib import Path
 from typing import Any
 
 
-ALLOWED_ARTIFACTS = {"storyboard.json", "project-brief.json", "quality-report.json", "codex-task.md", "AGENTS.md", "repair-plan.json"}
+ALLOWED_ARTIFACTS = {"storyboard.json", "project-brief.json", "quality-report.json", "codex-task.md", "AGENTS.md", "repair-plan.json", "revision-brief.md"}
 BRIEF_MARKER = "## v4.3 Rendered Review Repair Brief"
+REVISION_BRIEF = "revision-brief.md"
 
 
 def now_iso() -> str:
@@ -73,6 +74,24 @@ def candidate_bullets(candidates: list[dict[str, Any]]) -> str:
         page = f" `{item.get('page')}`" if item.get("page") else ""
         lines.append(f"- {item.get('id')}{page}: {item.get('title')} ({item.get('targetArtifact')})")
     return "\n".join(lines) + "\n"
+
+
+def build_revision_brief(candidates: list[dict[str, Any]], applied_at: str) -> str:
+    candidate_lines = candidate_bullets(candidates)
+    return (
+        "# v4.3 Rendered Review Revision Brief\n\n"
+        f"Generated at: `{applied_at}`\n\n"
+        "This brief is generated from `review-findings.json` and `repair-plan.json`.\n"
+        "Do not rewrite source facts, business conclusions, or final body copy automatically.\n"
+        "Use it as a second-generation instruction layer after the user confirms the repair direction.\n\n"
+        "## Safe Candidates\n\n"
+        f"{candidate_lines}\n"
+        "## Required Guardrails\n\n"
+        "- Keep `source.md` and extracted source material unchanged.\n"
+        "- Use evidence placeholders only to request human source-map selection; never invent evidence.\n"
+        "- Prefer recipe variety, density relief, raster-policy correction, and visual prompt reinforcement.\n"
+        "- Re-run `python3 scripts/review_rendered_deck.py <project_path>` after the next generation.\n"
+    )
 
 
 def append_markdown_brief(path: Path, candidates: list[dict[str, Any]], applied_at: str) -> None:
@@ -151,6 +170,7 @@ def apply_plan(project: Path, candidates: list[dict[str, Any]]) -> None:
     update_json_summary(project / "quality-report.json", candidates, applied_at)
     append_markdown_brief(project / "codex-task.md", candidates, applied_at)
     append_markdown_brief(project / "AGENTS.md", candidates, applied_at)
+    (project / REVISION_BRIEF).write_text(build_revision_brief(candidates, applied_at), encoding="utf-8")
 
     plan = read_json(project / "repair-plan.json")
     if isinstance(plan, dict):
@@ -158,6 +178,8 @@ def apply_plan(project: Path, candidates: list[dict[str, Any]]) -> None:
         plan["appliedAt"] = applied_at
         plan["appliedCandidateCount"] = len(candidates)
         plan["appliedCandidates"] = [compact_candidate(item) for item in candidates]
+        plan["revisionBrief"] = REVISION_BRIEF
+        plan["revisionBriefUpdatedAt"] = applied_at
         write_json(project / "repair-plan.json", plan)
 
 
@@ -188,6 +210,7 @@ def main(argv: list[str]) -> int:
         "projectPath": str(project),
         "safeCandidates": len(candidates),
         "candidateIds": [item.get("id") for item in candidates],
+        "revisionBrief": REVISION_BRIEF,
     }
 
     if not dry_run:

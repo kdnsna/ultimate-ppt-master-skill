@@ -111,7 +111,9 @@ class RenderedReviewTest(unittest.TestCase):
         self.assertGreaterEqual(len(findings["repairCandidates"]), 3)
         self.assertEqual(repair_plan["version"], "review-repair-plan-v1")
         self.assertEqual(repair_plan["status"], "proposed")
+        self.assertGreaterEqual(repair_plan["candidateCount"], 3)
         self.assertGreaterEqual(repair_plan["summary"]["candidateCount"], 3)
+        self.assertEqual(repair_plan["revisionBrief"], "revision-brief.md")
         for candidate in repair_plan["candidates"]:
             self.assertIn(candidate["riskLevel"], {"low", "medium"})
             self.assertIn("targetArtifact", candidate)
@@ -150,6 +152,8 @@ class RenderedReviewTest(unittest.TestCase):
         payload = json.loads(result.stdout)
         self.assertTrue(payload["dryRun"])
         self.assertGreaterEqual(payload["safeCandidates"], 3)
+        self.assertEqual(payload["revisionBrief"], "revision-brief.md")
+        self.assertFalse((project / "revision-brief.md").exists())
 
     def test_apply_review_plan_apply_only_updates_safe_planning_artifacts(self):
         with TemporaryDirectory() as tmp:
@@ -178,6 +182,7 @@ class RenderedReviewTest(unittest.TestCase):
             codex_task = (project / "codex-task.md").read_text(encoding="utf-8")
             agent_guide = (project / "AGENTS.md").read_text(encoding="utf-8")
             repair_plan = json.loads((project / "repair-plan.json").read_text(encoding="utf-8"))
+            revision_brief = (project / "revision-brief.md").read_text(encoding="utf-8")
             source_after = (project / "source.md").read_text(encoding="utf-8")
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -188,7 +193,25 @@ class RenderedReviewTest(unittest.TestCase):
         self.assertEqual(brief["reviewRepairPlan"]["status"], "applied")
         self.assertIn("v4.3 Rendered Review Repair Brief", codex_task)
         self.assertIn("v4.3 Rendered Review Repair Brief", agent_guide)
+        self.assertIn("# v4.3 Rendered Review Revision Brief", revision_brief)
+        self.assertIn("Do not rewrite source facts", revision_brief)
+        self.assertNotIn("客户等待时间下降 18%", revision_brief)
         self.assertEqual(repair_plan["status"], "applied")
+        self.assertEqual(repair_plan["revisionBrief"], "revision-brief.md")
+
+    def test_review_and_apply_scripts_have_safe_cli_help(self):
+        for script in ("review_rendered_deck.py", "apply_review_plan.py"):
+            with self.subTest(script=script):
+                result = subprocess.run(
+                    ["python3", f"scripts/{script}", "--help"],
+                    cwd=ROOT,
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                )
+
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn("usage:", result.stdout.lower())
 
     def test_review_loop_handles_three_chinese_fixture_types_without_rewriting_source(self):
         fixtures = [

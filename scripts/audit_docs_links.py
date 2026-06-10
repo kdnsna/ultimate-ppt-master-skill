@@ -11,7 +11,7 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "4.2.0"
+VERSION = "4.3.0"
 
 MOVED_DOCS = {
     "docs/web-experience.md": "docs/guides/web-experience.md",
@@ -96,6 +96,8 @@ def audit_version_markers(errors: list[str]) -> None:
     require("v4.1 精简网页控制台" in readme_zh, "Chinese README missing v4.1 console entry", errors)
     require("DeckIR AI Planning Workflow v4.2" in readme, "README missing v4.2 AI planning entry", errors)
     require("v4.2 DeckIR AI 策划工作流" in readme_zh, "Chinese README missing v4.2 AI planning entry", errors)
+    require("v4.3 Rendered Review Loop" in readme, "README missing v4.3 rendered review entry", errors)
+    require("v4.3 渲染审阅闭环" in readme_zh, "Chinese README missing v4.3 rendered review entry", errors)
 
 
 def audit_moved_stubs(errors: list[str]) -> None:
@@ -173,7 +175,9 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/guides/agent-connect-bridge.md",
         "./docs/guides/agent-setup.md",
         "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
+        "./docs/quality/rendered-review-loop-v4.3.md",
         "./docs/release/release-notes-v4.2.0.md",
+        "./docs/release/release-notes-v4.3.0.md",
         "./docs/strategy/skill-market-distribution.md",
     ]
     for link in required:
@@ -182,7 +186,9 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
     required_zh = [
         "./docs/zh-CN/guides/agent-connect-bridge.md",
         "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
+        "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
         "./docs/zh-CN/release/release-notes-v4.2.0.md",
+        "./docs/zh-CN/release/release-notes-v4.3.0.md",
         "./docs/zh-CN/strategy/skill-market-distribution.md",
     ]
     for link in required_zh:

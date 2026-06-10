@@ -1,9 +1,9 @@
-# Ultimate PPT Master - Hybrid-Editable AI Presentation Workbench
+# Ultimate PPT Master - AI Presentation Production Workbench
 
-> Local-first presentation production for Chinese office work: turn source material into editable PPTX decks or magazine-style Web Decks, with a v4.1 simplified Web console, DeckIR AI planning, v4.0 page recipes, no-text generated visual layers, and delivery audits that protect editability.
+> Local-first AI presentation production for Chinese office work: turn source material into editable PPTX decks or magazine-style Web Decks, then use DeckIR planning, rendered review, safe repair briefs, page recipes, no-text generated visual layers, and formal delivery audits to keep the result usable in real office workflows.
 
 <p align="center">
-  <strong>v4.2.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/guides/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v4.3.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/guides/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -13,22 +13,63 @@
   ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Benchmark Wall</strong></a>
   ·
-  <a href="./docs/quality/hybrid-editable-visual-workflow-v4.0.md"><strong>v4.0 Workflow</strong></a>
+  <a href="./docs/quality/rendered-review-loop-v4.3.md"><strong>v4.3 Rendered Review Loop</strong></a>
   ·
-  <a href="./docs/release/release-notes-v4.2.0.md"><strong>v4.2.0 Notes</strong></a>
+  <a href="./docs/release/release-notes-v4.3.0.md"><strong>v4.3.0 Notes</strong></a>
   ·
-  <a href="./docs/strategy/skill-market-distribution.md"><strong>Skill Market</strong></a>
+  <a href="./docs/strategy/skill-market-distribution.md"><strong>Skill Market Distribution</strong></a>
 </p>
 
 <p align="center">
-  <img alt="Version 4.2.0" src="https://img.shields.io/badge/Version-4.2.0-172033?style=for-the-badge">
-  <img alt="Simplified console" src="https://img.shields.io/badge/4.1-Simplified%20Console-0F766E?style=for-the-badge">
-  <img alt="Hybrid editable" src="https://img.shields.io/badge/4.0-Hybrid%20Editable-2563EB?style=for-the-badge">
-  <img alt="Visual recipes" src="https://img.shields.io/badge/Page-Recipes-7C3AED?style=for-the-badge">
+  <img alt="Version 4.3.0" src="https://img.shields.io/badge/Version-4.3.0-172033?style=for-the-badge">
+  <img alt="Rendered review loop" src="https://img.shields.io/badge/4.3-Rendered%20Review%20Loop-0F766E?style=for-the-badge">
+  <img alt="DeckIR planning" src="https://img.shields.io/badge/4.2-DeckIR%20Planning-2563EB?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
   <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-172033?style=for-the-badge">
 </p>
+
+## Why Teams Use It
+
+Most AI PPT tools can make something that looks finished. Office teams need something they can trust, edit, audit, and revise.
+
+| Need | What Ultimate PPT Master gives you |
+|---|---|
+| Turn messy source material into slides | A local handoff folder with source markdown, DeckIR page map, evidence refs, and an Agent-ready brief. |
+| Keep PowerPoint editable | PPTX output keeps real text, shapes, tables, charts, notes, logos, QR codes, and traceable image sources. |
+| Avoid repetitive AI layouts | page recipes and `scripts/audit_visual_recipes.py` prevent repeated title-card grids and body-slide raster shortcuts. |
+| Review before revising | v4.3 writes `review-findings.json`, `repair-plan.json`, and user-approved `revision-brief.md` for the second pass. |
+| Stay local-first | The Bridge writes project files on localhost; private source material is not uploaded unless the user explicitly chooses that route. |
+
+## Product Loop
+
+```text
+Source material
+  -> Web Experience / Desktop / Bridge
+  -> DeckIR storyboard + source-map evidence boundary
+  -> page recipes + editability/raster policy
+  -> editable PPTX or magazine Web Deck
+  -> rendered review findings
+  -> safe repair plan
+  -> revision-brief.md for the approved second pass
+  -> formal delivery audits
+```
+
+Core artifacts:
+
+- `storyboard.json`: DeckIR page map with page roles, recipe IDs, evidence refs, raster policy, and editability targets.
+- `source-map.json`: traceable source claims used by the deck.
+- `planning-report.json`: route recommendation, fallback status, and planner notes.
+- `review-findings.json`: rendered-review issues with severity, risk level, repair target, and suggested command.
+- `repair-plan.json`: low-risk repair candidates; default path is dry-run.
+- `revision-brief.md`: second-generation brief created only after explicit safe apply.
+- `quality-report.json`: merged delivery, planning, and rendered-review status.
+
+## v4.3 Rendered Review Loop
+
+v4.3 makes the review step actionable without making it dangerous. `scripts/review_rendered_deck.py` inspects the generated project and writes findings. `scripts/apply_review_plan.py --safe-only --dry-run` shows what would be applied. `--apply` only writes planning hints, reports, Agent instructions, and `revision-brief.md`; it does not rewrite `source.md`, business facts, or final body claims.
+
+Read the workflow: [Rendered Review Loop v4.3](./docs/quality/rendered-review-loop-v4.3.md). Release: [v4.3.0](./docs/release/release-notes-v4.3.0.md).
 
 ## 60-second quickstart
 
@@ -40,7 +81,7 @@ npm run doctor
 npm run bridge
 ```
 
-Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/). v4.1 shows one primary next action at a time; use **No Bridge** for public demos and the benchmark wall, or connect locally when you want source parsing and a project folder for Codex or another AI helper.
+Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/). The v4.1 console still gives one primary next action at a time: prepare the brief, add source material, connect locally, and deliver the handoff project.
 
 | Need | Best route | Output |
 |---|---|---|
@@ -48,68 +89,17 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 | Talk, showcase, demo day, editorial presentation | Web Deck | Single-file browser deck with stronger visual rhythm and shareable HTML. |
 | Both formal handoff and browser preview | Dual delivery | Separate PPTX and Web projects with shared source and aligned structure. |
 
-## What v4.1 Fixes
+## Capability Matrix
 
-v4.1 keeps the v4.0 generation contract, but makes the Web console easier to operate.
+| Layer | Release | What it protects |
+|---|---|---|
+| Rendered review and repair brief | [v4.3 Rendered Review Loop](./docs/quality/rendered-review-loop-v4.3.md) | Review after rendering, propose low-risk repairs, generate `revision-brief.md` only after confirmation. |
+| AI planning | [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md) | `scripts/ai_storyboard.py`, `storyboard.json`, evidence refs, editability targets, and no-key fallback. |
+| Simplified Web console | [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md) | Four-step console, one primary next action, grouped previews, lower first-screen complexity. |
+| Hybrid-editable generation | [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) | page recipes, no-text generated visual layers, editable PPTX body content, formal raster policy. |
+| Public proof surface | [Quality Workbench v2.5](./docs/quality/quality-workbench-v2.5.md) | Benchmark Wall, synthetic proof packs, Design Doctor reporting, and release checks. |
 
-| Problem | v4.1 answer |
-|---|---|
-| Five navigation tabs plus a workflow wizard compete for attention | One four-step console: prepare, add sources, connect locally, deliver. |
-| The screen repeats copy/send/launch/download buttons | One state-driven primary action plus a small "more actions" menu. |
-| Advanced setup, proof walls, and technical files crowd the first screen | Settings, proofs, glossary, and generated files are grouped behind drawers. |
-| Eleven preview tabs feel like implementation detail | Preview is grouped into user preview, AI-helper files, and quality report. |
-
-Release: [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md).
-
-## AI Planning Pack
-
-The next layer is a planner-first flow: source material is converted into a DeckIR page map before the Agent writes slides. Web, Bridge, and Desktop handoff now share `storyboard.json`, `source-map.json`, `planning-report.json`, and `review-findings.json`, so the AI assistant starts from page roles, evidence, editability targets, and rendered-review checks instead of a loose prompt.
-
-Read the workflow: [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md).
-
-## What v4.0 Fixes
-
-v4.0 is built around one uncomfortable truth: many AI-generated PPTs look polished at first glance but fail in real office use because they are repetitive, text-heavy, or flattened into images.
-
-Ultimate PPT Master now uses a hybrid-editable contract:
-
-| Problem | v4.0 answer |
-|---|---|
-| Every page becomes another card grid | `templates/page-recipes/index.json` defines page roles before generation. |
-| Generated images hide the content | Visual generation is limited to no-text support layers on formal body pages. |
-| PPTX output is hard to edit | Copy, numbers, tables, charts, logos, and QR codes stay editable or traceable. |
-| Quality checks pass file completeness but miss visual sameness | `scripts/audit_visual_recipes.py` blocks recipe repetition and full-page raster body slides. |
-
-Read the workflow: [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md).
-
-## How It Works
-
-```text
-Source material
-  -> Web Experience or Agent brief
-  -> local handoff folder
-  -> DeckIR page map and source map
-  -> page role and page recipe contract
-  -> editable PPTX or magazine Web Deck
-  -> rendered review findings
-  -> visual layer prompts when useful
-  -> formal delivery and recipe audits
-```
-
-Key planning and quality artifacts:
-
-- `storyboard.json`: planned DeckIR page map with slide roles, recipe IDs, evidence refs, raster policy, and editability targets.
-- `source-map.json`: traceable source claims that the deck should cite or preserve.
-- `planning-report.json`: route recommendation, fallback status, and planner notes for the Agent.
-- `spec_lock.md`: locks page recipes, visual layers, and raster policy.
-- `assets/generated/page-visuals/manifest.json`: records generated or manual page visual prompts.
-- `quality-report.json`: records delivery checks and remaining risks.
-- `review-findings.json`: records rendered-review issues and low-risk repair suggestions.
-- `scripts/ai_storyboard.py`: creates DeckIR planning files, with no-key fallback.
-- `scripts/audit_storyboard.py`: checks DeckIR structure, evidence refs, and raster policy before generation.
-- `scripts/review_rendered_deck.py`: reviews the rendered result and merges findings into the quality report.
-- `scripts/generate_visual_layers.py`: prepares page-level visual-layer prompts.
-- `scripts/audit_visual_recipes.py`: enforces recipe variety and body-slide raster policy.
+Historical release notes: [v4.2.0](./docs/release/release-notes-v4.2.0.md), [v4.1.0](./docs/release/release-notes-v4.1.0.md), [v4.0.0](./docs/release/release-notes-v4.0.0.md), [v3.0.0](./docs/release/release-notes-v3.0.0.md).
 
 ## Proofs
 
@@ -118,10 +108,9 @@ The [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmar
 | Proof | Link |
 |---|---|
 | Stable proof matrix | [Quality Workbench v2.5](./docs/quality/quality-workbench-v2.5.md) |
-| Formal handoff release | [Release Notes - v3.0.0](./docs/release/release-notes-v3.0.0.md) |
-| Hybrid-editable release | [Release Notes - v4.0.0](./docs/release/release-notes-v4.0.0.md) |
-| Simplified Web console | [Release Notes - v4.1.0](./docs/release/release-notes-v4.1.0.md) |
+| Rendered review release | [Release Notes - v4.3.0](./docs/release/release-notes-v4.3.0.md) |
 | DeckIR AI planning pack | [Release Notes - v4.2.0](./docs/release/release-notes-v4.2.0.md) |
+| Hybrid-editable release | [Release Notes - v4.0.0](./docs/release/release-notes-v4.0.0.md) |
 | Skill marketplace readiness | [Skill Market Distribution](./docs/strategy/skill-market-distribution.md) |
 
 ## Use As Agent Skill
@@ -149,8 +138,8 @@ Guide: [Agent Setup](./docs/guides/agent-setup.md). Local connector: [Agent Conn
 | Install and invoke the Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | Choose PPTX vs Web Deck vs Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
 | Configure provider keys locally | [Model and Provider Setup](./docs/guides/model-provider-setup.md) |
+| Review v4.3 repair flow | [Rendered Review Loop v4.3](./docs/quality/rendered-review-loop-v4.3.md) |
 | Understand DeckIR AI planning | [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md) |
-| Understand the simplified Web console | [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md) |
 | Understand the v4.0 visual contract | [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) |
 | Review release maintenance | [Release and Maintenance](./docs/release/release-maintenance.md) |
 | Debug setup or generation issues | [Troubleshooting](./docs/guides/troubleshooting.md) |
@@ -166,6 +155,7 @@ npm run audit:presets
 npm run audit:quality
 npm run audit:market
 npm run test:node
+npm run test:bridge
 npm run test:worker
 npm run build:web
 npm run build:desktop
