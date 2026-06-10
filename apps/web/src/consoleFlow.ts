@@ -1,73 +1,44 @@
-export type ConsoleStepId = "start" | "sources" | "configuration" | "handoff";
+export type CodexFlowState =
+  | "needs_input"
+  | "needs_bridge"
+  | "ready_to_create"
+  | "creating"
+  | "ready_for_codex"
+  | "error";
 
-export type PrimaryActionId =
-  | "completeBrief"
-  | "addSources"
-  | "connectLocal"
-  | "createProject"
-  | "launchAgent"
-  | "reviewDelivery";
+export type CodexPrimaryAction =
+  | "complete_input"
+  | "start_bridge"
+  | "create_project"
+  | "creating"
+  | "copy_codex_command"
+  | "retry";
 
-export type PreviewMode =
-  | "webdeck"
-  | "source"
-  | "prompt"
-  | "brief"
-  | "extracted"
-  | "manifest"
-  | "deckIR"
-  | "codexTask"
-  | "assetPlan"
-  | "elementKit"
-  | "checklist"
-  | "qualityReport";
-
-export type PreviewGroup = "user" | "agent" | "quality";
-
-export interface ConsoleFlowInput {
-  readiness: number;
-  sourceCount: number;
-  localConnected: boolean;
-  helperAvailable: boolean;
+export interface CodexFlowInput {
+  hasUsableInput: boolean;
+  bridgeConnected: boolean;
+  creating: boolean;
   projectReady: boolean;
+  hasError: boolean;
 }
 
-export interface ConsoleStep {
-  id: ConsoleStepId;
-  status: "complete" | "active" | "blocked" | "ready";
+export function getCodexFlowState(input: CodexFlowInput): CodexFlowState {
+  if (input.hasError) return "error";
+  if (input.creating) return "creating";
+  if (input.projectReady) return "ready_for_codex";
+  if (!input.hasUsableInput) return "needs_input";
+  if (!input.bridgeConnected) return "needs_bridge";
+  return "ready_to_create";
 }
 
-export function getPrimaryActionId(input: ConsoleFlowInput): PrimaryActionId {
-  if (input.readiness < 70) return "completeBrief";
-  if (input.sourceCount === 0) return "addSources";
-  if (!input.localConnected) return "connectLocal";
-  if (!input.projectReady) return "createProject";
-  if (input.helperAvailable) return "launchAgent";
-  return "reviewDelivery";
-}
-
-export function getConsoleSteps(input: ConsoleFlowInput): ConsoleStep[] {
-  const briefDone = input.readiness >= 70;
-  const sourcesDone = input.sourceCount > 0;
-  const connected = input.localConnected;
-  const delivered = input.projectReady;
-
-  return [
-    { id: "start", status: briefDone ? "complete" : "active" },
-    { id: "sources", status: sourcesDone ? "complete" : briefDone ? "active" : "ready" },
-    { id: "configuration", status: connected ? "complete" : sourcesDone ? "active" : "ready" },
-    { id: "handoff", status: delivered ? "complete" : connected ? "active" : "blocked" }
-  ];
-}
-
-export const previewGroupModes: Record<PreviewGroup, PreviewMode[]> = {
-  user: ["webdeck", "source", "prompt"],
-  agent: ["brief", "extracted", "manifest", "deckIR", "codexTask"],
-  quality: ["assetPlan", "elementKit", "checklist", "qualityReport"]
-};
-
-export function previewGroupFor(mode: PreviewMode): PreviewGroup {
-  if (previewGroupModes.agent.includes(mode)) return "agent";
-  if (previewGroupModes.quality.includes(mode)) return "quality";
-  return "user";
+export function getCodexPrimaryAction(state: CodexFlowState): CodexPrimaryAction {
+  const actionByState: Record<CodexFlowState, CodexPrimaryAction> = {
+    needs_input: "complete_input",
+    needs_bridge: "start_bridge",
+    ready_to_create: "create_project",
+    creating: "creating",
+    ready_for_codex: "copy_codex_command",
+    error: "retry"
+  };
+  return actionByState[state];
 }

@@ -1,12 +1,12 @@
 # Documentation Map
 
-Ultimate PPT Master v4.3 uses a categorized documentation structure. Start with the route that matches the work you are doing.
+Ultimate PPT Master v4.4 uses a categorized documentation structure. Start with the route that matches the work you are doing.
 
 ## Guides
 
 | Need | Read |
 |---|---|
-| Understand the web front door | [Web Experience](./guides/web-experience.md) |
+| Understand the Codex-first web launcher | [Web Experience](./guides/web-experience.md) |
 | Connect the web page to local files and Agents | [Agent Connect Bridge](./guides/agent-connect-bridge.md) |
 | Install and invoke the Skill | [Agent Setup](./guides/agent-setup.md) |
 | Choose PPTX, Web Deck, dual delivery, or desktop preview | [Choosing a Workflow](./guides/choosing-a-workflow.md) |
@@ -30,7 +30,8 @@ Ultimate PPT Master v4.3 uses a categorized documentation structure. Start with 
 
 | Need | Read |
 |---|---|
-| See the latest release | [Release Notes - v4.3.0](./release/release-notes-v4.3.0.md) |
+| See the latest release | [Release Notes - v4.4.0](./release/release-notes-v4.4.0.md) |
+| Review the Codex-first web launcher release | [Release Notes - v4.4.0](./release/release-notes-v4.4.0.md) |
 | Review the rendered-review loop release | [Release Notes - v4.3.0](./release/release-notes-v4.3.0.md) |
 | Review the AI planning release | [Release Notes - v4.2.0](./release/release-notes-v4.2.0.md) |
 | Review the hybrid-editable release | [Release Notes - v4.0.0](./release/release-notes-v4.0.0.md) |

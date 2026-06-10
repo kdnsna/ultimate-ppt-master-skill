@@ -1,6 +1,6 @@
 # Web Experience
 
-The Web Experience is the primary public entry point for Ultimate PPT Master. It is a static React/Vite four-step console deployed to GitHub Pages, and it now acts as the fusion front door for source intake, local project creation, PPTX production, and Web Deck production.
+The Web Experience is the v4.4 Codex-first launcher for Ultimate PPT Master. It is a static React/Vite page deployed to GitHub Pages, but its job is deliberately small: gather source material and one goal, write a local handoff project through Bridge, and copy the Codex command.
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/
@@ -8,40 +8,53 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 
 ## What It Does
 
-- shows one state-driven primary action for the normal path: prepare, add sources, connect locally, deliver;
-- keeps source type, scenario, output mode, visual style, language, AI helper, and model preference behind progressive settings;
-- exposes reusable preset starter packs with pack paths, template candidates, and scenario-specific quality checks;
-- groups help, examples, glossary, setup checks, provider status, and generated-file details behind drawers or collapsed sections;
-- accepts pasted source notes, source URLs, and dropped `.md`, `.txt`, `.pdf`, `.docx`, `.pptx`, `.xlsx`, and related files;
+- accepts dropped `.md`, `.txt`, `.pdf`, `.docx`, `.pptx`, `.xlsx`, and related files;
+- accepts pasted source notes and a single goal for Codex;
 - pre-reads browser-safe text files and marks binary files for local Bridge parsing;
-- generates a slide outline and brief-readiness check;
-- shows the Hugo He / ppt-master PPTX route and the op7418 / Guizang Web Deck route side by side;
-- detects the local Agent Bridge, local Agent commands, and provider readiness when Bridge is running;
-- provides one-click checks for the local connector, installed AI helpers, and configured providers;
-- provides Bridge-backed one-click Skill install / update actions for Codex and a generic Agent folder, with terminal-command fallback when Bridge is offline;
-- generates a browser-local `preview-web-deck.html` and live iframe preview;
-- generates copy-ready Agent instructions, `source.md`, `extracted-source.md`, `manifest.json`, and `project-brief.json`;
-- downloads a full `handoff-kit.zip` or creates a local project through the local connector;
-- includes `source.md`, `extracted-source.md`, `attachments/`, `manifest.json`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, `AGENTS.md`, `quality-report.json`, and `README.md` in the handoff kit;
-- writes a `formal-business` quality gate into the handoff so Codex gets acceptance criteria, artifact checks, and review commands;
-- creates a ChatGPT-generation-first visual element plan for section dividers, metric badges, process nodes, connectors, icon accents, subtle patterns, and callout stickers;
-- shows the exact `generate_visual_element_kit.py` command after Bridge creates a local handoff folder;
-- explains the `Needs-Manual` path when no image backend or OpenAI key is configured;
-- opens the sanitized Agentic Developer Stack 2026 Web Deck demo;
-- keeps Skill installation visible as a second core path.
+- auto-selects editable PPTX for formal business material unless the brief asks for Web Deck or both outputs;
+- keeps page count, audience, language, and output override behind one advanced section;
+- detects the local Agent Bridge when it is running;
+- copies the safe Bridge startup command when Bridge is offline;
+- creates a local project through `POST /handoff` when Bridge is online;
+- immediately copies the suggested Codex command after the local project is created;
+- can call `/agent/launch` for Codex when the Bridge was started with launch permission;
+- keeps `storyboard.json`, `source-map.json`, `planning-report.json`, `review-findings.json`, `repair-plan.json`, `revision-brief.md`, `quality-report.json`, Benchmark Wall, and other proof details in the debug drawer.
+
+## Handoff Contents
+
+The local project still receives the full production contract:
+
+- `source.md`
+- `extracted-source.md`
+- `attachments/`
+- `manifest.json`
+- `agent-prompt.md`
+- `project-brief.json`
+- `preview-web-deck.html`
+- `engine-plan.md`
+- `quality-checklist.md`
+- `asset-plan.md`
+- `visual-element-kit.md`
+- `codex-task.md`
+- `AGENTS.md`
+- `storyboard.json`
+- `source-map.json`
+- `planning-report.json`
+- `review-findings.json`
+- `repair-plan.json`
+- `revision-brief.md`
+- `quality-report.json`
 
 ## What It Does Not Do
 
-- no backend;
 - no hosted model API;
 - no account system;
 - no hosted source-material upload or server storage;
 - no browser-side API key storage;
-- no analytics requirement for MVP.
+- no full presentation production inside the web page;
+- no complex provider setup on the main screen.
 
 Brief assembly is handled in the browser. If users run `npm run bridge`, source files are sent only to `127.0.0.1` for local parsing and project staging.
-
-v4.1.0 keeps the v4.0 hybrid-editable visual governance contract, but simplifies the console. Offline means the primary action copies the local connection command. Online means the primary action creates a local project. After project creation, the primary action launches or copies the AI-helper command, while command details and file manifests stay behind collapsed sections.
 
 ## Local Development
 
@@ -66,41 +79,32 @@ The `GITHUB_PAGES=true` flag sets the asset base path to `/ultimate-ppt-master-s
 
 ## Smoke Checks
 
-Use these checks before promoting a release:
-
 | Check | Expected result |
 |---|---|
-| Open Web Experience | The studio, four-step rail, quick console, one primary action, and collapsed help/settings areas render. |
-| Local connection offline | The primary action copies the startup command that finds or clones the local repo before running `npm run bridge`, and zip download remains available under more actions. |
-| Local connection online | `GET /health` populates local AI helper and provider status. |
-| Drop text source | The file appears as browser pre-read and is included in `extracted-source.md`. |
-| Drop binary source | The file appears as pending local Bridge parsing and is included in `attachments/`. |
-| Live Web Deck preview | The preview frame renders `preview-web-deck.html` without backend calls or script dependencies. |
-| Copy Agent prompt | Clipboard receives the generated prompt with outline and kit context. |
-| Copy `source.md` | Clipboard receives the generated source markdown. |
-| Download `source.md` | Browser downloads a Markdown brief with current form values and outline. |
-| Download `preview-web-deck.html` | Browser downloads a standalone HTML preview with the current brief and storyboard. |
-| Download `handoff-kit.zip` | Browser downloads a zip containing source files, manifest, attachments, prompt, preview, engine plan, checklist, asset plan, visual element kit, Codex task, AGENTS guide, quality report, and README. |
-| Create local project | The local connector writes a project folder and returns suggested AI-helper commands. |
-| Delivery details | After the local project is created, the collapsed detail panel shows `python3 scripts/generate_visual_element_kit.py <projectPath>`, the AI-helper command, and the `Needs-Manual` prompt fallback. |
-| Install Skill via local connector | `POST /skill/install` links or updates an allowlisted local Skill target without accepting arbitrary paths. |
-| Open Web Deck demo | `examples/agentic-developer-tools-2026/web-demo.html` opens from the static build. |
-| Skill setup link | Opens the README Skill section or `docs/guides/agent-setup.md`. |
-| Mobile viewport | Four-step rail, primary action, settings drawer, and grouped preview controls wrap cleanly. |
+| Open Web Experience | One Codex-first screen renders with source dropzone, pasted notes, one goal, one primary action, and status panel. |
+| Local connection offline | The primary action copies the startup command that finds the local repo before running `npm run bridge`. |
+| Local connection online | `GET /health` marks Bridge connected and the primary action creates a local project. |
+| Drop text source | The file appears as browser pre-read and is included in the handoff payload. |
+| Drop binary source | The file appears as Bridge-parsed attachment and is included in `attachments/`. |
+| Create local project | The local connector writes a project folder and returns the suggested Codex command. |
+| Completion state | The page shows project path, Codex command, and the copied-command message. |
+| Debug drawer | Advanced proof artifacts remain visible without blocking the primary flow. |
+| Mobile viewport | Input, action, result, and debug drawer wrap without overlap. |
 
 ## Scenario Coverage
 
-The current MVP should keep these brief-generation cases working:
+The current launcher should keep these source-to-handoff cases working:
 
-- Chinese executive report PPTX;
-- English pitch Web Deck;
-- consulting proposal Skill workflow;
-- training courseware Skill workflow.
+- Chinese executive report to editable PPTX;
+- consulting proposal to editable PPTX;
+- training courseware to editable PPTX;
+- keynote or demo brief to Web Deck;
+- explicit dual-output brief to PPTX plus Web Deck.
 
-The page should also keep both engine paths visible. The web route is for onboarding, preview, and handoff; the Skill route remains the production path for final quality, source parsing, rendering, repair, and export.
+The web route is now only the launcher. The Skill and Codex route remains the production path for final quality, source parsing, rendering, repair, and export.
 
 ## Implementation Notes
 
 - App source: [apps/web](../../apps/web)
+- Bridge source: [apps/bridge/server.mjs](../../apps/bridge/server.mjs)
 - Pages workflow: [.github/workflows/pages.yml](../../.github/workflows/pages.yml)
-- Shared public demo source: [examples/agentic-developer-tools-2026](../../examples/agentic-developer-tools-2026)

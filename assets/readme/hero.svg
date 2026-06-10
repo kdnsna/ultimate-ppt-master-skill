@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master v4.3.0 Rendered review loop</title>
-  <desc id="desc">A simplified four-step Web Experience showing DeckIR AI planning, rendered review loop, repair plan, revision brief, local connector, AI helper, and generated local project folder.</desc>
+  <title id="title">Ultimate PPT Master v4.4.0 Codex-first launcher</title>
+  <desc id="desc">A one-screen Codex-first Web Experience showing source intake, one goal, local Bridge handoff, copied Codex command, DeckIR AI planning, rendered review loop, and generated local project folder.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#F8FAFC"/>
@@ -29,16 +29,16 @@
     <circle cx="30" cy="24" r="8" fill="#2563EB"/>
     <circle cx="56" cy="24" r="8" fill="#10B981"/>
     <circle cx="82" cy="24" r="8" fill="#EF5B3F"/>
-    <text x="112" y="30" fill="#526173" font-size="15" font-weight="850">v4.3.0 Rendered review loop</text>
+    <text x="112" y="30" fill="#526173" font-size="15" font-weight="850">v4.4.0 Codex-first launcher</text>
 
     <text x="0" y="122" fill="#172033" font-size="66" font-weight="950">Ultimate PPT Master</text>
-    <text x="0" y="174" fill="#2563EB" font-size="34" font-weight="900">Plan. Render. Review. Repair safely.</text>
-    <text x="0" y="224" fill="#5F6F84" font-size="22" font-weight="650">把资料整理成本地项目包，再交给 Codex / Hermes / OpenClaw / Claude Code 深加工。</text>
+    <text x="0" y="174" fill="#2563EB" font-size="34" font-weight="900">Drop. Brief. Hand off to Codex.</text>
+    <text x="0" y="224" fill="#5F6F84" font-size="22" font-weight="650">拖资料，写一句目标，复制 Codex 命令，让本地 Skill 深加工。</text>
   </g>
 
   <g transform="translate(1032 102)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" filter="url(#softShadow)">
     <rect width="362" height="172" rx="14" fill="#172033"/>
-    <text x="28" y="42" fill="#FFFFFF" font-size="17" font-weight="900">Rendered review loop</text>
+    <text x="28" y="42" fill="#FFFFFF" font-size="17" font-weight="900">Debug drawer keeps proofs</text>
     <text x="28" y="72" fill="#B9C6D6" font-size="15" font-weight="720">页面地图</text>
     <text x="28" y="100" fill="#B9C6D6" font-size="15" font-weight="720">证据边界</text>
     <text x="28" y="128" fill="#B9C6D6" font-size="15" font-weight="720">可编辑目标</text>
@@ -57,12 +57,12 @@
       <rect width="224" height="278" rx="14" fill="#EFF6FF" stroke="#BFDBFE"/>
       <circle cx="34" cy="36" r="18" fill="#2563EB"/>
       <text x="34" y="43" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">1</text>
-      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Prepare</text>
-      <text x="24" y="116" fill="#355B91" font-size="16" font-weight="720">Write the task</text>
-      <text x="24" y="142" fill="#355B91" font-size="16" font-weight="720">Keep one next step</text>
-      <text x="24" y="168" fill="#355B91" font-size="16" font-weight="720">Fold advanced setup</text>
+      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Source</text>
+      <text x="24" y="116" fill="#355B91" font-size="16" font-weight="720">Drop files</text>
+      <text x="24" y="142" fill="#355B91" font-size="16" font-weight="720">Paste notes</text>
+      <text x="24" y="168" fill="#355B91" font-size="16" font-weight="720">Write one goal</text>
       <rect x="24" y="212" width="176" height="38" rx="8" fill="#2563EB"/>
-      <text x="112" y="237" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="900">Open Web Experience</text>
+      <text x="112" y="237" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="900">One screen</text>
     </g>
 
     <path d="M284 230H352" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
@@ -72,7 +72,7 @@
       <rect width="224" height="278" rx="14" fill="#ECFDF5" stroke="#A7F3D0"/>
       <circle cx="34" cy="36" r="18" fill="#10B981"/>
       <text x="34" y="43" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">2</text>
-      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Connect</text>
+      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Bridge</text>
       <text x="24" y="116" fill="#23684E" font-size="16" font-weight="720">Local connector</text>
       <text x="24" y="142" fill="#23684E" font-size="16" font-weight="720">127.0.0.1 only</text>
       <text x="24" y="168" fill="#23684E" font-size="16" font-weight="720">No API key leaks</text>
@@ -87,7 +87,7 @@
       <rect width="224" height="278" rx="14" fill="#FFF7ED" stroke="#FED7AA"/>
       <circle cx="34" cy="36" r="18" fill="#F97316"/>
       <text x="34" y="43" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">3</text>
-      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Deliver</text>
+      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Handoff</text>
       <text x="24" y="116" fill="#8A4B17" font-size="16" font-weight="720">storyboard.json</text>
       <text x="24" y="142" fill="#8A4B17" font-size="16" font-weight="720">source-map.json</text>
       <text x="24" y="168" fill="#8A4B17" font-size="16" font-weight="720">repair-plan.json</text>
@@ -102,9 +102,9 @@
       <rect width="224" height="278" rx="14" fill="#F8FAFC" stroke="#D7DEE8"/>
       <circle cx="34" cy="36" r="18" fill="#172033"/>
       <text x="34" y="43" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">4</text>
-      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">AI helper</text>
-      <text x="24" y="116" fill="#526173" font-size="16" font-weight="720">Codex / Hermes</text>
-      <text x="24" y="142" fill="#526173" font-size="16" font-weight="720">OpenClaw / Claude</text>
+      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Codex</text>
+      <text x="24" y="116" fill="#526173" font-size="16" font-weight="720">Copied command</text>
+      <text x="24" y="142" fill="#526173" font-size="16" font-weight="720">Read AGENTS.md</text>
       <text x="24" y="168" fill="#526173" font-size="16" font-weight="720">Skill does final QA</text>
       <rect x="24" y="212" width="176" height="38" rx="8" fill="#172033"/>
       <text x="112" y="237" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="900">Produce PPTX / HTML</text>
@@ -114,6 +114,6 @@
   <g transform="translate(182 790)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
     <rect width="1236" height="56" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
     <rect x="28" y="20" width="160" height="16" rx="8" fill="url(#brand)"/>
-    <text x="214" y="35" fill="#172033" font-size="17" font-weight="850">DeckIR page map · rendered review loop · revision-brief.md for safe second pass</text>
+    <text x="214" y="35" fill="#172033" font-size="17" font-weight="850">Codex-first handoff · DeckIR page map · rendered review loop · safe second pass</text>
   </g>
 </svg>

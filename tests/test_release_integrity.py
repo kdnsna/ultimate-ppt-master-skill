@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "4.3.0"
+VERSION = "4.4.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -69,6 +69,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/rendered-review-loop-v4.3.md",
+            "docs/release/release-notes-v4.4.0.md",
             "docs/release/release-notes-v4.3.0.md",
             "docs/quality/quality-workbench-v2.5.md",
             "docs/release/release-notes-v4.2.0.md",
@@ -80,6 +81,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "docs/zh-CN/release/release-notes-v4.4.0.md",
             "docs/zh-CN/release/release-notes-v4.3.0.md",
             "docs/zh-CN/release/release-notes-v4.2.0.md",
             "docs/zh-CN/release/release-notes-v4.1.0.md",
@@ -99,7 +101,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             self.assertTrue("Document Moved" in text or "文档已迁移" in text)
             self.assertIn(canonical, text)
 
-    def test_v43_readmes_are_refactored_as_product_homepages(self):
+    def test_v44_readmes_are_refactored_as_codex_first_homepages(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
         marketplace_prompt = (
@@ -109,15 +111,18 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         for expected in (
             "60-second quickstart",
-            "Why Teams Use It",
+            "Why v4.4 Exists",
             "Product Loop",
+            "Codex-first web launcher",
+            "Open Codex-First Web Launcher",
             "v4.3 Rendered Review Loop",
             "revision-brief.md",
             "repair-plan.json",
             "Simplified Web Console v4.1",
             "DeckIR AI Planning Workflow v4.2",
             "Hybrid-Editable Visual Workflow v4.0",
-            "one primary next action",
+            "one screen",
+            "copied command",
             "storyboard.json",
             "scripts/ai_storyboard.py",
             "scripts/apply_review_plan.py",
@@ -131,6 +136,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "./docs/quality/rendered-review-loop-v4.3.md",
+            "./docs/release/release-notes-v4.4.0.md",
             "./docs/release/release-notes-v4.3.0.md",
             "./docs/strategy/skill-market-distribution.md",
             marketplace_prompt,
@@ -139,15 +145,18 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         for expected in (
             "60 秒开箱即用",
-            "为什么团队会用它",
+            "v4.4 为什么存在",
             "产品闭环",
+            "Codex 优先网页启动器",
+            "打开 Codex 优先网页启动器",
             "v4.3 渲染审阅闭环",
             "revision-brief.md",
             "repair-plan.json",
             "v4.1 精简网页控制台",
             "v4.2 DeckIR AI 策划工作流",
             "v4.0 混合可编辑视觉工作流",
-            "一个状态驱动主按钮",
+            "一个屏幕",
+            "复制 Codex 命令",
             "storyboard.json",
             "scripts/ai_storyboard.py",
             "scripts/apply_review_plan.py",
@@ -161,6 +170,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "./docs/zh-CN/release/release-notes-v4.4.0.md",
             "./docs/zh-CN/release/release-notes-v4.3.0.md",
             "./docs/zh-CN/strategy/skill-market-distribution.md",
             marketplace_prompt,
@@ -234,6 +244,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         release_v42_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.2.0.md").read_text(encoding="utf-8")
         release_v43 = (ROOT / "docs/release/release-notes-v4.3.0.md").read_text(encoding="utf-8")
         release_v43_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.3.0.md").read_text(encoding="utf-8")
+        release_v44 = (ROOT / "docs/release/release-notes-v4.4.0.md").read_text(encoding="utf-8")
+        release_v44_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.4.0.md").read_text(encoding="utf-8")
 
         self.assertIn("npm run audit:docs", release_maintenance)
         self.assertIn("npm run audit:web-console", release_maintenance)
@@ -250,11 +262,17 @@ class ReleaseIntegrityTest(unittest.TestCase):
             for expected in ("asset-plan.md", "visual-element-kit.md", "codex-task.md", "AGENTS.md", "quality-report.json"):
                 self.assertIn(expected, text)
 
-        for text in (web_doc, web_doc_zh, release_v3, release_v3_zh):
+        for text in (release_v3, release_v3_zh):
             self.assertIn("formal-business", text)
             self.assertIn("generate_visual_element_kit.py", text)
             self.assertIn("Needs-Manual", text)
             self.assertIn("ChatGPT", text)
+
+        for text in (web_doc, web_doc_zh):
+            self.assertIn("Codex", text)
+            self.assertIn("127.0.0.1", text)
+            self.assertIn("codex-task.md", text)
+            self.assertIn("review-findings.json", text)
 
         for text in (release_v4, release_v4_zh):
             self.assertIn("generate_visual_layers.py", text)
@@ -281,16 +299,26 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("apply_review_plan.py", release_v43_zh)
         self.assertIn("revision-brief.md", release_v43_zh)
         self.assertIn("白话更新栏", release_v43_zh)
+        self.assertIn("Codex-first", release_v44)
+        self.assertIn("CodexFirstFlow", release_v44)
+        self.assertIn("Plain-Language Update Notes", release_v44)
+        self.assertIn("Codex 优先", release_v44_zh)
+        self.assertIn("CodexFirstFlow", release_v44_zh)
+        self.assertIn("白话更新栏", release_v44_zh)
 
-    def test_web_handoff_panel_has_executable_next_step_ui(self):
+    def test_web_handoff_panel_has_codex_first_next_step_ui(self):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
 
-        self.assertIn("handoffExecutionTitle", app)
-        self.assertIn("elementGenerationCommand", app)
+        self.assertIn("CodexFirstFlow", app)
+        self.assertIn("CodexPrimaryAction", app)
+        self.assertIn("CodexResult", app)
+        self.assertIn("DebugDrawer", app)
+        self.assertIn("buildCodexFirstBridgePayload", app)
         self.assertIn("generate_visual_element_kit.py", app)
-        self.assertIn("generatedNowTitle", app)
-        self.assertIn("codexNextTitle", app)
-        self.assertNotIn("<span>quality-checklist.md</span>\n              <span>quality-checklist.md</span>", app)
+        self.assertIn("已复制，打开 Codex 执行这条命令", app)
+        self.assertNotIn("ConsoleStepRail", app)
+        self.assertNotIn("QuickStartConsole", app)
+        self.assertNotIn("GroupedPreviewTabs", app)
 
     def test_desktop_worker_resource_copy_is_in_sync(self):
         source = (ROOT / "apps/desktop/worker/desktop_worker.py").read_text(encoding="utf-8")
@@ -304,8 +332,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v4.3.0", hero)
-        self.assertIn("Rendered review loop", hero)
+        self.assertIn("v4.4.0", hero)
+        self.assertIn("Codex-first launcher", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)
         self.assertNotIn("v2.3.0", combined)
@@ -324,15 +352,14 @@ class ReleaseIntegrityTest(unittest.TestCase):
                 self.assertNotIn("v2.3 Demo", demo)
                 self.assertNotIn("v2.3 Proof", demo)
 
-    def test_web_experience_does_not_advertise_unearned_progress(self):
+    def test_web_experience_does_not_advertise_old_console_progress(self):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
 
         self.assertNotIn('meta: `${sourceCount} files · ${readiness}%`', app)
         self.assertNotIn('id: "handoff", label: t.navHandoff, meta: t.commandReady', app)
-        self.assertIn("sourceProgressLabel", app)
-        self.assertIn("handoffProgressLabel", app)
-        self.assertIn("noRealSourcesYet", app)
-        self.assertIn("handoffNotCreated", app)
+        self.assertIn("getCodexFlowState", app)
+        self.assertIn("needs_input", (ROOT / "apps/web/src/consoleFlow.ts").read_text(encoding="utf-8"))
+        self.assertIn("ready_for_codex", (ROOT / "apps/web/src/consoleFlow.ts").read_text(encoding="utf-8"))
 
     def test_formal_business_quality_gate_is_release_guarded(self):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")

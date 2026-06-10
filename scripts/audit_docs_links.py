@@ -11,7 +11,7 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "4.3.0"
+VERSION = "4.4.0"
 
 MOVED_DOCS = {
     "docs/web-experience.md": "docs/guides/web-experience.md",
@@ -90,6 +90,8 @@ def audit_version_markers(errors: list[str]) -> None:
 
     require((ROOT / f"docs/release/release-notes-v{VERSION}.md").is_file(), "missing English current release notes", errors)
     require((ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md").is_file(), "missing Chinese current release notes", errors)
+    require("Codex-first web launcher" in readme, "README missing v4.4 Codex-first launcher entry", errors)
+    require("Codex 优先网页启动器" in readme_zh, "Chinese README missing v4.4 Codex-first launcher entry", errors)
     require("Hybrid-Editable Visual Workflow v4.0" in readme, "README missing v4 hybrid workflow entry", errors)
     require("v4.0 混合可编辑视觉工作流" in readme_zh, "Chinese README missing v4 hybrid workflow entry", errors)
     require("Simplified Web Console v4.1" in readme, "README missing v4.1 console entry", errors)
@@ -176,6 +178,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/guides/agent-setup.md",
         "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/quality/rendered-review-loop-v4.3.md",
+        "./docs/release/release-notes-v4.4.0.md",
         "./docs/release/release-notes-v4.2.0.md",
         "./docs/release/release-notes-v4.3.0.md",
         "./docs/strategy/skill-market-distribution.md",
@@ -187,6 +190,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/zh-CN/guides/agent-connect-bridge.md",
         "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+        "./docs/zh-CN/release/release-notes-v4.4.0.md",
         "./docs/zh-CN/release/release-notes-v4.2.0.md",
         "./docs/zh-CN/release/release-notes-v4.3.0.md",
         "./docs/zh-CN/strategy/skill-market-distribution.md",
@@ -195,7 +199,6 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         require(link in readme_zh, f"Chinese README missing canonical link {link}", errors)
 
     require("docs/guides/agent-connect-bridge.md" in app, "Web app still points to old bridge docs path", errors)
-    require("docs/strategy/skill-market-distribution.md" in app, "Web app still points to old skill market docs path", errors)
     require(listing.get("metadata", {}).get("distributionGuide") == "docs/strategy/skill-market-distribution.md", "marketplace listing uses old English distribution guide path", errors)
     require(listing.get("metadata", {}).get("distributionGuideZh") == "docs/zh-CN/strategy/skill-market-distribution.md", "marketplace listing uses old Chinese distribution guide path", errors)
     require(listing.get("links", {}).get("agentSetup") == "docs/guides/agent-setup.md", "marketplace listing uses old agent setup path", errors)

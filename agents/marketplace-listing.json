@@ -2,7 +2,7 @@
   "id": "ultimate-ppt-master",
   "name": "Ultimate PPT Master",
   "displayName": "终极融合PPT大师",
-  "version": "4.3.0",
+  "version": "4.4.0",
   "invocation": "$ultimate-ppt-master",
   "category": [
     "presentation generation",
@@ -11,7 +11,7 @@
     "office productivity"
   ],
   "shortDescription": "Generate quality-checked PPTX and Web Decks from local source files.",
-  "positioning": "A local-first PPT quality workbench for Chinese office users, consultants, operators, trainers, and agent users who need editable deliverables.",
+  "positioning": "A local-first Codex handoff launcher for Chinese office users, consultants, operators, trainers, and agent users who need editable PPT deliverables.",
   "defaultPrompt": "Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report.",
   "metadata": {
     "openai": "agents/openai.yaml",
