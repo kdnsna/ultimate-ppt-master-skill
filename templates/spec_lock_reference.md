@@ -15,10 +15,19 @@
 ## visual_direction
 - id: finance_internal_report
 - benchmark: Formal banking report with source-grounded evidence pages and restrained brand-color structure.
+- theme_art_direction: restrained-title-lockup
+- theme_motif: brand-color rule lines; source-grounded evidence panels; quiet negative space
+- theme_scope: cover+section+tail
+- title_treatment: restrained report title with weight contrast
+- serious_context_exception: work-report/compliance tone keeps title restrained
 - release_boundary: Replace temporary logo and schematic assets before external release.
 
 > `id` must match `templates/visual-directions/index.json`, or be `custom`.
 > `benchmark` is a one-sentence visual target.
+> `theme_art_direction` is the named subject-fit concept chosen after reading the source, e.g. `山海交汇 烟火同行` for cultural-tourism or `restrained-title-lockup` for serious work reports.
+> `theme_motif` lists the visual motifs Executor may reuse. Keep them specific and source-linked, not generic decoration.
+> `theme_scope` is one of `deck-wide`, `cover+section+tail`, `cover+tail`, or `restrained-title-only`.
+> `title_treatment` records how the main title carries the theme. Expressive decks should use an artistic lockup, motif-integrated framing, generated no-text cover support, or vector-drawn accent. Serious work-report/government/compliance decks may use restrained title treatment only when `serious_context_exception` explains why.
 > `release_boundary` records asset or brand blockers for formal external use.
 
 ## brand_assets
@@ -80,11 +89,16 @@
 - card_title_body_ratio: 1.15-1.35
 - max_peer_cards_per_slide: 6
 - min_card_padding_px: 20
+- theme_art_direction: required
+- title_art_treatment: expressive-unless-serious
+- cover_tail_motif: required
 - whitespace_strategy: one dominant quiet zone per page
 - logo_strategy: official-assets-first
 - polish_risks: title-too-small; body-below-18; overcrowded-cards; fake-logo; logo-crowding; weak-dominant-element; random-decoration; low-contrast-secondary-text
 
 > Formal-business decks MUST include this section. It prevents small-looking slides by making the scale contract explicit. `body` in `typography` must be >= `min_body_px`; page title ratio should stay inside `title_body_ratio`; primary card/body copy must not shrink below the minimum. If content does not fit, split or restructure the page.
+>
+> `theme_art_direction`, `title_art_treatment`, and `cover_tail_motif` make sure the deck is not only typographically clean but also thematically designed. For cultural/tourism/brand/showcase decks, the main title must show the chosen art direction unless the serious-context exception in `visual_direction` applies.
 
 ## icons
 - library: chunk-filled

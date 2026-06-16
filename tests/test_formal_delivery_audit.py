@@ -37,6 +37,14 @@ def write_good_artifacts(project: Path) -> None:
 - Visual Direction: finance_internal_report
 - Benchmark Sentence: formal banking report with source-grounded evidence pages
 
+### Theme Art Direction
+- Art Direction Name: restrained-title-lockup
+- Why It Fits The Source: formal banking material needs a calm evidence-led title system.
+- Motif System: brand-color rule lines; source-grounded evidence panels; quiet negative space
+- Scope: cover+section+tail
+- Main Title Treatment: restrained report title with weight contrast
+- Serious Context Exception: work-report/compliance tone keeps title restrained
+
 ### Brand / IP Assets
 | Asset ID | Display Text / Mark | State | Source URL / Provenance | File Path | Target Pages | Release Boundary |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -64,6 +72,11 @@ def write_good_artifacts(project: Path) -> None:
 ## visual_direction
 - id: finance_internal_report
 - benchmark: Formal banking report with source-grounded evidence pages.
+- theme_art_direction: restrained-title-lockup
+- theme_motif: brand-color rule lines; source-grounded evidence panels; quiet negative space
+- theme_scope: cover+section+tail
+- title_treatment: restrained report title with weight contrast
+- serious_context_exception: work-report/compliance tone keeps title restrained
 - release_boundary: internal-review
 
 ## typography
@@ -83,6 +96,9 @@ def write_good_artifacts(project: Path) -> None:
 - card_title_body_ratio: 1.15-1.35
 - max_peer_cards_per_slide: 6
 - min_card_padding_px: 20
+- theme_art_direction: required
+- title_art_treatment: expressive-unless-serious
+- cover_tail_motif: required
 - whitespace_strategy: one dominant quiet zone per page
 - logo_strategy: official-assets-first
 - polish_risks: title-too-small; body-below-18; overcrowded-cards; fake-logo
@@ -212,6 +228,32 @@ class FormalDeliveryAuditTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("Formal delivery audit passed", result.stdout)
+
+    def test_missing_theme_art_direction_fails(self):
+        with TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            write_good_artifacts(project)
+            write_formal_manifest(project)
+            lock_path = project / "spec_lock.md"
+            lock_path.write_text(
+                "\n".join(
+                    line
+                    for line in lock_path.read_text(encoding="utf-8").splitlines()
+                    if "theme_art_direction" not in line
+                ),
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                ["python3", "scripts/audit_formal_delivery.py", str(project)],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("theme_art_direction", result.stdout + result.stderr)
 
     def test_chatgpt_first_handoff_requires_visual_element_kit_or_manifest(self):
         with TemporaryDirectory() as tmp:

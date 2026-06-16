@@ -120,6 +120,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "one delivery brief",
             "official/IP asset plan",
             "Codex-first generated visuals",
+            "Theme art direction",
+            "山海交汇 烟火同行",
             "Microsoft YaHei",
             "formal delivery audits",
             "v4.3 Rendered Review Loop",
@@ -160,6 +162,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "一份交付简报",
             "官方/IP 素材计划",
             "Codex-first 生成视觉",
+            "主题艺术方向",
+            "山海交汇 烟火同行",
             "微软雅黑",
             "正式交付审计",
             "v4.3 渲染审阅闭环",
@@ -306,9 +310,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("revision-brief.md", release_v43_zh)
         self.assertIn("白话更新栏", release_v43_zh)
         self.assertIn("Codex native GPT image generation", release_v5)
+        self.assertIn("theme art direction", release_v5)
+        self.assertIn("山海交汇 烟火同行", release_v5)
         self.assertIn("Microsoft YaHei", release_v5)
         self.assertIn("Plain-Language Update Notes", release_v5)
         self.assertIn("Codex 原生 GPT 生图", release_v5_zh)
+        self.assertIn("主题艺术方向", release_v5_zh)
+        self.assertIn("山海交汇 烟火同行", release_v5_zh)
         self.assertIn("微软雅黑", release_v5_zh)
         self.assertIn("白话更新栏", release_v5_zh)
 
@@ -368,6 +376,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
         bridge = (ROOT / "apps/bridge/server.mjs").read_text(encoding="utf-8")
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        design_spec_reference = (ROOT / "templates/design_spec_reference.md").read_text(encoding="utf-8")
+        spec_lock_reference = (ROOT / "templates/spec_lock_reference.md").read_text(encoding="utf-8")
 
         for text in (app, bridge):
             self.assertIn("qualityGate", text)
@@ -385,7 +395,11 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("Formal Business Delivery Gate", skill)
         self.assertIn("logo must not degrade into text fragments", skill)
         self.assertIn("Codex native GPT image generation", skill)
+        self.assertIn("Theme art direction", skill)
         self.assertIn("generate_visual_element_kit.py", skill)
+        for text in (design_spec_reference, spec_lock_reference):
+            self.assertIn("theme_art_direction", text)
+            self.assertIn("title_treatment", text)
 
     def test_bridge_source_does_not_embed_secret_values(self):
         bridge = (ROOT / "apps/bridge/server.mjs").read_text(encoding="utf-8")

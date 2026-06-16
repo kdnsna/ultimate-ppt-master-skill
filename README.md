@@ -54,6 +54,7 @@ v5.0.0 is the delivery-defaults release. The product is no longer described as a
 | One delivery brief | The agent records assumptions and proceeds unless a missing answer would materially change the deliverable. |
 | Codex-first generated visuals | Generated imagery supports the page as no-text layers or reusable micro-assets; body content remains editable. |
 | Official/IP asset plan | Deterministic marks are sourced or documented. Fake logo-like placeholders are blocked for external release. |
+| Theme art direction | After reading the source, the agent names a subject-fit art concept, such as `山海交汇 烟火同行` for cultural tourism, then carries it through cover/tail pages and title treatment unless the deck is a serious report. |
 | Typography and layout system | Microsoft YaHei is the default CJK office font; body text normally stays 18-24px with clear title/body scale and safe margins. |
 | Formal-business audit | `design_spec.md`, `spec_lock.md`, `design-quality-report.md`, asset manifests, and PPTX/Web artifacts are checked before delivery. |
 

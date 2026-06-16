@@ -35,18 +35,40 @@ Record these items in the delivery brief and the final spec:
 - **Required page roles**: the role vocabulary that the outline must use.
 - **Required page recipes**: the structural recipe vocabulary from `templates/page-recipes/index.json`.
 - **Asset expectation**: real / generated / schematic / no-image, with external-release boundary.
+- **Theme art direction**: one subject-fit artistic concept that can guide cover/tail pages and, when appropriate, recurring motifs across the deck.
+- **Main title treatment**: expressive artistic lockup by default for cultural, tourism, brand, training, campaign, education, keynote, showcase, and public-facing decks; restrained lockup only for work reports, serious government, compliance, or other inappropriate contexts.
 - **Visual layer policy**: no-text generated support layers only; formal body pages keep editable content.
 - **Raster policy**: full-page raster allowed only for cover/section/poster/showcase or explicit override.
 - **Anti-patterns**: layout or visual habits the Executor must avoid.
 
 If a direction pack matches, it is binding. Do not default to generic free design. If `custom` is used, write one concrete benchmark sentence such as "Swiss-style executive analysis with chart-led pages" or "image-led external promotion with full-bleed subject visuals."
 
+### 0.1 Theme Art Direction Audit
+
+After reading the source and selecting the visual direction, create a named theme concept before writing the delivery brief. This is the deck's artistic through-line, not a decoration list.
+
+Required decisions:
+
+- `theme_art_direction`: a compact name that fits the source. For a cultural-tourism deck, a name like `山海交汇 烟火同行` is stronger than "文旅风" because it gives composition, color, and motif clues.
+- `theme_motif`: 3-5 reusable motifs tied to the material, such as coastline contour, mountain silhouette, travel stamp, route line, local market lights, archival ticket, product/card texture, or official brand rule.
+- `theme_scope`: `deck-wide`, `cover+section+tail`, `cover+tail`, or `restrained-title-only`.
+- `title_treatment`: how the main title carries the theme: artistic lockup, motif-integrated frame, generated no-text cover visual with editable title, vector-drawn stroke accent, or restrained report title.
+- `serious_context_exception`: write `not-applicable` unless a work report, serious government/finance compliance deck, or similar context makes expressive title styling inappropriate.
+
+Examples:
+
+- Cultural tourism / city campaign: `山海交汇 烟火同行` — mountain/sea contours, route-line rhythm, warm market lights, travel-stamp section marks; title uses motif-integrated framing.
+- Training / public service: `一路通办 温度抵达` — route lines, service-window rhythm, warm human scenes; title uses soft structure and readable editorial hierarchy.
+- Serious quarterly work report: `restrained-title-lockup` — brand-color rule, quiet evidence grid, no expressive title art; exception explains the report context.
+
+Write these decisions into `design_spec.md §III Theme Art Direction`, `spec_lock.md visual_direction`, and `spec_lock.md aesthetic_checks`.
+
 The selected direction must be recorded in:
 
 - `design_spec.md §III Visual Theme`
 - `design_spec.md §V Layout Principles`
 - `design_spec.md §IX Content Outline`
-- `spec_lock.md visual_direction`
+- `spec_lock.md visual_direction` including `theme_art_direction`, `theme_motif`, `theme_scope`, `title_treatment`, and `serious_context_exception`
 - `spec_lock.md page_roles`, `visual_weight`, `layout_family`, `page_recipes`, `visual_layers`, `raster_policy`, `asset_requirements`, and `anti_patterns`
 
 ---
@@ -91,7 +113,7 @@ Example rows for a Shandong BOCOM cultural-tourism deck:
 
 🚧 **GATE — Page recipe read**: `read_file templates/page-recipes/index.json` before writing `design_spec.md`. Assign one recipe per page in §V and §IX, then copy the same mapping into `spec_lock.md page_recipes`.
 
-After the reads, decide the eight production items below as one bundled delivery brief. If enough context exists, do not wait for confirmation; write the decisions into `design_spec.md` and `spec_lock.md` and continue. Ask at most one concise user question only when the missing answer would materially change the deliverable, such as PPTX vs Web Deck, legal permission to use brand assets, or whether private material may be uploaded for image generation.
+After the reads, decide the production items below as one bundled delivery brief. If enough context exists, do not wait for confirmation; write the decisions into `design_spec.md` and `spec_lock.md` and continue. Ask at most one concise user question only when the missing answer would materially change the deliverable, such as PPTX vs Web Deck, legal permission to use brand assets, or whether private material may be uploaded for image generation.
 
 > **Execution discipline**: This is the only normal planning checkpoint. Once the brief is set, complete the Design Spec and proceed to image generation / SVG / post-processing without further pauses.
 
@@ -154,6 +176,18 @@ Accept user combinations and one-off coinages ("Scandinavian + slight industrial
 > **Template vs descriptor**: a style mention may sound like a template name ("academic style" vs the `academic_defense/` template directory). Step 3 only triggers on an explicit template directory path supplied by the user — bare names and style words never copy templates. If a template was triggered upstream, its files are already in `<project_path>/templates/`. Layer 2 only handles descriptors that did NOT come with a template path.
 
 **Downstream effect**: e / f / g / h values realize the Layer 2 descriptor on top of the Layer 1 mode. Example: "A) Versatile + neo-Chinese" → e leans cinnabar / ink / rice-paper; g pairs serif (KaiTi-class) with sans body; f minimal line icons; h restrained traditional imagery with negative space.
+
+### d.5 Theme Art Direction
+
+Output: `d.5 Theme Art Direction: <name> | scope=<deck-wide|cover+section+tail|cover+tail|restrained-title-only> | title=<treatment>`
+
+Rules:
+
+- Use the source topic, audience, and selected visual direction to create a named artistic concept. The name may be Chinese when the deck is Chinese-primary.
+- For cultural/tourism/brand/showcase/training/keynote/public-facing material, the main title should visibly carry the theme unless the user asks for a conservative report.
+- For work reports, serious government, regulated finance/compliance, or other unsuitable contexts, use `restrained-title-only` or `cover+tail` with a calm title lockup and state the exception.
+- Keep body typography practical: Microsoft YaHei remains the default body font. Title artistry should come from layout, scale, vector accents, masks, no-text generated visual support, and motif framing rather than risky fonts.
+- This line is not optional; if the concept is restrained, name the restraint rather than omitting the field.
 
 ### e. Color Scheme Recommendation
 
@@ -769,7 +803,8 @@ Templates are starting points. The Strategist may adjust based on content and au
 3. Save to: `projects/<project_name>.../design_spec.md`
 4. **Generate execution lock**: read `templates/spec_lock_reference.md` and produce `projects/<project_name>.../spec_lock.md` — a distilled, machine-readable short form of the color / typography / icon / image / **page_rhythm** / **page_layouts** / **page_charts** decisions above. This file is what the Executor re-reads before every page (see [executor-base.md](executor-base.md) §2.1). The values in `spec_lock.md` MUST exactly match the decisions recorded in `design_spec.md`; if they ever diverge, `spec_lock.md` wins and `design_spec.md` should be treated as historical narrative.
    - **brand_assets is mandatory** for formal-business decks: list every deterministic IP mark or write `none-detected: none`. Use the states from §0.5.
-   - **aesthetic_checks is mandatory** for formal-business decks: include body baseline, min body, title/body ratio, card-count bound, padding bound, logo strategy, and polish risks.
+   - **visual_direction theme fields are mandatory**: include `theme_art_direction`, `theme_motif`, `theme_scope`, `title_treatment`, and `serious_context_exception`; they must match §III Theme Art Direction in `design_spec.md`.
+   - **aesthetic_checks is mandatory** for formal-business decks: include body baseline, min body, title/body ratio, card-count bound, padding bound, theme art direction requirement, title art treatment, cover/tail motif requirement, logo strategy, and polish risks.
    - **page_rhythm is mandatory**: Based on the page list in §IX Content Outline, assign each page one of `anchor` / `dense` / `breathing` (see `spec_lock_reference.md` for the full vocabulary). This is what breaks the uniform "every page is a card grid" feel — without it the Executor defaults all pages to `dense`.
    - **Rhythm follows narrative, not quota**: `breathing` pages mark natural pauses — chapter transitions, standalone emphasis (hero quote / big number), SCQA bridges. Dense decks may legitimately be all `dense`. **Do NOT invent filler pages** ("Thank you", empty dividers) to pad rhythm — every `breathing` page must say something independent.
    - **page_layouts (write only when a template is in use)**: For each page that inherits a template SVG, add `P<NN>: <svg_basename>` (e.g., `P04: 03a_content_image_text`). Pages designed freely get **no entry** — Executor reads the absence as "free design, no inheritance". If zero pages use a template, omit the section entirely.
