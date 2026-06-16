@@ -63,7 +63,7 @@ It should cover:
 - whitespace checks.
 
 CI should run on the current GitHub Actions JavaScript runtime generation. For
-v4.3.0 that means Node 24 in the workflows and current official action majors
+v5.0.0 that means Node 24 in the workflows and current official action majors
 for checkout, Node, and Python setup.
 
 The Pages workflow lives at:
@@ -141,9 +141,13 @@ When syncing upstream:
 
 ## Version Notes
 
-v4.3.0 positions this repository as:
+v5.0.0 positions this repository as:
 
-- a hybrid-editable presentation workbench for Chinese office users who need formal PPTX and high-impact Web Deck outputs;
+- a delivery-defaults presentation workbench for Chinese office users who need formal PPTX and high-impact Web Deck outputs;
+- an office-first Agent Skill where generic PPT requests default to editable PPTX and one delivery brief instead of repeated confirmations;
+- a Codex-first generated-visual workflow that uses no-text support visuals and micro-assets without flattening body-slide content;
+- an official/IP asset governance workflow that records brand marks as official-source, user-provided, text-lockup-fallback, or needs-authorized-replacement;
+- a Microsoft YaHei formal typography and layout baseline for practical PowerPoint handoff;
 - a DeckIR AI planning workbench that writes page maps, source maps, planning reports, and rendered-review findings before final generation;
 - a rendered-review repair loop that writes low-risk repair plans and a user-approved `revision-brief.md` for the second pass;
 - a four-step Web Experience console with one primary next action and advanced controls behind drawers;

@@ -142,6 +142,9 @@ TERMINAL_ELEMENT_STATUSES = {"Generated", "Needs-Manual", "Inserted"}
 
 REQUIRED_DESIGN_LOCK_SECTIONS = {
     "visual_direction",
+    "typography",
+    "brand_assets",
+    "aesthetic_checks",
     "page_roles",
     "visual_weight",
     "layout_family",
@@ -150,6 +153,26 @@ REQUIRED_DESIGN_LOCK_SECTIONS = {
     "raster_policy",
     "asset_requirements",
     "anti_patterns",
+}
+
+REQUIRED_PAGE_LOCK_SECTIONS = REQUIRED_DESIGN_LOCK_SECTIONS - {
+    "visual_direction",
+    "typography",
+    "brand_assets",
+    "aesthetic_checks",
+}
+
+KNOWN_IP_MARKERS = {
+    "交通银行": ("traffic_bank", "bankcomm", "bank of communications", "bocom"),
+    "好客山东": ("haoke_shandong", "friendly_shandong", "hospitality_shandong"),
+    "文旅大戏": ("wenlv_daxi", "culture_tourism_show", "cultural_tourism_show"),
+}
+
+VALID_BRAND_STATES = {
+    "official-source",
+    "user-provided",
+    "text-lockup-fallback",
+    "needs-authorized-replacement",
 }
 
 
@@ -184,6 +207,76 @@ def discover_design_contracts(paths: list[Path]) -> tuple[list[Path], list[Path]
             elif file_path.name == "spec_lock.md":
                 spec_locks.append(file_path)
     return unique_paths(design_specs), unique_paths(spec_locks)
+
+
+def first_number(value: str) -> float | None:
+    match = re.search(r"\d+(?:\.\d+)?", value)
+    return float(match.group(0)) if match else None
+
+
+def number_range(value: str) -> tuple[float, float] | None:
+    numbers = [float(item) for item in re.findall(r"\d+(?:\.\d+)?", value)]
+    if not numbers:
+        return None
+    if len(numbers) == 1:
+        return numbers[0], numbers[0]
+    return min(numbers[0], numbers[1]), max(numbers[0], numbers[1])
+
+
+def audit_brand_assets(lock: dict[str, dict[str, str]], design_text: str) -> list[str]:
+    errors: list[str] = []
+    rows = lock.get("brand_assets", {})
+    if not rows:
+        return ["spec_lock.md is missing brand_assets entries."]
+    asset_text = "\n".join(f"{key}: {value}" for key, value in rows.items())
+    lowered_assets = asset_text.lower()
+    if "fake" in lowered_assets or "lookalike" in lowered_assets or "approximate-logo" in lowered_assets:
+        errors.append("brand_assets must not contain fake/lookalike/approximate logo handling.")
+    if set(rows) != {"none-detected"}:
+        for key, value in rows.items():
+            if key == "none-detected":
+                continue
+            state_match = re.search(r"state:\s*([a-z-]+)", value)
+            if not state_match:
+                errors.append(f"brand_assets {key} must declare state:<official-source|user-provided|text-lockup-fallback|needs-authorized-replacement>.")
+            elif state_match.group(1) not in VALID_BRAND_STATES:
+                errors.append(f"brand_assets {key} has invalid state: {state_match.group(1)}.")
+    for marker, aliases in KNOWN_IP_MARKERS.items():
+        if marker in design_text:
+            marker_present = marker.lower() in lowered_assets or any(alias in lowered_assets for alias in aliases)
+            if not marker_present:
+                errors.append(f"known IP mark `{marker}` appears in design_spec.md but is not listed in spec_lock.md brand_assets.")
+    return errors
+
+
+def audit_typography_scale(lock: dict[str, dict[str, str]]) -> list[str]:
+    errors: list[str] = []
+    typography = lock.get("typography", {})
+    checks = lock.get("aesthetic_checks", {})
+    if not typography:
+        return ["spec_lock.md is missing typography entries."]
+    body = first_number(typography.get("body", ""))
+    if body is None:
+        errors.append("spec_lock.md typography must declare body font size.")
+        return errors
+    min_body = first_number(checks.get("min_body_px", "18")) or 18
+    if body < min_body:
+        errors.append(f"body font size {body:g}px is below formal minimum {min_body:g}px.")
+    title = first_number(typography.get("title", ""))
+    ratio_range = number_range(checks.get("title_body_ratio", "1.6-2.0")) or (1.6, 2.0)
+    if title is not None:
+        ratio = title / body
+        if ratio < ratio_range[0] or ratio > ratio_range[1]:
+            errors.append(
+                f"title/body ratio {ratio:.2f} is outside formal range {ratio_range[0]:g}-{ratio_range[1]:g}."
+            )
+    if "max_peer_cards_per_slide" not in checks:
+        errors.append("aesthetic_checks must declare max_peer_cards_per_slide.")
+    if "min_card_padding_px" not in checks:
+        errors.append("aesthetic_checks must declare min_card_padding_px.")
+    if "logo_strategy" not in checks:
+        errors.append("aesthetic_checks must declare logo_strategy.")
+    return errors
 
 
 def audit_element_manifests(element_manifests: list[Path]) -> tuple[list[str], bool]:
@@ -270,7 +363,15 @@ def audit_design_contract(design_specs: list[Path], spec_locks: list[Path]) -> l
         errors.append("design_spec.md is required for formal-business deliveries.")
     else:
         combined = "\n".join(read_text(path) for path in design_specs)
-        for token in ("Visual Direction", "Page Role / Visual Weight Contract", "page_recipe_id", "visual_layer", "raster_policy"):
+        for token in (
+            "Visual Direction",
+            "Brand / IP Assets",
+            "Page Role / Visual Weight Contract",
+            "page_recipe_id",
+            "visual_layer",
+            "raster_policy",
+            "Aesthetic",
+        ):
             if token not in combined:
                 errors.append(f"design_spec.md must include {token}.")
     if not spec_locks:
@@ -280,9 +381,12 @@ def audit_design_contract(design_specs: list[Path], spec_locks: list[Path]) -> l
         missing_sections = sorted(REQUIRED_DESIGN_LOCK_SECTIONS - set(lock))
         if missing_sections:
             errors.append("spec_lock.md is missing visual-completion section(s): " + ", ".join(missing_sections))
-        for section in REQUIRED_DESIGN_LOCK_SECTIONS - {"visual_direction"}:
+        for section in REQUIRED_PAGE_LOCK_SECTIONS:
             if section in lock and not any(re.fullmatch(r"P\d{2}", key) for key in lock[section]):
                 errors.append(f"spec_lock.md section {section} must contain PNN page entries.")
+        combined_design = "\n".join(read_text(path) for path in design_specs) if design_specs else ""
+        errors.extend(audit_brand_assets(lock, combined_design))
+        errors.extend(audit_typography_scale(lock))
     return errors
 
 

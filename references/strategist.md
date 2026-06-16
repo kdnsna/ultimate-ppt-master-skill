@@ -8,7 +8,7 @@ As a top-tier AI presentation strategist, receive source documents, perform cont
 
 | Previous Step | Current | Next Step |
 |--------------|---------|-----------|
-| Project creation + Template option confirmed | **Strategist**: Eight Confirmations + Design Spec | Image_Generator or Executor |
+| Project creation + Template option confirmed | **Strategist**: One Delivery Brief + Design Spec | Image_Generator or Executor |
 
 ---
 
@@ -20,7 +20,7 @@ As a top-tier AI presentation strategist, receive source documents, perform cont
 
 ## 0. Visual Direction Audit
 
-Before the Eight Confirmations, read:
+Before the delivery brief, read:
 
 ```
 templates/visual-directions/index.json
@@ -28,7 +28,7 @@ templates/visual-directions/index.json
 
 Select exactly one direction pack when the deck context clearly matches it; otherwise select `custom`.
 
-Output these items inside the Eight Confirmations bundle:
+Record these items in the delivery brief and the final spec:
 
 - **Visual direction**: direction id and one-sentence rationale.
 - **Aesthetic risks**: the top 3 ways this deck could look unprofessional or generic.
@@ -51,31 +51,63 @@ The selected direction must be recorded in:
 
 ---
 
-## 1. Eight Confirmations Process
+## 0.5 Official/IP Asset Audit
+
+Before writing the delivery brief, scan the source and user request for deterministic IP names:
+
+- company / bank / government / partner names that normally have official logos
+- campaign or event IP names (`文旅大戏`, `心动的旅"城"`), tourism city brands (`好客山东`), product/card/app marks, QR codes, seals, badges, association marks
+- any visible marks in supplied PPT/PDF/DOCX/image sources
+
+For every detected mark, decide one of four states and record it in `design_spec.md §III Brand / IP Assets` and `spec_lock.md brand_assets`:
+
+| State | Use when | Delivery behavior |
+|---|---|---|
+| `official-source` | Official or authorized file/page is found | Insert the asset and record source URL, publisher, file path, target pages |
+| `user-provided` | User supplied the logo/card/QR/seal | Preserve it as the preferred source |
+| `text-lockup-fallback` | No safe asset file is available for an internal draft | Use exact text in the official name, no fake symbol; block external release until replaced |
+| `needs-authorized-replacement` | External delivery or brand-sensitive page lacks authorized asset | Pause only if legal/brand risk blocks the task; otherwise label the placeholder and block external release in the quality report |
+
+**Search rule**: for fixed IP marks, use official or quasi-official sources first: brand/corporate website, official press release, official media kit, government/public-service portal, official campaign page, or user-provided materials. Third-party logo-download sites may only provide clues; they are not sufficient proof for final insertion.
+
+**Hard prohibition**: never generate, trace, redraw, or approximate an official logo or campaign mark with arbitrary shapes, initials, icon badges, or AI-generated lookalikes. If the real asset is unavailable, use a clean text lockup and note the replacement requirement.
+
+Example rows for a Shandong BOCOM cultural-tourism deck:
+
+```markdown
+## brand_assets
+- traffic_bank: required | text: 交通银行 | state: official-source | file: images/brand/traffic-bank-logo.png | source: https://www.bankcomm.com/... | pages: P01,P06,P12
+- haoke_shandong: required | text: 好客山东 | state: official-source | file: images/brand/haoke-shandong-logo.png | source: official tourism/public-service portal | pages: P01,P04
+- wenlv_daxi: required | text: 文旅大戏 | state: text-lockup-fallback | file: none | source: official activity/news page | pages: P01,P02
+```
+
+---
+
+## 1. One Delivery Brief Process
 
 🚧 **GATE — Mandatory read first**: `read_file templates/design_spec_reference.md` before any analysis or writing. The design_spec.md output MUST follow that template's 11-section structure exactly. After writing, self-check each section is present: I Project Info → II Canvas → III Visual Theme → IV Typography → V Layout → VI Icon → VII Visualization → VIII Image → IX Outline → X Speaker Notes → XI Tech Constraints.
 
-🚧 **GATE — Visual direction read**: `read_file templates/visual-directions/index.json` before writing the Eight Confirmations. If a pack is selected, also read that pack's `.md` file before producing `design_spec.md`.
+🚧 **GATE — Visual direction read**: `read_file templates/visual-directions/index.json` before writing the delivery brief. If a pack is selected, also read that pack's `.md` file before producing `design_spec.md`.
 
 🚧 **GATE — Page recipe read**: `read_file templates/page-recipes/index.json` before writing `design_spec.md`. Assign one recipe per page in §V and §IX, then copy the same mapping into `spec_lock.md page_recipes`.
 
-⛔ **BLOCKING**: After the read, present professional recommendations for the eight items below as a bundled package and wait for explicit user confirmation.
+After the reads, decide the eight production items below as one bundled delivery brief. If enough context exists, do not wait for confirmation; write the decisions into `design_spec.md` and `spec_lock.md` and continue. Ask at most one concise user question only when the missing answer would materially change the deliverable, such as PPTX vs Web Deck, legal permission to use brand assets, or whether private material may be uploaded for image generation.
 
-> **Execution discipline**: This is the last BLOCKING checkpoint in the pipeline. After confirmation, complete the Design Spec and proceed to image generation / SVG / post-processing without further pauses.
+> **Execution discipline**: This is the only normal planning checkpoint. Once the brief is set, complete the Design Spec and proceed to image generation / SVG / post-processing without further pauses.
 
-### a. Canvas Format Confirmation
+### a. Canvas Format
 
 Recommend format based on scenario (see [`canvas-formats.md`](canvas-formats.md)).
 
-### b. Page Count Confirmation
+### b. Page Count
 
 Provide specific page count recommendation based on source document content volume.
 
-### c. Key Information Confirmation
+### c. Key Information
 
 Confirm target audience, usage occasion, and core message; provide initial assessment based on document nature.
 
-### d. Style Objective Confirmation
+### d. Style Objective
 
 Two layers. Output: `d. Style: <Mode> + <Visual style descriptor>`.
 
@@ -103,7 +135,7 @@ Audience?
 
 #### Layer 2 — Visual style
 
-Anchors the downstream confirmations e (Color), f (Icon), g (Typography), h (Image).
+Anchors the downstream items e (Color), f (Icon), g (Typography), h (Image).
 
 **Source**:
 - User named a style → record verbatim as a short descriptor (normalize multilingual phrasings to a single canonical form)
@@ -142,7 +174,7 @@ Proactively provide a color scheme (HEX values) based on content characteristics
 
 **Color rules**: 60-30-10 rule (primary 60%, secondary 30%, accent 10%); text contrast ratio >= 4.5:1; no more than 4 colors per page.
 
-### f. Icon Usage Confirmation
+### f. Icon Usage
 
 | Option | Approach | Suitable Scenarios |
 |--------|----------|-------------------|
@@ -157,7 +189,7 @@ See [`../templates/icons/README.md`](../templates/icons/README.md) for the curre
 
 > **Mandatory rules when choosing C**:
 >
-> **At the eight-confirmation stage — decide the library only. Do NOT run `ls | grep` yet.**
+> **At the delivery-brief stage — decide the library only. Do NOT run `ls | grep` yet.**
 >
 > 1. **Pick exactly one stylistic library** — read the source material, then choose the library whose visual character best serves the deck:
 >    - **`chunk-filled`** — fill, straight-line geometry (M/L/H/V/Z only); sharp right angles; heavy, solid, architectural
@@ -168,16 +200,16 @@ See [`../templates/icons/README.md`](../templates/icons/README.md) for the curre
 >    - **Brand-logo exception**: `simple-icons` is NOT a stylistic library. Add it to the deck's icon inventory **only when** the deck genuinely contains real company / product / service brand marks (customer logos, tech-stack icons, social handles). Never substitute it for a missing generic icon.
 > 2. **Stroke weight lock (stroke-style libraries only)** — for stroke-based libraries (currently `tabler-outline`), pick one deck-wide value from `{1.5, 2, 3}` (default `2`). For heavier presence, switch library instead of going above `3`.
 >
-> **After all eight confirmations are approved — when writing `design_spec.md` §VI / `spec_lock.md`**, then materialize the icon inventory:
+> **When writing `design_spec.md` §VI / `spec_lock.md`**, materialize the icon inventory:
 >
-> 3. Enumerate the concepts the deck actually needs (home, chart, users, …) based on the confirmed outline.
+> 3. Enumerate the concepts the deck actually needs (home, chart, users, ...) based on the final outline.
 > 4. Search for each concept's filename in the chosen library: `ls skills/ppt-master/templates/icons/<chosen-library>/ | grep <keyword>`
 > 5. Use the verified filename (without `.svg`) as the icon name; always include the library prefix (e.g., `chunk-filled/home`).
 > 6. List the final icon inventory and chosen library in `design_spec.md` §VI; record the same in `spec_lock.md icons` (including `stroke_width` for stroke-style libraries). Executor may only use icons from this list.
 >
 > **Do NOT preload any index file** — when the inventory step arrives, use `ls | grep` to search on demand with zero token cost.
 
-### g. Typography Plan Confirmation (Font + Size)
+### g. Typography Plan (Font + Size)
 
 #### Font Combinations
 
@@ -200,7 +232,9 @@ See [`../templates/icons/README.md`](../templates/icons/README.md) for the curre
 - `"Times New Roman"` ↔ `Times`
 - `Georgia` ↔ `Cambria`
 
-**Mandatory**: propose **two** combinations to the user — one concord (safe), one contrast (with tension). Do not default to "title = body, same font" without explicit user request.
+**Default for Chinese office delivery**: lock `"Microsoft YaHei"` / 微软雅黑 as the title and body family unless the user, brand guide, or template explicitly requires another installed font. Use weight, size, spacing, and layout contrast first; do not add extra fonts just to look designed.
+
+When the deck needs stronger editorial or academic contrast, propose or lock one safe contrast stack and record the reason in §IV. Do not pause for a font choice unless the user's brand requirement makes it necessary.
 
 > **Template precedence**: when a template was loaded at Step 3 via an explicit path and declares `title` / `body` font stacks in `<project_path>/templates/design_spec.md §III Typography` / §IV (or whichever heading the fused spec uses), lock those directly and skip the two-combination presentation. Same precedence as e. — user override > template values.
 
@@ -228,7 +262,7 @@ See [`../templates/icons/README.md`](../templates/icons/README.md) for the curre
 | Cool serif (academic) | `Cambria, SimSun, serif` | `"Times New Roman", SimSun, serif` | — |
 | Hei × song (政务) | `SimHei, "Microsoft YaHei", sans-serif` | `SimSun, serif` | — |
 | Tech / developer | `Arial, "Microsoft YaHei", sans-serif` | same | `Consolas, "Courier New", monospace` |
-| Concord (default fallback) | `"Microsoft YaHei", "PingFang SC", sans-serif` | same | — |
+| Concord (default office delivery) | `"Microsoft YaHei", "PingFang SC", Arial, sans-serif` | same | — |
 
 > **Stack length discipline (soft rule).** ≤4 fonts per stack. Lead with Windows-preinstalled fonts (Microsoft YaHei / SimSun / Arial / Georgia / Consolas); keep at most **one** macOS-exclusive family (typically `"PingFang SC"`). Converter only picks the first Latin and first CJK font ([`drawingml_utils.py parse_font_family`](../scripts/svg_to_pptx/drawingml_utils.py)); macOS→Windows fallback is auto-mapped via `FONT_FALLBACK_WIN`.
 
@@ -247,6 +281,7 @@ Baseline choice follows **content density**, not style. Common: `18px` (dense) /
 | Common recommendation | Points per Page | Body Baseline | Suitable Scenarios |
 |----------------|----------------|---------------|-------------------|
 | Relaxed | 3-5 items | 24px | Keynote-style, training materials |
+| Medium formal | 4-6 items | 20-22px | Leadership reports, bank/government/business handoffs |
 | Dense | 6+ items | 18px | Data reports, consulting analysis |
 
 | Level | Ratio to body | 24px baseline | 18px baseline |
@@ -262,6 +297,14 @@ Baseline choice follows **content density**, not style. Common: `18px` (dense) /
 
 > Two baseline columns are illustrative only — for any other baseline (16/20/22/28/32…), multiply the row's ratio. Checker reads live `body` from `spec_lock.md`. Executor may pick any px within a role's band without pre-declaring; values outside **every** band require lock extension first.
 
+**Formal handoff scale guardrail**:
+
+- For business / government / finance / stakeholder decks, default body baseline is `20-22px`; use `18px` only for genuinely dense consulting pages.
+- Do not set formal body baseline below `18px`. Chart labels, captions, footnotes, and legal notes may be smaller, but they must not carry primary content.
+- If a card, node, or table cell needs body text below `18px`, reduce copy, split the slide, or convert prose to a visual structure.
+- Page title should be about `1.6-2.0× body`; card title `1.15-1.35× body`; subtitle `1.2-1.5× body`. If the title is visually close to card text, the page will feel small and must be redesigned.
+- Record the chosen baseline, title/body ratio, and any exception in `spec_lock.md aesthetic_checks`.
+
 ### h. Image Usage Confirmation
 
 | Option | Approach | Suitable Scenarios |
@@ -272,15 +315,15 @@ Baseline choice follows **content density**, not style. Common: `18px` (dense) /
 | **D** | Web-sourced | Real-world reference imagery, editorial support, stock-style needs (no API key required for default providers) |
 | **E** | Placeholders | Images to be added later |
 
-**When recommending C** — surface its three implementation modes so the user knows "no API key" is a supported state:
+**When using C** — default to Codex native GPT image generation (`image2` when available). Surface implementation modes only if generation cannot run automatically:
 
 | Mode | Trigger | Mechanism |
 |---|---|---|
-| **Path A** | `IMAGE_BACKEND` configured (default) | `image_gen.py` runs in Step 5 |
-| **Path B** | `IMAGE_BACKEND` not configured AND host has a native image tool (Codex / Antigravity / Claude Code / similar) — auto-selected, no user prompting needed | Host-native generation |
-| **Offline Manual** | `IMAGE_BACKEND` not configured AND host has no native image tool | Prompts written to `images/image_prompts.json`; user generates externally and places files in `project/images/` |
+| **Path A** | Host is Codex or another environment with native GPT image generation | Host-native image generation (`image2` in Codex) |
+| **Path B** | Host-native generation is unavailable and `IMAGE_BACKEND` is configured | `image_gen.py` runs in Step 5 |
+| **Offline Manual** | Neither host-native generation nor backend is available | Prompts written to `images/image_prompts.json`; user generates externally and places files in `project/images/` |
 
-Selection is automatic in Step 5 (A → B → Manual). Detailed contract: [`image-generator.md`](./image-generator.md) §3.2.
+Selection is automatic in Step 5 (Codex/image2 → backend → manual). Detailed contract: [`image-generator.md`](./image-generator.md) §7.
 
 Selections may be mixed at the row level — e.g. a deck can use C for hero illustrations while sourcing D for supporting team photos.
 
@@ -290,11 +333,11 @@ When the deck includes any `ai` rows, Strategist locks a **deck-wide rendering**
 
 🚧 **GATE — before recommending values**: `read_file references/image-renderings/_index.md` and `read_file references/image-palettes/_index.md`. They contain the catalog, auto-selection tables, and a rendering × palette compatibility matrix.
 
-#### Three-candidate presentation (default path)
+#### Auto-lock visual strategy (default path)
 
-**Hard rule**: Unless the user has already named a specific rendering or palette (chat or template), present **≥3 distinct rendering × palette combinations** and let the user pick. Never auto-lock a single combination silently.
+**Hard rule**: Unless the user asks for visual exploration, auto-lock one rendering × palette combination that fits the deck and proceed. The goal is fewer loops, not a style menu. Record up to two rejected alternatives in `design-quality-report.md` when useful, but do not make the user choose among them.
 
-**Per-candidate schema** (exactly 4 lines, no extras):
+If the user explicitly asks to compare visual directions, use this compact schema:
 
 ```
 [Plan A] <temperament label> — <rendering> × <palette>
@@ -303,24 +346,24 @@ When the deck includes any `ai` rows, Strategist locks a **deck-wide rendering**
   Mood: <2-3 traits>; like <real-world analogy: company / publication / event>
 ```
 
-After the candidates, append one line:
+After optional candidates, append one line:
 
 ```
 > Reference images: see references/ai-image-comparison/ for matching PNGs by name.
 ```
 
-**Hard rules for candidate construction**:
+**Hard rules for auto-lock or candidate construction**:
 
 | Rule | Behavior |
 |---|---|
 | Filter by e.'s HEX | Only include palettes whose temperament can carry the user's HEX. Vivid red → exclude `cool-corporate` / `mono-ink`; include `vivid-launch` / `warm-earth` / `editorial-classic`. |
 | HEX values in `Color` line MUST be e.'s real values | Palette contributes only the 60-30-10 ratio + role assignment. Never substitute the palette's typical HEX. |
-| Span a personality spectrum | Typically: one conservative-default (industry norm), one shifted-tone (same fit, 1-2 ticks different), one bold-contrast (more expressive, may challenge default). No near-duplicates. |
+| Span a personality spectrum | Only when presenting options: one conservative-default, one shifted-tone, one bold-contrast. No near-duplicates. |
 | `Mood` line MUST include a real-world analogy | Company / publication / event the user can picture. Adjective stacks alone are forbidden. |
 | Adapt labels to chat language | Schema is English by default. Chinese chat → render as 「方案 A / 视觉 / 色彩 / 情绪」. Structure stays the same; only the labels translate. |
 | Skip presentation when user has specified | User-named rendering or palette (chat / brand / template) bypasses the candidate flow — lock directly per the truth-precedence rule. |
 
-**Forbidden — padding with conflicts**: if e.'s HEX cannot find ≥3 compatible palettes, present the smaller set (2 candidates) and state "your color is unusual — only N palettes can carry it without conflict." Never fill remaining slots with known-conflicting options.
+**Forbidden — padding with conflicts**: if presenting options and e.'s HEX cannot find ≥3 compatible palettes, present the smaller set (2 candidates) and state "your color is unusual — only N palettes can carry it without conflict." Never fill remaining slots with known-conflicting options.
 
 **Worked example** (e. = `#1E3A5F` navy + `#F8F9FA` off-white + `#D4AF37` gold; d. = consulting; chat in English):
 
@@ -343,7 +386,7 @@ After the candidates, append one line:
 > Reference images: see references/ai-image-comparison/ for matching PNGs by name.
 ```
 
-After the user picks a candidate (or supplies a custom variant), proceed to "Recording the lock" below.
+After auto-locking the best fit, or after the user picks a candidate, proceed to "Recording the lock" below.
 
 ---
 
@@ -422,9 +465,15 @@ After auto-selecting, cross-check `image-palettes/_index.md` compatibility matri
 
 Image_Generator reads these two fields and applies them deck-wide. If both are absent (legacy decks), Image_Generator falls back to inferring them from `d. Style` and `e. Color` — quality is acceptable but not optimal. Always lock both when C is selected.
 
-#### hero_page suggestion (same confirmation turn)
+#### h.6 Official/IP Asset Search Rows
 
-After the user picks a candidate, scan the outline and surface any pages where the image makes more sense as the page's main voice than as a local block. Present them as a short list and let the user confirm, edit, or skip. Result is recorded as `page_role: hero_page` on the matching `ai` rows. Density is judgment-based — no fixed quota.
+When the brand/IP audit in §0.5 identifies a deterministic mark and the asset is not already user-provided, add an image resource row or `brand_assets` entry with `Acquire Via: web-official` in the design narrative and `state: official-source` / `text-lockup-fallback` in `spec_lock.md`.
+
+`web-official` means manual official-source search by the agent (search/open official pages, download or screenshot/crop only when legally appropriate), not the open-license stock provider chain. Do not route official logos through Openverse/Pexels/Pixabay. The final record must include source URL, publisher, file path if downloaded, target pages, and release boundary.
+
+#### hero_page decision (same brief)
+
+After the rendering/palette is locked, scan the outline and decide any pages where the image makes more sense as the page's main voice than as a local block. Record the result as `page_role: hero_page` on the matching `ai` rows. Surface the list to the user only if it changes editability expectations or uses a full-page raster page. Density is judgment-based — no fixed quota.
 
 **When selection includes B**, you must run `python3 scripts/analyze_images.py <project_path>/images` before outputting the spec, and integrate scan results into the image resource list.
 
@@ -526,6 +575,23 @@ Side-by-side only: container ratio must match image ratio. Hero / atmosphere / a
 
 > **Pipeline handoff**: When C) AI generation is selected, Image_Generator consumes `Pending` rows and updates them to `Generated` or `Needs-Manual` before Executor proceeds. Status names are defined in [`svg-image-embedding.md`](svg-image-embedding.md).
 
+### i. Aesthetic Scale & Polish Checks
+
+Fill these checks before leaving Strategist. Copy the short machine-readable version into `spec_lock.md aesthetic_checks`.
+
+| Check | Formal default |
+| ----- | -------------- |
+| Body baseline | 20-22px recommended; 18px lower bound for dense formal pages |
+| Title/body ratio | 1.6-2.0× for page titles |
+| Card title/body ratio | 1.15-1.35× |
+| Peer cards per slide | Prefer 3-5; never exceed 6 on 16:9 without converting to table/matrix |
+| Card padding | 24-36px for normal cards; never below 20px in formal PPTX |
+| Major whitespace | Keep one dominant empty/quiet zone per page; avoid filling every corner |
+| Logo zone | Official marks sit in a consistent reserved zone and do not compete with the title |
+| Decoration | Accent lines, tags, shadows, and patterns must support hierarchy, not fill space |
+
+Common failure modes to add to `anti_patterns` when relevant: `title-too-small`, `body-below-18`, `overcrowded-cards`, `fake-logo`, `logo-crowding`, `weak-dominant-element`, `random-decoration`, `low-contrast-secondary-text`, `all-boxes-equal-weight`.
+
 ### Template Match — Visualization + Structural Patterns (Non-blocking — Strategist recommends, no user confirmation needed)
 
 The catalog covers **both data charts and structural information designs**. A "match" is not limited to numeric pages — any page whose content shape matches a `Pick for ...` clause is a candidate:
@@ -536,7 +602,7 @@ The catalog covers **both data charts and structural information designs**. A "m
 The most common Strategist failure mode is missing the structural half — treating "chart" as "numeric chart only" and leaving team / agenda / principles / journey pages as text-only when a template would fit. Read the catalog with both lenses.
 
 > **Reading is mandatory; the catalog is a starting point, not a copy target.**
-> - Fully read `templates/charts/charts_index.json` **before drafting the Eight Confirmations** — the read happens up front, not when you sit down to write Section VII. The file contains `meta` + `charts.<key>.summary` only; each `summary` is a selection rule (`"Pick for … Skip if …"`), not a description. There is **no category, quickLookup, or keyword index** — selection is done by semantically matching each page's content shape against all 71 summaries in one pass.
+> - Fully read `templates/charts/charts_index.json` **before drafting the delivery brief** — the read happens up front, not when you sit down to write Section VII. The file contains `meta` + `charts.<key>.summary` only; each `summary` is a selection rule (`"Pick for ... Skip if ..."`), not a description. There is **no category, quickLookup, or keyword index** — selection is done by semantically matching each page's content shape against all 71 summaries in one pass.
 > - Not every page needs a chart. When a page's information structure matches a catalog entry, **use that template as a structural starting point** — keep the visualization type and core layout logic, then adapt composition, density, color, decoration, and accompanying elements to fit this deck's content and visual tone. Free adjustment is encouraged; what is forbidden is (a) generating without reading the catalog, and (b) blind verbatim mimicry that ignores the page's actual content weight.
 >
 > **Workflow**:
@@ -702,6 +768,8 @@ Templates are starting points. The Strategist may adjust based on content and au
 2. Generate complete spec from scratch based on analysis
 3. Save to: `projects/<project_name>.../design_spec.md`
 4. **Generate execution lock**: read `templates/spec_lock_reference.md` and produce `projects/<project_name>.../spec_lock.md` — a distilled, machine-readable short form of the color / typography / icon / image / **page_rhythm** / **page_layouts** / **page_charts** decisions above. This file is what the Executor re-reads before every page (see [executor-base.md](executor-base.md) §2.1). The values in `spec_lock.md` MUST exactly match the decisions recorded in `design_spec.md`; if they ever diverge, `spec_lock.md` wins and `design_spec.md` should be treated as historical narrative.
+   - **brand_assets is mandatory** for formal-business decks: list every deterministic IP mark or write `none-detected: none`. Use the states from §0.5.
+   - **aesthetic_checks is mandatory** for formal-business decks: include body baseline, min body, title/body ratio, card-count bound, padding bound, logo strategy, and polish risks.
    - **page_rhythm is mandatory**: Based on the page list in §IX Content Outline, assign each page one of `anchor` / `dense` / `breathing` (see `spec_lock_reference.md` for the full vocabulary). This is what breaks the uniform "every page is a card grid" feel — without it the Executor defaults all pages to `dense`.
    - **Rhythm follows narrative, not quota**: `breathing` pages mark natural pauses — chapter transitions, standalone emphasis (hero quote / big number), SCQA bridges. Dense decks may legitimately be all `dense`. **Do NOT invent filler pages** ("Thank you", empty dividers) to pad rhythm — every `breathing` page must say something independent.
    - **page_layouts (write only when a template is in use)**: For each page that inherits a template SVG, add `P<NN>: <svg_basename>` (e.g., `P04: 03a_content_image_text`). Pages designed freely get **no entry** — Executor reads the absence as "free design, no inheritance". If zero pages use a template, omit the section entirely.

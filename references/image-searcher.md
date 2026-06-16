@@ -6,6 +6,8 @@ Role definition for the **web image acquisition path**: translate Strategist int
 
 **Trigger**: resource list rows with `Acquire Via: web`. The role is loaded only when at least one such row exists.
 
+> **Not for deterministic official/IP assets**: company logos, tourism/campaign IP marks, product/card marks, QR codes, seals, and partner marks use the `web-official` path described in `strategist.md §0.5` / `§h.6`, not this open-license provider chain. Do not fetch official logos from Openverse/Pexels/Pixabay, and do not use third-party logo-download sites as final provenance.
+
 ---
 
 ## 1. License Tier Discipline
@@ -40,6 +42,15 @@ Strict:  provider chain, license filter = cc0,pdm,pexels,pixabay
 ```
 
 `--strict-no-attribution` is opt-in. Use it only when the deck cannot tolerate any on-slide credit (corporate template, full-bleed hero).
+
+### 2.1 Official/IP Asset Boundary
+
+If the image row or `brand_assets` entry names a fixed mark (`交通银行`, `好客山东`, `文旅大戏`, card faces, official app/mini-program QR, seals, partner logos), stop using this reference and return to the official-source workflow:
+
+1. Search official or quasi-official pages: corporate site, official press release, public-service/government portal, official campaign page, official media kit, or user-provided source.
+2. Save the file only when the asset is safe to use for the requested draft context. Otherwise use `text-lockup-fallback` and mark `needs-authorized-replacement`.
+3. Record source URL, publisher, usage note, target pages, and release boundary in `spec_lock.md brand_assets` and `design-quality-report.md`.
+4. Never generate or redraw an official logo or IP mark.
 
 ---
 

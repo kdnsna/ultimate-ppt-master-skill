@@ -44,6 +44,20 @@
 - **Visual Strategy Mode**: [default `hybrid-editable`; generated no-text visual layers support editable PPTX structure]
 - **Raster Slide Mode**: [default `disabled_for_formal_body`; full-page raster only for cover/section/poster/showcase pages]
 
+### Brand / IP Assets
+
+> List every deterministic official mark mentioned in the source or user request. This includes company logos, campaign/event IP (`文旅大戏`), tourism brands (`好客山东`), product/card/app marks, QR codes, seals, government/partner marks, and official badges. Do not leave this table out for formal-business decks; if none are detected, write one row: `none-detected`.
+
+| Asset ID | Display Text / Mark | State | Source URL / Provenance | File Path | Target Pages | Release Boundary |
+| -------- | ------------------- | ----- | ----------------------- | --------- | ------------ | ---------------- |
+| traffic_bank | 交通银行 | official-source / user-provided / text-lockup-fallback / needs-authorized-replacement | [official or user source] | images/brand/... | P01,P12 | [e.g., replace before external release] |
+
+Rules:
+- Use official or authorized sources first: official website, press release, media kit, government/public-service portal, official campaign page, or user-provided asset.
+- Third-party logo-download sites are clues only, not final proof.
+- Never approximate official logos with arbitrary shapes, initials, generated lookalikes, or decorative icons.
+- If a safe asset is unavailable, use exact text lockup only and flag `needs-authorized-replacement` / release blocker.
+
 ### Color Scheme
 
 > Strategist: determine values from project content, industry, brand colors.
@@ -95,9 +109,11 @@
 
 > **Per-role families are expected, not optional.** Title / Body / Emphasis / Code may each use a different family (e.g., display serif title + geometric sans body). One family throughout is not required. See [strategist.md §g — Font Combinations](../references/strategist.md) for starting directions; you may propose a combination not listed.
 >
+> **Default Chinese office delivery**: use `"Microsoft YaHei"` / 微软雅黑 for title and body unless the user, brand guide, or selected template explicitly requires another installed font. Make the deck feel premium through weight, scale, spacing, hierarchy, and layout, not through risky web fonts.
+>
 > **⚠️ PPT-safe stack discipline (HARD rule).** PPTX stores a single `typeface` per run — no runtime fallback. Every stack MUST end with a cross-platform pre-installed font: `"Microsoft YaHei", sans-serif` / `SimSun, serif` / `Arial, sans-serif` / `"Times New Roman", serif` / `Consolas, "Courier New", monospace`. Stacks led by a non-preinstalled font (Inter / Google Fonts / brand typefaces) are allowed only when this spec notes the font-install or embedding requirement.
 
-**Typography direction**: [Fill in one phrase, e.g., "modern CJK sans" / "academic serif" / "brand-specific: McKinsey Bower (requires font install)"]
+**Typography direction**: [Fill in one phrase, e.g., "Microsoft YaHei office delivery with weight contrast" / "academic serif with installed fallback" / "brand-specific: McKinsey Bower (requires font install)"]
 
 Two views on the same font decisions — fill both, keep them consistent:
 
@@ -106,15 +122,15 @@ Two views on the same font decisions — fill both, keep them consistent:
 
 | Role | Chinese | English | Fallback tail |
 | ---- | ------- | ------- | ------------- |
-| **Title** | [e.g., `"Microsoft YaHei"`, or `"Microsoft YaHei", "PingFang SC"` for macOS preview nicety] | [e.g., `Georgia`] | [e.g., `serif`] |
-| **Body** | [e.g., `"Microsoft YaHei", "PingFang SC"`] | [e.g., `Arial`] | [e.g., `sans-serif`] |
-| **Emphasis** | [e.g., `SimSun`, or `—` for Latin-only] | [e.g., `Georgia`] | [e.g., `serif`] |
+| **Title** | [default `"Microsoft YaHei", "PingFang SC"`] | [default `Arial`] | [default `sans-serif`] |
+| **Body** | [default `"Microsoft YaHei", "PingFang SC"`] | [default `Arial`] | [default `sans-serif`] |
+| **Emphasis** | [default same as title/body, or a safe contrast such as `SimHei` / `SimSun` when justified] | [default `Arial`] | [default `sans-serif`] |
 | **Code** | — | [e.g., `Consolas, "Courier New"`] | [e.g., `monospace`] |
 
 **Per-role font stacks** (CSS `font-family` strings, one per role — arrange the table's pieces in the order your design intends):
 
-- Title: `[Fill in stack, e.g. Georgia, "Microsoft YaHei", serif for Latin-led; or "Microsoft YaHei", "PingFang SC", Georgia, serif for CJK-led]`
-- Body: `[Fill in stack — may be same as Title]`
+- Title: `[Default: "Microsoft YaHei", "PingFang SC", Arial, sans-serif]`
+- Body: `[Default: "Microsoft YaHei", "PingFang SC", Arial, sans-serif]`
 - Emphasis: `[Fill in stack, or write "same as Body" to omit the override]`
 - Code: `[Fill in monospace stack, e.g. Consolas, "Courier New", monospace]`
 
@@ -134,6 +150,8 @@ Two views on the same font decisions — fill both, keep them consistent:
 
 **Baseline**: Body font size = [fill in]px (any reasonable integer — `18` and `24` are most common; `16` for chart-heavy, `20`/`22` for medium density, `28-32` for poster / cover decks are all valid. Drive by content density.)
 
+**Common 16:9 delivery ranges**: cover title 60-92px, section title 44-60px, page title 30-40px, subtitle 22-28px, body 18-24px, chart labels/captions 12-16px. Dense consulting pages usually use body 18-20px; training/keynote pages use 22-24px. For business / government / finance / stakeholder handoff, default body is 20-22px and 18px is the lower bound. Do not let body text fall below 18px in a formal handoff unless it is a chart label, footnote, or legal/source note rather than primary content.
+
 | Purpose | Ratio to body | Example @ body=24 (relaxed) | Example @ body=18 (dense) | Weight |
 | ------- | ------------- | --------------------------- | ------------------------- | ------ |
 | Cover title (hero headline) | 2.5-5x | 60-120px | 45-90px | Bold / Heavy |
@@ -149,15 +167,35 @@ Two views on the same font decisions — fill both, keep them consistent:
 
 > Sizes outside **every** band remain forbidden — surface the need and extend `spec_lock.md typography` (e.g., `cover_title: 96`) rather than invent a one-off value.
 
+### Scale Guardrail
+
+| Check | Current Project |
+| ----- | --------------- |
+| Body baseline | [20-22px recommended; 18px lower bound] |
+| Page title/body ratio | [1.6-2.0×] |
+| Card title/body ratio | [1.15-1.35×] |
+| Smallest primary-content text | [must be >=18px in formal PPTX] |
+| Smallest secondary text | [chart/caption/source only; normally 12-16px] |
+| Exception handling | [split slide / reduce copy / table/process conversion / none] |
+
 ---
 
 ## V. Layout Principles
 
 ### Page Structure
 
-- **Header area**: [Height and content description]
-- **Content area**: [Height and content description]
-- **Footer area**: [Height and content description]
+- **Header area**: [Default 72-96px on 16:9; title, section label, or page number only]
+- **Content area**: [Default safe area within 48-64px side margins; one dominant visual system plus support text]
+- **Footer area**: [Default 28-40px; source, confidentiality, page number, or none]
+
+### Single-slide Delivery Rules
+
+- One slide communicates one primary judgment; the title should carry that judgment when the deck is analytical.
+- Body pages should normally contain one dominant visual system plus 2-4 support points, or one dense table/chart with a visible takeaway.
+- Avoid more than 6 peer cards on one 16:9 slide; split the page or convert to table/timeline when density grows.
+- Align all major elements to a 12-column grid or a deliberate asymmetric split. Optical alignment beats decorative symmetry.
+- Keep text away from chart axes, image focal points, logos, and page edges. Minimum edge-safe margin is 48px for formal 16:9.
+- Use callouts sparingly: 1-2 emphasis blocks per slide. If everything is highlighted, nothing is highlighted.
 
 ### Layout Pattern Library (combine or break as content demands)
 
@@ -206,6 +244,22 @@ Two views on the same font decisions — fill both, keep them consistent:
 - **Line-height**: 1.4-1.6× body font size.
 - **Full-bleed text placement**: inset text away from the image's focal points; legibility over photographic backgrounds typically needs a gradient or opacity overlay.
 - **Content width** is driven by reading comfort and image composition, not a card grid slot — don't back-compute "column width" when there's no column.
+
+### Aesthetic Polish Checks
+
+| Check | Current Project |
+| ----- | --------------- |
+| Dominant element | [What should be seen first on most pages] |
+| Whitespace strategy | [Where the quiet/empty zone lives; avoid filling every corner] |
+| Card count bound | [Prefer 3-5 peer cards; max 6 on 16:9 unless table/matrix] |
+| Card padding bound | [24-36px normal; never below 20px formal] |
+| Corner radius | [Usually 6-12px; avoid overly pill-shaped cards unless brand requires] |
+| Shadow/depth | [0-2 focal shadows per page; peer grids remain flat] |
+| Logo placement | [Reserved zone; official marks do not compete with title] |
+| Contrast | [Secondary text remains readable; no low-contrast gray body copy] |
+| Decoration rule | [Accent lines/tags/patterns must support hierarchy, not fill space] |
+
+Common anti-patterns to record per page: `title-too-small`, `body-below-18`, `overcrowded-cards`, `fake-logo`, `logo-crowding`, `weak-dominant-element`, `random-decoration`, `low-contrast-secondary-text`, `all-boxes-equal-weight`.
 
 ### Page Role / Visual Weight Contract
 

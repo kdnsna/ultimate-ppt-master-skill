@@ -193,7 +193,7 @@ class RenderedReviewTest(unittest.TestCase):
         self.assertEqual(brief["reviewRepairPlan"]["status"], "applied")
         self.assertIn("v4.3 Rendered Review Repair Brief", codex_task)
         self.assertIn("v4.3 Rendered Review Repair Brief", agent_guide)
-        self.assertIn("# v4.3 Rendered Review Revision Brief", revision_brief)
+        self.assertIn("# v5 Delivery Review Revision Brief", revision_brief)
         self.assertIn("Do not rewrite source facts", revision_brief)
         self.assertNotIn("客户等待时间下降 18%", revision_brief)
         self.assertEqual(repair_plan["status"], "applied")

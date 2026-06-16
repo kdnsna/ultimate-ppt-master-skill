@@ -18,51 +18,42 @@ description: >
 
 > Ultimate Fusion PPT Master: a Codex skill that fuses editable PPTX generation with magazine-style web deck generation.
 
-**Core Pipeline**: `Request → Output Mode Selection → Source Document → Project Setup → Design Workflow → Generate → Verify → Export/Preview`
+**Core Pipeline**: `Request → Source Document → One Delivery Brief → Assets → Generate → Verify → Export/Preview`
 
-**Quality Pipeline Add-on**: stakeholder-facing decks must also pass `Visual Direction Audit → Page Role Contract → Visual Completion Audit`.
+**Quality Pipeline Add-on**: stakeholder-facing decks must also pass `Visual Direction → Page Role Contract → Visual Completion Audit`.
 
-## Output Mode Selection (MANDATORY FIRST STEP)
+## Default Delivery Route
 
-When the user makes a generic PPT request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", or "turn this into slides", first present the two 终极融合PPT大师 modes and wait for the user's choice. Do not start content conversion, project creation, outline writing, or slide generation before this choice.
+The skill is optimized for real office PPT delivery. Keep the route decision simple:
 
-Use this concise chooser in the user's language:
+- For generic requests such as "做一个 PPT", "帮我做 PPT", "make a deck", or "turn this into slides", default to **Mode 1: Editable PPTX** and proceed. Say briefly that Web Deck remains available if the user wants a showcase-style browser version.
+- Choose **Mode 1: Editable PPTX** when the user asks for PowerPoint, `.pptx`, editable files, business reports, consulting decks, training material, government/finance material, or anything another person may need to revise.
+- Choose **Mode 2: Magazine Web Deck** only when the user explicitly asks for magazine style, web PPT, HTML slides, horizontal swipe deck, editorial/e-ink, Swiss Style, keynote/showcase/demo-day style, or a browser-first deliverable.
+- If the user asks for both, produce separate deliverables in separate project folders.
+- Ask the user to choose only when the request is genuinely route-ambiguous and the scenario cannot decide it. Ask one concise question, then continue.
 
-```markdown
-我可以做两种 PPT，先选一种：
+Plain-language wording for generic requests:
 
-1. 可编辑 PowerPoint（PPTX）
-   适合：正式汇报、咨询/商业报告、培训课件、需要交给别人继续改的文件。
-   特点：输出 .pptx，里面是真实文字、形状和图表，PowerPoint 里可继续编辑。
-
-2. 杂志风网页 PPT（HTML）
-   适合：线下分享、发布会、个人演讲、demo day、想要强视觉风格的展示。
-   特点：输出单个 index.html，横向翻页，电子杂志/电子墨水风格，有 WebGL 背景和动效；不适合多人在 PowerPoint 里继续编辑。
-
-你想做哪一种？如果不确定，我建议正式材料选 1，演讲分享选 2。
-```
-
-Selection rules:
-- If the user explicitly asks for editable PPTX, PowerPoint, `.pptx`, business/report/consulting/training deck, or "可编辑", choose **Mode 1: Editable PPTX**.
-- If the user explicitly asks for magazine style, web PPT, HTML slides, horizontal swipe deck, editorial magazine, e-ink/electronic ink, Swiss Style, 瑞士风, keynote/showcase/demo-day visual deck, choose **Mode 2: Magazine Web Deck**.
-- If the user has already selected "1", "PPTX", "可编辑", "2", "网页", "杂志风", or equivalent, proceed with that mode without asking again.
-- If the user asks for both modes, complete them as separate deliverables and keep their project folders separate.
+> 我会默认做可编辑 PPTX，适合正式汇报和后续修改；如果你想要杂志风网页 PPT，我也可以改走 HTML 版本。
 
 ## Formal Business Delivery Gate
 
 Default to `qualityGate.level = "formal-business"` for business/report/consulting/training/government/finance decks and for any deliverable expected to be handed to a real stakeholder. This is the default quality bar unless the user explicitly asks for a quick draft.
 
-Before generating final PPTX or Web Deck files, lock these items in `manifest.json`, `project-brief.json`, `agent-prompt.md`, and `quality-checklist.md`:
+Before generating final PPTX or Web Deck files, lock these items in `design_spec.md`, `spec_lock.md`, and `design-quality-report.md`:
 - Visual direction selection from `templates/visual-directions/`, or a documented `custom` benchmark when no direction fits.
 - Page role and recipe contract: every page has `page_role`, `visual_weight`, `layout_family`, `page_recipe_id`, `asset_requirement`, `visual_layer`, `raster_policy`, and `anti_patterns` in `design_spec.md` / `spec_lock.md`.
 - Brand assets or a documented fallback strategy.
+- Official/IP asset plan for deterministic marks mentioned by the source or user, such as company logos, campaign logos, tourism IP, product marks, QR codes, seals, and partner marks. Search official or authorized sources first; never draw a fake logo-shaped placeholder.
 - Traceable evidence sources and data interpretation boundaries.
-- ChatGPT/OpenAI as the primary visual asset engine for custom visuals; record prompts, filenames, target slides, and manual edits in `asset-plan.md`.
-- Reusable small element asset plan in `visual-element-kit.md`: section dividers, metric badges, process nodes, connectors, icon accents, textures, and callout stickers.
+- Codex native GPT image generation (`image2` when available) as the default visual asset engine for custom visuals; this is the Codex execution path for "ChatGPT/OpenAI as the primary visual asset engine". Record prompts, filenames, target slides, and manual edits in `asset-plan.md` or `images/image_prompts.md`.
+- Reusable small element asset plan when useful: section dividers, metric badges, process nodes, connectors, icon accents, textures, and callout stickers.
 - Local element generation state from `scripts/generate_visual_element_kit.py`: `assets/generated/element-manifest.json`, `images/image_prompts.json`, and `images/image_prompts.md`.
 - Public asset search plan for evidence, official references, and brand boundaries, or explicit no-search rationale; record source URL, publisher, license/usage note, and insertion target for each selected public asset.
+- `spec_lock.md brand_assets` and `asset-plan.md` / `images/image_sources.json` entries for every deterministic IP mark that will appear in the deck. Each entry must record `official-source`, `user-provided`, `text-lockup-fallback`, or `needs-authorized-replacement`.
 - Image, chart, and infographic plan, or an explicit no-image strategy.
 - Page rhythm, layout variety, and the role of each slide.
+- `spec_lock.md aesthetic_checks` covering body font baseline, title/body scale, card count, card padding, whitespace target, logo handling, and repeated-layout risk.
 - 4.0 hybrid-editable visual strategy: generated visuals support the page as no-text layers; formal body pages remain editable.
 - Visual completion status: screenshots/PNGs rendered, repeated-layout risk checked, placeholder assets labeled, and design-quality-report written.
 - Artifact checks for editable PPTX objects and complete Web Deck visual rendering.
@@ -74,16 +65,35 @@ Formal delivery rules:
 - Do not use full-page generated images for formal PPTX body pages. Full-page raster is allowed only for covers, section/tail pages, poster/KV pages, Web showcase pages, or explicit user override recorded in `raster_policy`.
 - Do not proceed with only slide titles unless the deck is clearly marked as a draft and the user accepts that limitation.
 - Do not use a generic "free design" look when a visual direction pack matches the deck context. Select the direction pack first, then adapt.
-- Treat ChatGPT/OpenAI as the primary visual asset engine when visuals can improve the deck. Generate custom supporting visuals and small reusable micro-assets before final slide assembly.
-- Generate and reuse a coherent element kit (`visual-element-kit.md`) rather than relying on random stock imagery: small section dividers, metric badges, process nodes, connectors, icon accents, subtle patterns, and callout stickers.
-- Run `python3 scripts/generate_visual_element_kit.py <project_path>` before final slide assembly. If no image backend/key is configured, continue with `Needs-Manual` prompts in `images/image_prompts.md`; do not block the whole deck.
+- Treat Codex native GPT image generation (`image2` when available) as the primary visual asset engine when visuals can improve the deck. Generate composed supporting visuals and small reusable micro-assets before final slide assembly.
+- Do not rely on random stock imagery or pure element stacking. Each AI visual must have a scene/composition role: background atmosphere, evidence illustration, process accent, conceptual metaphor, product/context scene, or no-text visual layer.
+- Generate and reuse a coherent element kit when it helps: small section dividers, metric badges, process nodes, connectors, icon accents, subtle patterns, and callout stickers.
+- Run `python3 scripts/generate_visual_element_kit.py <project_path>` before final slide assembly for formal decks with repeated micro-assets. If no image backend/key and no host-native image tool is available, continue with `Needs-Manual` prompts in `images/image_prompts.md`; do not block the whole deck.
 - Use public/official/reusable asset search mainly for factual evidence, official references, and brand boundaries; document the source and usage boundary before insertion.
-- Store ChatGPT/OpenAI generated assets under `assets/generated/` or the project image folder, and insert them as real assets.
+- For fixed IP names in the source, run official-source search before generation. Examples: `交通银行`, `好客山东`, `文旅大戏`, product/card names, partner organizations, city/tourism brands, app/mini-program marks, event marks. Prefer official websites, press releases, media kits, government/public-service portals, or user-provided files. Third-party logo download sites may be used only as search clues, not as final source evidence.
+- Deterministic IP assets are not decorative icons. Insert the real asset when officially sourced or user-provided; otherwise use a clean text lockup with a visible/documented replacement note. Do not create a fake symbol, generic badge, or "looks similar" mark.
+- Store Codex/GPT/OpenAI generated assets under `assets/generated/` or the project image folder, and insert them as real assets.
 - Private source material, internal screenshots, customer data, and API keys stay local unless the user explicitly approves upload.
 - PPTX output must use editable text, shapes, charts, images, and notes; do not flatten slides into full-page screenshots.
 - Logo and brand marks must use real assets, clean vector treatment, or a documented text fallback; logo must not degrade into text fragments such as `b` / `c`.
+- Known logos and campaign IP marks must not be replaced by arbitrary shapes, initials, icon badges, or generated approximations. If the official asset cannot be acquired safely, block external release in `design-quality-report.md` and record `needs-authorized-replacement`.
 - For Web Decks, verify desktop/mobile visual completeness, media rendering, and layout variety.
 - Design Doctor is report-only by default. Do not auto-repair SVG unless the user explicitly requests automatic repair.
+
+## Delivery Design Defaults
+
+Use these defaults unless the user, brand guide, or selected template explicitly overrides them:
+
+- **Font family**: default CJK and body font is `"Microsoft YaHei"` (微软雅黑), with `"PingFang SC"` only as a preview fallback and `Arial` as Latin fallback. This keeps PowerPoint handoff practical and avoids web-font copyright or install risk.
+- **Title/body relationship**: use Microsoft YaHei throughout for most formal decks, with weight contrast instead of extra fonts. Use serif/display contrast only when the deck needs an editorial, academic, or keynote tone and the font is pre-installed or clearly documented.
+- **Font sizes on 16:9 PPT**: cover title 60-92px, section title 44-60px, page title 30-40px, subtitle 22-28px, body 18-24px, chart labels/captions 12-16px. Dense consulting pages usually use body 18-20px; training or keynote pages use 22-24px.
+- **Scale and generosity**: avoid "small PPT" syndrome. Formal body text should normally be 20-22px when the page has 3-5 text groups; 18px is the lower bound for dense reports. If text must go below 18px, split the slide, convert prose to a table/process, or move detail to notes. Page titles should feel visibly dominant at roughly 1.6-2.0× body; card titles 1.15-1.35× body; footnotes stay visually secondary.
+- **Margins and grid**: 16:9 safe margin 48-64px, title band 72-96px, footer 28-40px, primary content area aligned to a 12-column grid or a deliberate asymmetric split. No text should touch canvas edges, chart axes, or decorative layers.
+- **Single-slide content limit**: one page communicates one primary judgment. Body pages should normally contain one dominant visual system plus 2-4 support points, or a dense table/chart with a clear takeaway title.
+- **Layout variety**: alternate page families across body pages: chart + takeaway, image/text split, process flow, evidence table, negative-space statement, matrix, timeline, FAQ/risk stack. Avoid repeated title + three cards as the default.
+- **Element discipline**: use flat shapes, crisp dividers, subtle fills, and restrained shadows. Cards are for grouped items, not for every paragraph. Icons support scanning; they do not replace content.
+- **Image discipline**: generated visuals are no-text support layers unless the page is a cover, section divider, poster/showcase, or intentionally image-led Web Deck page. Formal body PPTX remains editable.
+- **Polish discipline**: avoid tiny gutters, over-rounded cards, equal-weight boxes everywhere, weak title hierarchy, low-contrast gray text, orphan labels, crowded logos, random decorative lines, and unlicensed official-looking marks. Use whitespace, scale, alignment, and one clear dominant element before adding decoration.
 
 Run the formal audit when project artifacts exist:
 
@@ -100,13 +110,13 @@ If the audit fails, report the concrete issues and fix the deck before final del
 >
 > **This workflow is a strict serial pipeline. The following rules have the highest priority — violating any one of them constitutes execution failure:**
 >
-> 1. **SERIAL EXECUTION** — Steps MUST be executed in order; the output of each step is the input for the next. Non-BLOCKING adjacent steps may proceed continuously once prerequisites are met, without waiting for the user to say "continue"
-> 2. **BLOCKING = HARD STOP** — Steps marked ⛔ BLOCKING require a full stop; the AI MUST wait for an explicit user response before proceeding and MUST NOT make any decisions on behalf of the user
-> 3. **NO CROSS-PHASE BUNDLING** — Cross-phase bundling is FORBIDDEN. (Note: the Eight Confirmations in Step 4 are ⛔ BLOCKING — the AI MUST present recommendations and wait for explicit user confirmation before proceeding. Once the user confirms, all subsequent non-BLOCKING steps — design spec output, SVG generation, speaker notes, and post-processing — may proceed automatically without further user confirmation)
+> 1. **LEAN SERIAL EXECUTION** — Steps run in order, but do not manufacture extra waits. Once prerequisites are available, continue through non-blocking steps without asking the user to say "continue".
+> 2. **STOP ONLY FOR REAL BLOCKERS** — Stop only when a required source, route choice, legal/brand permission, or missing manual asset makes proceeding risky. Otherwise make reasonable assumptions, record them, and continue.
+> 3. **ONE DELIVERY BRIEF** — Replace multi-round confirmations with one concise delivery brief. The Strategist still decides canvas, page count, audience, style, colors, icons, typography, and images, but these are recorded as one production contract rather than a chain of user-facing checkpoints.
 > 4. **GATE BEFORE ENTRY** — Each Step has prerequisites (🚧 GATE) listed at the top; these MUST be verified before starting that Step
 > 5. **NO SPECULATIVE EXECUTION** — "Pre-preparing" content for subsequent Steps is FORBIDDEN (e.g., writing SVG code during the Strategist phase)
 > 6. **NO SUB-AGENT SVG GENERATION** — Executor Step 6 SVG generation is context-dependent and MUST be completed by the current main agent end-to-end. Delegating page SVG generation to sub-agents is FORBIDDEN
-> 7. **SEQUENTIAL PAGE GENERATION ONLY** — In Executor Step 6, after the global design context is confirmed, SVG pages MUST be generated sequentially page by page in one continuous pass. Grouped page batches (for example, 5 pages at a time) are FORBIDDEN
+> 7. **SEQUENTIAL PAGE GENERATION ONLY** — In Executor Step 6, after the global design context is locked, SVG pages MUST be generated sequentially page by page in one continuous pass. Grouped page batches (for example, 5 pages at a time) are FORBIDDEN
 > 8. **SPEC_LOCK RE-READ PER PAGE** — Before generating each SVG page, Executor MUST `read_file <project_path>/spec_lock.md`. All colors / fonts / icons / images MUST come from this file — no values from memory or invented on the fly. Executor MUST also look up the current page's `page_rhythm` tag and apply the matching layout discipline (`anchor` / `dense` / `breathing` — see executor-base.md §2.1). This rule exists to resist context-compression drift on long decks and to break the uniform "every page is a card grid" default
 > 9. **SVG MUST BE HAND-WRITTEN, NOT SCRIPT-GENERATED** — Editable PPTX SVG pages are written by the main agent directly, one page at a time. Do not batch-generate deck SVGs with Python / Node / shell scripts.
 
@@ -193,7 +203,7 @@ For complete tool documentation, see `${SKILL_DIR}/scripts/README.md`.
 
 ## Mode 2: Magazine Web Deck Workflow
 
-Use this workflow only when Output Mode Selection chooses the magazine-style web deck.
+Use this workflow only when the Default Delivery Route selects the magazine-style web deck.
 
 ### Web Step 1: Clarify the Deck Brief
 
@@ -370,7 +380,7 @@ This is a hint, not a question — do NOT block, do NOT require an answer. Skip 
 
 ---
 
-### Step 4: Strategist Phase (MANDATORY — cannot be skipped)
+### Step 4: Delivery Brief & Strategist Phase (MANDATORY — cannot be skipped)
 
 🚧 **GATE**: Step 3 complete; default free-design path taken, or (if triggered) template files copied into the project.
 
@@ -381,11 +391,11 @@ Read references/strategist.md
 
 > ⚠️ **Mandatory gate in `strategist.md`**: Before writing `design_spec.md`, Strategist MUST `read_file templates/design_spec_reference.md` and produce the spec following its full I–XI section structure. See `strategist.md` Section 1 for the explicit gate rule.
 
-> ⚠️ **Visual Direction Audit gate**: Before the Eight Confirmations, Strategist MUST read `templates/visual-directions/index.json`, select the closest visual direction pack (or `custom`), and state the selected pack, why it fits, top aesthetic risks, required page roles, and anti-patterns. This is a recommendation inside the Eight Confirmations bundle, not an extra blocking step.
+> ⚠️ **Visual Direction gate**: Strategist MUST read `templates/visual-directions/index.json`, select the closest visual direction pack (or `custom`), and record why it fits, top aesthetic risks, required page roles, page recipes, and anti-patterns.
 
-**Must complete the Eight Confirmations** (full template structure in `templates/design_spec_reference.md`):
+**Must complete one delivery brief**:
 
-⛔ **BLOCKING**: The Eight Confirmations MUST be presented to the user as a bundled set of recommendations, and you MUST **wait for the user to confirm or modify** before outputting the Design Specification & Content Outline. This is the single core confirmation point in the workflow. Once confirmed, all subsequent script execution and slide generation should proceed fully automatically.
+The delivery brief is one compact production decision, not eight separate user-facing confirmations. If the source, audience, and output route are sufficient, record assumptions and continue without waiting. Stop only if a missing answer would materially change the deliverable.
 
 1. Canvas format
 2. Page count range
@@ -396,7 +406,9 @@ Read references/strategist.md
 7. Typography plan
 8. Image usage approach
 
-After the eight items, append one short split-mode note in the user's language. For large page counts or bulky sources, recommend switching to `workflows/resume-execute.md` after Step 5 by opening a fresh chat and entering `继续生成 projects/<project_name>`; for normal scale, state that continuous mode is the default and split mode remains available.
+Use plain user-facing words in the brief. Avoid exposing specialist labels unless they are useful: say "可编辑正文", "页面角色", "主视觉", "图文分栏", "图表页", "风险页" instead of relying on `raster_policy`, `page_recipe_id`, or `layout_family` in chat. Keep the technical field names inside `design_spec.md` and `spec_lock.md`.
+
+For large page counts or bulky sources, add one short split-mode note in the user's language recommending `workflows/resume-execute.md` after Step 5 by opening a fresh chat and entering `继续生成 projects/<project_name>`. For normal scale, continuous mode is the default.
 
 If the user has provided images, run the analysis script **before outputting the design spec** (do NOT directly read/open image files — use the script output only):
 ```bash
@@ -413,7 +425,7 @@ python3 ${SKILL_DIR}/scripts/analyze_images.py <project_path>/images
 **✅ Checkpoint — Phase deliverables complete, auto-proceed to next step**:
 ```markdown
 ## ✅ Strategist Phase Complete
-- [x] Eight Confirmations completed (user confirmed)
+- [x] One delivery brief completed (or assumptions recorded)
 - [x] Design Specification & Content Outline generated
 - [x] Execution lock (spec_lock.md) generated
 - [ ] **Next**: Auto-proceed to [Image_Generator / Executor] phase
@@ -423,7 +435,7 @@ python3 ${SKILL_DIR}/scripts/analyze_images.py <project_path>/images
 
 ### Step 5: Image Acquisition Phase (Conditional)
 
-🚧 **GATE**: Step 4 complete; Design Specification & Content Outline generated and user confirmed.
+🚧 **GATE**: Step 4 complete; Design Specification & Content Outline generated, and any real blocker has been resolved.
 
 > **Trigger condition**: at least one Design Spec image row needs `Acquire Via: ai` and/or `Acquire Via: web`. If every row is `user` or `placeholder`, skip directly to Step 6.
 
@@ -437,7 +449,7 @@ Then lazy-load only the needed path-specific reference:
 
 | Acquire Via | Load reference | Run |
 |---|---|---|
-| `ai` | `references/image-generator.md` | `python3 ${SKILL_DIR}/scripts/image_gen.py --manifest <project_path>/images/image_prompts.json` |
+| `ai` | `references/image-generator.md` | Default to Codex native GPT image generation (`image2` when available); otherwise run `python3 ${SKILL_DIR}/scripts/image_gen.py --manifest <project_path>/images/image_prompts.json` |
 | `web` | `references/image-searcher.md` | `python3 ${SKILL_DIR}/scripts/image_search.py ...` |
 | `user` / `placeholder` | skip | skip |
 
@@ -449,7 +461,7 @@ Then lazy-load only the needed path-specific reference:
 - [x] No row remains `Pending`
 ```
 
-> On generation failure, do NOT halt — follow the Failure Handling rule in `references/image-generator.md` §4.3: retry once, then mark the row `Needs-Manual`, report to user, and continue to Step 6.
+> On generation failure, do NOT halt — follow the Failure Handling rule in `references/image-generator.md`: retry once, fall back between Codex/image2 and configured backend when possible, then mark the row `Needs-Manual`, report filename + reason, and continue to Step 6.
 
 ---
 

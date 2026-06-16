@@ -1,6 +1,6 @@
 interface:
   display_name: "终极融合PPT大师"
-  short_description: "Generate quality-checked PPTX/Web Decks"
+  short_description: "Codex-first quality-checked PPTX/Web Decks"
   icon_small: "./assets/skill-market/ultimate-ppt-master-icon.svg"
   icon_large: "./assets/skill-market/ultimate-ppt-master-card.svg"
   brand_color: "#0F766E"

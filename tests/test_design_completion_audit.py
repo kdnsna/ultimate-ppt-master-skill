@@ -36,7 +36,18 @@ def write_design_spec(project: Path) -> None:
 - Visual Direction: finance_internal_report
 - Benchmark Sentence: formal banking service deck with explicit page roles
 
+### Brand / IP Assets
+| Asset ID | Display Text / Mark | State | Source URL / Provenance | File Path | Target Pages | Release Boundary |
+| --- | --- | --- | --- | --- | --- | --- |
+| none-detected | none | text-lockup-fallback | none | none | none | none |
+
+### Scale Guardrail
+- Body baseline: 20px
+
 ## V. Layout Principles
+### Aesthetic Polish Checks
+- Dominant element: title and primary visual
+
 ### Page Role / Visual Weight Contract
 | page | page_role | visual_weight | layout_family | page_recipe_id | asset_requirement | visual_layer | raster_policy | anti_patterns |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -66,6 +77,27 @@ def write_spec_lock(project: Path, *, repeated: bool = False, missing_sections: 
 - id: finance_internal_report
 - benchmark: Formal banking service deck with explicit page roles.
 - release_boundary: internal-review
+
+## typography
+- font_family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif
+- body: 20
+- title: 36
+- subtitle: 24
+- annotation: 14
+
+## brand_assets
+- none-detected: none
+
+## aesthetic_checks
+- min_body_px: 18
+- target_body_px: 20-22
+- title_body_ratio: 1.6-2.0
+- card_title_body_ratio: 1.15-1.35
+- max_peer_cards_per_slide: 6
+- min_card_padding_px: 20
+- whitespace_strategy: one dominant quiet zone per page
+- logo_strategy: official-assets-first
+- polish_risks: title-too-small; body-below-18; overcrowded-cards; fake-logo
 
 ## page_roles
 - P01: anchor
@@ -206,6 +238,47 @@ class DesignCompletionAuditTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertIn("spec_lock.md missing section", result.stdout + result.stderr)
+
+    def test_too_small_body_font_fails(self):
+        with TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            write_project(project)
+            lock_path = project / "spec_lock.md"
+            lock_path.write_text(lock_path.read_text(encoding="utf-8").replace("- body: 20", "- body: 16"), encoding="utf-8")
+
+            result = subprocess.run(
+                ["python3", "scripts/audit_design_completion.py", str(project)],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("below formal minimum", result.stdout + result.stderr)
+
+    def test_known_ip_requires_brand_asset_plan(self):
+        with TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            write_project(project)
+            spec_path = project / "design_spec.md"
+            spec_path.write_text(
+                spec_path.read_text(encoding="utf-8") + "\n交通银行、好客山东与交通银行文旅大戏共同发布。\n",
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                ["python3", "scripts/audit_design_completion.py", str(project)],
+                cwd=ROOT,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        combined = result.stdout + result.stderr
+        self.assertIn("known IP mark", combined)
+        self.assertIn("交通银行", combined)
 
 
 if __name__ == "__main__":
