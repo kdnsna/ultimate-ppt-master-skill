@@ -83,6 +83,19 @@ Before generating each page, output which template is used:
 
 Before the first SVG page, output a confirmation listing: canvas dimensions, body font size, color scheme (primary/secondary/accent HEX), font plan. Prevents spec/execution drift.
 
+### 2.0 Delivery Layout Guardrails
+
+Apply these guardrails on every formal PPTX page unless `spec_lock.md` or the template gives a stricter value:
+
+- **Font**: use the font stack from `spec_lock.md`. For Chinese office delivery this should normally resolve to `"Microsoft YaHei"` / 微软雅黑. Do not introduce unlisted fonts during SVG generation.
+- **16:9 safe area**: keep major content inside 48-64px side margins and 40-56px top/bottom breathing space. Header bands are typically 72-96px; footers are 28-40px.
+- **One-page judgment**: each slide must make one primary judgment obvious through title, hierarchy, and dominant visual. Do not scatter equal-weight blocks across the page when one chart, table, image, or statement should lead.
+- **Text density**: formal body text normally sits at 18-24px; chart labels/captions at 12-16px; page titles at 30-40px. If content cannot fit without shrinking below the ramp, split the slide or convert text to a table/process visual.
+- **Aesthetic scale**: for formal business decks, prefer 20-22px body on ordinary report pages, 18px only for dense pages. Titles must be visibly dominant; avoid "everything is small but fits" layouts.
+- **Alignment**: align major edges and baselines to the declared grid or to a deliberate asymmetric split. Avoid accidental 5-10px misalignments between peer cards, charts, and text blocks.
+- **Containers**: use cards only for grouped peer items. Avoid wrapping every paragraph in a rounded rectangle; use whitespace, dividers, accent rules, and typography when grouping is enough.
+- **Visual layers**: generated images support the editable slide. Do not place full-page raster behind body content unless `raster_policy` explicitly allows it for cover/section/poster/showcase pages.
+
 ### 2.1 Per-page spec_lock re-read (Mandatory)
 
 > Long decks drift off the declared palette/icons mid-deck due to context compression. `spec_lock.md` is the canonical execution reference — re-read it per page to bypass model memory.
@@ -131,6 +144,8 @@ Before drawing each page, also look up these sections in `spec_lock.md`:
 | `raster_policy` | Decide whether full-page raster is prohibited or allowed for this page. |
 | `asset_requirements` | Decide whether a real/generated/schematic/labeled-placeholder asset is required. |
 | `anti_patterns` | List page-specific failure modes to avoid before drawing. |
+| `brand_assets` | Use official/user-provided marks or text lockups only; never fake official IP assets. |
+| `aesthetic_checks` | Enforce font scale, card count, padding, whitespace, logo zone, and polish risks. |
 
 Missing sections are allowed only for legacy decks. New formal-business decks MUST include them. If any section is missing, emit one warning: `visual completion contract incomplete — audit_design_completion.py may fail`.
 
@@ -147,6 +162,21 @@ Use `asset_requirements` literally:
 - `schematic`: draw or insert a schematic and label it as示意图 when the content could be mistaken for official imagery.
 - `placeholder-labeled`: placeholder is acceptable only with visible replacement text.
 - `none`: do not add decorative images just to satisfy a visual quota.
+
+Use `brand_assets` literally:
+
+- `official-source` / `user-provided`: insert the listed file or the exact officially sourced mark. Keep it in the reserved logo zone and do not stretch, recolor, crop, or redraw it unless the source/brand guide permits.
+- `text-lockup-fallback`: render the exact official text as a clean wordmark, using the deck font and a documented replacement note. Do not add a fake symbol beside it.
+- `needs-authorized-replacement`: use a clearly labeled placeholder only for internal draft flow and mark external release blocked in `design-quality-report.md`.
+- If the source/page text contains a known IP mark that is missing from `brand_assets`, pause the page design long enough to add it to `spec_lock.md` or surface the blocker. Do not quietly substitute an icon.
+
+Use `aesthetic_checks` literally:
+
+- Body text that carries primary content must be at least `min_body_px` (formal default 18px). If content cannot fit, reduce copy, split the slide, or change the visual structure.
+- Keep page-title/body ratio within the declared range (formal default 1.6-2.0×). If the title reads like card text, redesign the hierarchy.
+- Respect `max_peer_cards_per_slide`; more items become a table, matrix, timeline, or split slide.
+- Respect `min_card_padding_px`; cramped cards are a design failure, not a space-saving strategy.
+- Preserve the declared whitespace and logo strategies. A professional slide usually has one quiet zone and one dominant element; do not fill every gap with accents.
 
 **Per-page template lookup — `page_layouts` section**:
 

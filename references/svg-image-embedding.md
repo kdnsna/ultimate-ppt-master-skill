@@ -8,7 +8,7 @@ Technical spec and workflow for adding images to SVG files.
 
 ## Image Resource List Format
 
-Defined in the Design Specification & Content Outline; each image carries an `Acquire Via` field plus a status annotation. This file is authoritative for status names and SVG embedding behavior. If image approach includes "B) User-provided": run `analyze_images.py` right after the Eight Confirmations and complete the list before outputting the design spec.
+Defined in the Design Specification & Content Outline; each image carries an `Acquire Via` field plus a status annotation. This file is authoritative for status names and SVG embedding behavior. If image approach includes "B) User-provided": run `analyze_images.py` during the one delivery brief and complete the list before outputting the design spec.
 
 ```markdown
 | Filename | Dimensions | Purpose | Type | Acquire Via | Status | Reference |
@@ -37,7 +37,7 @@ Defined in the Design Specification & Content Outline; each image carries an `Ac
 ```
 1. Strategist defines image needs → Add image resource list with Acquire Via + Status per row
 2. Image Acquisition (Step 5):
-   - Pending + ai  → Image_Generator runs image_gen.py     → Generated
+   - Pending + ai  → Image_Generator uses Codex/image2 or image_gen.py fallback → Generated
    - Pending + web → Image_Searcher runs image_search.py   → Sourced
    - user / placeholder rows are skipped
 3. Executor generates SVGs (svg_output/)

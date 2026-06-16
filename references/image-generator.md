@@ -8,9 +8,11 @@ Role definition for the **AI image generation path**: convert each `Acquire Via:
 
 ---
 
-## 1. Core Principle — Maximize AI Image Capability in Service of the Deck
+## 1. Core Principle — Maximize GPT Image Capability in Service of the Deck
 
 AI images exist to serve the deck's communication goal. Pick whatever combination of `page_role` and `text_policy` makes the page work best.
+
+In Codex, the default is to actually invoke the native GPT image generation capability (`image2` when available) for each `Acquire Via: ai` row. Writing prompts without attempting generation is a fallback state, not the intended path.
 
 **Two page roles** (orthogonal to type):
 
@@ -32,6 +34,8 @@ AI images exist to serve the deck's communication goal. Pick whatever combinatio
 - HEX codes and color names are rendering guidance — never visible text in the image
 - Long body copy / data points / bulleted lists / long quotes stay in SVG (improving them later means regenerating the image, which is expensive)
 - Prompts are one coherent prose paragraph, not tag soup (a model-output reality, not an aesthetic choice)
+- Prompts describe a composed visual scene or system, not a bag of PPT decorations. Specify subject, spatial hierarchy, focal area, negative space, material/lighting, and how the image supports the slide layout.
+- Every generated asset must have a slide job: cover atmosphere, section transition, evidence illustration, process accent, conceptual metaphor, product/context scene, no-text visual layer, or micro-asset kit. Do not generate ornamental filler.
 
 Everything else is the AI's judgment per page. No mandated padding, no type-locked text_policy, no scenario whitelists for hero_page.
 
@@ -129,7 +133,7 @@ The assembled prompt is **one cohesive paragraph**, not a bulleted list of tags.
 
 ### Step 4 — Write the manifest and generate
 
-Write `project/images/image_prompts.json` per §6. Then run `image_gen.py --manifest` (§7 Path A). The CLI iterates `items[]`, writes status back, and re-renders the Markdown sidecar.
+Write `project/images/image_prompts.json` per §6. Then generate the images using the deterministic path order in §7: Codex/native GPT image generation first, configured backend second, manual prompt handoff last. The manifest remains the source of truth for filenames, prompts, and status.
 
 ---
 
@@ -274,23 +278,34 @@ C (AI-generated) supports three implementation modes sharing one `image_prompts.
 
 | Trigger | Mode | Mechanism |
 |---|---|---|
-| **Default** — `IMAGE_BACKEND` configured | **Path A**: `image_gen.py --manifest` | One command runs the whole manifest with concurrency; status writes back per item |
-| `IMAGE_BACKEND` not configured (or Path A fails) AND host has a native image tool | **Path B**: Host-native tool | Agent invokes the host's image capability; outputs land at `project/images/<filename>` |
+| **Default in Codex** — host has native GPT image generation | **Path A**: Host-native GPT image tool (`image2` in Codex) | Agent invokes the host image capability; outputs land at `project/images/<filename>` |
+| Host-native generation unavailable or fails, and `IMAGE_BACKEND` is configured | **Path B**: `image_gen.py --manifest` | One command runs the whole manifest with concurrency; status writes back per item |
 | **Both Path A and Path B fail/unavailable** | **Offline Manual Mode** | Manifest stays on disk; user generates externally from `items[].prompt` and places files at `project/images/<filename>` |
 
 **Selection logic** — monotonic A → B → C fallback chain (automatic, no user prompting):
 
-1. **Try Path A** — if `IMAGE_BACKEND` is configured (env or `.env`), run `image_gen.py --manifest`. If it fails twice in a row, fall to Path B.
-2. **Try Path B** — if `IMAGE_BACKEND` was not configured (A skipped), or A failed, and the host has a native image tool (Codex / Antigravity / Claude Code / similar), the agent invokes the host's image capability directly.
-3. **Fall to C (Offline Manual)** — if B is also unavailable (no host-native tool) or fails, write prompts to `images/image_prompts.json` and hand off to the user.
+1. **Try Path A** — if the host provides native GPT image generation, invoke it directly for every `Pending` item. In Codex, this means using the `image2`/GPT image generation capability rather than stopping at a prompt file.
+2. **Try Path B** — if Path A is unavailable or fails, and `IMAGE_BACKEND` is configured (env or `.env`), run `image_gen.py --manifest`. If it fails twice in a row, fall to Offline Manual.
+3. **Fall to C (Offline Manual)** — if B is also unavailable or fails, write prompts to `images/image_prompts.json` and hand off to the user.
 
-**User override**: If the user explicitly names Path B ("use Codex's image tool"), skip A and start at B. Explicit naming is the only way to bypass an earlier path in the chain; otherwise the chain is monotonic.
+**User override**: If the user explicitly asks to use a configured backend instead of Codex/native generation, start at Path B. If the user explicitly asks to use Codex's image tool, stay on Path A even when `IMAGE_BACKEND` is configured.
 
 **Hard rule**: Step 4 is execution, not re-decision. Never present an interactive choice between paths here — image strategy was locked in Strategist Step 4 h item.
 
 > All three modes share one output contract: file at `project/images/<filename>`. Step 6 SVG references are mode-agnostic.
 
-### Path A — `image_gen.py --manifest` (Default)
+### Path A — Host-Native GPT Image Tool (Default in Codex)
+
+Triggered automatically when the host provides native image generation (Codex image2/GPT image generation, Antigravity, Claude Code's image tool, or similar).
+
+- Invoke the host image tool for each `Pending` item using `items[].prompt` exactly as the source prompt. Add only operational sizing/filename instructions outside the creative prompt if the host requires them.
+- Use the requested aspect ratio and image size from the manifest. Prefer 16:9 for full-slide and wide region assets; use the row's target dimensions for local blocks and micro-assets.
+- Save or place the generated output at `project/images/<filename-from-resource-list>`.
+- After each file exists, set the corresponding manifest item `status` to `Generated`.
+- If the host tool returns a visual artifact outside the project folder, move/copy it into `project/images/` with the exact filename before Executor begins.
+- If a generation is visibly wrong (text appeared despite `text_policy: none`, wrong subject, unusable crop), revise only the failing item's prompt and regenerate once before marking it `Needs-Manual`.
+
+### Path B — `image_gen.py --manifest` (Configured backend fallback)
 
 ```bash
 python3 scripts/image_gen.py \
@@ -312,7 +327,7 @@ The CLI iterates `items[]` with adaptive concurrency, writes `status` back per i
 | `--model` | `-m` | Default model; per-item `model` wins | Backend default |
 | `--list-backends` | - | Print support tiers and exit | — |
 
-> The single-image form `image_gen.py "prompt" --filename ...` is preserved for ad-hoc one-offs (re-rolling a single image) but is no longer the primary path.
+> The single-image form `image_gen.py "prompt" --filename ...` is preserved for ad-hoc one-offs (re-rolling a single image) but is no longer the primary path in Codex.
 
 **Configuration sources**:
 - Current process environment variables
@@ -344,15 +359,6 @@ Precedence:
 - Interrupting mid-run is safe — completed items keep `status: Generated` and are skipped on re-run
 - On normal completion the Markdown sidecar is re-rendered automatically; if the run is interrupted, run `--render-md` manually to refresh the sidecar
 
-### Path B — Host-Native Image Tool
-
-Triggered automatically when `IMAGE_BACKEND` is not configured (or Path A fails) **and** the host provides a native image generation tool (Codex, Antigravity, Claude Code's image tool, and similar). No user prompting required — the agent detects the host capability and proceeds. The user may also explicitly name this path ("use Codex's image tool") to force it even when `IMAGE_BACKEND` is configured.
-
-- Agent invokes the host's native image tool directly; prompts come from `items[].prompt`
-- Outputs **must** land at `project/images/<filename-from-resource-list>` with dimensions matching the Image Resource List
-- After each placement, set the corresponding item's `status` to `Generated` in the manifest
-- Executor downstream is path-agnostic — no spec change required between Path A and Path B
-
 ### Offline Manual Mode (C's third implementation mode)
 
 **Trigger**: Both Path A and Path B fail or are unavailable.
@@ -374,9 +380,9 @@ Triggered automatically when `IMAGE_BACKEND` is not configured (or Path A fails)
 
 #### AI-specific Failure Handling (extends image-base.md §6)
 
-If Path A's backend fails twice in a row:
+If Path A host-native generation fails:
 
-1. Do not halt. Automatically attempt to fall back to **Path B (Host-Native Tool)**.
+1. Do not halt. Automatically attempt to fall back to **Path B (`image_gen.py --manifest`)** when `IMAGE_BACKEND` is configured.
 2. If Path B also fails or is unavailable, mark the row `Needs-Manual`.
 3. Report to user: filename, prompt used, error message.
 4. Fall through to **Offline Manual Mode** above.

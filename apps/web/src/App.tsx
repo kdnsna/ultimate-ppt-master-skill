@@ -215,7 +215,7 @@ const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v4";
-const appVersion = "4.3.0";
+const appVersion = "5.0.0";
 
 const designDoctorScores = [
   {
@@ -3426,7 +3426,7 @@ function buildSourceClaimsForDeckIR(form: FormState, sources: UploadedSource[]) 
 }
 
 function pendingRevisionBrief(title: string) {
-  return `# v4.3 Rendered Review Revision Brief
+  return `# v5 Delivery Review Revision Brief
 
 Project: ${title}
 Status: pending

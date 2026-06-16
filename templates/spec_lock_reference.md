@@ -21,6 +21,16 @@
 > `benchmark` is a one-sentence visual target.
 > `release_boundary` records asset or brand blockers for formal external use.
 
+## brand_assets
+- traffic_bank: required | text: 交通银行 | state: official-source | file: images/brand/traffic-bank-logo.png | source: https://www.bankcomm.com/... | pages: P01,P12
+- haoke_shandong: required | text: 好客山东 | state: text-lockup-fallback | file: none | source: official/public-service search required | pages: P01
+
+> Formal-business decks MUST include this section. Use one row per deterministic IP mark mentioned in the source/user request, or a single `none-detected: none` row when the scan finds no marks.
+>
+> Valid `state` values: `official-source`, `user-provided`, `text-lockup-fallback`, `needs-authorized-replacement`.
+>
+> Official/company/campaign/tourism/product/QR/seal marks are deterministic assets, not decorative icons. Insert real sourced/user-provided files when safe; otherwise use text lockup and block external release. Never fake, generate, or approximate a logo.
+
 ## colors
 - bg: #FFFFFF
 - primary: #......
@@ -37,13 +47,13 @@
 > **`image_rendering` and `image_palette`** — required only when `images` section below contains `ai`-sourced files. Values MUST be valid names from `references/image-renderings/_index.md` and `references/image-palettes/_index.md`. Image_Generator reads these and applies them deck-wide. Omit both rows when the deck has no AI-generated images.
 
 ## typography
-- font_family: "Microsoft YaHei", Arial, sans-serif
-- title_family: Georgia, SimSun, serif
+- font_family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif
+- title_family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif
 - body_family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif
-- emphasis_family: Georgia, SimSun, serif
+- emphasis_family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif
 - code_family: Consolas, "Courier New", monospace
-- body: 22
-- title: 32
+- body: 20
+- title: 36
 - subtitle: 24
 - annotation: 14
 
@@ -53,15 +63,28 @@
 >
 > `font_family` is the default fallback. Every declared family is a CSS font-stack string.
 >
-> **Source**: copy verbatim from the *Per-role font stacks* list in `design_spec.md §IV Font Plan`. Stack **order** encodes browser-rendering intent (Latin-led vs. CJK-led) that the breakdown table cannot — strings here must match character-for-character. See `design_spec.md §IV` for the explainer.
+> **Source**: copy verbatim from the *Per-role font stacks* list in `design_spec.md §IV Font Plan`. Stack **order** encodes browser-rendering intent (Latin-led vs. CJK-led) that the breakdown table cannot — strings here must match character-for-character. See `design_spec.md §IV` for the explainer. For Chinese office deliverables, default to `"Microsoft YaHei", "PingFang SC", Arial, sans-serif`.
 >
 > Sizes (`body` / `title` / etc.) are in px, matching SVG units. `body` is the **required baseline anchor** — all other sizes derive as ratios of it (ramp table: `design_spec_reference.md §IV`).
 >
-> **Size slots are anchors, not a closed menu.** Common slots (`title` / `subtitle` / `annotation`) cover frequent cases. Add role-specific slots (e.g. `cover_title: 72`, `hero_number: 48`, `chart_annotation: 13`) when needed — common for cover-heavy decks, consulting-style hero numbers, dense pages. Executor may use intermediate sizes as long as the ratio to `body` sits in the role's ramp band.
+> **Size slots are anchors, not a closed menu.** Common slots (`title` / `subtitle` / `annotation`) cover frequent cases. Add role-specific slots (e.g. `cover_title: 72`, `section_title: 52`, `hero_number: 48`, `chart_annotation: 13`) when needed — common for cover-heavy decks, consulting-style hero numbers, dense pages. Executor may use intermediate sizes as long as the ratio to `body` sits in the role's ramp band.
 >
 > **⚠️ PPT-safe stack discipline (HARD rule).** PPTX stores one `typeface` per run with no runtime fallback. Every stack MUST end with a cross-platform pre-installed font: `"Microsoft YaHei", sans-serif` / `SimSun, serif` / `Arial, sans-serif` / `"Times New Roman", serif` / `Consolas, "Courier New", monospace`. Non-preinstalled fonts (Inter / Google Fonts / brand typefaces) may lead the stack only when the Design Spec notes the font-install or embedding requirement.
 >
 > **Stack length discipline.** 3-4 fonts per stack is the sweet spot. Converter only writes the **first** Latin and **first** CJK font into PPTX — everything after is silently dropped. macOS-only families (`Songti SC`, `Menlo`, `Monaco`, `Helvetica`) are auto-mapped to Windows equivalents via `FONT_FALLBACK_WIN` (see `scripts/svg_to_pptx/drawingml_utils.py`); stacking both is redundant. Lead with Windows-preinstalled fonts (`Microsoft YaHei` / `SimSun` / `Arial` / `Georgia` / `Consolas`); keep at most **one** macOS-exclusive family (typically `"PingFang SC"`) as a browser-preview nicety.
+
+## aesthetic_checks
+- min_body_px: 18
+- target_body_px: 20-22
+- title_body_ratio: 1.6-2.0
+- card_title_body_ratio: 1.15-1.35
+- max_peer_cards_per_slide: 6
+- min_card_padding_px: 20
+- whitespace_strategy: one dominant quiet zone per page
+- logo_strategy: official-assets-first
+- polish_risks: title-too-small; body-below-18; overcrowded-cards; fake-logo; logo-crowding; weak-dominant-element; random-decoration; low-contrast-secondary-text
+
+> Formal-business decks MUST include this section. It prevents small-looking slides by making the scale contract explicit. `body` in `typography` must be >= `min_body_px`; page title ratio should stay inside `title_body_ratio`; primary card/body copy must not shrink below the minimum. If content does not fit, split or restructure the page.
 
 ## icons
 - library: chunk-filled

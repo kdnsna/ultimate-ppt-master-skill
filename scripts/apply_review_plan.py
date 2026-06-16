@@ -79,7 +79,7 @@ def candidate_bullets(candidates: list[dict[str, Any]]) -> str:
 def build_revision_brief(candidates: list[dict[str, Any]], applied_at: str) -> str:
     candidate_lines = candidate_bullets(candidates)
     return (
-        "# v4.3 Rendered Review Revision Brief\n\n"
+        "# v5 Delivery Review Revision Brief\n\n"
         f"Generated at: `{applied_at}`\n\n"
         "This brief is generated from `review-findings.json` and `repair-plan.json`.\n"
         "Do not rewrite source facts, business conclusions, or final body copy automatically.\n"

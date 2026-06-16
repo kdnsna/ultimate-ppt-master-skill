@@ -11,7 +11,7 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "4.3.0"
+VERSION = "5.0.0"
 
 MOVED_DOCS = {
     "docs/web-experience.md": "docs/guides/web-experience.md",
@@ -176,6 +176,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/guides/agent-setup.md",
         "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/quality/rendered-review-loop-v4.3.md",
+        "./docs/release/release-notes-v5.0.0.md",
         "./docs/release/release-notes-v4.2.0.md",
         "./docs/release/release-notes-v4.3.0.md",
         "./docs/strategy/skill-market-distribution.md",
@@ -187,6 +188,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/zh-CN/guides/agent-connect-bridge.md",
         "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+        "./docs/zh-CN/release/release-notes-v5.0.0.md",
         "./docs/zh-CN/release/release-notes-v4.2.0.md",
         "./docs/zh-CN/release/release-notes-v4.3.0.md",
         "./docs/zh-CN/strategy/skill-market-distribution.md",

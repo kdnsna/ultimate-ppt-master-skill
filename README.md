@@ -1,9 +1,9 @@
-# Ultimate PPT Master - AI Presentation Production Workbench
+# Ultimate PPT Master - v5 Delivery System for AI Presentations
 
-> Local-first AI presentation production for Chinese office work: turn source material into editable PPTX decks or magazine-style Web Decks, then use DeckIR planning, rendered review, safe repair briefs, page recipes, no-text generated visual layers, and formal delivery audits to keep the result usable in real office workflows.
+> Local-first AI presentation production for real office work: turn source material into editable PPTX or magazine-style Web Decks with one delivery brief, official/IP asset boundaries, Codex-first generated visuals, Microsoft YaHei typography defaults, rendered review, and formal delivery audits.
 
 <p align="center">
-  <strong>v4.3.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/guides/agent-connect-bridge.md">Agent Bridge</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v5.0.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/release/release-notes-v5.0.0.md">v5 Release Notes</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -13,17 +13,17 @@
   ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Benchmark Wall</strong></a>
   ·
-  <a href="./docs/quality/rendered-review-loop-v4.3.md"><strong>v4.3 Rendered Review Loop</strong></a>
+  <a href="./docs/release/release-notes-v5.0.0.md"><strong>v5.0.0 Notes</strong></a>
   ·
-  <a href="./docs/release/release-notes-v4.3.0.md"><strong>v4.3.0 Notes</strong></a>
+  <a href="./docs/guides/agent-connect-bridge.md"><strong>Agent Bridge</strong></a>
   ·
   <a href="./docs/strategy/skill-market-distribution.md"><strong>Skill Market Distribution</strong></a>
 </p>
 
 <p align="center">
-  <img alt="Version 4.3.0" src="https://img.shields.io/badge/Version-4.3.0-172033?style=for-the-badge">
-  <img alt="Rendered review loop" src="https://img.shields.io/badge/4.3-Rendered%20Review%20Loop-0F766E?style=for-the-badge">
-  <img alt="DeckIR planning" src="https://img.shields.io/badge/4.2-DeckIR%20Planning-2563EB?style=for-the-badge">
+  <img alt="Version 5.0.0" src="https://img.shields.io/badge/Version-5.0.0-172033?style=for-the-badge">
+  <img alt="Delivery defaults" src="https://img.shields.io/badge/v5-Delivery%20Defaults-0F766E?style=for-the-badge">
+  <img alt="Codex first visuals" src="https://img.shields.io/badge/Codex--first-Generated%20Visuals-2563EB?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
   <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-172033?style=for-the-badge">
@@ -35,41 +35,54 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 
 | Need | What Ultimate PPT Master gives you |
 |---|---|
-| Turn messy source material into slides | A local handoff folder with source markdown, DeckIR page map, evidence refs, and an Agent-ready brief. |
+| Make a real PowerPoint by default | Generic requests such as "make a deck" or "做个 PPT" default to editable PPTX instead of another route-selection loop. |
+| Reduce production friction | The old multi-confirmation flow is compressed into one delivery brief with route, audience, style, typography, assets, and constraints. |
+| Use better AI visuals | Codex/GPT image generation is treated as a composed visual engine for no-text backgrounds, support scenes, and micro-assets, not element stacking. |
+| Keep brands safe | Official/IP marks such as logos, campaign names, cards, QR codes, and partner marks require official-source, user-provided, text-lockup fallback, or replacement status. |
 | Keep PowerPoint editable | PPTX output keeps real text, shapes, tables, charts, notes, logos, QR codes, and traceable image sources. |
-| Avoid repetitive AI layouts | page recipes and `scripts/audit_visual_recipes.py` prevent repeated title-card grids and body-slide raster shortcuts. |
-| Review before revising | v4.3 writes `review-findings.json`, `repair-plan.json`, and user-approved `revision-brief.md` for the second pass. |
+| Avoid "small PPT" syndrome | Microsoft YaHei defaults, 16:9 spacing guardrails, title/body scale, card-count limits, and layout variety are locked before final assembly. |
+| Review before revising | Rendered review writes findings, a safe repair plan, and a user-approved `revision-brief.md` for the second pass. |
 | Stay local-first | The Bridge writes project files on localhost; private source material is not uploaded unless the user explicitly chooses that route. |
+
+## What v5 Changes
+
+v5.0.0 is the delivery-defaults release. The product is no longer described as a toolkit of separate capabilities first. It is described as a practical production system for handing a deck to a stakeholder.
+
+| v5 default | Practical effect |
+|---|---|
+| Editable PPTX first | Formal reports, consulting decks, finance/government material, and normal "make PPT" requests go straight to PowerPoint-ready output. |
+| One delivery brief | The agent records assumptions and proceeds unless a missing answer would materially change the deliverable. |
+| Codex-first generated visuals | Generated imagery supports the page as no-text layers or reusable micro-assets; body content remains editable. |
+| Official/IP asset plan | Deterministic marks are sourced or documented. Fake logo-like placeholders are blocked for external release. |
+| Typography and layout system | Microsoft YaHei is the default CJK office font; body text normally stays 18-24px with clear title/body scale and safe margins. |
+| Formal-business audit | `design_spec.md`, `spec_lock.md`, `design-quality-report.md`, asset manifests, and PPTX/Web artifacts are checked before delivery. |
 
 ## Product Loop
 
 ```text
 Source material
   -> Web Experience / Desktop / Bridge
-  -> DeckIR storyboard + source-map evidence boundary
-  -> page recipes + editability/raster policy
+  -> one delivery brief
+  -> official/IP asset plan
+  -> page roles + recipes + editability/raster policy
+  -> Codex/GPT no-text visual assets when useful
   -> editable PPTX or magazine Web Deck
   -> rendered review findings
-  -> safe repair plan
-  -> revision-brief.md for the approved second pass
+  -> safe repair plan + revision-brief.md
   -> formal delivery audits
 ```
 
 Core artifacts:
 
+- `design_spec.md`: human-readable design contract for visual direction, page roles, typography, assets, and completion risks.
+- `spec_lock.md`: machine-readable execution lock for page recipes, visual layers, raster policy, brand assets, and aesthetic checks.
 - `storyboard.json`: DeckIR page map with page roles, recipe IDs, evidence refs, raster policy, and editability targets.
 - `source-map.json`: traceable source claims used by the deck.
-- `planning-report.json`: route recommendation, fallback status, and planner notes.
+- `images/image_sources.json` and `images/image_prompts.json`: official/public/generative asset provenance and prompt records.
 - `review-findings.json`: rendered-review issues with severity, risk level, repair target, and suggested command.
 - `repair-plan.json`: low-risk repair candidates; default path is dry-run.
 - `revision-brief.md`: second-generation brief created only after explicit safe apply.
 - `quality-report.json`: merged delivery, planning, and rendered-review status.
-
-## v4.3 Rendered Review Loop
-
-v4.3 makes the review step actionable without making it dangerous. `scripts/review_rendered_deck.py` inspects the generated project and writes findings. `scripts/apply_review_plan.py --safe-only --dry-run` shows what would be applied. `--apply` only writes planning hints, reports, Agent instructions, and `revision-brief.md`; it does not rewrite `source.md`, business facts, or final body claims.
-
-Read the workflow: [Rendered Review Loop v4.3](./docs/quality/rendered-review-loop-v4.3.md). Release: [v4.3.0](./docs/release/release-notes-v4.3.0.md).
 
 ## 60-second quickstart
 
@@ -81,7 +94,7 @@ npm run doctor
 npm run bridge
 ```
 
-Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/). The v4.1 console still gives one primary next action at a time: prepare the brief, add source material, connect locally, and deliver the handoff project.
+Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skill/). The console keeps one primary next action visible: prepare the brief, add source material, connect locally, and deliver the handoff project.
 
 | Need | Best route | Output |
 |---|---|---|
@@ -93,13 +106,14 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 
 | Layer | Release | What it protects |
 |---|---|---|
+| Delivery defaults | [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) | Default PPTX route, one delivery brief, official/IP asset handling, Microsoft YaHei layout scale, and Codex-first image generation. |
 | Rendered review and repair brief | [v4.3 Rendered Review Loop](./docs/quality/rendered-review-loop-v4.3.md) | Review after rendering, propose low-risk repairs, generate `revision-brief.md` only after confirmation. |
 | AI planning | [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md) | `scripts/ai_storyboard.py`, `storyboard.json`, evidence refs, editability targets, and no-key fallback. |
 | Simplified Web console | [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md) | Four-step console, one primary next action, grouped previews, lower first-screen complexity. |
 | Hybrid-editable generation | [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) | page recipes, no-text generated visual layers, editable PPTX body content, formal raster policy. |
 | Public proof surface | [Quality Workbench v2.5](./docs/quality/quality-workbench-v2.5.md) | Benchmark Wall, synthetic proof packs, Design Doctor reporting, and release checks. |
 
-Historical release notes: [v4.2.0](./docs/release/release-notes-v4.2.0.md), [v4.1.0](./docs/release/release-notes-v4.1.0.md), [v4.0.0](./docs/release/release-notes-v4.0.0.md), [v3.0.0](./docs/release/release-notes-v3.0.0.md).
+Historical release notes: [v4.3.0](./docs/release/release-notes-v4.3.0.md), [v4.2.0](./docs/release/release-notes-v4.2.0.md), [v4.1.0](./docs/release/release-notes-v4.1.0.md), [v4.0.0](./docs/release/release-notes-v4.0.0.md), [v3.0.0](./docs/release/release-notes-v3.0.0.md).
 
 ## Proofs
 
@@ -107,10 +121,11 @@ The [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmar
 
 | Proof | Link |
 |---|---|
-| Stable proof matrix | [Quality Workbench v2.5](./docs/quality/quality-workbench-v2.5.md) |
+| v5 delivery-defaults release | [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) |
 | Rendered review release | [Release Notes - v4.3.0](./docs/release/release-notes-v4.3.0.md) |
 | DeckIR AI planning pack | [Release Notes - v4.2.0](./docs/release/release-notes-v4.2.0.md) |
 | Hybrid-editable release | [Release Notes - v4.0.0](./docs/release/release-notes-v4.0.0.md) |
+| Stable proof matrix | [Quality Workbench v2.5](./docs/quality/quality-workbench-v2.5.md) |
 | Skill marketplace readiness | [Skill Market Distribution](./docs/strategy/skill-market-distribution.md) |
 
 ## Use As Agent Skill
@@ -138,9 +153,12 @@ Guide: [Agent Setup](./docs/guides/agent-setup.md). Local connector: [Agent Conn
 | Install and invoke the Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | Choose PPTX vs Web Deck vs Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
 | Configure provider keys locally | [Model and Provider Setup](./docs/guides/model-provider-setup.md) |
+| Review v5 delivery defaults | [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) |
 | Review v4.3 repair flow | [Rendered Review Loop v4.3](./docs/quality/rendered-review-loop-v4.3.md) |
+| Apply rendered repair plan | [`scripts/apply_review_plan.py`](./scripts/apply_review_plan.py) |
 | Understand DeckIR AI planning | [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md) |
 | Understand the v4.0 visual contract | [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) |
+| Audit visual recipes | [`scripts/audit_visual_recipes.py`](./scripts/audit_visual_recipes.py) |
 | Review release maintenance | [Release and Maintenance](./docs/release/release-maintenance.md) |
 | Debug setup or generation issues | [Troubleshooting](./docs/guides/troubleshooting.md) |
 

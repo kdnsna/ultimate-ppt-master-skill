@@ -148,7 +148,7 @@ replication_mode: standard | fidelity | mirror
 - HEX values with role labels (primary / accent / background / text / etc.)
 - Brand-specific application rules when present (e.g. "KPI cards rotate blue→green→red→yellow")
 
-## III. Typography (omit when using the default `Arial, "Microsoft YaHei", sans-serif` stack)
+## III. Typography (omit when using the default `"Microsoft YaHei", "PingFang SC", Arial, sans-serif` stack)
 - Per-role font stacks ONLY when the template intentionally diverges (display serif title, brand typeface, etc.)
 - Font-install or embedding requirement when a non-preinstalled font leads any stack
 - Body baseline px (informational; `spec_lock.md` owns the actual values per project)

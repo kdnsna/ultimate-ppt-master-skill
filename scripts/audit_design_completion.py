@@ -18,6 +18,9 @@ from typing import Any
 
 REQUIRED_LOCK_SECTIONS = {
     "visual_direction",
+    "typography",
+    "brand_assets",
+    "aesthetic_checks",
     "page_roles",
     "visual_weight",
     "layout_family",
@@ -26,6 +29,26 @@ REQUIRED_LOCK_SECTIONS = {
     "raster_policy",
     "asset_requirements",
     "anti_patterns",
+}
+
+PAGE_LOCK_SECTIONS = REQUIRED_LOCK_SECTIONS - {
+    "visual_direction",
+    "typography",
+    "brand_assets",
+    "aesthetic_checks",
+}
+
+KNOWN_IP_MARKERS = {
+    "交通银行": ("traffic_bank", "bankcomm", "bank of communications", "bocom"),
+    "好客山东": ("haoke_shandong", "friendly_shandong", "hospitality_shandong"),
+    "文旅大戏": ("wenlv_daxi", "culture_tourism_show", "cultural_tourism_show"),
+}
+
+VALID_BRAND_STATES = {
+    "official-source",
+    "user-provided",
+    "text-lockup-fallback",
+    "needs-authorized-replacement",
 }
 
 SKIP_DIRS = {"node_modules", ".git", ".venv", "dist", "build", "__pycache__"}
@@ -148,6 +171,68 @@ def repeated_layout_failures(layouts: dict[str, str], roles: dict[str, str], ant
     return failures
 
 
+def first_number(value: str) -> float | None:
+    match = re.search(r"\d+(?:\.\d+)?", value)
+    return float(match.group(0)) if match else None
+
+
+def number_range(value: str) -> tuple[float, float] | None:
+    numbers = [float(item) for item in re.findall(r"\d+(?:\.\d+)?", value)]
+    if not numbers:
+        return None
+    if len(numbers) == 1:
+        return numbers[0], numbers[0]
+    return min(numbers[0], numbers[1]), max(numbers[0], numbers[1])
+
+
+def typography_scale_failures(lock: dict[str, dict[str, str]]) -> list[str]:
+    failures: list[str] = []
+    typography = lock.get("typography", {})
+    checks = lock.get("aesthetic_checks", {})
+    body = first_number(typography.get("body", ""))
+    if body is None:
+        return ["spec_lock.md typography must declare body font size"]
+    min_body = first_number(checks.get("min_body_px", "18")) or 18
+    if body < min_body:
+        failures.append(f"body font size {body:g}px is below formal minimum {min_body:g}px")
+    title = first_number(typography.get("title", ""))
+    ratio_range = number_range(checks.get("title_body_ratio", "1.6-2.0")) or (1.6, 2.0)
+    if title is not None:
+        ratio = title / body
+        if ratio < ratio_range[0] or ratio > ratio_range[1]:
+            failures.append(f"title/body ratio {ratio:.2f} outside formal range {ratio_range[0]:g}-{ratio_range[1]:g}")
+    for field in ("max_peer_cards_per_slide", "min_card_padding_px", "logo_strategy"):
+        if field not in checks:
+            failures.append(f"aesthetic_checks missing {field}")
+    return failures
+
+
+def brand_asset_failures(lock: dict[str, dict[str, str]], spec_text: str) -> list[str]:
+    failures: list[str] = []
+    rows = lock.get("brand_assets", {})
+    if not rows:
+        return ["spec_lock.md brand_assets has no entries"]
+    asset_text = "\n".join(f"{key}: {value}" for key, value in rows.items())
+    lowered_assets = asset_text.lower()
+    if "fake" in lowered_assets or "lookalike" in lowered_assets or "approximate-logo" in lowered_assets:
+        failures.append("brand_assets must not contain fake/lookalike/approximate logo handling")
+    if set(rows) != {"none-detected"}:
+        for key, value in rows.items():
+            if key == "none-detected":
+                continue
+            state_match = re.search(r"state:\s*([a-z-]+)", value)
+            if not state_match:
+                failures.append(f"brand_assets {key} missing state")
+            elif state_match.group(1) not in VALID_BRAND_STATES:
+                failures.append(f"brand_assets {key} has invalid state {state_match.group(1)}")
+    for marker, aliases in KNOWN_IP_MARKERS.items():
+        if marker in spec_text:
+            marker_present = marker.lower() in lowered_assets or any(alias in lowered_assets for alias in aliases)
+            if not marker_present:
+                failures.append(f"known IP mark `{marker}` missing from brand_assets")
+    return failures
+
+
 def audit_project(path: Path) -> dict[str, Any]:
     files = find_project_files(path)
     failures: list[str] = []
@@ -159,9 +244,10 @@ def audit_project(path: Path) -> dict[str, Any]:
 
     if not files["design_spec"]:
         failures.append("missing design_spec.md")
+        spec_text = ""
     else:
         spec_text = "\n".join(read_text(p) for p in files["design_spec"])
-        for token in ["Visual Direction", "Page Role / Visual Weight Contract", "page_recipe_id", "visual_layer", "raster_policy", "anti_patterns"]:
+        for token in ["Visual Direction", "Brand / IP Assets", "Page Role / Visual Weight Contract", "page_recipe_id", "visual_layer", "raster_policy", "anti_patterns", "Aesthetic"]:
             if token not in spec_text:
                 failures.append(f"design_spec.md missing visual-completion token: {token}")
 
@@ -176,7 +262,7 @@ def audit_project(path: Path) -> dict[str, Any]:
             role_pages = section_pages(lock["page_roles"])
             if not role_pages:
                 failures.append("spec_lock.md page_roles has no PNN entries")
-            for section_name in ["visual_weight", "layout_family", "page_recipes", "visual_layers", "raster_policy", "asset_requirements", "anti_patterns"]:
+            for section_name in sorted(PAGE_LOCK_SECTIONS - {"page_roles"}):
                 missing_pages = sorted(set(role_pages) - set(section_pages(lock[section_name])))
                 if missing_pages:
                     failures.append(f"spec_lock.md {section_name} missing page(s): {', '.join(missing_pages)}")
@@ -187,6 +273,8 @@ def audit_project(path: Path) -> dict[str, Any]:
             failures.extend(repeated_layout_failures(lock["page_recipes"], lock["page_roles"], lock["anti_patterns"]))
             if lock["visual_direction"].get("id", "") in {"", "custom"} and not lock["visual_direction"].get("benchmark"):
                 failures.append("visual_direction custom requires a benchmark")
+            failures.extend(brand_asset_failures(lock, spec_text))
+            failures.extend(typography_scale_failures(lock))
             for page, policy in lock["raster_policy"].items():
                 if re.fullmatch(r"P\d{2}", page):
                     role = lock["page_roles"].get(page, "")

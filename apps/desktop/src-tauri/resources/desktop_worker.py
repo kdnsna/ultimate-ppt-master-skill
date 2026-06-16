@@ -1351,8 +1351,10 @@ def formal_quality_gate() -> dict[str, Any]:
         "requiredInputs": [
             "visual direction pack or documented custom benchmark",
             "brand assets or explicit fallback strategy",
+            "official/IP asset plan for deterministic marks and no fake logo substitutes",
             "traceable source evidence",
             "page role and recipe contract with visual weight, layout family, page recipe, visual layer, raster policy, asset requirement, and anti-patterns",
+            "aesthetic scale contract covering body baseline, title/body ratio, card bounds, whitespace, and logo strategy",
             "ChatGPT-generation-first visual asset plan with prompts, filenames, and insertion targets",
             "small reusable element kit plan for section dividers, metric badges, process nodes, connectors, and icons",
             "page visual layer plan for no-text backgrounds, patterns, process accents, and metric accents",
@@ -1370,6 +1372,8 @@ def formal_quality_gate() -> dict[str, Any]:
             "page visual layers are no-text support assets and are not allowed to contain policy wording, numbers, logos, QR codes, or body copy",
             "generated assets are stored under assets/generated and listed in asset-plan.md",
             "public web asset searches are limited to evidence, official references, or brand boundaries and record source URLs, licensing notes, and insertion targets",
+            "fixed IP marks use official/user-provided assets or documented text-lockup fallback; never arbitrary logo-like shapes",
+            "formal primary body text stays at or above the declared minimum and pages are split/restructured instead of shrinking text",
             "PPTX keeps real editable text, shapes, charts, and notes",
             "Web Deck has a complete visual system, layout variety, and desktop/mobile readability",
             "logo must not degrade into text fragments",
@@ -1377,7 +1381,7 @@ def formal_quality_gate() -> dict[str, Any]:
         ],
         "artifactChecks": [
             "manifest.json contains formal-business qualityGate",
-            "design_spec.md and spec_lock.md contain visual direction, page role, recipe, visual layer, and raster policy contracts",
+            "design_spec.md and spec_lock.md contain visual direction, brand_assets, aesthetic_checks, page role, recipe, visual layer, and raster policy contracts",
             "HTML/PPTX expose enough layout types",
             "real image/brand assets are used or no-image strategy is explicit",
             "asset-plan.md records public searches, generated assets, citations, and insert targets",
@@ -1781,6 +1785,31 @@ def page_contract_for_outline(outline: list[dict[str, Any]]) -> list[dict[str, s
     return contracts
 
 
+KNOWN_IP_ASSETS = [
+    ("traffic_bank", "交通银行", "official corporate source required"),
+    ("haoke_shandong", "好客山东", "official tourism/public-service source required"),
+    ("wenlv_daxi", "文旅大戏", "official activity/news page required"),
+]
+
+
+def brand_asset_rows(title: str) -> tuple[str, str]:
+    records = [item for item in KNOWN_IP_ASSETS if item[1] in title]
+    if not records:
+        spec_row = "| none-detected | none | text-lockup-fallback | none | none | none | none |"
+        lock_row = "- none-detected: none"
+        return spec_row, lock_row
+    spec_lines = []
+    lock_lines = []
+    for asset_id, text, source_note in records:
+        spec_lines.append(
+            f"| {asset_id} | {text} | text-lockup-fallback | {source_note} | none | P01 | replace before external release |"
+        )
+        lock_lines.append(
+            f"- {asset_id}: required | text: {text} | state: text-lockup-fallback | file: none | source: {source_note} | pages: P01"
+        )
+    return "\n".join(spec_lines), "\n".join(lock_lines)
+
+
 def design_spec_text(title: str, style: str, output_mode: str, direction: dict[str, str], contracts: list[dict[str, str]]) -> str:
     rows = "\n".join(
         "| {page} | {page_role} | {visual_weight} | {layout_family} | {page_recipe_id} | {asset_requirement} | {visual_layer} | {raster_policy} | {anti_patterns} |".format(**item)
@@ -1790,6 +1819,7 @@ def design_spec_text(title: str, style: str, output_mode: str, direction: dict[s
         "- {page}: {title} | role={page_role} | recipe={page_recipe_id} | layer={visual_layer} | raster={raster_policy}".format(**item)
         for item in contracts
     )
+    brand_spec_rows, _ = brand_asset_rows(title)
     return f"""# Design Specification
 
 ## I. Project Info
@@ -1809,11 +1839,22 @@ def design_spec_text(title: str, style: str, output_mode: str, direction: dict[s
 - Visual Strategy Mode: hybrid-editable
 - Raster Slide Mode: disabled_for_formal_body
 
+### Brand / IP Assets
+| Asset ID | Display Text / Mark | State | Source URL / Provenance | File Path | Target Pages | Release Boundary |
+| --- | --- | --- | --- | --- | --- | --- |
+{brand_spec_rows}
+
 ## IV. Typography
-- Body baseline: 18 px equivalent
+- Body baseline: 20 px equivalent
 - Title/body split: display title plus readable dense body text
 
 ## V. Layout Principles
+### Aesthetic Polish Checks
+- Dominant element: title plus one primary visual system
+- Body baseline: 20px; formal minimum: 18px
+- Card count bound: max 6 peer cards per slide
+- Logo strategy: official-assets-first
+
 ### Page Role / Visual Weight Contract
 | page | page_role | visual_weight | layout_family | page_recipe_id | asset_requirement | visual_layer | raster_policy | anti_patterns |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -1844,13 +1885,14 @@ def design_spec_text(title: str, style: str, output_mode: str, direction: dict[s
 """
 
 
-def spec_lock_text(direction: dict[str, str], contracts: list[dict[str, str]]) -> str:
+def spec_lock_text(title: str, direction: dict[str, str], contracts: list[dict[str, str]]) -> str:
     def section(name: str, key: str) -> str:
         lines = [f"## {name}"]
         for item in contracts:
             lines.append(f"- {item['page']}: {item[key]}")
         return "\n".join(lines)
 
+    _, brand_lock_rows = brand_asset_rows(title)
     return "\n\n".join(
         [
             "\n".join(
@@ -1859,6 +1901,31 @@ def spec_lock_text(direction: dict[str, str], contracts: list[dict[str, str]]) -
                     f"- id: {direction['id']}",
                     f"- benchmark: {direction['benchmark']}",
                     f"- release_boundary: {direction['release_boundary']}",
+                ]
+            ),
+            "\n".join(
+                [
+                    "## typography",
+                    '- font_family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif',
+                    "- body: 20",
+                    "- title: 36",
+                    "- subtitle: 24",
+                    "- annotation: 14",
+                ]
+            ),
+            "\n".join(["## brand_assets", brand_lock_rows]),
+            "\n".join(
+                [
+                    "## aesthetic_checks",
+                    "- min_body_px: 18",
+                    "- target_body_px: 20-22",
+                    "- title_body_ratio: 1.6-2.0",
+                    "- card_title_body_ratio: 1.15-1.35",
+                    "- max_peer_cards_per_slide: 6",
+                    "- min_card_padding_px: 20",
+                    "- whitespace_strategy: one dominant quiet zone per page",
+                    "- logo_strategy: official-assets-first",
+                    "- polish_risks: title-too-small; body-below-18; overcrowded-cards; fake-logo; logo-crowding; weak-dominant-element",
                 ]
             ),
             section("page_roles", "page_role"),
@@ -2227,7 +2294,7 @@ def write_formal_delivery_files(
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         written.append(path)
     design_spec_path.write_text(design_spec_text(title, job["stylePreset"], job["outputMode"], visual_direction, page_contracts), encoding="utf-8")
-    spec_lock_path.write_text(spec_lock_text(visual_direction, page_contracts), encoding="utf-8")
+    spec_lock_path.write_text(spec_lock_text(title, visual_direction, page_contracts), encoding="utf-8")
     written.extend([design_spec_path, spec_lock_path])
     page_visual_manifest_path.parent.mkdir(parents=True, exist_ok=True)
     page_visual_manifest_path.write_text(json.dumps(page_visual_manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

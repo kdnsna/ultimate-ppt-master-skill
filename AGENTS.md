@@ -14,12 +14,12 @@ Use this repository as a portable presentation-generation skill package for agen
 
 Use this skill when the user asks to create, rewrite, convert, or polish a PPT, PowerPoint, deck, slide deck, presentation, 演示文稿, or 幻灯片.
 
-For generic requests like “做一个 PPT” or “make a deck”, first show the two output modes and wait for the user to choose:
+For generic requests like “做一个 PPT” or “make a deck”, default to editable PowerPoint and proceed. Mention the web deck option briefly, but do not stop for a mode choice unless the request is genuinely ambiguous.
 
 1. Editable PowerPoint (`.pptx`)
 2. Magazine-style web deck (`index.html`; default editorial/e-ink style, optional Swiss Style)
 
-Do not start conversion or generation before the user chooses a mode unless the user already made the mode explicit.
+Use the web deck route only when the user explicitly asks for HTML, web PPT, magazine/editorial/e-ink, Swiss Style, horizontal swipe, keynote/showcase/demo-day, or browser-first delivery.
 
 ## Runtime
 
