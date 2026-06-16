@@ -12,6 +12,7 @@
 | **Canvas Format** | {canvas_info['name']} ({canvas_info['dimensions']}) |
 | **Page Count** | [Filled by Strategist] |
 | **Design Style** | {design_style} |
+| **Theme Art Direction** | [Filled by Strategist, e.g., `山海交汇 烟火同行` for cultural-tourism decks, or `restrained-title-lockup` for serious work reports] |
 | **Target Audience** | [Filled by Strategist] |
 | **Use Case** | [Filled by Strategist] |
 | **Created Date** | {date_str} |
@@ -43,6 +44,26 @@
 - **External Release Boundary**: [what must be replaced or verified before formal external release]
 - **Visual Strategy Mode**: [default `hybrid-editable`; generated no-text visual layers support editable PPTX structure]
 - **Raster Slide Mode**: [default `disabled_for_formal_body`; full-page raster only for cover/section/poster/showcase pages]
+
+### Theme Art Direction
+
+> Strategist: after reading the source and selecting the visual direction, name one artistic concept that can carry the deck. Keep it specific to the topic, not a generic mood label.
+
+- **Art Direction Name**: [e.g., `山海交汇 烟火同行` / `Urban Service Flow` / `Restrained Compliance Ledger`]
+- **Why It Fits The Source**: [one concrete sentence linking source topic, audience, and emotional tone]
+- **Motif System**: [3-5 motifs, e.g., mountain/sea contour, travel stamp, night-market glow, route line, bank-brand red accent]
+- **Scope**: [deck-wide / cover+section+tail / cover+tail only / restrained-title-only]
+- **Main Title Treatment**: [artistic lockup / motif-integrated framing / generated no-text cover visual + editable title / restrained report title]
+- **Serious Context Exception**: [write `not-applicable`, or explain why a work report / serious government / compliance deck uses a restrained title treatment]
+- **AI Visual Prompt Seed**: [one no-text prompt seed for Codex/GPT visuals; must describe composition, not just list elements]
+
+Machine field mapping: copy this section into `spec_lock.md visual_direction` as `theme_art_direction`, `theme_motif`, `theme_scope`, `title_treatment`, and `serious_context_exception`.
+
+Rules:
+- Cultural, tourism, brand, training, campaign, education, keynote, showcase, and public-facing decks should usually have an expressive theme art direction. Example: a cultural-tourism finance deck can use `山海交汇 烟火同行` to blend coastline, mountain silhouettes, travel route marks, warm market lights, and disciplined banking structure.
+- Work reports, serious government briefings, compliance/finance risk decks, and highly regulated material may use a restrained title lockup. Still name the direction, but document the exception and keep the cover/tail professional.
+- Body copy remains editable and office-safe. Use Microsoft YaHei for body text; create title artistry through composition, weight, spacing, vector strokes, masks, and generated no-text visual support rather than unlicensed fonts.
+- The art direction must appear in `spec_lock.md visual_direction` and `spec_lock.md aesthetic_checks`, then show up at least on cover and closing pages unless the serious-context exception says otherwise.
 
 ### Brand / IP Assets
 
@@ -110,6 +131,8 @@ Rules:
 > **Per-role families are expected, not optional.** Title / Body / Emphasis / Code may each use a different family (e.g., display serif title + geometric sans body). One family throughout is not required. See [strategist.md §g — Font Combinations](../references/strategist.md) for starting directions; you may propose a combination not listed.
 >
 > **Default Chinese office delivery**: use `"Microsoft YaHei"` / 微软雅黑 for title and body unless the user, brand guide, or selected template explicitly requires another installed font. Make the deck feel premium through weight, scale, spacing, hierarchy, and layout, not through risky web fonts.
+>
+> **Theme title treatment**: when §III Theme Art Direction is expressive, the main title should receive an artistic lockup or motif-integrated framing while remaining editable or drawn as safe vector treatment. Do not use unlicensed display fonts. In serious work-report/government/compliance contexts, use a restrained title lockup and document the exception in §III.
 >
 > **⚠️ PPT-safe stack discipline (HARD rule).** PPTX stores a single `typeface` per run — no runtime fallback. Every stack MUST end with a cross-platform pre-installed font: `"Microsoft YaHei", sans-serif` / `SimSun, serif` / `Arial, sans-serif` / `"Times New Roman", serif` / `Consolas, "Courier New", monospace`. Stacks led by a non-preinstalled font (Inter / Google Fonts / brand typefaces) are allowed only when this spec notes the font-install or embedding requirement.
 

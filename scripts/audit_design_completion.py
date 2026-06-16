@@ -207,6 +207,32 @@ def typography_scale_failures(lock: dict[str, dict[str, str]]) -> list[str]:
     return failures
 
 
+def theme_art_direction_failures(lock: dict[str, dict[str, str]]) -> list[str]:
+    failures: list[str] = []
+    visual_direction = lock.get("visual_direction", {})
+    checks = lock.get("aesthetic_checks", {})
+    for field in (
+        "theme_art_direction",
+        "theme_motif",
+        "theme_scope",
+        "title_treatment",
+        "serious_context_exception",
+    ):
+        if not visual_direction.get(field, "").strip():
+            failures.append(f"visual_direction missing {field}")
+    scope = visual_direction.get("theme_scope", "").strip()
+    if scope and scope not in {"deck-wide", "cover+section+tail", "cover+tail", "restrained-title-only"}:
+        failures.append("visual_direction theme_scope has invalid value")
+    for field in ("theme_art_direction", "title_art_treatment", "cover_tail_motif"):
+        if field not in checks:
+            failures.append(f"aesthetic_checks missing {field}")
+    title_treatment = visual_direction.get("title_treatment", "").lower()
+    serious_exception = visual_direction.get("serious_context_exception", "").lower()
+    if "restrained" in title_treatment and serious_exception in {"", "none", "not-applicable", "n/a"}:
+        failures.append("restrained title_treatment requires serious_context_exception")
+    return failures
+
+
 def brand_asset_failures(lock: dict[str, dict[str, str]], spec_text: str) -> list[str]:
     failures: list[str] = []
     rows = lock.get("brand_assets", {})
@@ -247,7 +273,7 @@ def audit_project(path: Path) -> dict[str, Any]:
         spec_text = ""
     else:
         spec_text = "\n".join(read_text(p) for p in files["design_spec"])
-        for token in ["Visual Direction", "Brand / IP Assets", "Page Role / Visual Weight Contract", "page_recipe_id", "visual_layer", "raster_policy", "anti_patterns", "Aesthetic"]:
+        for token in ["Visual Direction", "Theme Art Direction", "Brand / IP Assets", "Page Role / Visual Weight Contract", "page_recipe_id", "visual_layer", "raster_policy", "anti_patterns", "Aesthetic"]:
             if token not in spec_text:
                 failures.append(f"design_spec.md missing visual-completion token: {token}")
 
@@ -275,6 +301,7 @@ def audit_project(path: Path) -> dict[str, Any]:
                 failures.append("visual_direction custom requires a benchmark")
             failures.extend(brand_asset_failures(lock, spec_text))
             failures.extend(typography_scale_failures(lock))
+            failures.extend(theme_art_direction_failures(lock))
             for page, policy in lock["raster_policy"].items():
                 if re.fullmatch(r"P\d{2}", page):
                     role = lock["page_roles"].get(page, "")

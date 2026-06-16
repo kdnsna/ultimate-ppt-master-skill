@@ -279,6 +279,33 @@ def audit_typography_scale(lock: dict[str, dict[str, str]]) -> list[str]:
     return errors
 
 
+def audit_theme_art_direction(lock: dict[str, dict[str, str]]) -> list[str]:
+    errors: list[str] = []
+    visual_direction = lock.get("visual_direction", {})
+    checks = lock.get("aesthetic_checks", {})
+    for field in (
+        "theme_art_direction",
+        "theme_motif",
+        "theme_scope",
+        "title_treatment",
+        "serious_context_exception",
+    ):
+        value = visual_direction.get(field, "").strip()
+        if not value:
+            errors.append(f"visual_direction must declare {field}.")
+    scope = visual_direction.get("theme_scope", "").strip()
+    if scope and scope not in {"deck-wide", "cover+section+tail", "cover+tail", "restrained-title-only"}:
+        errors.append("visual_direction theme_scope must be deck-wide, cover+section+tail, cover+tail, or restrained-title-only.")
+    for field in ("theme_art_direction", "title_art_treatment", "cover_tail_motif"):
+        if field not in checks:
+            errors.append(f"aesthetic_checks must declare {field}.")
+    title_treatment = visual_direction.get("title_treatment", "").lower()
+    serious_exception = visual_direction.get("serious_context_exception", "").lower()
+    if "restrained" in title_treatment and serious_exception in {"", "none", "not-applicable", "n/a"}:
+        errors.append("restrained title_treatment must explain the serious_context_exception.")
+    return errors
+
+
 def audit_element_manifests(element_manifests: list[Path]) -> tuple[list[str], bool]:
     errors: list[str] = []
     has_terminal_record = False
@@ -365,6 +392,7 @@ def audit_design_contract(design_specs: list[Path], spec_locks: list[Path]) -> l
         combined = "\n".join(read_text(path) for path in design_specs)
         for token in (
             "Visual Direction",
+            "Theme Art Direction",
             "Brand / IP Assets",
             "Page Role / Visual Weight Contract",
             "page_recipe_id",
@@ -387,6 +415,7 @@ def audit_design_contract(design_specs: list[Path], spec_locks: list[Path]) -> l
         combined_design = "\n".join(read_text(path) for path in design_specs) if design_specs else ""
         errors.extend(audit_brand_assets(lock, combined_design))
         errors.extend(audit_typography_scale(lock))
+        errors.extend(audit_theme_art_direction(lock))
     return errors
 
 

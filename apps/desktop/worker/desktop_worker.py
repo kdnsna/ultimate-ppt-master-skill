@@ -1644,22 +1644,59 @@ Do not embed body text, numbers, logos, or long labels inside generated images; 
 """
 
 
-def visual_direction_for_style(style: str, output_mode: str) -> dict[str, str]:
+def visual_direction_for_style(style: str, output_mode: str, title: str = "") -> dict[str, str]:
     if style == "consulting":
         direction_id = "consulting_analysis"
         benchmark = "Top-tier consulting analysis deck with varied evidence, process, and decision pages."
+        theme = {
+            "theme_art_direction": "evidence-to-decision arc",
+            "theme_motif": "source cards; decision arrows; executive rule lines; quiet proof zones",
+            "theme_scope": "cover+section+tail",
+            "title_treatment": "restrained executive title with evidence-line framing",
+            "serious_context_exception": "consulting/business decision deck keeps title restrained",
+        }
     elif style == "academic":
         direction_id = "training_courseware"
         benchmark = "Structured courseware deck with clear learning rhythm and diagram-first explanation pages."
+        theme = {
+            "theme_art_direction": "learning path with clear checkpoints",
+            "theme_motif": "chapter markers; path lines; diagram frames; practice callouts",
+            "theme_scope": "deck-wide",
+            "title_treatment": "friendly instructional title lockup with chapter motif",
+            "serious_context_exception": "not-applicable",
+        }
     elif style in {"editorial", "swiss"} or output_mode == "web":
         direction_id = "launch_promotion"
         benchmark = "High-rhythm web presentation with strong anchors, metric moments, and controlled visual contrast."
+        theme = {
+            "theme_art_direction": "story-led showcase rhythm",
+            "theme_motif": "editorial anchors; oversized title grid; section stamp; high-contrast reveal",
+            "theme_scope": "deck-wide",
+            "title_treatment": "artistic editorial title lockup with motif-integrated framing",
+            "serious_context_exception": "not-applicable",
+        }
     else:
         direction_id = "finance_internal_report"
         benchmark = "Formal internal business report with source-grounded evidence pages and restrained brand expression."
+        theme = {
+            "theme_art_direction": "restrained-title-lockup",
+            "theme_motif": "brand-color rule lines; source-grounded evidence panels; quiet negative space",
+            "theme_scope": "cover+section+tail",
+            "title_treatment": "restrained report title with weight contrast",
+            "serious_context_exception": "work-report/compliance tone keeps title restrained",
+        }
+    if re.search(r"文旅|旅游|文化|景区|城市|山海|烟火|tourism|travel|culture|heritage", title, flags=re.IGNORECASE):
+        theme = {
+            "theme_art_direction": "山海交汇 烟火同行",
+            "theme_motif": "mountain and sea contour; travel route line; warm market lights; stamp-like section marks; restrained brand accent",
+            "theme_scope": "cover+section+tail",
+            "title_treatment": "artistic cultural-tourism title lockup with motif-integrated framing",
+            "serious_context_exception": "not-applicable",
+        }
     return {
         "id": direction_id,
         "benchmark": benchmark,
+        **theme,
         "release_boundary": "desktop-draft; replace fallback brand assets before formal external release",
     }
 
@@ -1839,6 +1876,15 @@ def design_spec_text(title: str, style: str, output_mode: str, direction: dict[s
 - Visual Strategy Mode: hybrid-editable
 - Raster Slide Mode: disabled_for_formal_body
 
+### Theme Art Direction
+- Art Direction Name: {direction["theme_art_direction"]}
+- Why It Fits The Source: desktop worker inferred this from title, style preset, and output mode for a first-pass formal handoff.
+- Motif System: {direction["theme_motif"]}
+- Scope: {direction["theme_scope"]}
+- Main Title Treatment: {direction["title_treatment"]}
+- Serious Context Exception: {direction["serious_context_exception"]}
+- AI Visual Prompt Seed: composed no-text support visual using {direction["theme_motif"]}; keep title, numbers, logos, and body copy editable.
+
 ### Brand / IP Assets
 | Asset ID | Display Text / Mark | State | Source URL / Provenance | File Path | Target Pages | Release Boundary |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -1900,6 +1946,11 @@ def spec_lock_text(title: str, direction: dict[str, str], contracts: list[dict[s
                     "## visual_direction",
                     f"- id: {direction['id']}",
                     f"- benchmark: {direction['benchmark']}",
+                    f"- theme_art_direction: {direction['theme_art_direction']}",
+                    f"- theme_motif: {direction['theme_motif']}",
+                    f"- theme_scope: {direction['theme_scope']}",
+                    f"- title_treatment: {direction['title_treatment']}",
+                    f"- serious_context_exception: {direction['serious_context_exception']}",
                     f"- release_boundary: {direction['release_boundary']}",
                 ]
             ),
@@ -1923,6 +1974,9 @@ def spec_lock_text(title: str, direction: dict[str, str], contracts: list[dict[s
                     "- card_title_body_ratio: 1.15-1.35",
                     "- max_peer_cards_per_slide: 6",
                     "- min_card_padding_px: 20",
+                    "- theme_art_direction: required",
+                    "- title_art_treatment: expressive-unless-serious",
+                    "- cover_tail_motif: required",
                     "- whitespace_strategy: one dominant quiet zone per page",
                     "- logo_strategy: official-assets-first",
                     "- polish_risks: title-too-small; body-below-18; overcrowded-cards; fake-logo; logo-crowding; weak-dominant-element",
@@ -2127,7 +2181,7 @@ def write_formal_delivery_files(
         "blockedReason": "",
     }
     title = outline[0]["title"] if outline else source_name
-    visual_direction = visual_direction_for_style(job["stylePreset"], job["outputMode"])
+    visual_direction = visual_direction_for_style(job["stylePreset"], job["outputMode"], title)
     page_contracts = page_contract_for_outline(outline)
     page_visual_manifest, page_visual_prompts, page_visual_prompt_md = page_visual_layer_records(str(title), page_contracts)
     design_spec_path = project_path / "design_spec.md"
