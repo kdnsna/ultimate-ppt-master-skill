@@ -44,6 +44,34 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 | Review before revising | Rendered review writes findings, a safe repair plan, and a user-approved `revision-brief.md` for the second pass. |
 | Stay local-first | The Bridge writes project files on localhost; private source material is not uploaded unless the user explicitly chooses that route. |
 
+## Who It Is For
+
+| Audience | Typical work | Why v5 fits |
+|---|---|---|
+| Office teams | Leadership updates, work reports, training decks, project reviews, and sales enablement decks. | Defaults to a real PPTX that another colleague can edit the same day. |
+| Finance, government, and enterprise users | Formal materials that need careful wording, brand boundaries, and traceable source claims. | Keeps official/IP assets documented and blocks fake logo-like placeholders. |
+| Consultants and internal strategy teams | Structured narratives, industry scans, solution proposals, and executive summaries. | Builds a one-brief production contract before page generation so structure, audience, and style stay aligned. |
+| Event and brand teams | Keynotes, campaign decks, culture-tourism decks, product showcases, and public-facing visuals. | Uses Codex/GPT image generation for composed no-text visuals while the business message stays editable. |
+
+## Typical Scenarios
+
+| Request | v5 default behavior |
+|---|---|
+| "Make this source into a PPT." | Create an editable PPTX first, unless the user explicitly asks for a Web Deck. |
+| "Use a stronger visual style." | Read the source, name a theme art direction, generate no-text support visuals when useful, then keep titles, numbers, tables, and charts editable. |
+| "This is for an external brand or public event." | Require an official/IP asset plan for logos, campaign marks, cards, QR codes, partner marks, and any generated imagery. |
+| "I need to revise it after review." | Render the deck, write findings, create a safe repair plan, and produce `revision-brief.md` only after confirmation. |
+
+## What You Get
+
+| Deliverable | What is inside | Why it matters |
+|---|---|---|
+| Editable PPTX | Real text boxes, shapes, charts, tables, speaker notes, and editable brand lockups where safe. | The deck can be handed to a PowerPoint user, not only admired as screenshots. |
+| Web Deck | A single-file browser presentation for talks, showcases, and magazine-style storytelling. | Useful when visual rhythm and sharing matter more than PowerPoint editing. |
+| Delivery brief | Audience, route, page count, tone, visual direction, typography, image use, and missing-source assumptions. | The agent asks fewer questions but still leaves a production record. |
+| Source and asset records | `source-map.json`, `image_sources.json`, `image_prompts.json`, and official/IP fallback notes. | Reviewers can see what was sourced, generated, replaced, or left for authorization. |
+| Review package | Rendered previews, findings, repair candidates, and quality status. | Revisions start from observed issues instead of vague "make it better" loops. |
+
 ## What v5 Changes
 
 v5.0.0 is the delivery-defaults release. The product is no longer described as a toolkit of separate capabilities first. It is described as a practical production system for handing a deck to a stakeholder.
@@ -58,7 +86,21 @@ v5.0.0 is the delivery-defaults release. The product is no longer described as a
 | Typography and layout system | Microsoft YaHei is the default CJK office font; body text normally stays 18-24px with clear title/body scale and safe margins. |
 | Formal-business audit | `design_spec.md`, `spec_lock.md`, `design-quality-report.md`, asset manifests, and PPTX/Web artifacts are checked before delivery. |
 
+## v5 Delivery Standard
+
+| Area | Standard |
+|---|---|
+| Fewer confirmations | Ask only when the missing answer changes the deliverable. Otherwise record the assumption in the delivery brief and proceed. |
+| PPTX editability | Business content stays editable. Full-slide raster images are reserved for intentional no-text backgrounds, illustrations, or browser-only Web Deck moments. |
+| Image generation | Codex/GPT visuals must be composed scenes or support assets with no embedded text, no fake logos, and prompt records. |
+| Official assets | Logos, cards, QR codes, campaign IP, and partner marks must be official-source, user-provided, text-lockup fallback, or needs-authorized-replacement. |
+| Typography | Microsoft YaHei is the default Chinese office font. Page titles, body text, captions, numbers, and footers must have visible hierarchy. |
+| Layout | 16:9 pages use safe margins, card-count limits, readable body scale, and layout variety across summary, process, comparison, data, and closing pages. |
+| Handoff | The final package should include the PPTX or Web Deck, rendered review, quality report, source records, and any asset caveats. |
+
 ## Product Loop
+
+The production path is intentionally narrow. It should feel like a senior PPT operator turning messy material into a deliverable, not like a user configuring an engine.
 
 ```text
 Source material
@@ -73,7 +115,7 @@ Source material
   -> formal delivery audits
 ```
 
-Core artifacts:
+Core artifacts in plain language:
 
 - `design_spec.md`: human-readable design contract for visual direction, page roles, typography, assets, and completion risks.
 - `spec_lock.md`: machine-readable execution lock for page recipes, visual layers, raster policy, brand assets, and aesthetic checks.
@@ -84,6 +126,8 @@ Core artifacts:
 - `repair-plan.json`: low-risk repair candidates; default path is dry-run.
 - `revision-brief.md`: second-generation brief created only after explicit safe apply.
 - `quality-report.json`: merged delivery, planning, and rendered-review status.
+
+DeckIR is the page map. Page recipes are the layout instructions for each slide. Raster policy is the rule that decides which visual layers may become pixels and which content must remain editable.
 
 ## 60-second quickstart
 
@@ -102,6 +146,17 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 | Formal report, consulting deck, training deck, editable business material | Editable PPTX | PowerPoint deck with editable text, shapes, charts, tables, notes, and quality checks. |
 | Talk, showcase, demo day, editorial presentation | Web Deck | Single-file browser deck with stronger visual rhythm and shareable HTML. |
 | Both formal handoff and browser preview | Dual delivery | Separate PPTX and Web projects with shared source and aligned structure. |
+
+## Real Production Flow
+
+| Step | What the agent should do |
+|---|---|
+| Read the source | Extract the core message, audience, constraints, figures, and named assets before proposing page structure. |
+| Lock the brief | Choose PPTX/Web/Dual, page count, tone, typography, theme art direction, asset boundaries, and known caveats in one brief. |
+| Plan pages | Assign every page a role: cover, summary, evidence, process, comparison, data, case, route, call-to-action, or closing. |
+| Build assets | Use official/user assets where required; generate no-text visuals only where they improve the message. |
+| Assemble | Keep business text, charts, tables, and labels editable; use Microsoft YaHei and a restrained office hierarchy by default. |
+| Review | Render the output, inspect layout and asset risks, write findings, then repair only with a safe plan. |
 
 ## Capability Matrix
 
@@ -145,6 +200,17 @@ bash -lc 'set -e; dir="$HOME/.codex/skills/ultimate-ppt-master"; if [ -d "$dir/.
 
 Guide: [Agent Setup](./docs/guides/agent-setup.md). Local connector: [Agent Connect Bridge](./docs/guides/agent-connect-bridge.md).
 
+## Repository Map
+
+| Area | Use it for |
+|---|---|
+| `SKILL.md` and `references/` | Agent behavior, route selection, asset sourcing, visual generation, and delivery rules. |
+| `apps/web` and `apps/desktop` | Web Experience, local bridge handoff surface, and desktop worker integration. |
+| `scripts/` | Audits, release checks, rendered-review repair, provider setup, and repository maintenance. |
+| `templates/` | Design spec and spec lock references used by formal-business delivery. |
+| `docs/` | User guides, release notes, quality workflows, strategy docs, and Chinese documentation. |
+| `tests/` | Release integrity, audits, worker behavior, bridge behavior, and public-surface guarantees. |
+
 ## Documentation Map
 
 | Need | Read |
@@ -165,7 +231,9 @@ Guide: [Agent Setup](./docs/guides/agent-setup.md). Local connector: [Agent Conn
 
 Full map: [docs/README.md](./docs/README.md). Chinese map: [docs/zh-CN/README.md](./docs/zh-CN/README.md).
 
-## Maintainer Checks
+## Quality Gates
+
+Run these maintainer checks before publishing a README, version, Skill, Web, or Desktop release:
 
 ```bash
 npm run audit:docs
@@ -181,4 +249,4 @@ npm run build:desktop
 git diff --check
 ```
 
-The README promise must stay tied to executable checks. If a capability is advertised here, it should have a doc, script, test, audit, or public proof artifact.
+The README promise must stay tied to executable checks. If a capability is advertised here, it should have a doc, script, test, audit, or public proof artifact. Desktop binary packaging is not claimed by this README unless a separate packaging command is run and recorded for that release.
