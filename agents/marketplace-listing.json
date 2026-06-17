@@ -2,7 +2,7 @@
   "id": "ultimate-ppt-master",
   "name": "Ultimate PPT Master",
   "displayName": "终极融合PPT大师",
-  "version": "5.0.0",
+  "version": "5.1.0",
   "invocation": "$ultimate-ppt-master",
   "category": [
     "presentation generation",
@@ -12,7 +12,7 @@
   ],
   "shortDescription": "Generate Codex-first quality-checked PPTX and Web Decks from local source files.",
   "positioning": "A local-first PPT quality workbench for Chinese office users, consultants, operators, trainers, and agent users who need editable deliverables.",
-  "defaultPrompt": "Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report.",
+  "defaultPrompt": "Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report. If my brief is incomplete, ask staged questions first.",
   "metadata": {
     "openai": "agents/openai.yaml",
     "skillEntrypoint": "SKILL.md",

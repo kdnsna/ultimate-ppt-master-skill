@@ -19,7 +19,7 @@ const AGENT_COMMANDS = {
   codex: {
     label: "Codex",
     binary: "codex",
-    prompt: "Read AGENTS.md, codex-task.md, and visual-element-kit.md first. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image key is configured, use the Needs-Manual prompts. Execute the ChatGPT-generation-first formal-business workflow, update asset-plan.md and quality-report.json, then list final files."
+    prompt: "Read AGENTS.md, codex-task.md, project-brief.json, and visual-element-kit.md first. If expectationFit.readyForProduction is false, run guided intake before final production. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image key is configured, use the Needs-Manual prompts. Execute the ChatGPT-generation-first formal-business workflow, update asset-plan.md and quality-report.json, then list final files."
   },
   claude: {
     label: "Claude Code",
@@ -586,8 +586,16 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     repairPlan: "repair-plan.json",
     revisionBrief: "revision-brief.md"
   };
+  const visualBrief = projectBrief.visualBrief || payload.visualBrief || defaultVisualBrief(payload);
+  const guidedBrief = projectBrief.guidedBrief || payload.guidedBrief || defaultGuidedBrief({ payload, visualBrief });
+  const expectationFit = projectBrief.expectationFit || payload.expectationFit || defaultExpectationFit({ payload, projectBrief, visualBrief });
+  const briefMode = projectBrief.briefMode || payload.briefMode || (expectationFit.readyForProduction ? "source-first" : "codex-guided-intake");
   const enrichedProjectBrief = {
     ...projectBrief,
+    briefMode,
+    visualBrief,
+    guidedBrief,
+    expectationFit,
     qualityProfile,
     qualityGate,
     workflowState,
@@ -619,8 +627,8 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   await writeProjectFile("quality-checklist.md", payload.qualityChecklist || "");
   await writeProjectFile("asset-plan.md", payload.assetPlan || defaultAssetPlan({ title, qualityGate }));
   await writeProjectFile("visual-element-kit.md", payload.visualElementKit || defaultVisualElementKit({ title, qualityGate }));
-  await writeProjectFile("codex-task.md", payload.codexTask || defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands }));
-  await writeProjectFile("AGENTS.md", payload.codexAgentGuide || defaultCodexAgentGuide({ qualityGate }));
+  await writeProjectFile("codex-task.md", payload.codexTask || defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands, briefMode, expectationFit }));
+  await writeProjectFile("AGENTS.md", payload.codexAgentGuide || defaultCodexAgentGuide({ qualityGate, expectationFit }));
   await writeProjectFile("README.md", payload.readme || defaultHandoffReadme());
 
   const extractedSections = [
@@ -667,6 +675,10 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     qualityProfile,
     qualityGate,
     workflowState,
+    briefMode,
+    visualBrief,
+    guidedBrief,
+    expectationFit,
     expectedArtifacts,
     reviewCommands,
     deckIR,
@@ -675,7 +687,7 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   };
 
   await writeProjectFile("extracted-source.md", extractedSource);
-  await writeProjectFile("quality-report.json", JSON.stringify(createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands, deckIR }), null, 2));
+  await writeProjectFile("quality-report.json", JSON.stringify(createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands, deckIR, expectationFit }), null, 2));
   await writeProjectFile("manifest.json", JSON.stringify(manifest, null, 2));
 
   return {
@@ -693,6 +705,78 @@ function parseJsonMaybe(value) {
   } catch {
     return {};
   }
+}
+
+function defaultVisualBrief(payload = {}) {
+  return {
+    selectedTags: {
+      scenario: [],
+      audience: [],
+      purpose: [],
+      contentState: [],
+      visualStyle: [],
+      layoutDensity: [],
+      assetStrategy: ["official-first", "ai-visuals"],
+      outputPreference: ["editable-pptx", "editable-first"]
+    },
+    tagPreset: "bridge-fallback",
+    backgroundText: payload?.form?.sourceNotes || "",
+    extraRequirements: payload?.form?.constraints || "",
+    referenceLinks: [],
+    autoSuggestedTags: [],
+    userEditedTags: false
+  };
+}
+
+function defaultGuidedBrief({ payload, visualBrief }) {
+  return {
+    scenario: payload?.form?.scenario || "",
+    audience: payload?.form?.audience || "",
+    purpose: "",
+    coreMessage: payload?.form?.coreMessage || "",
+    contentSources: [payload?.sourceMarkdown ? "source.md" : "", visualBrief.backgroundText ? "visualBrief.backgroundText" : ""].filter(Boolean),
+    slideCount: payload?.form?.slideCount || "",
+    outlinePreference: "",
+    visualStyle: [],
+    assetRules: visualBrief.selectedTags?.assetStrategy || [],
+    outputFormat: visualBrief.selectedTags?.outputPreference || [],
+    mustInclude: [],
+    mustAvoid: []
+  };
+}
+
+function defaultExpectationFit({ payload, projectBrief }) {
+  const sourceText = String(payload?.sourceMarkdown || payload?.source || projectBrief?.sourceNotes || "").trim();
+  const hasAttachments = Array.isArray(payload?.attachments) && payload.attachments.length > 0;
+  const hasAudience = Boolean(payload?.form?.audience || projectBrief?.audience);
+  const hasCore = Boolean(payload?.form?.coreMessage || projectBrief?.coreMessage);
+  const missingSignals = [];
+  if (!hasAudience) missingSignals.push("missing audience");
+  if (!hasCore) missingSignals.push("missing core message");
+  if (!sourceText && !hasAttachments) missingSignals.push("missing source material");
+  const sourceAdequacy = sourceText.length > 220 ? "substantive" : hasAttachments ? "private-unparsed" : sourceText.length > 60 ? "thin" : "topic-only";
+  const score = Math.max(35, 100 - missingSignals.length * 14 - (sourceAdequacy === "substantive" ? 0 : sourceAdequacy === "thin" ? 12 : 24));
+  const riskLevel = score >= 82 ? "green" : score >= 55 ? "yellow" : "red";
+  return {
+    riskLevel,
+    score,
+    sourceAdequacy,
+    missingSignals,
+    assumptions: [
+      "Default to editable PPTX unless project-brief.json says otherwise.",
+      "Use official/user-provided assets first; use ChatGPT/OpenAI for no-text support visuals and micro-assets.",
+      "Record assumptions in quality-report.json before final delivery."
+    ],
+    conflicts: [],
+    successCriteria: [
+      "The deck states a clear audience, purpose, and core message before production.",
+      "The final response explains which choices came from user input and which were assumptions."
+    ],
+    readyForProduction: riskLevel !== "red",
+    nextQuestions: riskLevel === "red"
+      ? ["Who is the deck for, what setting will it be used in, what should the audience do afterward, and what source material should be used?"]
+      : []
+  };
 }
 
 const roleRecipeMap = {
@@ -907,6 +991,7 @@ function defaultQualityGate() {
   return {
     level: "formal-business",
     requiredInputs: [
+      "visualBrief / guidedBrief / expectationFit with user tags, background, assumptions, and guided-intake readiness",
       "brand assets or explicit fallback strategy",
       "traceable source evidence",
       "ChatGPT-generation-first visual asset plan with prompts, filenames, and insertion targets",
@@ -928,6 +1013,7 @@ function defaultQualityGate() {
     ],
     artifactChecks: [
       "manifest.json contains formal-business qualityGate",
+      "project-brief.json contains briefMode, visualBrief, guidedBrief, and expectationFit",
       "storyboard.json and source-map.json contain DeckIR page roles, recipes, evidence refs, raster policy, and editability targets",
       "HTML/PPTX expose enough layout types",
       "real image/brand assets are used or no-image strategy is explicit",
@@ -954,7 +1040,7 @@ function defaultQualityGate() {
   };
 }
 
-function createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands, deckIR }) {
+function createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands, deckIR, expectationFit }) {
   return {
     version: BRIDGE_VERSION,
     title,
@@ -963,6 +1049,7 @@ function createPendingQualityReport({ title, qualityProfile, qualityGate, workfl
     qualityProfile,
     qualityGate,
     workflowState,
+    expectationFit,
     expectedArtifacts,
     reviewCommands,
     deckIR,
@@ -984,7 +1071,13 @@ function createPendingQualityReport({ title, qualityProfile, qualityGate, workfl
       zh: "Design Doctor / 视觉复查尚未运行。请先生成预览和最终文件，再按 reviewCommands 运行检查；默认只报告问题和建议，只有明确要求时才自动修 SVG。",
       en: "Design Doctor has not run yet. Generate the preview and final files, then run reviewCommands. By default it reports issues and suggestions before automatic repair."
     },
-    checks: []
+    checks: [
+      {
+        id: "expectation-fit",
+        status: expectationFit?.readyForProduction ? "ready" : "needs-guided-intake",
+        summary: `Expectation fit ${expectationFit?.score ?? 0}%, risk ${expectationFit?.riskLevel || "unknown"}.`
+      }
+    ]
   };
 }
 
@@ -1055,7 +1148,7 @@ Use short, specific prompts with transparent/isolated backgrounds when possible:
 `;
 }
 
-function defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands }) {
+function defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands, briefMode, expectationFit }) {
   const gateInputs = (qualityGate?.requiredInputs || []).map((item) => `- ${item}`).join("\n");
   const gateCriteria = (qualityGate?.acceptanceCriteria || []).map((item) => `- ${item}`).join("\n");
   const gateChecks = (qualityGate?.artifactChecks || []).map((item) => `- ${item}`).join("\n");
@@ -1066,6 +1159,7 @@ function defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts
 Project: ${title}
 Current workflow step: ${workflowState?.currentStep || "handoff"}
 Blocked reason: ${workflowState?.blockedReason || "none"}
+Brief mode: ${briefMode || "source-first"}
 
 ## Read First
 1. AGENTS.md
@@ -1092,6 +1186,19 @@ ${gateCriteria}
 
 Artifact checks:
 ${gateChecks}
+
+## Expectation Fit and Guided Intake
+- Risk level: ${expectationFit?.riskLevel || "unknown"}
+- Score: ${expectationFit?.score ?? 0}%
+- Source adequacy: ${expectationFit?.sourceAdequacy || "unknown"}
+- Ready for production: ${expectationFit?.readyForProduction ? "yes" : "no"}
+- Missing signals: ${(expectationFit?.missingSignals || []).join(", ") || "none"}
+
+Rules:
+1. Read project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit before production.
+2. If readyForProduction is false, ask one coherent group of questions per turn and clarify audience, usage setting, desired action, content source, core message, slide count, visual style, brand/IP assets, output format, and must-avoid boundaries.
+3. Start final-quality deck production only after the brief is clear enough or the user explicitly asks for a draft with assumptions.
+4. Record user answers, assumptions, and remaining expectation risk in project-brief.json and quality-report.json.
 
 ## Asset Workflow
 1. Inspect supplied attachments and extracted-source.md before searching.
@@ -1124,13 +1231,15 @@ Final response: list generated files, generated micro-assets inserted, public re
 `;
 }
 
-function defaultCodexAgentGuide({ qualityGate }) {
+function defaultCodexAgentGuide({ qualityGate, expectationFit }) {
   const level = qualityGate?.level || "formal-business";
   return `# AGENTS.md
 
 ## Codex Local Rules
 - Work in this handoff folder and the Ultimate PPT Master repository scripts only.
 - Read codex-task.md before editing or generating deliverables.
+- Read project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit first. Current expectationFit: ${expectationFit?.riskLevel || "unknown"} / ${expectationFit?.score ?? 0}%.
+- If expectationFit.readyForProduction is false, run guided intake before final production. Ask one related question group per turn until audience, setting, purpose, sources, core message, slide count, style, asset boundary, output, and must-avoid rules are clear.
 - Read storyboard.json and source-map.json before final slide generation; they define the DeckIR page map and source evidence boundary.
 - Keep private source material local. Do not upload private files, customer data, internal screenshots, or API keys unless the user explicitly approves.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py before final slide assembly when the deck needs visual richness.
@@ -1258,7 +1367,7 @@ function relativeFromProject(filePath) {
 
 function suggestedCommands(projectPath) {
   const quotedPath = shellQuote(projectPath);
-  const instruction = "Read AGENTS.md, codex-task.md, storyboard.json, source-map.json, planning-report.json, review-findings.json, repair-plan.json, revision-brief.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, keep DeckIR evidence/editability constraints, insert reusable micro-assets when useful, run audit_storyboard.py, formal delivery audit, review_rendered_deck.py, and apply_review_plan.py --safe-only --dry-run, update quality-report.json, then list final files.";
+  const instruction = "Read AGENTS.md, codex-task.md, storyboard.json, source-map.json, planning-report.json, review-findings.json, repair-plan.json, revision-brief.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Inspect project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit; if expectationFit.readyForProduction is false, run guided intake before final production and ask one related question group per turn. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, keep DeckIR evidence/editability constraints, insert reusable micro-assets when useful, run audit_storyboard.py, formal delivery audit, review_rendered_deck.py, and apply_review_plan.py --safe-only --dry-run, update quality-report.json, then list final files.";
   return {
     codex: `cd ${quotedPath} && codex "${instruction}"`,
     claude: `cd ${quotedPath} && claude "${instruction}"`,

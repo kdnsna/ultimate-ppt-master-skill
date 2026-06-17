@@ -37,6 +37,7 @@ The folder includes:
 - `manifest.json` - parse status, project metadata, suggested Agent commands.
 - `agent-prompt.md` - the production prompt for Codex / Claude Code / Hermes / OpenClaw.
 - `project-brief.json` - structured choices from the Web Experience.
+- `project-brief.json.briefMode` / `visualBrief` / `guidedBrief` / `expectationFit` - user intent from visual tags, pasted background, guided-intake state, assumptions, and production readiness.
 - `preview-web-deck.html` - browser-local rough preview.
 - `engine-plan.md` - PPTX / Web Deck / Fusion route split.
 - `quality-checklist.md` - checks before delivery.
@@ -46,7 +47,7 @@ The folder includes:
 - `AGENTS.md` - local Codex rules for privacy, assets, and quality gates.
 - `quality-report.json` - pending Design Doctor / formal-business review status.
 
-Codex should read `AGENTS.md`, `codex-task.md`, `visual-element-kit.md`, `asset-plan.md`, `quality-checklist.md`, `manifest.json`, and `project-brief.json` first. The expected next local command is:
+Codex should read `AGENTS.md`, `codex-task.md`, `visual-element-kit.md`, `asset-plan.md`, `quality-checklist.md`, `manifest.json`, and `project-brief.json` first. If `expectationFit.readyForProduction` is false, Codex should run Guided Intake before final-quality deck production, asking one related question group per turn until audience, scenario, purpose, sources, core message, page count, style, asset boundary, output format, and must-avoid rules are clear. The expected next local command after the brief is production-ready is:
 
 ```bash
 cd <repoRoot> && python3 scripts/generate_visual_element_kit.py <projectPath>

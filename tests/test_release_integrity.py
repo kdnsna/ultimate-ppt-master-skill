@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "5.0.0"
+VERSION = "5.1.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -69,6 +69,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/rendered-review-loop-v4.3.md",
+            "docs/release/release-notes-v5.1.0.md",
             "docs/release/release-notes-v5.0.0.md",
             "docs/release/release-notes-v4.3.0.md",
             "docs/quality/quality-workbench-v2.5.md",
@@ -81,6 +82,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "docs/zh-CN/release/release-notes-v5.1.0.md",
             "docs/zh-CN/release/release-notes-v5.0.0.md",
             "docs/zh-CN/release/release-notes-v4.3.0.md",
             "docs/zh-CN/release/release-notes-v4.2.0.md",
@@ -106,7 +108,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
         marketplace_prompt = (
             "Use $ultimate-ppt-master to turn my source material into a "
-            "quality-checked PPTX or Web Deck with a visual review report."
+            "quality-checked PPTX or Web Deck with a visual review report. "
+            "If my brief is incomplete, ask staged questions first."
         )
 
         for expected in (
@@ -114,9 +117,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "Why Teams Use It",
             "What v5 Changes",
             "Product Loop",
-            "v5.0.0 Notes",
-            "Release Notes - v5.0.0",
+            "v5.1.0 Notes",
+            "Release Notes - v5.1.0",
             "Editable PPTX first",
+            "Visual Brief Builder",
+            "Codex Guided Intake",
+            "project-brief.json",
+            "expectationFit",
             "one delivery brief",
             "official/IP asset plan",
             "Codex-first generated visuals",
@@ -144,6 +151,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "./docs/quality/rendered-review-loop-v4.3.md",
+            "./docs/release/release-notes-v5.1.0.md",
             "./docs/release/release-notes-v5.0.0.md",
             "./docs/release/release-notes-v4.3.0.md",
             "./docs/strategy/skill-market-distribution.md",
@@ -156,9 +164,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "为什么团队会用它",
             "v5 做对了什么",
             "产品闭环",
-            "v5.0.0 说明",
-            "发布说明 - v5.0.0",
+            "v5.1.0 说明",
+            "发布说明 - v5.1.0",
             "可编辑 PPTX 优先",
+            "Visual Brief Builder",
+            "Codex 分步访谈",
+            "project-brief.json",
+            "expectationFit",
             "一份交付简报",
             "官方/IP 素材计划",
             "Codex-first 生成视觉",
@@ -186,6 +198,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "./docs/zh-CN/release/release-notes-v5.1.0.md",
             "./docs/zh-CN/release/release-notes-v5.0.0.md",
             "./docs/zh-CN/release/release-notes-v4.3.0.md",
             "./docs/zh-CN/strategy/skill-market-distribution.md",
@@ -262,6 +275,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         release_v43_zh = (ROOT / "docs/zh-CN/release/release-notes-v4.3.0.md").read_text(encoding="utf-8")
         release_v5 = (ROOT / "docs/release/release-notes-v5.0.0.md").read_text(encoding="utf-8")
         release_v5_zh = (ROOT / "docs/zh-CN/release/release-notes-v5.0.0.md").read_text(encoding="utf-8")
+        release_v51 = (ROOT / "docs/release/release-notes-v5.1.0.md").read_text(encoding="utf-8")
+        release_v51_zh = (ROOT / "docs/zh-CN/release/release-notes-v5.1.0.md").read_text(encoding="utf-8")
 
         self.assertIn("npm run audit:docs", release_maintenance)
         self.assertIn("npm run audit:web-console", release_maintenance)
@@ -314,11 +329,21 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("山海交汇 烟火同行", release_v5)
         self.assertIn("Microsoft YaHei", release_v5)
         self.assertIn("Plain-Language Update Notes", release_v5)
+        self.assertIn("Visual Brief Builder", release_v51)
+        self.assertIn("Codex Guided Intake", release_v51)
+        self.assertIn("project-brief.json", release_v51)
+        self.assertIn("expectationFit", release_v51)
+        self.assertIn("Plain-Language Update Notes", release_v51)
         self.assertIn("Codex 原生 GPT 生图", release_v5_zh)
         self.assertIn("主题艺术方向", release_v5_zh)
         self.assertIn("山海交汇 烟火同行", release_v5_zh)
         self.assertIn("微软雅黑", release_v5_zh)
         self.assertIn("白话更新栏", release_v5_zh)
+        self.assertIn("Visual Brief Builder", release_v51_zh)
+        self.assertIn("Codex 分步访谈", release_v51_zh)
+        self.assertIn("project-brief.json", release_v51_zh)
+        self.assertIn("expectationFit", release_v51_zh)
+        self.assertIn("白话更新栏", release_v51_zh)
 
     def test_web_handoff_panel_has_executable_next_step_ui(self):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
@@ -342,8 +367,9 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v5.0.0", hero)
-        self.assertIn("Delivery defaults", hero)
+        self.assertIn("v5.1.0", hero)
+        self.assertIn("Guided intake", hero)
+        self.assertIn("expectationFit", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)
         self.assertNotIn("v2.3.0", combined)

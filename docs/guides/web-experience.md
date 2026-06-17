@@ -13,14 +13,17 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - exposes reusable preset starter packs with pack paths, template candidates, and scenario-specific quality checks;
 - groups help, examples, glossary, setup checks, provider status, and generated-file details behind drawers or collapsed sections;
 - accepts pasted source notes, source URLs, and dropped `.md`, `.txt`, `.pdf`, `.docx`, `.pptx`, `.xlsx`, and related files;
+- adds a Visual Brief Builder with diverse selectable tags for scenario, audience, purpose, content state, visual style, layout density, asset strategy, and output preference;
+- keeps free-form areas for background context, special requirements, must-avoid rules, official/reference links, and related notes;
 - pre-reads browser-safe text files and marks binary files for local Bridge parsing;
-- generates a slide outline and brief-readiness check;
+- generates a slide outline, brief-readiness check, and `expectationFit` risk signal for unclear or conflicting requirements;
 - shows the Hugo He / ppt-master PPTX route and the op7418 / Guizang Web Deck route side by side;
 - detects the local Agent Bridge, local Agent commands, and provider readiness when Bridge is running;
 - provides one-click checks for the local connector, installed AI helpers, and configured providers;
 - provides Bridge-backed one-click Skill install / update actions for Codex and a generic Agent folder, with terminal-command fallback when Bridge is offline;
 - generates a browser-local `preview-web-deck.html` and live iframe preview;
 - generates copy-ready Agent instructions, `source.md`, `extracted-source.md`, `manifest.json`, and `project-brief.json`;
+- writes `briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit` into `project-brief.json` so Codex knows whether to produce immediately, ask staged clarification questions, or proceed as a draft with assumptions;
 - downloads a full `handoff-kit.zip` or creates a local project through the local connector;
 - includes `source.md`, `extracted-source.md`, `attachments/`, `manifest.json`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, `AGENTS.md`, `quality-report.json`, and `README.md` in the handoff kit;
 - writes a `formal-business` quality gate into the handoff so Codex gets acceptance criteria, artifact checks, and review commands;
@@ -77,6 +80,8 @@ Use these checks before promoting a release:
 | Drop binary source | The file appears as pending local Bridge parsing and is included in `attachments/`. |
 | Live Web Deck preview | The preview frame renders `preview-web-deck.html` without backend calls or script dependencies. |
 | Copy Agent prompt | Clipboard receives the generated prompt with outline and kit context. |
+| Select visual tags | `project-brief.json` records `visualBrief.selectedTags`, selected tag labels, background text, special requirements, and reference links. |
+| Thin or vague brief | `expectationFit` turns yellow/red and the Agent prompt tells Codex to run Guided Intake before final production. |
 | Copy `source.md` | Clipboard receives the generated source markdown. |
 | Download `source.md` | Browser downloads a Markdown brief with current form values and outline. |
 | Download `preview-web-deck.html` | Browser downloads a standalone HTML preview with the current brief and storyboard. |

@@ -17,6 +17,24 @@
 | **Use Case** | [Filled by Strategist] |
 | **Created Date** | {date_str} |
 
+### Expectation Contract
+
+| Item | Value |
+| ---- | ----- |
+| **Brief Mode** | [visual-tags / codex-guided-intake / source-first / draft-with-assumptions] |
+| **Expectation Fit** | [green/yellow/red + score + readyForProduction] |
+| **Source Adequacy** | [substantive / thin / topic-only / private-unparsed / conflicting / no-source] |
+| **Known User Intent** | [scenario, audience, purpose, and style in plain words] |
+| **Missing Signals** | [what is still unclear, or `none`] |
+| **Assumptions** | [defaults being used, such as PPTX, Microsoft YaHei, official assets first] |
+| **Codex Guided Intake State** | [complete / required-before-production / draft accepted with assumptions] |
+| **Next Question Group** | [one staged question group if intake is required, or `none`] |
+
+Rules:
+- If `readyForProduction` is false, Codex must ask staged clarification questions before final-quality production unless the user explicitly asks for a draft with assumptions.
+- Web tags are a source of user intent. Pasted background and special requirements override tag defaults when they conflict.
+- Copy the machine-readable summary into `spec_lock.md expectation_contract`.
+
 ---
 
 ## II. Canvas Specification

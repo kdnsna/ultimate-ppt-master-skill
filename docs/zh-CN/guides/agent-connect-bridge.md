@@ -37,6 +37,7 @@ Bridge 会在本地写入项目：
 - `manifest.json`：解析状态、项目元数据、建议 Agent 命令。
 - `agent-prompt.md`：交给 Codex / Claude Code / Hermes / OpenClaw 的生产 prompt。
 - `project-brief.json`：网页端结构化选择。
+- `project-brief.json.briefMode` / `visualBrief` / `guidedBrief` / `expectationFit`：来自可视化标签、粘贴背景、分步访谈状态、默认假设和生产就绪度的用户意图契约。
 - `preview-web-deck.html`：浏览器本地粗预览。
 - `engine-plan.md`：PPTX / Web Deck / Fusion 路线分工。
 - `quality-checklist.md`：交付前检查清单。
@@ -46,7 +47,7 @@ Bridge 会在本地写入项目：
 - `AGENTS.md`：Codex 本地隐私、素材和质量门禁规则。
 - `quality-report.json`：Design Doctor / 正式商务复查状态。
 
-Codex 应先读 `AGENTS.md`、`codex-task.md`、`visual-element-kit.md`、`asset-plan.md`、`quality-checklist.md`、`manifest.json` 和 `project-brief.json`。下一条本地命令是：
+Codex 应先读 `AGENTS.md`、`codex-task.md`、`visual-element-kit.md`、`asset-plan.md`、`quality-checklist.md`、`manifest.json` 和 `project-brief.json`。如果 `expectationFit.readyForProduction` 为 false，Codex 应先进行分步需求访谈，每轮只问一组相关问题，直到受众、场景、目的、资料、核心观点、页数、风格、素材边界、输出格式和禁忌都明确。brief 可生产后，下一条本地命令是：
 
 ```bash
 cd <repoRoot> && python3 scripts/generate_visual_element_kit.py <projectPath>

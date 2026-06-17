@@ -30,7 +30,8 @@ Ultimate PPT Master v5 uses a categorized documentation structure. Start with th
 
 | Need | Read |
 |---|---|
-| See the latest release | [Release Notes - v5.0.0](./release/release-notes-v5.0.0.md) |
+| See the latest release | [Release Notes - v5.1.0](./release/release-notes-v5.1.0.md) |
+| Review the v5.1 guided-intake release | [Release Notes - v5.1.0](./release/release-notes-v5.1.0.md) |
 | Review the v5 delivery-defaults release | [Release Notes - v5.0.0](./release/release-notes-v5.0.0.md) |
 | Review the rendered-review loop release | [Release Notes - v4.3.0](./release/release-notes-v4.3.0.md) |
 | Review the AI planning release | [Release Notes - v4.2.0](./release/release-notes-v4.2.0.md) |

@@ -149,7 +149,7 @@ def audit_readme_surfaces(errors: list[str]) -> None:
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
         "Skill Market Distribution",
         "./docs/strategy/skill-market-distribution.md",
-        "./docs/release/release-notes-v5.0.0.md",
+        "./docs/release/release-notes-v5.1.0.md",
         "./docs/quality/rendered-review-loop-v4.3.md",
     ):
         require(needle in readme, f"README.md missing marketplace surface: {needle}", errors)
@@ -160,7 +160,7 @@ def audit_readme_surfaces(errors: list[str]) -> None:
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
         "Skill 市场分发",
         "./docs/zh-CN/strategy/skill-market-distribution.md",
-        "./docs/zh-CN/release/release-notes-v5.0.0.md",
+        "./docs/zh-CN/release/release-notes-v5.1.0.md",
         "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
     ):
         require(needle in readme_zh, f"README.zh-CN.md missing marketplace surface: {needle}", errors)

@@ -1349,6 +1349,7 @@ def formal_quality_gate() -> dict[str, Any]:
     return {
         "level": "formal-business",
         "requiredInputs": [
+            "visualBrief / guidedBrief / expectationFit with user tags, background, assumptions, and guided-intake readiness",
             "visual direction pack or documented custom benchmark",
             "brand assets or explicit fallback strategy",
             "official/IP asset plan for deterministic marks and no fake logo substitutes",
@@ -1381,6 +1382,7 @@ def formal_quality_gate() -> dict[str, Any]:
         ],
         "artifactChecks": [
             "manifest.json contains formal-business qualityGate",
+            "project-brief.json contains briefMode, visualBrief, guidedBrief, and expectationFit",
             "design_spec.md and spec_lock.md contain visual direction, brand_assets, aesthetic_checks, page role, recipe, visual layer, and raster policy contracts",
             "HTML/PPTX expose enough layout types",
             "real image/brand assets are used or no-image strategy is explicit",
@@ -1463,6 +1465,8 @@ def codex_task_text(
     quality_gate: dict[str, Any],
     workflow_state: dict[str, str],
     expected_artifacts: list[str],
+    expectation_fit: dict[str, Any],
+    brief_mode: str,
 ) -> str:
     gate_inputs = "\n".join(f"- {item}" for item in quality_gate["requiredInputs"])
     gate_criteria = "\n".join(f"- {item}" for item in quality_gate["acceptanceCriteria"])
@@ -1475,6 +1479,7 @@ Project: {title}
 Output mode: {output_mode}
 Current workflow step: {workflow_state["currentStep"]}
 Blocked reason: {workflow_state["blockedReason"] or "none"}
+Brief mode: {brief_mode}
 
 ## Read First
 1. AGENTS.md
@@ -1503,6 +1508,19 @@ Acceptance criteria:
 
 Artifact checks:
 {gate_checks}
+
+## Expectation Fit and Guided Intake
+- Risk level: {expectation_fit["riskLevel"]}
+- Score: {expectation_fit["score"]}%
+- Source adequacy: {expectation_fit["sourceAdequacy"]}
+- Ready for production: {"yes" if expectation_fit["readyForProduction"] else "no"}
+- Missing signals: {", ".join(expectation_fit["missingSignals"]) or "none"}
+
+Rules:
+1. Read project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit before production.
+2. If readyForProduction is false, run Codex Guided Intake first. Ask one related question group per turn and clarify audience, usage setting, desired action, content source, core message, slide count/sections, visual style, brand/IP assets, output format, and must-avoid boundaries.
+3. Start final-quality production only after the brief is clear enough or the user explicitly asks for a draft with assumptions.
+4. Record user answers, assumptions, and remaining expectation risk in project-brief.json and quality-report.json.
 
 ## Asset Workflow
 1. Inspect sources/source.md and generated previews before searching.
@@ -1537,12 +1555,14 @@ Final response: list generated files, ChatGPT micro-assets inserted, public refe
 """
 
 
-def codex_agent_guide_text(quality_gate: dict[str, Any]) -> str:
+def codex_agent_guide_text(quality_gate: dict[str, Any], expectation_fit: dict[str, Any]) -> str:
     return f"""# AGENTS.md
 
 ## Codex Local Rules
 - Work in this desktop project and the Ultimate PPT Master repository scripts only.
 - Read codex-task.md before editing or generating deliverables.
+- Read project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit first. Current expectationFit: {expectation_fit["riskLevel"]} / {expectation_fit["score"]}%.
+- If expectationFit.readyForProduction is false, run guided intake before final production. Ask one related question group per turn until audience, setting, purpose, sources, core message, slide count, style, asset boundary, output, and must-avoid rules are clear.
 - Read storyboard.json and source-map.json before final slide generation; they define the DeckIR page map and source evidence boundary.
 - Keep private source material, customer data, internal screenshots, and API keys local unless the user explicitly approves upload.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py first when the deck needs visual richness.
@@ -1847,7 +1867,7 @@ def brand_asset_rows(title: str) -> tuple[str, str]:
     return "\n".join(spec_lines), "\n".join(lock_lines)
 
 
-def design_spec_text(title: str, style: str, output_mode: str, direction: dict[str, str], contracts: list[dict[str, str]]) -> str:
+def design_spec_text(title: str, style: str, output_mode: str, direction: dict[str, str], contracts: list[dict[str, str]], expectation_fit: dict[str, Any]) -> str:
     rows = "\n".join(
         "| {page} | {page_role} | {visual_weight} | {layout_family} | {page_recipe_id} | {asset_requirement} | {visual_layer} | {raster_policy} | {anti_patterns} |".format(**item)
         for item in contracts
@@ -1863,6 +1883,14 @@ def design_spec_text(title: str, style: str, output_mode: str, direction: dict[s
 - Title: {title}
 - Output Mode: {output_mode}
 - Style Preset: {style}
+- Expectation Fit: {expectation_fit["riskLevel"]} / {expectation_fit["score"]}% / readyForProduction={expectation_fit["readyForProduction"]}
+
+### Expectation Contract
+- Source Adequacy: {expectation_fit["sourceAdequacy"]}
+- Missing Signals: {", ".join(expectation_fit["missingSignals"]) or "none"}
+- Default Assumptions: {"; ".join(expectation_fit["assumptions"])}
+- Codex Guided Intake: {"required before production" if not expectation_fit["readyForProduction"] else "not required unless the user changes the brief"}
+- Next Questions: {"; ".join(expectation_fit["nextQuestions"]) or "none"}
 
 ## II. Canvas
 - Aspect Ratio: 16:9
@@ -1931,7 +1959,7 @@ def design_spec_text(title: str, style: str, output_mode: str, direction: dict[s
 """
 
 
-def spec_lock_text(title: str, direction: dict[str, str], contracts: list[dict[str, str]]) -> str:
+def spec_lock_text(title: str, direction: dict[str, str], contracts: list[dict[str, str]], expectation_fit: dict[str, Any]) -> str:
     def section(name: str, key: str) -> str:
         lines = [f"## {name}"]
         for item in contracts:
@@ -1941,6 +1969,17 @@ def spec_lock_text(title: str, direction: dict[str, str], contracts: list[dict[s
     _, brand_lock_rows = brand_asset_rows(title)
     return "\n\n".join(
         [
+            "\n".join(
+                [
+                    "## expectation_contract",
+                    f"- risk_level: {expectation_fit['riskLevel']}",
+                    f"- score: {expectation_fit['score']}",
+                    f"- source_adequacy: {expectation_fit['sourceAdequacy']}",
+                    f"- ready_for_production: {str(expectation_fit['readyForProduction']).lower()}",
+                    f"- missing_signals: {'; '.join(expectation_fit['missingSignals']) or 'none'}",
+                    f"- assumptions: {'; '.join(expectation_fit['assumptions'])}",
+                ]
+            ),
             "\n".join(
                 [
                     "## visual_direction",
@@ -2165,6 +2204,95 @@ def append_manifest_generated_file(project_path: Path, path: Path) -> None:
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def desktop_visual_brief(job: dict[str, Any], source_text: str, outline: list[dict[str, Any]]) -> dict[str, Any]:
+    output_tags = ["editable-pptx", "editable-first"] if job["outputMode"] == "pptx" else ["web-preview", "visual-impact"]
+    style = str(job.get("stylePreset", "business"))
+    style_tags = {
+        "business": ["formal-business"],
+        "consulting": ["consulting-report", "formal-business"],
+        "editorial": ["magazine", "brand-promo"],
+        "swiss": ["tech-clean", "consulting-report"],
+        "academic": ["formal-business", "training"],
+    }.get(style, ["formal-business"])
+    content_state = ["well-sourced"] if len(source_text) > 1200 else ["thin"] if len(source_text) > 240 else ["topic-only"]
+    if re.search(r"\d+[%万亿千]|kpi|数据|指标|metric|revenue|growth", source_text, flags=re.IGNORECASE):
+        content_state.append("data-heavy")
+    return {
+        "selectedTags": {
+            "scenario": ["work-report"],
+            "audience": [],
+            "purpose": ["align-understanding"],
+            "contentState": content_state,
+            "visualStyle": style_tags,
+            "layoutDensity": ["standard-business"],
+            "assetStrategy": ["official-first", "ai-visuals", "ip-compliance"],
+            "outputPreference": output_tags,
+        },
+        "tagPreset": "desktop-worker-auto",
+        "backgroundText": clip_text(source_text, 800),
+        "extraRequirements": "Desktop worker inferred a first-pass visual brief; Codex should refine it before formal external delivery.",
+        "referenceLinks": [],
+        "autoSuggestedTags": ["desktop-worker-auto"],
+        "userEditedTags": False,
+        "outlineTitles": [str(item.get("title", "")) for item in outline[:8]],
+    }
+
+
+def desktop_guided_brief(job: dict[str, Any], source_name: str, source_text: str, visual_brief: dict[str, Any]) -> dict[str, Any]:
+    title_line = extract_lines(source_text)[0] if source_text else source_name
+    return {
+        "scenario": ", ".join(visual_brief["selectedTags"].get("scenario", [])),
+        "audience": "",
+        "purpose": ", ".join(visual_brief["selectedTags"].get("purpose", [])),
+        "coreMessage": title_line,
+        "contentSources": ["sources/source.md", source_name],
+        "slideCount": "auto",
+        "outlinePreference": ", ".join(visual_brief["selectedTags"].get("layoutDensity", [])),
+        "visualStyle": visual_brief["selectedTags"].get("visualStyle", []),
+        "assetRules": visual_brief["selectedTags"].get("assetStrategy", []),
+        "outputFormat": visual_brief["selectedTags"].get("outputPreference", []),
+        "mustInclude": ["official/user-provided assets first"],
+        "mustAvoid": ["fake logos", "full-slide screenshots for formal PPTX body pages"],
+    }
+
+
+def desktop_expectation_fit(job: dict[str, Any], source_text: str, source_name: str) -> dict[str, Any]:
+    missing: list[str] = []
+    if not re.search(r"领导|客户|员工|专家|投资|audience|executive|customer|team|investor", source_text, flags=re.IGNORECASE):
+        missing.append("missing explicit audience")
+    if len(source_text.strip()) < 180:
+        missing.append("source material is too thin for final-quality production")
+    if not re.search(r"目标|目的|希望|结论|行动|decision|goal|objective|action", source_text, flags=re.IGNORECASE):
+        missing.append("missing explicit purpose or desired audience action")
+    source_adequacy = "substantive" if len(source_text) >= 900 else "thin" if len(source_text) >= 180 else "topic-only"
+    if source_name.lower().endswith((".pdf", ".docx", ".pptx", ".xlsx")) and "Imported file:" in source_text:
+        source_adequacy = "private-unparsed"
+    score = max(30, 100 - len(missing) * 14 - (0 if source_adequacy == "substantive" else 12 if source_adequacy == "thin" else 24))
+    risk_level = "green" if score >= 82 else "yellow" if score >= 55 else "red"
+    return {
+        "riskLevel": risk_level,
+        "score": score,
+        "sourceAdequacy": source_adequacy,
+        "missingSignals": missing,
+        "assumptions": [
+            "Desktop worker defaults to editable PPTX for formal office handoff unless outputMode says web.",
+            "Microsoft YaHei is the default body font for Chinese office delivery.",
+            "Official/user-provided brand assets are required before external release; otherwise use documented text lockups.",
+            "ChatGPT/OpenAI generated visuals are no-text support layers or reusable micro-assets, not body-copy containers.",
+        ],
+        "conflicts": [],
+        "successCriteria": [
+            "Codex states audience, scenario, purpose, source scope, visual style, asset boundary, and output format before final production.",
+            "quality-report.json explains what came from the user/source and what remains an assumption.",
+        ],
+        "readyForProduction": risk_level != "red",
+        "nextQuestions": [
+            "Who will see this PPT, in what setting, and what should they do or believe after reading it?",
+            "Which source material is authoritative, and are official/brand assets required for external use?",
+        ] if risk_level == "red" else [],
+    }
+
+
 def write_formal_delivery_files(
     project_path: Path,
     job: dict[str, Any],
@@ -2173,6 +2301,7 @@ def write_formal_delivery_files(
     generated_files: list[str],
     preview_html: str,
     now: str,
+    source_text: str = "",
 ) -> list[Path]:
     quality_gate = formal_quality_gate()
     quality_profile = formal_quality_profile(job["outputMode"])
@@ -2184,6 +2313,10 @@ def write_formal_delivery_files(
     visual_direction = visual_direction_for_style(job["stylePreset"], job["outputMode"], title)
     page_contracts = page_contract_for_outline(outline)
     page_visual_manifest, page_visual_prompts, page_visual_prompt_md = page_visual_layer_records(str(title), page_contracts)
+    visual_brief = desktop_visual_brief(job, source_text, outline)
+    guided_brief = desktop_guided_brief(job, source_name, source_text, visual_brief)
+    expectation_fit = desktop_expectation_fit(job, source_text, source_name)
+    brief_mode = "source-first" if expectation_fit["readyForProduction"] else "codex-guided-intake"
     design_spec_path = project_path / "design_spec.md"
     spec_lock_path = project_path / "spec_lock.md"
     manifest_path = project_path / "manifest.json"
@@ -2216,10 +2349,14 @@ def write_formal_delivery_files(
     ]
     brief = {
         "version": "desktop-worker-formal-v1",
+        "briefMode": brief_mode,
         "title": title,
         "sourceName": source_name,
         "outputMode": job["outputMode"],
         "stylePreset": job["stylePreset"],
+        "visualBrief": visual_brief,
+        "guidedBrief": guided_brief,
+        "expectationFit": expectation_fit,
         "qualityProfile": quality_profile,
         "qualityGate": quality_gate,
         "workflowState": workflow_state,
@@ -2261,6 +2398,10 @@ def write_formal_delivery_files(
         "qualityProfile": quality_profile,
         "qualityGate": quality_gate,
         "workflowState": workflow_state,
+        "briefMode": brief_mode,
+        "visualBrief": visual_brief,
+        "guidedBrief": guided_brief,
+        "expectationFit": expectation_fit,
         "expectedArtifacts": quality_profile["expectedArtifacts"],
         "reviewCommands": quality_gate["reviewCommands"],
         "artifactChecks": quality_gate["artifactChecks"],
@@ -2296,6 +2437,10 @@ def write_formal_delivery_files(
         "qualityProfile": quality_profile,
         "qualityGate": quality_gate,
         "workflowState": workflow_state,
+        "briefMode": brief_mode,
+        "visualBrief": visual_brief,
+        "guidedBrief": guided_brief,
+        "expectationFit": expectation_fit,
         "reviewCommands": quality_gate["reviewCommands"],
         "visualDirection": visual_direction,
         "pageContractSummary": {
@@ -2335,6 +2480,11 @@ def write_formal_delivery_files(
                 "id": "formal-business-gate",
                 "status": "pending",
                 "summary": "等待 audit_formal_delivery.py 验证。",
+            },
+            {
+                "id": "expectation-fit",
+                "status": "ready" if expectation_fit["readyForProduction"] else "needs-guided-intake",
+                "summary": f"Expectation fit {expectation_fit['score']}%, risk {expectation_fit['riskLevel']}.",
             }
         ],
     }
@@ -2347,8 +2497,8 @@ def write_formal_delivery_files(
     for path, payload in files:
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         written.append(path)
-    design_spec_path.write_text(design_spec_text(title, job["stylePreset"], job["outputMode"], visual_direction, page_contracts), encoding="utf-8")
-    spec_lock_path.write_text(spec_lock_text(title, visual_direction, page_contracts), encoding="utf-8")
+    design_spec_path.write_text(design_spec_text(title, job["stylePreset"], job["outputMode"], visual_direction, page_contracts, expectation_fit), encoding="utf-8")
+    spec_lock_path.write_text(spec_lock_text(title, visual_direction, page_contracts, expectation_fit), encoding="utf-8")
     written.extend([design_spec_path, spec_lock_path])
     page_visual_manifest_path.parent.mkdir(parents=True, exist_ok=True)
     page_visual_manifest_path.write_text(json.dumps(page_visual_manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -2357,10 +2507,10 @@ def write_formal_delivery_files(
     page_visual_prompt_md_path.write_text(page_visual_prompt_md, encoding="utf-8")
     written.extend([page_visual_manifest_path, page_visual_prompt_json_path, page_visual_prompt_md_path])
     codex_task_path.write_text(
-        codex_task_text(title, job["outputMode"], quality_gate, workflow_state, quality_profile["expectedArtifacts"]),
+        codex_task_text(title, job["outputMode"], quality_gate, workflow_state, quality_profile["expectedArtifacts"], expectation_fit, brief_mode),
         encoding="utf-8",
     )
-    codex_guide_path.write_text(codex_agent_guide_text(quality_gate), encoding="utf-8")
+    codex_guide_path.write_text(codex_agent_guide_text(quality_gate, expectation_fit), encoding="utf-8")
     revision_brief_path.write_text(
         (
             "# v4.3 Rendered Review Revision Brief\n\n"
@@ -2491,7 +2641,7 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     )
 
     now = utc_now()
-    formal_files = write_formal_delivery_files(project_path, valid, source_name, outline, generated_files, preview_html, now)
+    formal_files = write_formal_delivery_files(project_path, valid, source_name, outline, generated_files, preview_html, now, text)
     generated_files.extend(str(path) for path in formal_files)
     review_paths = run_rendered_review(repo_root, project_path)
     for review_path in review_paths:

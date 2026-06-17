@@ -30,7 +30,8 @@ Ultimate PPT Master v5 采用分类文档结构。先按你当前要做的事情
 
 | 需求 | 阅读 |
 |---|---|
-| 查看最新发布 | [发布说明 - v5.0.0](./release/release-notes-v5.0.0.md) |
+| 查看最新发布 | [发布说明 - v5.1.0](./release/release-notes-v5.1.0.md) |
+| 查看 v5.1 分步访谈发布 | [发布说明 - v5.1.0](./release/release-notes-v5.1.0.md) |
 | 查看 v5 交付默认规范发布 | [发布说明 - v5.0.0](./release/release-notes-v5.0.0.md) |
 | 查看渲染审阅闭环发布 | [发布说明 - v4.3.0](./release/release-notes-v4.3.0.md) |
 | 查看 AI 策划发布 | [发布说明 - v4.2.0](./release/release-notes-v4.2.0.md) |
@@ -55,4 +56,4 @@ Ultimate PPT Master v5 采用分类文档结构。先按你当前要做的事情
 打开 Web Experience -> 拖入资料或粘贴摘要 -> 启动 npm run bridge -> 发送到本地 Bridge -> 把 handoff 项目交给 Codex / Claude Code / Hermes / OpenClaw 深加工
 ```
 
-v5 的新增重点是：默认可编辑 PPTX、一份交付简报、官方/IP 素材边界、Codex-first 生成视觉、微软雅黑版式规范和 formal-business 审计强化；v4.3 的渲染审阅闭环、v4.2 的 DeckIR 页面地图和 v4.0 的可编辑视觉契约继续作为主线。
+v5.1 的新增重点是：Web 可视化标签、Codex 分步访谈、统一 `project-brief.json`、预期契合风险和制作前关键问题澄清；v5.0 的默认可编辑 PPTX、官方/IP 素材边界、Codex-first 生成视觉、微软雅黑版式规范和 formal-business 审计继续作为主线。

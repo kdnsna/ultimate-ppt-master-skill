@@ -55,6 +55,10 @@ type StepStatus = "locked" | "ready" | "active" | "complete" | "blocked";
 type QualityGateLevel = "quick" | "formal-business" | "showcase";
 type UploadedSourceKind = "file" | "url";
 type UploadedSourceStatus = "textExtracted" | "attachedOnly" | "urlOnly";
+type BriefMode = "visual-tags" | "codex-guided-intake" | "source-first" | "draft-with-assumptions";
+type VisualTagGroupId = "scenario" | "audience" | "purpose" | "contentState" | "visualStyle" | "layoutDensity" | "assetStrategy" | "outputPreference";
+type ExpectationRiskLevel = "green" | "yellow" | "red";
+type SourceAdequacy = "substantive" | "thin" | "topic-only" | "private-unparsed" | "conflicting" | "no-source";
 
 interface StoryItem {
   title: string;
@@ -108,6 +112,65 @@ interface WorkflowStep {
   action: string;
 }
 
+interface VisualBrief {
+  selectedTags: Record<VisualTagGroupId, string[]>;
+  tagPreset: string;
+  backgroundText: string;
+  extraRequirements: string;
+  referenceLinks: string[];
+  autoSuggestedTags: string[];
+  userEditedTags: boolean;
+}
+
+interface GuidedBrief {
+  scenario: string;
+  audience: string;
+  purpose: string;
+  coreMessage: string;
+  contentSources: string[];
+  slideCount: string;
+  outlinePreference: string;
+  visualStyle: string[];
+  assetRules: string[];
+  outputFormat: string[];
+  mustInclude: string[];
+  mustAvoid: string[];
+}
+
+interface ExpectationFit {
+  riskLevel: ExpectationRiskLevel;
+  score: number;
+  sourceAdequacy: SourceAdequacy;
+  missingSignals: string[];
+  assumptions: string[];
+  conflicts: string[];
+  successCriteria: string[];
+  readyForProduction: boolean;
+  nextQuestions: string[];
+}
+
+interface VisualTag {
+  id: string;
+  zh: string;
+  en: string;
+}
+
+interface VisualTagGroup {
+  id: VisualTagGroupId;
+  zh: string;
+  en: string;
+  tags: VisualTag[];
+}
+
+interface VisualBriefPreset {
+  id: string;
+  zh: string;
+  en: string;
+  descriptionZh: string;
+  descriptionEn: string;
+  tags: Partial<Record<VisualTagGroupId, string[]>>;
+}
+
 interface FormState {
   language: Language;
   presetId: PresetId;
@@ -123,6 +186,7 @@ interface FormState {
   coreMessage: string;
   sourceNotes: string;
   constraints: string;
+  visualBrief: VisualBrief;
 }
 
 interface UploadedSource {
@@ -215,7 +279,7 @@ const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v4";
-const appVersion = "5.0.0";
+const appVersion = "5.1.0";
 
 const designDoctorScores = [
   {
@@ -439,6 +503,20 @@ const labels = {
     coreMessage: "核心结论",
     sourceNotes: "粘贴资料 / 摘要",
     constraints: "补充要求",
+    visualBriefPanel: "可视化需求标签",
+    visualBriefSubtitle: "用标签快速说明场景、受众、目的、风格、素材和输出偏好；也可以继续粘贴背景和特殊要求。",
+    recommendedTagCombos: "推荐组合",
+    backgroundContext: "背景 / 相关内容",
+    extraVisualRequirements: "特殊要求 / 禁忌",
+    referenceLinks: "参考链接 / 官网 / 资料地址",
+    expectationFit: "预期契合度",
+    expectationFitGreen: "可以进入正式制作",
+    expectationFitYellow: "可制作，但需要记录假设",
+    expectationFitRed: "建议先问清楚再制作",
+    sourceAdequacy: "资料充分度",
+    nextCodexQuestion: "Codex 下一步应问",
+    readyForProduction: "可正式制作",
+    needsGuidedIntake: "需要分步问清",
     sourceUrl: "资料 URL",
     addUrl: "添加 URL",
     copied: "已复制",
@@ -669,6 +747,20 @@ const labels = {
     coreMessage: "Core message",
     sourceNotes: "Pasted material / notes",
     constraints: "Extra requirements",
+    visualBriefPanel: "Visual brief tags",
+    visualBriefSubtitle: "Use tags to clarify scenario, audience, purpose, style, assets, and output. Paste background and special constraints when needed.",
+    recommendedTagCombos: "Suggested combinations",
+    backgroundContext: "Background / related context",
+    extraVisualRequirements: "Special requirements / must avoid",
+    referenceLinks: "Reference links / official sites / source URLs",
+    expectationFit: "Expectation fit",
+    expectationFitGreen: "Ready for production",
+    expectationFitYellow: "Can proceed with recorded assumptions",
+    expectationFitRed: "Clarify before production",
+    sourceAdequacy: "Source adequacy",
+    nextCodexQuestion: "Codex should ask next",
+    readyForProduction: "Production ready",
+    needsGuidedIntake: "Guided intake needed",
     sourceUrl: "Source URL",
     addUrl: "Add URL",
     copied: "Copied",
@@ -791,6 +883,214 @@ const optionText = {
   }
 } as const;
 
+const visualTagGroups: VisualTagGroup[] = [
+  {
+    id: "scenario",
+    zh: "使用场景",
+    en: "Scenario",
+    tags: [
+      { id: "work-report", zh: "工作汇报", en: "work report" },
+      { id: "executive-review", zh: "高层汇报", en: "executive review" },
+      { id: "consulting-proposal", zh: "咨询提案", en: "consulting proposal" },
+      { id: "product-launch", zh: "产品发布", en: "product launch" },
+      { id: "training", zh: "培训课件", en: "training deck" },
+      { id: "investment", zh: "路演融资", en: "investor pitch" },
+      { id: "research-report", zh: "调研报告", en: "research report" },
+      { id: "campaign", zh: "活动方案", en: "campaign plan" },
+      { id: "government-report", zh: "政企材料", en: "government / SOE" },
+      { id: "culture-tourism", zh: "文旅推介", en: "culture tourism" }
+    ]
+  },
+  {
+    id: "audience",
+    zh: "目标受众",
+    en: "Audience",
+    tags: [
+      { id: "executives", zh: "高层领导", en: "executives" },
+      { id: "department-heads", zh: "部门负责人", en: "department heads" },
+      { id: "customers", zh: "客户", en: "customers" },
+      { id: "partners", zh: "合作伙伴", en: "partners" },
+      { id: "employees", zh: "员工", en: "employees" },
+      { id: "public-media", zh: "公众媒体", en: "public / media" },
+      { id: "reviewers", zh: "评审专家", en: "review panel" },
+      { id: "investors", zh: "投资人", en: "investors" }
+    ]
+  },
+  {
+    id: "purpose",
+    zh: "交付目的",
+    en: "Purpose",
+    tags: [
+      { id: "decision", zh: "说服决策", en: "drive decision" },
+      { id: "showcase", zh: "展示成果", en: "showcase results" },
+      { id: "resource-request", zh: "申请资源", en: "request resources" },
+      { id: "explain-solution", zh: "解释方案", en: "explain solution" },
+      { id: "drive-execution", zh: "推动执行", en: "drive execution" },
+      { id: "public-communication", zh: "制造传播", en: "public communication" },
+      { id: "align-understanding", zh: "统一认知", en: "align understanding" },
+      { id: "training-learning", zh: "培训学习", en: "training / learning" }
+    ]
+  },
+  {
+    id: "contentState",
+    zh: "内容状态",
+    en: "Content state",
+    tags: [
+      { id: "well-sourced", zh: "资料充分", en: "well sourced" },
+      { id: "outline-only", zh: "只有大纲", en: "outline only" },
+      { id: "topic-only", zh: "只有主题", en: "topic only" },
+      { id: "data-heavy", zh: "数据较多", en: "data heavy" },
+      { id: "text-heavy", zh: "文字较多", en: "text heavy" },
+      { id: "image-heavy", zh: "图片较多", en: "image heavy" },
+      { id: "unclear-viewpoint", zh: "观点不明", en: "unclear viewpoint" },
+      { id: "needs-research", zh: "需要调研", en: "needs research" }
+    ]
+  },
+  {
+    id: "visualStyle",
+    zh: "视觉风格",
+    en: "Visual style",
+    tags: [
+      { id: "formal-business", zh: "正式大气", en: "formal business" },
+      { id: "finance-steady", zh: "金融稳重", en: "financial steady" },
+      { id: "tech-clean", zh: "科技简洁", en: "clean tech" },
+      { id: "consulting-report", zh: "咨询报告感", en: "consulting report" },
+      { id: "brand-promo", zh: "品牌宣传感", en: "brand promo" },
+      { id: "magazine", zh: "杂志感", en: "magazine" },
+      { id: "young-vivid", zh: "年轻活泼", en: "young vivid" },
+      { id: "government-soe", zh: "政府/国企风", en: "government / SOE" },
+      { id: "launch-show", zh: "发布会感", en: "launch show" }
+    ]
+  },
+  {
+    id: "layoutDensity",
+    zh: "排版密度",
+    en: "Layout density",
+    tags: [
+      { id: "spacious", zh: "极简留白", en: "spacious" },
+      { id: "standard-business", zh: "标准商务", en: "standard business" },
+      { id: "information-dense", zh: "信息密集", en: "information dense" },
+      { id: "text-image-balanced", zh: "图文均衡", en: "text/image balance" },
+      { id: "data-dashboard", zh: "数据看板", en: "data dashboard" },
+      { id: "story-driven", zh: "故事化叙事", en: "story driven" }
+    ]
+  },
+  {
+    id: "assetStrategy",
+    zh: "素材策略",
+    en: "Asset strategy",
+    tags: [
+      { id: "official-first", zh: "官方素材优先", en: "official assets first" },
+      { id: "ai-visuals", zh: "可用 AI 生图", en: "AI visuals allowed" },
+      { id: "ip-compliance", zh: "IP/品牌合规", en: "IP / brand compliant" },
+      { id: "avoid-portrait", zh: "避免人物肖像", en: "avoid portraits" },
+      { id: "icon-system", zh: "需要图标体系", en: "icon system" },
+      { id: "real-scene", zh: "需要实景图片", en: "real scene photos" }
+    ]
+  },
+  {
+    id: "outputPreference",
+    zh: "输出偏好",
+    en: "Output preference",
+    tags: [
+      { id: "editable-pptx", zh: "默认 PPTX", en: "editable PPTX" },
+      { id: "pptx-pdf", zh: "PPTX + PDF", en: "PPTX + PDF" },
+      { id: "web-preview", zh: "网页预览", en: "web preview" },
+      { id: "editable-first", zh: "可编辑优先", en: "editability first" },
+      { id: "visual-impact", zh: "视觉冲击优先", en: "visual impact first" },
+      { id: "easy-revision", zh: "便于二次修改", en: "easy to revise" }
+    ]
+  }
+];
+
+const visualBriefPresets: VisualBriefPreset[] = [
+  {
+    id: "executive-review",
+    zh: "高层汇报",
+    en: "Executive review",
+    descriptionZh: "适合经营复盘、管理层决策、资源投入和风险机会说明。",
+    descriptionEn: "For business reviews, management decisions, resource allocation, and risk/opportunity updates.",
+    tags: {
+      scenario: ["executive-review", "work-report"],
+      audience: ["executives", "department-heads"],
+      purpose: ["decision", "drive-execution"],
+      contentState: ["data-heavy", "well-sourced"],
+      visualStyle: ["formal-business", "finance-steady"],
+      layoutDensity: ["standard-business", "data-dashboard"],
+      assetStrategy: ["official-first", "ip-compliance", "ai-visuals"],
+      outputPreference: ["editable-pptx", "editable-first", "easy-revision"]
+    }
+  },
+  {
+    id: "client-proposal",
+    zh: "客户提案",
+    en: "Client proposal",
+    descriptionZh: "适合客户方案、合作提案、招商推介和解决方案说明。",
+    descriptionEn: "For client solutions, partnership proposals, sales decks, and solution explanation.",
+    tags: {
+      scenario: ["consulting-proposal"],
+      audience: ["customers", "partners"],
+      purpose: ["explain-solution", "decision"],
+      contentState: ["outline-only", "text-heavy"],
+      visualStyle: ["consulting-report", "brand-promo"],
+      layoutDensity: ["text-image-balanced", "story-driven"],
+      assetStrategy: ["official-first", "ai-visuals", "icon-system"],
+      outputPreference: ["editable-pptx", "web-preview", "easy-revision"]
+    }
+  },
+  {
+    id: "product-launch",
+    zh: "产品发布",
+    en: "Product launch",
+    descriptionZh: "适合新品介绍、发布会、路演展示和公开传播。",
+    descriptionEn: "For launches, product showcases, demo day, and public communication.",
+    tags: {
+      scenario: ["product-launch"],
+      audience: ["customers", "public-media", "investors"],
+      purpose: ["public-communication", "showcase"],
+      contentState: ["image-heavy", "outline-only"],
+      visualStyle: ["launch-show", "tech-clean", "brand-promo"],
+      layoutDensity: ["spacious", "story-driven"],
+      assetStrategy: ["ai-visuals", "official-first", "real-scene"],
+      outputPreference: ["visual-impact", "web-preview", "editable-pptx"]
+    }
+  },
+  {
+    id: "training",
+    zh: "内部培训",
+    en: "Training",
+    descriptionZh: "适合员工培训、课程课件、操作说明和知识传达。",
+    descriptionEn: "For internal training, courseware, operations guidance, and knowledge transfer.",
+    tags: {
+      scenario: ["training"],
+      audience: ["employees"],
+      purpose: ["training-learning", "align-understanding"],
+      contentState: ["text-heavy", "well-sourced"],
+      visualStyle: ["formal-business", "tech-clean"],
+      layoutDensity: ["information-dense", "standard-business"],
+      assetStrategy: ["icon-system", "ai-visuals"],
+      outputPreference: ["editable-pptx", "easy-revision"]
+    }
+  },
+  {
+    id: "research-report",
+    zh: "调研报告",
+    en: "Research report",
+    descriptionZh: "适合调研、专家评审、趋势分析和研究型汇报。",
+    descriptionEn: "For research, expert review, trend analysis, and evidence-led reporting.",
+    tags: {
+      scenario: ["research-report"],
+      audience: ["reviewers", "executives"],
+      purpose: ["align-understanding", "decision"],
+      contentState: ["needs-research", "data-heavy"],
+      visualStyle: ["consulting-report", "formal-business"],
+      layoutDensity: ["information-dense", "data-dashboard"],
+      assetStrategy: ["official-first", "ip-compliance"],
+      outputPreference: ["editable-pptx", "pptx-pdf"]
+    }
+  }
+];
+
 const defaultForm: FormState = {
   language: "zh",
   presetId: "executive_business_review",
@@ -805,7 +1105,8 @@ const defaultForm: FormState = {
   slideCount: "12",
   coreMessage: "本季度增长质量需要从规模复盘转向下一阶段动作拆解，重点呈现风险、机会和可执行抓手。",
   sourceNotes: "1. 业务整体保持增长，但不同区域和渠道分化明显。\n2. 管理层关心下一阶段资源投入、关键风险和可量化目标。\n3. 需要同时输出正式可编辑 PPTX，以及适合分享的 Web Deck。",
-  constraints: "结论先行，减少空话；PPTX 保留可编辑结构；Web Deck 更适合传播；不要上传敏感资料，生成后检查预览和导出文件。"
+  constraints: "结论先行，减少空话；PPTX 保留可编辑结构；Web Deck 更适合传播；不要上传敏感资料，生成后检查预览和导出文件。",
+  visualBrief: makeVisualBriefFromPreset("executive-review")
 };
 
 export function App() {
@@ -832,11 +1133,12 @@ export function App() {
   const enginePlan = useMemo(() => buildEnginePlan(form), [form]);
   const qualityContract = useMemo(() => buildQualityContract(form, activePreset, enginePlan), [form, activePreset, enginePlan]);
   const readiness = useMemo(() => scoreBrief(form, sources), [form, sources]);
+  const expectationFit = useMemo(() => assessExpectationFit(form, sources), [form, sources]);
   const qualityGate = useMemo(() => buildQualityGate(form, qualityContract, enginePlan), [form, qualityContract, enginePlan]);
-  const prompt = useMemo(() => buildPrompt(form, storyboard, enginePlan, sources, qualityContract, qualityGate), [form, storyboard, enginePlan, sources, qualityContract, qualityGate]);
-  const sourceTemplate = useMemo(() => buildSourceTemplate(form, storyboard, enginePlan, sources, qualityContract), [form, storyboard, enginePlan, sources, qualityContract]);
+  const prompt = useMemo(() => buildPrompt(form, storyboard, enginePlan, sources, qualityContract, qualityGate, expectationFit), [form, storyboard, enginePlan, sources, qualityContract, qualityGate, expectationFit]);
+  const sourceTemplate = useMemo(() => buildSourceTemplate(form, storyboard, enginePlan, sources, qualityContract, expectationFit), [form, storyboard, enginePlan, sources, qualityContract, expectationFit]);
   const extractedSource = useMemo(() => buildExtractedSource(form, sources), [form, sources]);
-  const qualityChecklist = useMemo(() => buildQualityChecklist(form, enginePlan, sources, qualityContract, qualityGate), [form, enginePlan, sources, qualityContract, qualityGate]);
+  const qualityChecklist = useMemo(() => buildQualityChecklist(form, enginePlan, sources, qualityContract, qualityGate, expectationFit), [form, enginePlan, sources, qualityContract, qualityGate, expectationFit]);
   const assetPlan = useMemo(() => buildAssetPlan(form, sources, qualityGate), [form, sources, qualityGate]);
   const visualElementKit = useMemo(() => buildVisualElementKit(form, qualityGate), [form, qualityGate]);
   const deckIRPreview = useMemo(() => buildDeckIRPreview(form, storyboard, sources, enginePlan, qualityGate), [form, storyboard, sources, enginePlan, qualityGate]);
@@ -860,11 +1162,11 @@ export function App() {
   const previewGroup = previewGroupFor(previewMode);
   const workflowSteps = useMemo(() => buildWorkflowSteps({ form, sources, readiness, bridge, selectedAgent, handoffResult, labels: t }), [form, sources, readiness, bridge, selectedAgent, handoffResult, t]);
   const workflowState = useMemo(() => buildWorkflowState(workflowSteps), [workflowSteps]);
-  const codexTask = useMemo(() => buildCodexTask(form, enginePlan, sources, qualityGate, workflowState, qualityContract), [form, enginePlan, sources, qualityGate, workflowState, qualityContract]);
-  const codexAgentGuide = useMemo(() => buildCodexAgentGuide(form, qualityGate), [form, qualityGate]);
-  const qualityReport = useMemo(() => buildQualityReport(form, qualityContract, qualityGate, workflowState), [form, qualityContract, qualityGate, workflowState]);
-  const manifest = useMemo(() => buildManifest(form, sources, readiness, enginePlan, bridge, qualityContract, qualityGate, workflowState), [form, sources, readiness, enginePlan, bridge, qualityContract, qualityGate, workflowState]);
-  const briefObject = useMemo(() => buildBriefObject(form, storyboard, readiness, enginePlan, sources, qualityContract, qualityGate, workflowState), [form, storyboard, readiness, enginePlan, sources, qualityContract, qualityGate, workflowState]);
+  const codexTask = useMemo(() => buildCodexTask(form, enginePlan, sources, qualityGate, workflowState, qualityContract, expectationFit), [form, enginePlan, sources, qualityGate, workflowState, qualityContract, expectationFit]);
+  const codexAgentGuide = useMemo(() => buildCodexAgentGuide(form, qualityGate, expectationFit), [form, qualityGate, expectationFit]);
+  const qualityReport = useMemo(() => buildQualityReport(form, qualityContract, qualityGate, workflowState, expectationFit), [form, qualityContract, qualityGate, workflowState, expectationFit]);
+  const manifest = useMemo(() => buildManifest(form, sources, readiness, enginePlan, bridge, qualityContract, qualityGate, workflowState, expectationFit), [form, sources, readiness, enginePlan, bridge, qualityContract, qualityGate, workflowState, expectationFit]);
+  const briefObject = useMemo(() => buildBriefObject(form, storyboard, readiness, enginePlan, sources, qualityContract, qualityGate, workflowState, expectationFit), [form, storyboard, readiness, enginePlan, sources, qualityContract, qualityGate, workflowState, expectationFit]);
   const briefJson = useMemo(() => JSON.stringify(briefObject, null, 2), [briefObject]);
   const manifestJson = useMemo(() => JSON.stringify(manifest, null, 2), [manifest]);
   const visiblePreview =
@@ -921,7 +1223,57 @@ export function App() {
       audience: brief.audience,
       coreMessage: brief.coreMessage,
       sourceNotes: brief.sourceNotes,
-      constraints: brief.constraints
+      constraints: brief.constraints,
+      visualBrief: current.visualBrief.userEditedTags
+        ? current.visualBrief
+        : makeVisualBriefFromPreset(visualBriefPresetForContentPreset(presetId), current.visualBrief)
+    }));
+    setCopyState("");
+  }
+
+  function updateVisualBrief(patch: Partial<VisualBrief>) {
+    setForm((current) => ({
+      ...current,
+      visualBrief: normalizeVisualBrief({
+        ...current.visualBrief,
+        ...patch,
+        userEditedTags: true
+      })
+    }));
+    setCopyState("");
+  }
+
+  function toggleVisualTag(groupId: VisualTagGroupId, tagId: string) {
+    setForm((current) => {
+      const selectedTags = normalizeSelectedTags(current.visualBrief.selectedTags);
+      const values = new Set(selectedTags[groupId]);
+      if (values.has(tagId)) {
+        values.delete(tagId);
+      } else {
+        values.add(tagId);
+      }
+      return {
+        ...current,
+        visualBrief: normalizeVisualBrief({
+          ...current.visualBrief,
+          selectedTags: {
+            ...selectedTags,
+            [groupId]: Array.from(values)
+          },
+          userEditedTags: true
+        })
+      };
+    });
+    setCopyState("");
+  }
+
+  function applyVisualBriefPreset(presetId: string) {
+    setForm((current) => ({
+      ...current,
+      visualBrief: {
+        ...makeVisualBriefFromPreset(presetId, current.visualBrief),
+        userEditedTags: true
+      }
     }));
     setCopyState("");
   }
@@ -1471,6 +1823,14 @@ export function App() {
               {t.sourceNotes}
               <textarea className="large-input" value={form.sourceNotes} onChange={(event) => update("sourceNotes", event.target.value)} />
             </label>
+            <VisualBriefBuilder
+              form={form}
+              expectationFit={expectationFit}
+              labels={t}
+              onApplyPreset={applyVisualBriefPreset}
+              onToggleTag={toggleVisualTag}
+              onUpdateBrief={updateVisualBrief}
+            />
             <details className="advanced-settings">
               <summary>
                 <strong>{t.advancedSettings}</strong>
@@ -1521,6 +1881,7 @@ export function App() {
                 <span style={{ width: `${readiness.score}%` }} />
               </div>
             </div>
+            <ExpectationFitCard expectationFit={expectationFit} labels={t} />
             <details className="advanced-settings">
               <summary>
                 <strong>{t.advancedSettings}</strong>
@@ -2586,6 +2947,147 @@ function SourceList({
   );
 }
 
+function VisualBriefBuilder({
+  form,
+  expectationFit,
+  labels: t,
+  onApplyPreset,
+  onToggleTag,
+  onUpdateBrief
+}: {
+  form: FormState;
+  expectationFit: ExpectationFit;
+  labels: typeof labels.zh;
+  onApplyPreset: (presetId: string) => void;
+  onToggleTag: (groupId: VisualTagGroupId, tagId: string) => void;
+  onUpdateBrief: (patch: Partial<VisualBrief>) => void;
+}) {
+  const zh = form.language === "zh";
+  const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+
+  return (
+    <section className="visual-brief-builder" aria-label={t.visualBriefPanel}>
+      <div className="visual-brief-head">
+        <div>
+          <strong>{t.visualBriefPanel}</strong>
+          <p>{t.visualBriefSubtitle}</p>
+        </div>
+        <span className={`fit-badge ${expectationFit.riskLevel}`}>{expectationFit.score}%</span>
+      </div>
+      <div className="tag-preset-row" aria-label={t.recommendedTagCombos}>
+        <span>{t.recommendedTagCombos}</span>
+        <div>
+          {visualBriefPresets.map((preset) => (
+            <button
+              key={preset.id}
+              type="button"
+              className={form.visualBrief.tagPreset === preset.id ? "active" : ""}
+              title={zh ? preset.descriptionZh : preset.descriptionEn}
+              onClick={() => onApplyPreset(preset.id)}
+            >
+              {zh ? preset.zh : preset.en}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="tag-group-grid">
+        {visualTagGroups.map((group) => (
+          <div key={group.id} className="tag-group">
+            <strong>{zh ? group.zh : group.en}</strong>
+            <div>
+              {group.tags.map((tag) => {
+                const active = selectedTags[group.id].includes(tag.id);
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    className={active ? "active" : ""}
+                    onClick={() => onToggleTag(group.id, tag.id)}
+                  >
+                    {zh ? tag.zh : tag.en}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="visual-brief-inputs">
+        <label>
+          {t.backgroundContext}
+          <textarea
+            className="medium-input"
+            value={form.visualBrief.backgroundText}
+            onChange={(event) => onUpdateBrief({ backgroundText: event.target.value })}
+          />
+        </label>
+        <label>
+          {t.extraVisualRequirements}
+          <textarea
+            className="medium-input"
+            value={form.visualBrief.extraRequirements}
+            onChange={(event) => onUpdateBrief({ extraRequirements: event.target.value })}
+          />
+        </label>
+        <label>
+          {t.referenceLinks}
+          <textarea
+            className="medium-input"
+            value={form.visualBrief.referenceLinks.join("\n")}
+            onChange={(event) => onUpdateBrief({ referenceLinks: splitReferenceLinks(event.target.value) })}
+          />
+        </label>
+      </div>
+    </section>
+  );
+}
+
+function ExpectationFitCard({ expectationFit, labels: t }: { expectationFit: ExpectationFit; labels: typeof labels.zh }) {
+  const statusText =
+    expectationFit.riskLevel === "green"
+      ? t.expectationFitGreen
+      : expectationFit.riskLevel === "yellow"
+        ? t.expectationFitYellow
+        : t.expectationFitRed;
+  const details = [
+    ...expectationFit.missingSignals.slice(0, 3),
+    ...expectationFit.conflicts.slice(0, 2)
+  ];
+
+  return (
+    <div className={`expectation-fit-card ${expectationFit.riskLevel}`}>
+      <div>
+        <span>{t.expectationFit}</span>
+        <strong>{expectationFit.score}%</strong>
+      </div>
+      <p>{statusText}</p>
+      <dl>
+        <div>
+          <dt>{t.sourceAdequacy}</dt>
+          <dd>{sourceAdequacyLabel(expectationFit.sourceAdequacy, t.studio.includes("质量") ? "zh" : "en")}</dd>
+        </div>
+        <div>
+          <dt>{t.readyForProduction}</dt>
+          <dd>{expectationFit.readyForProduction ? t.expectationFitGreen : t.needsGuidedIntake}</dd>
+        </div>
+      </dl>
+      {details.length > 0 && (
+        <div className="expectation-signals">
+          {details.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+      )}
+      {expectationFit.nextQuestions.length > 0 && (
+        <div className="next-question">
+          <strong>{t.nextCodexQuestion}</strong>
+          <span>{expectationFit.nextQuestions[0]}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function BridgeStatusCard({
   bridge,
   checking,
@@ -2958,6 +3460,287 @@ function shellQuote(value: string) {
   return `'${value.replace(/'/g, "'\\''")}'`;
 }
 
+function emptySelectedTags(): Record<VisualTagGroupId, string[]> {
+  return visualTagGroups.reduce((acc, group) => {
+    acc[group.id] = [];
+    return acc;
+  }, {} as Record<VisualTagGroupId, string[]>);
+}
+
+function normalizeSelectedTags(input?: Partial<Record<VisualTagGroupId, string[]>>): Record<VisualTagGroupId, string[]> {
+  const next = emptySelectedTags();
+  for (const group of visualTagGroups) {
+    const known = new Set(group.tags.map((tag) => tag.id));
+    next[group.id] = Array.from(new Set((input?.[group.id] || []).filter((tagId) => known.has(tagId))));
+  }
+  return next;
+}
+
+function makeVisualBriefFromPreset(presetId: string, existing?: Partial<VisualBrief>): VisualBrief {
+  const preset = visualBriefPresets.find((item) => item.id === presetId) || visualBriefPresets[0];
+  return normalizeVisualBrief({
+    selectedTags: normalizeSelectedTags(preset.tags),
+    tagPreset: preset.id,
+    backgroundText: existing?.backgroundText || "",
+    extraRequirements: existing?.extraRequirements || "",
+    referenceLinks: existing?.referenceLinks || [],
+    autoSuggestedTags: existing?.autoSuggestedTags || [],
+    userEditedTags: false
+  });
+}
+
+function normalizeVisualBrief(input?: Partial<VisualBrief>): VisualBrief {
+  const fallback = visualBriefPresets[0];
+  return {
+    selectedTags: normalizeSelectedTags(input?.selectedTags || fallback.tags),
+    tagPreset: input?.tagPreset && visualBriefPresets.some((preset) => preset.id === input.tagPreset) ? input.tagPreset : fallback.id,
+    backgroundText: String(input?.backgroundText || ""),
+    extraRequirements: String(input?.extraRequirements || ""),
+    referenceLinks: Array.isArray(input?.referenceLinks) ? input.referenceLinks.map(String).filter(Boolean) : [],
+    autoSuggestedTags: Array.isArray(input?.autoSuggestedTags) ? input.autoSuggestedTags.map(String).filter(Boolean) : [],
+    userEditedTags: Boolean(input?.userEditedTags)
+  };
+}
+
+function visualBriefPresetForContentPreset(presetId: PresetId): string {
+  if (presetId === "consulting_proposal" || presetId === "finance_branch_solution") return "client-proposal";
+  if (presetId === "product_pitch" || presetId === "tech_trend_web_deck") return "product-launch";
+  if (presetId === "training_courseware") return "training";
+  if (presetId === "research_academic_defense") return "research-report";
+  return "executive-review";
+}
+
+function splitReferenceLinks(value: string) {
+  return value.split(/[\n,，]/).map((item) => item.trim()).filter(Boolean);
+}
+
+function selectedTagCount(brief: VisualBrief) {
+  return Object.values(normalizeSelectedTags(brief.selectedTags)).reduce((sum, items) => sum + items.length, 0);
+}
+
+function visualTagLabel(groupId: VisualTagGroupId, tagId: string, language: Language) {
+  const tag = visualTagGroups.find((group) => group.id === groupId)?.tags.find((item) => item.id === tagId);
+  return tag ? tag[language] : tagId;
+}
+
+function visualTagLabelsByGroup(brief: VisualBrief, language: Language) {
+  const selectedTags = normalizeSelectedTags(brief.selectedTags);
+  return visualTagGroups.reduce((acc, group) => {
+    acc[group.id] = selectedTags[group.id].map((tagId) => visualTagLabel(group.id, tagId, language));
+    return acc;
+  }, {} as Record<VisualTagGroupId, string[]>);
+}
+
+function flattenVisualTagLabels(brief: VisualBrief, language: Language) {
+  const grouped = visualTagLabelsByGroup(brief, language);
+  return visualTagGroups.flatMap((group) => grouped[group.id].map((label) => `${group[language]}: ${label}`));
+}
+
+function sourceAdequacyLabel(value: SourceAdequacy, language: Language) {
+  const zh: Record<SourceAdequacy, string> = {
+    substantive: "资料充分",
+    thin: "资料偏薄",
+    "topic-only": "只有主题",
+    "private-unparsed": "有附件待解析",
+    conflicting: "资料冲突",
+    "no-source": "缺少资料"
+  };
+  const en: Record<SourceAdequacy, string> = {
+    substantive: "substantive",
+    thin: "thin",
+    "topic-only": "topic only",
+    "private-unparsed": "private / unparsed attachments",
+    conflicting: "conflicting",
+    "no-source": "no source"
+  };
+  return language === "zh" ? zh[value] : en[value];
+}
+
+function inferSourceAdequacy(form: FormState, sources: UploadedSource[]): SourceAdequacy {
+  const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+  const text = [
+    form.sourceNotes,
+    form.visualBrief.backgroundText,
+    form.visualBrief.extraRequirements,
+    ...sources.map((source) => source.text || source.url || source.name)
+  ].join("\n").trim();
+  if (/冲突|矛盾|conflict|contradict/i.test(text)) return "conflicting";
+  if (sources.length > 0 && sources.every((source) => source.status !== "textExtracted" && !source.text)) return "private-unparsed";
+  if (text.length >= 260 || sources.some((source) => (source.text || "").length >= 180)) return "substantive";
+  if (text.length >= 80 || sources.length > 0) return "thin";
+  if (selectedTags.contentState.includes("topic-only") || form.title.trim().length > 4) return "topic-only";
+  return "no-source";
+}
+
+function draftAccepted(form: FormState) {
+  return /草稿|先做一版|先出一版|按默认|draft|rough|first pass/i.test([
+    form.constraints,
+    form.sourceNotes,
+    form.visualBrief.backgroundText,
+    form.visualBrief.extraRequirements
+  ].join("\n"));
+}
+
+function assessExpectationFit(form: FormState, sources: UploadedSource[]): ExpectationFit {
+  const zh = form.language === "zh";
+  const brief = normalizeVisualBrief(form.visualBrief);
+  const selectedTags = normalizeSelectedTags(brief.selectedTags);
+  const sourceAdequacy = inferSourceAdequacy({ ...form, visualBrief: brief }, sources);
+  const missingSignals: string[] = [];
+  const assumptions: string[] = [];
+  const conflicts: string[] = [];
+  const nextQuestions: string[] = [];
+  const sourceText = [form.sourceNotes, brief.backgroundText].join("\n").trim();
+
+  if (!selectedTags.scenario.length && !form.scenario) {
+    missingSignals.push(zh ? "缺少使用场景" : "missing scenario");
+  }
+  if (form.audience.trim().length < 4 && !selectedTags.audience.length) {
+    missingSignals.push(zh ? "缺少目标受众" : "missing audience");
+  }
+  if (form.coreMessage.trim().length < 12 && !selectedTags.purpose.length) {
+    missingSignals.push(zh ? "缺少核心目的或结论" : "missing core purpose or conclusion");
+  }
+  if (["no-source", "topic-only"].includes(sourceAdequacy) && sourceText.length < 80 && !selectedTags.contentState.includes("needs-research")) {
+    missingSignals.push(zh ? "缺少资料或调研许可" : "missing source material or research permission");
+  }
+  if (!selectedTags.visualStyle.length) {
+    missingSignals.push(zh ? "缺少视觉风格选择" : "missing visual style");
+  }
+  if (!selectedTags.assetStrategy.length) {
+    missingSignals.push(zh ? "缺少素材/IP 边界" : "missing asset / IP boundary");
+  }
+  if (!selectedTags.outputPreference.length) {
+    missingSignals.push(zh ? "缺少输出偏好" : "missing output preference");
+  }
+  if (!(Number.parseInt(form.slideCount, 10) > 0)) {
+    missingSignals.push(zh ? "缺少页数范围" : "missing slide count");
+  }
+
+  if (selectedTags.visualStyle.includes("formal-business") && (selectedTags.visualStyle.includes("young-vivid") || selectedTags.visualStyle.includes("launch-show"))) {
+    conflicts.push(zh ? "正式汇报风格与年轻/发布会风格同时出现" : "formal business conflicts with vivid / launch-show style");
+  }
+  if (selectedTags.contentState.includes("well-sourced") && selectedTags.contentState.includes("topic-only")) {
+    conflicts.push(zh ? "内容状态同时选择了资料充分和只有主题" : "content state says both well sourced and topic only");
+  }
+  if (form.outputMode === "web" && selectedTags.outputPreference.includes("editable-pptx") && !selectedTags.outputPreference.includes("web-preview")) {
+    conflicts.push(zh ? "输出形式选择 Web，但标签偏向可编辑 PPTX" : "output mode is Web, but tags prefer editable PPTX");
+  }
+
+  const hasDraftApproval = draftAccepted({ ...form, visualBrief: brief });
+  const sourcePenalty: Record<SourceAdequacy, number> = {
+    substantive: 0,
+    thin: 10,
+    "private-unparsed": 12,
+    "topic-only": 22,
+    conflicting: 26,
+    "no-source": 34
+  };
+  const score = Math.max(0, Math.min(100, 100 - sourcePenalty[sourceAdequacy] - missingSignals.length * 9 - conflicts.length * 14));
+  const riskLevel: ExpectationRiskLevel =
+    (score < 55 || sourceAdequacy === "no-source" || (missingSignals.length >= 4 && !hasDraftApproval))
+      ? "red"
+      : (score < 82 || missingSignals.length > 0 || conflicts.length > 0 || sourceAdequacy !== "substantive")
+        ? "yellow"
+        : "green";
+
+  if (form.audience.trim()) {
+    assumptions.push(zh ? `按目标听众“${form.audience.trim()}”组织内容。` : `Organize the deck for "${form.audience.trim()}".`);
+  } else if (selectedTags.audience.length) {
+    assumptions.push(zh ? `按标签中的目标受众组织内容。` : "Use the selected audience tags as the audience contract.");
+  }
+  assumptions.push(zh ? "默认输出可编辑 PPTX，必要时附 Web 预览。" : "Default to editable PPTX, with Web preview when requested.");
+  assumptions.push(zh ? "默认字体为微软雅黑，正文和关键数据保持可编辑。" : "Use Microsoft YaHei by default and keep body copy and key numbers editable.");
+  if (selectedTags.assetStrategy.includes("official-first") || selectedTags.assetStrategy.includes("ip-compliance")) {
+    assumptions.push(zh ? "品牌/IP 素材优先使用官方或用户提供来源。" : "Use official or user-provided sources for brand/IP assets first.");
+  }
+
+  const successCriteria = [
+    form.coreMessage.trim()
+      ? (zh ? `核心结论被封面和收束页重复强化：${form.coreMessage.trim()}` : `Core message appears in cover and closing: ${form.coreMessage.trim()}`)
+      : (zh ? "封面和收束页必须明确一句话结论。" : "Cover and closing must state a clear one-line conclusion."),
+    zh ? "版式、字体、素材和输出格式与所选标签一致。" : "Layout, typography, assets, and output route match the selected tags.",
+    zh ? "交付审计说明哪些信息来自用户、哪些来自默认假设。" : "Delivery audit states which choices came from the user and which are assumptions."
+  ];
+
+  if (missingSignals.some((item) => /受众|场景|目的|audience|scenario|purpose/.test(item))) {
+    nextQuestions.push(zh ? "这份 PPT 是给谁看、用在什么场景、希望对方看完做什么？" : "Who will see this deck, in what setting, and what should they do or believe afterward?");
+  }
+  if (missingSignals.some((item) => /资料|source|research/.test(item))) {
+    nextQuestions.push(zh ? "请提供资料来源，或确认是否允许我先调研补充内容。" : "Please provide source material, or confirm whether research-first completion is allowed.");
+  }
+  if (missingSignals.some((item) => /风格|素材|输出|style|asset|output/.test(item)) || conflicts.length > 0) {
+    nextQuestions.push(zh ? "视觉上更偏正式汇报、客户提案、产品发布，还是培训/调研报告？是否必须使用官方素材？" : "Should the deck feel like a formal report, client proposal, launch deck, training deck, or research report, and are official assets required?");
+  }
+
+  return {
+    riskLevel,
+    score,
+    sourceAdequacy,
+    missingSignals,
+    assumptions,
+    conflicts,
+    successCriteria,
+    readyForProduction: riskLevel !== "red" || hasDraftApproval,
+    nextQuestions
+  };
+}
+
+function buildGuidedBrief(form: FormState): GuidedBrief {
+  const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+  const labelsByGroup = visualTagLabelsByGroup(form.visualBrief, form.language);
+  return {
+    scenario: labelsByGroup.scenario.join(", ") || readOption(optionText.scenario, form.scenario, form.language),
+    audience: form.audience || labelsByGroup.audience.join(", "),
+    purpose: labelsByGroup.purpose.join(", "),
+    coreMessage: form.coreMessage,
+    contentSources: [
+      form.sourceNotes ? "sourceNotes" : "",
+      form.visualBrief.backgroundText ? "visualBrief.backgroundText" : "",
+      ...form.visualBrief.referenceLinks
+    ].filter(Boolean),
+    slideCount: form.slideCount,
+    outlinePreference: labelsByGroup.layoutDensity.join(", "),
+    visualStyle: labelsByGroup.visualStyle,
+    assetRules: labelsByGroup.assetStrategy,
+    outputFormat: labelsByGroup.outputPreference,
+    mustInclude: selectedTags.assetStrategy.includes("official-first") ? [form.language === "zh" ? "官方/用户提供素材优先" : "official/user-provided assets first"] : [],
+    mustAvoid: selectedTags.assetStrategy.includes("avoid-portrait") ? [form.language === "zh" ? "避免人物肖像" : "avoid portraits"] : []
+  };
+}
+
+function determineBriefMode(form: FormState, expectationFit: ExpectationFit, sources: UploadedSource[]): BriefMode {
+  if (draftAccepted(form)) return "draft-with-assumptions";
+  if (form.agentTool === "codex" && !expectationFit.readyForProduction) return "codex-guided-intake";
+  if (selectedTagCount(form.visualBrief) > 0 || form.visualBrief.backgroundText || form.visualBrief.referenceLinks.length > 0) return "visual-tags";
+  if (sources.length > 0) return "source-first";
+  return "codex-guided-intake";
+}
+
+function buildVisualBriefMarkdown(form: FormState, expectationFit: ExpectationFit) {
+  const zh = form.language === "zh";
+  const grouped = visualTagLabelsByGroup(form.visualBrief, form.language);
+  const sections = visualTagGroups
+    .map((group) => `- ${group[form.language]}: ${grouped[group.id].join(", ") || (zh ? "未选择" : "not selected")}`)
+    .join("\n");
+  const assumptions = expectationFit.assumptions.map((item) => `- ${item}`).join("\n");
+  const missing = expectationFit.missingSignals.length
+    ? expectationFit.missingSignals.map((item) => `- ${item}`).join("\n")
+    : (zh ? "- 暂无关键缺口" : "- No critical gaps");
+  const conflicts = expectationFit.conflicts.length
+    ? expectationFit.conflicts.map((item) => `- ${item}`).join("\n")
+    : (zh ? "- 暂无明显冲突" : "- No visible conflicts");
+  const questions = expectationFit.nextQuestions.length
+    ? expectationFit.nextQuestions.map((item) => `- ${item}`).join("\n")
+    : (zh ? "- 不需要额外问题即可进入制作" : "- No extra question needed before production");
+
+  if (zh) {
+    return `## 可视化需求标签\n${sections}\n\n## 背景 / 相关内容\n${form.visualBrief.backgroundText || "未填写"}\n\n## 特殊要求 / 禁忌\n${form.visualBrief.extraRequirements || "未填写"}\n\n## 参考链接\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- 未提供"}\n\n## 预期契合度\n- 风险等级: ${expectationFit.riskLevel}\n- 分数: ${expectationFit.score}%\n- 资料充分度: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- 可正式制作: ${expectationFit.readyForProduction ? "是" : "否，Codex 需要分步问清"}\n\n## 已知缺口\n${missing}\n\n## 冲突点\n${conflicts}\n\n## 默认假设\n${assumptions}\n\n## Codex 下一步问题\n${questions}`;
+  }
+
+  return `## Visual brief tags\n${sections}\n\n## Background / related context\n${form.visualBrief.backgroundText || "Not provided"}\n\n## Special requirements / must avoid\n${form.visualBrief.extraRequirements || "Not provided"}\n\n## Reference links\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- None"}\n\n## Expectation fit\n- Risk level: ${expectationFit.riskLevel}\n- Score: ${expectationFit.score}%\n- Source adequacy: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- Ready for production: ${expectationFit.readyForProduction ? "yes" : "no; Codex must run guided intake"}\n\n## Missing signals\n${missing}\n\n## Conflicts\n${conflicts}\n\n## Assumptions\n${assumptions}\n\n## Codex next questions\n${questions}`;
+}
+
 function loadSavedForm() {
   try {
     const saved = window.localStorage.getItem(storageKey);
@@ -2966,6 +3749,7 @@ function loadSavedForm() {
     if (!presetCatalog.some((preset) => preset.id === parsed.presetId)) {
       parsed.presetId = defaultForm.presetId;
     }
+    parsed.visualBrief = normalizeVisualBrief(parsed.visualBrief);
     return parsed;
   } catch {
     return defaultForm;
@@ -3147,6 +3931,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
   const requiredInputs = zh
     ? [
       "品牌资产或明确替代策略",
+      "visualBrief / guidedBrief / expectationFit：用户标签、背景资料、默认假设和是否需要分步问清",
       "可追溯资料来源和证据口径",
       "DeckIR 页面地图：页面角色、证据引用、页面配方、可编辑目标和 raster 策略",
       "ChatGPT 生图优先的视觉素材计划：prompt、文件名和插入页面",
@@ -3157,6 +3942,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
     ]
     : [
       "brand assets or explicit fallback strategy",
+      "visualBrief / guidedBrief / expectationFit with user tags, background, assumptions, and guided-intake readiness",
       "traceable source evidence",
       "DeckIR page map with page roles, evidence refs, recipes, editability targets, and raster policy",
       "ChatGPT-generation-first visual asset plan with prompts, filenames, and insertion targets",
@@ -3189,6 +3975,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
   const artifactChecks = zh
     ? [
       "manifest.json 包含 formal-business qualityGate",
+      "project-brief.json 包含 briefMode、visualBrief、guidedBrief 和 expectationFit",
       "storyboard.json / source-map.json 包含 DeckIR 页面角色、证据、配方和可编辑边界",
       "HTML/PPTX 有足够布局类型",
       "使用真实图片/品牌素材或写明无图策略",
@@ -3199,6 +3986,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
     ]
     : [
       "manifest.json contains formal-business qualityGate",
+      "project-brief.json contains briefMode, visualBrief, guidedBrief, and expectationFit",
       "storyboard.json and source-map.json contain DeckIR roles, evidence, recipes, and editability boundaries",
       "HTML/PPTX expose enough layout types",
       "real image/brand assets are used or no-image strategy is explicit",
@@ -3243,7 +4031,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
   };
 }
 
-function buildQualityReport(form: FormState, qualityContract: QualityContract, qualityGate: QualityGate, workflowState: WorkflowState) {
+function buildQualityReport(form: FormState, qualityContract: QualityContract, qualityGate: QualityGate, workflowState: WorkflowState, expectationFit: ExpectationFit) {
   const zh = form.language === "zh";
   return JSON.stringify({
     version: appVersion,
@@ -3253,6 +4041,7 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract, q
     qualityProfile: qualityContract,
     qualityGate,
     workflowState,
+    expectationFit,
     expectedArtifacts: qualityContract.expectedArtifacts,
     reviewCommands: qualityGate.reviewCommands,
     deckIR: {
@@ -3286,6 +4075,13 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract, q
         id: "quality-contract",
         status: "pending",
         summary: zh ? "等待 Agent 按质量目标验收。" : "Waiting for the Agent to validate against the quality contract."
+      },
+      {
+        id: "expectation-fit",
+        status: expectationFit.readyForProduction ? "ready" : "needs-guided-intake",
+        summary: zh
+          ? `预期契合度 ${expectationFit.score}%，风险 ${expectationFit.riskLevel}；Codex 需说明用户标签、背景资料和默认假设。`
+          : `Expectation fit ${expectationFit.score}%, risk ${expectationFit.riskLevel}; Codex must state user tags, background, and assumptions.`
       }
     ]
   }, null, 2);
@@ -3532,7 +4328,8 @@ function buildPrompt(
   enginePlan: EnginePlan,
   sources: UploadedSource[],
   qualityContract: QualityContract,
-  qualityGate: QualityGate
+  qualityGate: QualityGate,
+  expectationFit: ExpectationFit
 ) {
   const preset = findPreset(form.presetId);
   const sourceType = readOption(optionText.sourceType, form.sourceType, form.language);
@@ -3552,6 +4349,8 @@ function buildPrompt(
   const gateCriteria = qualityGate.acceptanceCriteria.map((item) => `- ${item}`).join("\n");
   const gateChecks = qualityGate.artifactChecks.map((item) => `- ${item}`).join("\n");
   const gateCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
+  const visualBriefText = buildVisualBriefMarkdown(form, expectationFit);
+  const briefMode = determineBriefMode(form, expectationFit, sources);
   const presetRoute = `${preset.label[form.language]} (${preset.packPath || "seed direction"})`;
   const activeEngines = [
     enginePlan.pptxActive ? `PPTX: ${enginePlan.pptxRoute}` : "",
@@ -3559,13 +4358,13 @@ function buildPrompt(
   ].filter(Boolean).join("\n- ");
 
   if (form.language === "en") {
-    return `Use the ultimate-ppt-master Agent Skill for this presentation task.\n\nProject title: ${form.title}\nAudience: ${form.audience}\nCore message: ${form.coreMessage}\nSource type: ${sourceType}\nScenario: ${scenario}\nContent preset: ${presetRoute}\nOutput target: ${output}\nVisual style: ${style}\nTarget length: ${form.slideCount} slides\nPreferred agent: ${agent}\nModel preference: ${model}\n\nExecution route:\n- ${activeEngines}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Visual route: ${enginePlan.styleRoute}\n\nPreset source requirements:\n${presetRequirements}\n\nPreset quality checks:\n${presetChecks}\n\nDesign Doctor quality contract:\n${qualityCriteria}\n\nFormal Business Delivery Gate (${qualityGate.level}):\nRequired inputs:\n${gateInputs}\n\nAcceptance criteria:\n${gateCriteria}\n\nArtifact checks:\n${gateChecks}\n\nGate review commands:\n${gateCommands}\n\nExpected artifacts:\n${expectedArtifacts}\n\nRecommended review commands:\n${reviewCommands}\n\nSource material:\n${sourceManifest}\n\nLocal Bridge expectations:\n- If this folder was created by Agent Bridge, read extracted-source.md first, then inspect attachments/ for original files.\n- If a PDF/DOCX/PPTX/XLSX converter failed, keep the original attachment and parse it with the best local tool available.\n- Never upload private source material unless the user explicitly approves it.\n\nSuggested outline:\n${outline}\n\nRequirements:\n- Read AGENTS.md, SKILL.md, quality-checklist.md, manifest.json, and project-brief.json from the ultimate-ppt-master project folder before production.\n- Respect the third-party notices and upstream license attributions.\n- Build the narrative before generating slides.\n- Use the selected content preset as the default structure, but adapt it to the actual source evidence.\n- For formal business delivery, do not build the whole deck from repeated title + card pages.\n- Lock the brand assets or fallback strategy, evidence sources, image/chart plan, page rhythm, and infographic strategy before generating final files.\n- Use the PPTX route for editable PowerPoint and the Web Deck route for magazine / Swiss HTML output.\n- PPTX must use editable text, shapes, charts, and images; do not replace slides with full-page screenshots.\n- Logos and brand marks must not degrade into text fragments such as b/c.\n- Render or preview the result, inspect issues, repair obvious layout problems, and list final files.\n- Run the formal delivery audit commands before final delivery.\n- Write or update quality-report.json with the visual review result and a plain-language Chinese summary.\n- Keep logs and intermediate artifacts in the local project folder.\n\nExtra requirements:\n${form.constraints || "No extra requirements."}`;
+    return `Use the ultimate-ppt-master Agent Skill for this presentation task.\n\nProject title: ${form.title}\nAudience: ${form.audience}\nCore message: ${form.coreMessage}\nSource type: ${sourceType}\nScenario: ${scenario}\nContent preset: ${presetRoute}\nOutput target: ${output}\nVisual style: ${style}\nTarget length: ${form.slideCount} slides\nPreferred agent: ${agent}\nModel preference: ${model}\nBrief mode: ${briefMode}\n\nExecution route:\n- ${activeEngines}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Visual route: ${enginePlan.styleRoute}\n\nPreset source requirements:\n${presetRequirements}\n\nPreset quality checks:\n${presetChecks}\n\nDesign Doctor quality contract:\n${qualityCriteria}\n\nFormal Business Delivery Gate (${qualityGate.level}):\nRequired inputs:\n${gateInputs}\n\nAcceptance criteria:\n${gateCriteria}\n\nArtifact checks:\n${gateChecks}\n\nGate review commands:\n${gateCommands}\n\nExpected artifacts:\n${expectedArtifacts}\n\nRecommended review commands:\n${reviewCommands}\n\nSource material:\n${sourceManifest}\n\n${visualBriefText}\n\nLocal Bridge expectations:\n- If this folder was created by Agent Bridge, read extracted-source.md first, then inspect attachments/ for original files.\n- If a PDF/DOCX/PPTX/XLSX converter failed, keep the original attachment and parse it with the best local tool available.\n- Never upload private source material unless the user explicitly approves it.\n\nSuggested outline:\n${outline}\n\nRequirements:\n- Read AGENTS.md, SKILL.md, quality-checklist.md, manifest.json, and project-brief.json from the ultimate-ppt-master project folder before production.\n- If project-brief.json says expectationFit.readyForProduction is false, enter Codex Guided Intake before final production: ask one coherent group of related questions per turn, covering audience, usage setting, desired action, content source, core message, page count, visual style, brand assets, output format, and must-avoid boundaries.\n- Do not start a final-quality PPT until the guided brief is clear enough or the user explicitly says to make a draft with assumptions.\n- Respect visualBrief tags as user intent; free-text background and extra requirements override tag defaults when they conflict.\n- Build the narrative before generating slides.\n- Use the selected content preset as the default structure, but adapt it to the actual source evidence.\n- For formal business delivery, do not build the whole deck from repeated title + card pages.\n- Lock the brand assets or fallback strategy, evidence sources, image/chart plan, page rhythm, and infographic strategy before generating final files.\n- Use the PPTX route for editable PowerPoint and the Web Deck route for magazine / Swiss HTML output.\n- PPTX must use editable text, shapes, charts, and images; do not replace slides with full-page screenshots.\n- Logos and brand marks must not degrade into text fragments such as b/c.\n- Render or preview the result, inspect issues, repair obvious layout problems, and list final files.\n- Run the formal delivery audit commands before final delivery.\n- Write or update quality-report.json with the visual review result, expectation-fit status, user tags/background sources, and a plain-language Chinese summary.\n- Keep logs and intermediate artifacts in the local project folder.\n\nExtra requirements:\n${form.constraints || "No extra requirements."}`;
   }
 
-  return `请使用 ultimate-ppt-master Agent Skill 完成这次演示文稿任务。\n\n项目标题：${form.title}\n目标听众：${form.audience}\n核心结论：${form.coreMessage}\n资料类型：${sourceType}\n使用场景：${scenario}\n内容预设：${presetRoute}\n输出目标：${output}\n视觉风格：${style}\n目标页数：${form.slideCount} 页\n优先 Agent：${agent}\n模型偏好：${model}\n\n执行路线：\n- ${activeEngines}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n预设资料要求：\n${presetRequirements}\n\n预设质量检查：\n${presetChecks}\n\nDesign Doctor 质量合同：\n${qualityCriteria}\n\n正式商务交付门禁（${qualityGate.level}）：\n必须输入：\n${gateInputs}\n\n验收标准：\n${gateCriteria}\n\n产物检查：\n${gateChecks}\n\n门禁检查命令：\n${gateCommands}\n\n预期产物：\n${expectedArtifacts}\n\n推荐检查命令：\n${reviewCommands}\n\n源资料：\n${sourceManifest}\n\n本地 Bridge 预期：\n- 如果这个目录由 Agent Bridge 创建，请先读 extracted-source.md，再检查 attachments/ 里的原始文件。\n- 如果 PDF/DOCX/PPTX/XLSX 转换失败，请保留原始附件，并用本地最合适的工具继续解析。\n- 私有资料默认留在本地，除非我明确要求，不要上传。\n\n建议页纲：\n${outline}\n\n执行要求：\n- 生产前读取项目目录里的 AGENTS.md、SKILL.md、quality-checklist.md、manifest.json 和 project-brief.json。\n- 尊重第三方声明和当前仓库保留的上游版权归属。\n- 先完成叙事结构，再生成页面。\n- 使用当前内容预设作为默认结构，但必须根据真实资料证据调整。\n- 正式商务交付不能只用重复的标题 + 卡片堆完整套 deck。\n- 生成最终文件前先锁定品牌资产或替代策略、证据来源、图片/图表计划、页面节奏和信息图策略。\n- PPTX 使用可编辑 PowerPoint 路线；Web Deck 使用杂志化 / Swiss HTML 路线。\n- PPTX 必须保留可编辑文本、形状、图表和图片，不能用整页截图替代可编辑对象。\n- logo 和品牌标识不得退化成 b/c 这类文字碎片。\n- 渲染或预览结果，检查问题，修复明显版式错误，并列出最终文件。\n- 最终交付前运行正式商务审计命令。\n- 写入或更新 quality-report.json，包含视觉复查结果和中文摘要。\n- 日志和中间产物保存在本地项目目录。\n\n补充要求：\n${form.constraints || "无额外要求。"}`;
+  return `请使用 ultimate-ppt-master Agent Skill 完成这次演示文稿任务。\n\n项目标题：${form.title}\n目标听众：${form.audience}\n核心结论：${form.coreMessage}\n资料类型：${sourceType}\n使用场景：${scenario}\n内容预设：${presetRoute}\n输出目标：${output}\n视觉风格：${style}\n目标页数：${form.slideCount} 页\n优先 Agent：${agent}\n模型偏好：${model}\nBrief 模式：${briefMode}\n\n执行路线：\n- ${activeEngines}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n预设资料要求：\n${presetRequirements}\n\n预设质量检查：\n${presetChecks}\n\nDesign Doctor 质量合同：\n${qualityCriteria}\n\n正式商务交付门禁（${qualityGate.level}）：\n必须输入：\n${gateInputs}\n\n验收标准：\n${gateCriteria}\n\n产物检查：\n${gateChecks}\n\n门禁检查命令：\n${gateCommands}\n\n预期产物：\n${expectedArtifacts}\n\n推荐检查命令：\n${reviewCommands}\n\n源资料：\n${sourceManifest}\n\n${visualBriefText}\n\n本地 Bridge 预期：\n- 如果这个目录由 Agent Bridge 创建，请先读 extracted-source.md，再检查 attachments/ 里的原始文件。\n- 如果 PDF/DOCX/PPTX/XLSX 转换失败，请保留原始附件，并用本地最合适的工具继续解析。\n- 私有资料默认留在本地，除非我明确要求，不要上传。\n\n建议页纲：\n${outline}\n\n执行要求：\n- 生产前读取项目目录里的 AGENTS.md、SKILL.md、quality-checklist.md、manifest.json 和 project-brief.json。\n- 如果 project-brief.json 里 expectationFit.readyForProduction 为 false，必须先进入 Codex 分步需求访谈：每轮只问一组相关问题，覆盖受众、场景、希望对方行动、资料来源、核心观点、页数、视觉风格、品牌素材、输出格式和禁忌边界。\n- 在 guided brief 足够明确之前，不要开始正式质量 PPT；只有用户明确说“先按默认做一版/先做草稿”时，才可以带假设生成。\n- visualBrief 标签是用户意图来源；自由粘贴的背景和特殊要求优先级高于标签默认值。\n- 先完成叙事结构，再生成页面。\n- 使用当前内容预设作为默认结构，但必须根据真实资料证据调整。\n- 正式商务交付不能只用重复的标题 + 卡片堆完整套 deck。\n- 生成最终文件前先锁定品牌资产或替代策略、证据来源、图片/图表计划、页面节奏和信息图策略。\n- PPTX 使用可编辑 PowerPoint 路线；Web Deck 使用杂志化 / Swiss HTML 路线。\n- PPTX 必须保留可编辑文本、形状、图表和图片，不能用整页截图替代可编辑对象。\n- logo 和品牌标识不得退化成 b/c 这类文字碎片。\n- 渲染或预览结果，检查问题，修复明显版式错误，并列出最终文件。\n- 最终交付前运行正式商务审计命令。\n- 写入或更新 quality-report.json，包含视觉复查结果、预期契合度、用户标签/背景资料来源和中文摘要。\n- 日志和中间产物保存在本地项目目录。\n\n补充要求：\n${form.constraints || "无额外要求。"}`;
 }
 
-function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[], qualityContract: QualityContract) {
+function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePlan: EnginePlan, sources: UploadedSource[], qualityContract: QualityContract, expectationFit: ExpectationFit) {
   const preset = findPreset(form.presetId);
   const scenario = readOption(optionText.scenario, form.scenario, form.language);
   const output = readOption(optionText.outputMode, form.outputMode, form.language);
@@ -3576,6 +4375,7 @@ function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePla
   const roster = preset.slideRoster.map((item, index) => `- ${index + 1}. ${item[form.language]}`).join("\n");
   const qualityCriteria = qualityContract.acceptanceCriteria.map((item) => `- ${item}`).join("\n");
   const reviewCommands = qualityContract.reviewCommands.map((item) => `- ${item}`).join("\n");
+  const visualBriefText = buildVisualBriefMarkdown(form, expectationFit);
   const templates = [
     `- layouts: ${preset.templateCandidates.layouts.join(", ")}`,
     preset.templateCandidates.brands?.length ? `- brands: ${preset.templateCandidates.brands.join(", ")}` : "",
@@ -3583,9 +4383,9 @@ function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePla
     `- webDeckStyle: ${preset.templateCandidates.webDeckStyle}`
   ].filter(Boolean).join("\n");
   if (form.language === "en") {
-    return `# ${form.title}\n\n## Audience\n${form.audience}\n\n## Core message\n${form.coreMessage}\n\n## Scenario\n${scenario}\n\n## Content preset\n${preset.label.en} (${preset.packPath || "seed direction"})\n\n## Desired output\n${output}, about ${form.slideCount} slides.\n\n## Visual style\n${style}\n\n## Engine route\n- PPTX: ${enginePlan.pptxActive ? "active" : "optional"} - ${enginePlan.pptxRoute}\n- Web Deck: ${enginePlan.webActive ? "active" : "optional"} - ${enginePlan.webRoute}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Style route: ${enginePlan.styleRoute}\n\n## Preset source requirements\n${requirements}\n\n## Preset slide roster\n${roster}\n\n## Preset template candidates\n${templates}\n\n## Quality profile\n${qualityCriteria}\n\n## Review commands\n${reviewCommands}\n\n## Source intake\n${sourceManifest}\n\n## Source notes\n${form.sourceNotes}\n\n## Suggested outline\n${outline}\n\n## Extra requirements\n${form.constraints}\n`;
+    return `# ${form.title}\n\n## Audience\n${form.audience}\n\n## Core message\n${form.coreMessage}\n\n## Scenario\n${scenario}\n\n## Content preset\n${preset.label.en} (${preset.packPath || "seed direction"})\n\n## Desired output\n${output}, about ${form.slideCount} slides.\n\n## Visual style\n${style}\n\n## Engine route\n- PPTX: ${enginePlan.pptxActive ? "active" : "optional"} - ${enginePlan.pptxRoute}\n- Web Deck: ${enginePlan.webActive ? "active" : "optional"} - ${enginePlan.webRoute}\n- Fusion shell: ${enginePlan.fusionRoute}\n- Style route: ${enginePlan.styleRoute}\n\n## Preset source requirements\n${requirements}\n\n## Preset slide roster\n${roster}\n\n## Preset template candidates\n${templates}\n\n## Quality profile\n${qualityCriteria}\n\n## Review commands\n${reviewCommands}\n\n## Source intake\n${sourceManifest}\n\n## Source notes\n${form.sourceNotes}\n\n${visualBriefText}\n\n## Suggested outline\n${outline}\n\n## Extra requirements\n${form.constraints}\n`;
   }
-  return `# ${form.title}\n\n## 目标听众\n${form.audience}\n\n## 核心结论\n${form.coreMessage}\n\n## 使用场景\n${scenario}\n\n## 内容预设\n${preset.label.zh}（${preset.packPath || "种子方向"}）\n\n## 目标输出\n${output}，约 ${form.slideCount} 页。\n\n## 视觉风格\n${style}\n\n## 双引擎路线\n- PPTX：${enginePlan.pptxActive ? "启用" : "备用"} - ${enginePlan.pptxRoute}\n- Web Deck：${enginePlan.webActive ? "启用" : "备用"} - ${enginePlan.webRoute}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n## 预设资料要求\n${requirements}\n\n## 预设页面结构\n${roster}\n\n## 预设模板候选\n${templates}\n\n## 质量目标\n${qualityCriteria}\n\n## 检查命令\n${reviewCommands}\n\n## 资料导入\n${sourceManifest}\n\n## 源资料要点\n${form.sourceNotes}\n\n## 建议页纲\n${outline}\n\n## 补充要求\n${form.constraints}\n`;
+  return `# ${form.title}\n\n## 目标听众\n${form.audience}\n\n## 核心结论\n${form.coreMessage}\n\n## 使用场景\n${scenario}\n\n## 内容预设\n${preset.label.zh}（${preset.packPath || "种子方向"}）\n\n## 目标输出\n${output}，约 ${form.slideCount} 页。\n\n## 视觉风格\n${style}\n\n## 双引擎路线\n- PPTX：${enginePlan.pptxActive ? "启用" : "备用"} - ${enginePlan.pptxRoute}\n- Web Deck：${enginePlan.webActive ? "启用" : "备用"} - ${enginePlan.webRoute}\n- Fusion shell：${enginePlan.fusionRoute}\n- 视觉路线：${enginePlan.styleRoute}\n\n## 预设资料要求\n${requirements}\n\n## 预设页面结构\n${roster}\n\n## 预设模板候选\n${templates}\n\n## 质量目标\n${qualityCriteria}\n\n## 检查命令\n${reviewCommands}\n\n## 资料导入\n${sourceManifest}\n\n## 源资料要点\n${form.sourceNotes}\n\n${visualBriefText}\n\n## 建议页纲\n${outline}\n\n## 补充要求\n${form.constraints}\n`;
 }
 
 function buildExtractedSource(form: FormState, sources: UploadedSource[]) {
@@ -3599,7 +4399,19 @@ function buildExtractedSource(form: FormState, sources: UploadedSource[]) {
     "",
     "## Pasted notes",
     "",
-    form.sourceNotes || (zh ? "暂无粘贴资料。" : "No pasted notes yet.")
+    form.sourceNotes || (zh ? "暂无粘贴资料。" : "No pasted notes yet."),
+    "",
+    "## Visual brief background",
+    "",
+    form.visualBrief.backgroundText || (zh ? "暂无额外背景。" : "No additional background."),
+    "",
+    "## Visual brief special requirements",
+    "",
+    form.visualBrief.extraRequirements || (zh ? "暂无特殊要求。" : "No special requirements."),
+    "",
+    "## Reference links",
+    "",
+    form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || (zh ? "- 暂无参考链接。" : "- No reference links.")
   ];
 
   for (const source of sources) {
@@ -3627,7 +4439,8 @@ function buildQualityChecklist(
   enginePlan: EnginePlan,
   sources: UploadedSource[],
   qualityContract: QualityContract,
-  qualityGate: QualityGate
+  qualityGate: QualityGate,
+  expectationFit: ExpectationFit
 ) {
   const preset = findPreset(form.presetId);
   const sourceLine = sources.length > 0
@@ -3641,10 +4454,15 @@ function buildQualityChecklist(
   const gateCriteria = qualityGate.acceptanceCriteria.map((item) => `- [ ] ${item}`).join("\n");
   const gateChecks = qualityGate.artifactChecks.map((item) => `- [ ] ${item}`).join("\n");
   const gateCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
+  const tagLine = flattenVisualTagLabels(form.visualBrief, form.language).join(" · ") || (form.language === "zh" ? "未选择标签" : "No tags selected");
+  const missingSignals = expectationFit.missingSignals.length
+    ? expectationFit.missingSignals.map((item) => `- [ ] ${item}`).join("\n")
+    : (form.language === "zh" ? "- [x] 暂无关键缺口" : "- [x] No critical gaps");
+  const assumptions = expectationFit.assumptions.map((item) => `- [ ] ${item}`).join("\n");
   if (form.language === "en") {
-    return `# Quality checklist\n\n## Selected preset\n${presetChecks}\n\n## Design Doctor contract\n${qualityCriteria}\n\n## Formal Business Delivery Gate\nLevel: ${qualityGate.level}\n\n### Required inputs\n${gateInputs}\n\n### Acceptance criteria\n${gateCriteria}\n\n### Artifact checks\n${gateChecks}\n\n### Gate review commands\n${gateCommands}\n\n## Expected artifacts\n${expectedArtifacts}\n\n## Review commands\n${reviewCommands}\n\n## Source and story\n- [ ] extracted-source.md reflects real source files, not only pasted notes.\n- [ ] Core message appears in the cover and conclusion.\n- [ ] Every slide has one job and one primary takeaway.\n- [ ] Sensitive material stays local unless the user explicitly approves upload.\n- [ ] Brand assets or a documented replacement strategy are locked before generating final files.\n- [ ] Evidence, image choices, chart/data plans, page rhythm, and infographic strategy are explicit.\n\n## Source files\n${sourceLine}\n\n## PPTX route\n- [ ] Route status: ${enginePlan.pptxActive ? "active" : "optional"}.\n- [ ] Text, shapes, charts, and notes remain editable.\n- [ ] No full-slide screenshot replacement for editable PPTX content.\n- [ ] Logos and brand marks are real assets or clean vector/text treatments, not stray fragments.\n- [ ] Run SVG/PPTX rendering checks from the Skill workflow.\n- [ ] Inspect exported pages and repair clipping, overlaps, tiny text, and broken charts.\n\n## Web Deck route\n- [ ] Route status: ${enginePlan.webActive ? "active" : "optional"}.\n- [ ] Use ${enginePlan.styleRoute} consistently.\n- [ ] Desktop and mobile viewports do not overlap text, controls, or media.\n- [ ] Visual completeness includes real images, charts, or an explicit no-image strategy.\n\n## Delivery\n- [ ] Final files are named clearly.\n- [ ] quality-report.json includes the visual review result and Chinese summary.\n- [ ] Include what was generated, what was checked, and which source files were parsed.\n- [ ] Keep upstream license and third-party notices intact.\n`;
+    return `# Quality checklist\n\n## Selected preset\n${presetChecks}\n\n## Design Doctor contract\n${qualityCriteria}\n\n## Formal Business Delivery Gate\nLevel: ${qualityGate.level}\n\n### Required inputs\n${gateInputs}\n\n### Acceptance criteria\n${gateCriteria}\n\n### Artifact checks\n${gateChecks}\n\n### Gate review commands\n${gateCommands}\n\n## Expected artifacts\n${expectedArtifacts}\n\n## Review commands\n${reviewCommands}\n\n## Expectation fit\n- [ ] Risk level: ${expectationFit.riskLevel}; score: ${expectationFit.score}%; readyForProduction: ${expectationFit.readyForProduction ? "yes" : "no"}.\n- [ ] User-selected tags are reflected in structure, visual style, assets, and output: ${tagLine}.\n- [ ] If readyForProduction is false, Codex runs Guided Intake before final production.\n- [ ] quality-report.json explains user tags, pasted background, assumptions, and remaining expectation risk.\n\n### Missing signals\n${missingSignals}\n\n### Assumptions to verify or record\n${assumptions || "- [ ] No assumptions recorded yet."}\n\n## Source and story\n- [ ] extracted-source.md reflects real source files, not only pasted notes.\n- [ ] Core message appears in the cover and conclusion.\n- [ ] Every slide has one job and one primary takeaway.\n- [ ] Sensitive material stays local unless the user explicitly approves upload.\n- [ ] Brand assets or a documented replacement strategy are locked before generating final files.\n- [ ] Evidence, image choices, chart/data plans, page rhythm, and infographic strategy are explicit.\n\n## Source files\n${sourceLine}\n\n## PPTX route\n- [ ] Route status: ${enginePlan.pptxActive ? "active" : "optional"}.\n- [ ] Text, shapes, charts, and notes remain editable.\n- [ ] No full-slide screenshot replacement for editable PPTX content.\n- [ ] Logos and brand marks are real assets or clean vector/text treatments, not stray fragments.\n- [ ] Run SVG/PPTX rendering checks from the Skill workflow.\n- [ ] Inspect exported pages and repair clipping, overlaps, tiny text, and broken charts.\n\n## Web Deck route\n- [ ] Route status: ${enginePlan.webActive ? "active" : "optional"}.\n- [ ] Use ${enginePlan.styleRoute} consistently.\n- [ ] Desktop and mobile viewports do not overlap text, controls, or media.\n- [ ] Visual completeness includes real images, charts, or an explicit no-image strategy.\n\n## Delivery\n- [ ] Final files are named clearly.\n- [ ] quality-report.json includes the visual review result and Chinese summary.\n- [ ] Include what was generated, what was checked, and which source files were parsed.\n- [ ] Keep upstream license and third-party notices intact.\n`;
   }
-  return `# 质量检查清单\n\n## 当前预设\n${presetChecks}\n\n## Design Doctor 合同\n${qualityCriteria}\n\n## 正式商务交付门禁\n等级：${qualityGate.level}\n\n### 必须输入\n${gateInputs}\n\n### 验收标准\n${gateCriteria}\n\n### 产物检查\n${gateChecks}\n\n### 门禁检查命令\n${gateCommands}\n\n## 预期产物\n${expectedArtifacts}\n\n## 检查命令\n${reviewCommands}\n\n## 资料与叙事\n- [ ] extracted-source.md 已根据真实源文件修正，而不只是网页粘贴摘要。\n- [ ] 核心结论出现在封面和收束页。\n- [ ] 每一页只承担一个主要任务，并有清晰 takeaway。\n- [ ] 敏感资料默认留在本地，除非用户明确同意上传。\n- [ ] 生成最终文件前，品牌资产或替代策略已锁定。\n- [ ] 证据来源、图片选择、图表/数据计划、页面节奏和信息图策略已明确。\n\n## 源文件\n${sourceLine}\n\n## PPTX 路线\n- [ ] 路线状态：${enginePlan.pptxActive ? "启用" : "备用"}。\n- [ ] 文本、形状、图表、备注保持可编辑。\n- [ ] 不用整页截图替代 PPTX 可编辑内容。\n- [ ] logo 和品牌标识是真实素材、干净矢量或规范文字处理，不是零散文字碎片。\n- [ ] 按 Skill 工作流运行 SVG / PPTX 渲染检查。\n- [ ] 检查导出页面并修复裁切、重叠、小字和图表损坏。\n\n## Web Deck 路线\n- [ ] 路线状态：${enginePlan.webActive ? "启用" : "备用"}。\n- [ ] 统一使用 ${enginePlan.styleRoute}。\n- [ ] 桌面端和移动端不出现文字、控件或媒体互相遮挡。\n- [ ] 视觉完整度包含真实图片、图表，或明确的无图策略。\n\n## 交付\n- [ ] 最终文件命名清晰。\n- [ ] quality-report.json 包含视觉复查结果和中文摘要。\n- [ ] 简短说明生成了什么、检查了什么、解析了哪些源文件。\n- [ ] 保留上游版权和第三方声明。\n`;
+  return `# 质量检查清单\n\n## 当前预设\n${presetChecks}\n\n## Design Doctor 合同\n${qualityCriteria}\n\n## 正式商务交付门禁\n等级：${qualityGate.level}\n\n### 必须输入\n${gateInputs}\n\n### 验收标准\n${gateCriteria}\n\n### 产物检查\n${gateChecks}\n\n### 门禁检查命令\n${gateCommands}\n\n## 预期产物\n${expectedArtifacts}\n\n## 检查命令\n${reviewCommands}\n\n## 预期契合度\n- [ ] 风险等级：${expectationFit.riskLevel}；分数：${expectationFit.score}%；可正式制作：${expectationFit.readyForProduction ? "是" : "否"}。\n- [ ] 用户选择的标签已体现在结构、视觉、素材和输出中：${tagLine}。\n- [ ] 如果 readyForProduction 为 false，Codex 已先完成分步需求访谈。\n- [ ] quality-report.json 说明用户标签、粘贴背景、默认假设和剩余预期风险。\n\n### 已知缺口\n${missingSignals}\n\n### 需确认或记录的默认假设\n${assumptions || "- [ ] 暂无默认假设。"}\n\n## 资料与叙事\n- [ ] extracted-source.md 已根据真实源文件修正，而不只是网页粘贴摘要。\n- [ ] 核心结论出现在封面和收束页。\n- [ ] 每一页只承担一个主要任务，并有清晰 takeaway。\n- [ ] 敏感资料默认留在本地，除非用户明确同意上传。\n- [ ] 生成最终文件前，品牌资产或替代策略已锁定。\n- [ ] 证据来源、图片选择、图表/数据计划、页面节奏和信息图策略已明确。\n\n## 源文件\n${sourceLine}\n\n## PPTX 路线\n- [ ] 路线状态：${enginePlan.pptxActive ? "启用" : "备用"}。\n- [ ] 文本、形状、图表、备注保持可编辑。\n- [ ] 不用整页截图替代 PPTX 可编辑内容。\n- [ ] logo 和品牌标识是真实素材、干净矢量或规范文字处理，不是零散文字碎片。\n- [ ] 按 Skill 工作流运行 SVG / PPTX 渲染检查。\n- [ ] 检查导出页面并修复裁切、重叠、小字和图表损坏。\n\n## Web Deck 路线\n- [ ] 路线状态：${enginePlan.webActive ? "启用" : "备用"}。\n- [ ] 统一使用 ${enginePlan.styleRoute}。\n- [ ] 桌面端和移动端不出现文字、控件或媒体互相遮挡。\n- [ ] 视觉完整度包含真实图片、图表，或明确的无图策略。\n\n## 交付\n- [ ] 最终文件命名清晰。\n- [ ] quality-report.json 包含视觉复查结果和中文摘要。\n- [ ] 简短说明生成了什么、检查了什么、解析了哪些源文件。\n- [ ] 保留上游版权和第三方声明。\n`;
 }
 
 function buildAssetPlan(form: FormState, sources: UploadedSource[], qualityGate: QualityGate) {
@@ -3794,7 +4612,8 @@ function buildCodexTask(
   sources: UploadedSource[],
   qualityGate: QualityGate,
   workflowState: WorkflowState,
-  qualityContract: QualityContract
+  qualityContract: QualityContract,
+  expectationFit: ExpectationFit
 ) {
   const zh = form.language === "zh";
   const gateInputs = qualityGate.requiredInputs.map((item) => `- ${item}`).join("\n");
@@ -3803,12 +4622,15 @@ function buildCodexTask(
   const expectedArtifacts = qualityContract.expectedArtifacts.map((item) => `- ${item}`).join("\n");
   const reviewCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
   const sourceLine = sourceSummaryMarkdown(sources, form.language);
+  const visualBriefText = buildVisualBriefMarkdown(form, expectationFit);
+  const briefMode = determineBriefMode(form, expectationFit, sources);
   if (zh) {
     return `# Codex Task
 
 项目：${form.title}
 当前步骤：${workflowState.currentStep}
 阻塞原因：${workflowState.blockedReason || "无"}
+Brief 模式：${briefMode}
 
 ## 先读这些文件
 1. AGENTS.md
@@ -3835,6 +4657,16 @@ ${gateCriteria}
 
 产物检查：
 ${gateChecks}
+
+## 预期契合与分步问清
+${visualBriefText}
+
+### Codex 执行规则
+- 如果 expectationFit.readyForProduction 为 false，先进入分步需求访谈，不要直接制作正式 PPT。
+- 每轮只问一组相关问题，按顺序问清：给谁看、什么场景、希望对方做什么、内容来源、核心观点、页数/章节、视觉风格、品牌/IP/官方素材、输出格式、禁忌边界。
+- 用户回答后整理一份需求确认稿，写入 project-brief.json / quality-report.json 的 guidedBrief 和 expectationFit。
+- 只有 brief 足够明确，或用户明确说“先按默认做一版/草稿”，才允许带假设开始制作。
+- Web 标签是用户意图来源；自由粘贴背景和特殊要求优先级高于标签默认值。
 
 ## Codex 素材工作流
 1. 先检查用户给的附件和 extracted-source.md，不要跳过真实资料。
@@ -3874,6 +4706,7 @@ ${sourceLine}
 Project: ${form.title}
 Current step: ${workflowState.currentStep}
 Blocked reason: ${workflowState.blockedReason || "none"}
+Brief mode: ${briefMode}
 
 ## Read first
 1. AGENTS.md
@@ -3900,6 +4733,16 @@ ${gateCriteria}
 
 Artifact checks:
 ${gateChecks}
+
+## Expectation fit and guided intake
+${visualBriefText}
+
+### Codex execution rules
+- If expectationFit.readyForProduction is false, run guided intake before final deck production.
+- Ask one coherent group of related questions per turn, covering audience, usage setting, desired action, content source, core message, slide count / sections, visual style, brand/IP/official assets, output format, and must-avoid boundaries.
+- After the user answers, write a concise confirmation brief and update guidedBrief plus expectationFit in project-brief.json / quality-report.json.
+- Start production only when the brief is clear enough, or when the user explicitly asks for a draft with assumptions.
+- Treat Web tags as user intent; pasted background and special requirements override tag defaults.
 
 ## Codex asset workflow
 1. Inspect supplied attachments and extracted-source.md before searching.
@@ -3935,13 +4778,16 @@ Final response must list generated files, ChatGPT micro-assets inserted, public 
 `;
 }
 
-function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate) {
+function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate, expectationFit: ExpectationFit) {
   if (form.language === "zh") {
     return `# AGENTS.md
 
 ## Codex 本地规则
 - 工作范围限于这个 handoff 文件夹和 Ultimate PPT Master 仓库脚本。
 - 编辑或生成前先读 codex-task.md。
+- 先看 project-brief.json 的 briefMode、visualBrief、guidedBrief 和 expectationFit；如果 readyForProduction=false，必须先分步问清需求。
+- 分步问清每轮只问一组相关问题，直到受众、场景、目的、资料、核心观点、页数、风格、素材边界、输出和禁忌明确。
+- 当前 expectationFit：${expectationFit.riskLevel} / ${expectationFit.score}%；${expectationFit.readyForProduction ? "可以进入生产，但仍需记录假设。" : "需要 guided intake 后再生产。"}
 - 生成最终页面前先读 storyboard.json 和 source-map.json；它们定义 DeckIR 页面地图、证据边界和可编辑要求。
 - 私有资料、客户数据、内部截图和 API key 默认不上传；除非用户明确同意。
 - ChatGPT/OpenAI 生图是主要视觉素材引擎。先读 visual-element-kit.md，需要视觉丰富度时先运行或处理 scripts/generate_visual_element_kit.py。
@@ -3959,6 +4805,9 @@ function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate) {
 ## Codex local rules
 - Work only in this handoff folder and the Ultimate PPT Master repository scripts.
 - Read codex-task.md before editing or generating deliverables.
+- Read briefMode, visualBrief, guidedBrief, and expectationFit in project-brief.json first; if readyForProduction=false, run guided intake before production.
+- Guided intake asks one related question group at a time until audience, setting, purpose, sources, core message, slide count, style, asset boundary, output, and must-avoid rules are clear.
+- Current expectationFit: ${expectationFit.riskLevel} / ${expectationFit.score}%; ${expectationFit.readyForProduction ? "production may start after recording assumptions." : "guided intake is required before production."}
 - Read storyboard.json and source-map.json before final slide generation; they define the DeckIR page map, evidence boundary, and editability requirements.
 - Keep private source material, customer data, internal screenshots, and API keys local unless the user explicitly approves upload.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py first when the deck needs visual richness.
@@ -4106,11 +4955,14 @@ function buildBriefObject(
   sources: UploadedSource[],
   qualityContract: QualityContract,
   qualityGate: QualityGate,
-  workflowState: WorkflowState
+  workflowState: WorkflowState,
+  expectationFit: ExpectationFit
 ) {
   const preset = findPreset(form.presetId);
+  const visualBrief = normalizeVisualBrief(form.visualBrief);
   return {
     version: appVersion,
+    briefMode: determineBriefMode({ ...form, visualBrief }, expectationFit, sources),
     title: form.title,
     audience: form.audience,
     coreMessage: form.coreMessage,
@@ -4132,6 +4984,13 @@ function buildBriefObject(
     workflowState,
     expectedArtifacts: qualityContract.expectedArtifacts,
     reviewCommands: qualityGate.reviewCommands,
+    visualBrief: {
+      ...visualBrief,
+      selectedTagLabels: visualTagLabelsByGroup(visualBrief, form.language),
+      flatTagLabels: flattenVisualTagLabels(visualBrief, form.language)
+    },
+    guidedBrief: buildGuidedBrief({ ...form, visualBrief }),
+    expectationFit,
     deckIR: {
       storyboard: "storyboard.json",
       sourceMap: "source-map.json",
@@ -4163,9 +5022,11 @@ function buildManifest(
   bridge: BridgeHealth | null,
   qualityContract: QualityContract,
   qualityGate: QualityGate,
-  workflowState: WorkflowState
+  workflowState: WorkflowState,
+  expectationFit: ExpectationFit
 ) {
   const preset = findPreset(form.presetId);
+  const visualBrief = normalizeVisualBrief(form.visualBrief);
   return {
     version: appVersion,
     createdAt: new Date().toISOString(),
@@ -4205,6 +5066,14 @@ function buildManifest(
     qualityProfile: qualityContract,
     qualityGate,
     workflowState,
+    briefMode: determineBriefMode({ ...form, visualBrief }, expectationFit, sources),
+    visualBrief: {
+      ...visualBrief,
+      selectedTagLabels: visualTagLabelsByGroup(visualBrief, form.language),
+      flatTagLabels: flattenVisualTagLabels(visualBrief, form.language)
+    },
+    guidedBrief: buildGuidedBrief({ ...form, visualBrief }),
+    expectationFit,
     expectedArtifacts: qualityContract.expectedArtifacts,
     reviewCommands: qualityGate.reviewCommands,
     deckIR: {

@@ -192,6 +192,11 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertIn("pageContractSummary", manifest)
             self.assertIn("visualStrategy", manifest)
             self.assertIn("deckIR", manifest)
+            self.assertIn("briefMode", manifest)
+            self.assertIn("visualBrief", manifest)
+            self.assertIn("guidedBrief", manifest)
+            self.assertIn("expectationFit", manifest)
+            self.assertIn("readyForProduction", manifest["expectationFit"])
             self.assertEqual(manifest["deckIR"]["storyboard"], "storyboard.json")
             self.assertTrue(any(path.endswith("storyboard.json") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("source-map.json") for path in result["generatedFiles"]))
@@ -200,6 +205,7 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertTrue(any(path.endswith("repair-plan.json") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("revision-brief.md") for path in result["generatedFiles"]))
             spec_lock = (Path(result["projectPath"]) / "spec_lock.md").read_text(encoding="utf-8")
+            self.assertIn("## expectation_contract", spec_lock)
             self.assertIn("## page_roles", spec_lock)
             self.assertIn("## layout_family", spec_lock)
             self.assertIn("## page_recipes", spec_lock)
@@ -212,6 +218,12 @@ class DesktopWorkerTest(unittest.TestCase):
             element_kit = (Path(result["projectPath"]) / "visual-element-kit.md").read_text(encoding="utf-8")
             self.assertIn("chatgpt-generation-first", element_kit)
             self.assertRegex(element_kit, r"section divider|metric badge|process node|connector")
+            brief = json.loads((Path(result["projectPath"]) / "project-brief.json").read_text(encoding="utf-8"))
+            self.assertIn("visualBrief", brief)
+            self.assertIn("guidedBrief", brief)
+            self.assertIn("expectationFit", brief)
+            codex_task = (Path(result["projectPath"]) / "codex-task.md").read_text(encoding="utf-8")
+            self.assertIn("Expectation Fit and Guided Intake", codex_task)
 
     def test_desktop_formal_business_outputs_pass_audit(self):
         source = {

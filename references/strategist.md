@@ -113,9 +113,21 @@ Example rows for a Shandong BOCOM cultural-tourism deck:
 
 🚧 **GATE — Page recipe read**: `read_file templates/page-recipes/index.json` before writing `design_spec.md`. Assign one recipe per page in §V and §IX, then copy the same mapping into `spec_lock.md page_recipes`.
 
-After the reads, decide the production items below as one bundled delivery brief. If enough context exists, do not wait for confirmation; write the decisions into `design_spec.md` and `spec_lock.md` and continue. Ask at most one concise user question only when the missing answer would materially change the deliverable, such as PPTX vs Web Deck, legal permission to use brand assets, or whether private material may be uploaded for image generation.
+Before the bundled delivery brief, check `project-brief.json.briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit` when they exist. If `expectationFit.readyForProduction = false`, direct Codex execution must run guided intake before final-quality production. Guided intake asks one related question group per turn until audience, scenario, purpose, source boundary, core message, page count, visual style, asset/IP rules, output format, and must-avoid rules are clear.
 
-> **Execution discipline**: This is the only normal planning checkpoint. Once the brief is set, complete the Design Spec and proceed to image generation / SVG / post-processing without further pauses.
+After guided intake or when enough context already exists, decide the production items below as one bundled delivery brief. Do not wait for confirmation when the source, audience, objective, and output route are clear; write the decisions into `design_spec.md` and `spec_lock.md` and continue. Ask concise user questions only when a missing answer would materially change the deliverable, such as PPTX vs Web Deck, legal permission to use brand assets, authoritative source choice, or whether private material may be uploaded for image generation.
+
+> **Execution discipline**: Guided intake is allowed only to clarify an under-specified direct Codex request. Once the brief is set, complete the Design Spec and proceed to image generation / SVG / post-processing without further pauses.
+
+### 0. Expectation Contract
+
+Record this near the top of `design_spec.md` and copy the machine-readable summary to `spec_lock.md expectation_contract`:
+
+- `briefMode`: `visual-tags`, `codex-guided-intake`, `source-first`, or `draft-with-assumptions`.
+- `visualBrief`: selected tags, background text, special requirements, reference links, auto-suggested tags, and user-edited state.
+- `guidedBrief`: scenario, audience, purpose, core message, content sources, slide count, outline preference, visual style, asset rules, output format, must-include, and must-avoid.
+- `expectationFit`: risk level, source adequacy, missing signals, assumptions, conflicts, success criteria, and production readiness.
+- `questionPlan`: the next staged question group when production is not ready.
 
 ### a. Canvas Format
 

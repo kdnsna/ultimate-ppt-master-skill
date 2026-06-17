@@ -12,6 +12,20 @@
 
 > Strategist: fill viewBox and format for the chosen canvas. Common values: `0 0 1280 720` (PPT 16:9), `0 0 1024 768` (PPT 4:3), `0 0 1242 1660` (Xiaohongshu), `0 0 1080 1080` (WeChat Moments), `0 0 1080 1920` (Story).
 
+## expectation_contract
+- brief_mode: visual-tags
+- risk_level: yellow
+- score: 78
+- source_adequacy: thin
+- ready_for_production: true
+- known_intent: executive review for company management; decision and execution focus
+- missing_signals: authoritative KPI period not explicit
+- assumptions: editable PPTX default; Microsoft YaHei; official assets first; no-text AI visuals only
+- guided_intake_state: complete
+- next_question_group: none
+
+> Strategist: fill from `project-brief.json.briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit` when available. If direct Codex intake created the brief, summarize the confirmed answers here. If `ready_for_production: false`, Executor must not start final-quality production until guided intake is completed or the user accepts a draft with assumptions.
+
 ## visual_direction
 - id: finance_internal_report
 - benchmark: Formal banking report with source-grounded evidence pages and restrained brand-color structure.

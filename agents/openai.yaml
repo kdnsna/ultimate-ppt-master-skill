@@ -4,6 +4,6 @@ interface:
   icon_small: "./assets/skill-market/ultimate-ppt-master-icon.svg"
   icon_large: "./assets/skill-market/ultimate-ppt-master-card.svg"
   brand_color: "#0F766E"
-  default_prompt: "Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report."
+  default_prompt: "Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report. If my brief is incomplete, ask staged questions first."
 policy:
   allow_implicit_invocation: true

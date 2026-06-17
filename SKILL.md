@@ -22,6 +22,28 @@ description: >
 
 **Quality Pipeline Add-on**: stakeholder-facing decks must also pass `Visual Direction → Page Role Contract → Visual Completion Audit`.
 
+## Brief Clarity Gate
+
+Before production, decide whether the request came through a visual Web brief or through direct Codex conversation:
+
+- **Web Visual Brief Builder**: read `project-brief.json.visualBrief`, `guidedBrief`, and `expectationFit`. The Web tags are user intent, not decoration. Pasted background and special requirements override tag defaults when they conflict.
+- **Codex Guided Intake**: when a direct Codex request does not provide enough detail, do not jump straight into final-quality PPT production. Ask step by step until the production frame is clear.
+- **Source-first**: when strong source files and target context are already present, record assumptions and continue.
+- **Draft-with-assumptions**: only use this when the user explicitly asks for a draft, first pass, or "先按默认做一版".
+
+Guided intake covers these items in stages, one related question group at a time:
+
+1. usage scenario and target audience;
+2. desired audience action or decision;
+3. source material and authoritative content boundary;
+4. core message and must-include points;
+5. page count, chapter structure, and speaker-note needs;
+6. visual style and density;
+7. brand, official/IP assets, AI-image permission, and must-avoid rules;
+8. output format, defaulting to editable PPTX.
+
+After the user answers, write a concise confirmation brief. Proceed only when `expectationFit.readyForProduction = true`, or when the user explicitly accepts a draft with recorded assumptions.
+
 ## Default Delivery Route
 
 The skill is optimized for real office PPT delivery. Keep the route decision simple:
@@ -113,14 +135,15 @@ If the audit fails, report the concrete issues and fix the deck before final del
 > **This workflow is a strict serial pipeline. The following rules have the highest priority — violating any one of them constitutes execution failure:**
 >
 > 1. **LEAN SERIAL EXECUTION** — Steps run in order, but do not manufacture extra waits. Once prerequisites are available, continue through non-blocking steps without asking the user to say "continue".
-> 2. **STOP ONLY FOR REAL BLOCKERS** — Stop only when a required source, route choice, legal/brand permission, or missing manual asset makes proceeding risky. Otherwise make reasonable assumptions, record them, and continue.
-> 3. **ONE DELIVERY BRIEF** — Replace multi-round confirmations with one concise delivery brief. The Strategist still decides canvas, page count, audience, style, colors, icons, typography, and images, but these are recorded as one production contract rather than a chain of user-facing checkpoints.
-> 4. **GATE BEFORE ENTRY** — Each Step has prerequisites (🚧 GATE) listed at the top; these MUST be verified before starting that Step
-> 5. **NO SPECULATIVE EXECUTION** — "Pre-preparing" content for subsequent Steps is FORBIDDEN (e.g., writing SVG code during the Strategist phase)
-> 6. **NO SUB-AGENT SVG GENERATION** — Executor Step 6 SVG generation is context-dependent and MUST be completed by the current main agent end-to-end. Delegating page SVG generation to sub-agents is FORBIDDEN
-> 7. **SEQUENTIAL PAGE GENERATION ONLY** — In Executor Step 6, after the global design context is locked, SVG pages MUST be generated sequentially page by page in one continuous pass. Grouped page batches (for example, 5 pages at a time) are FORBIDDEN
-> 8. **SPEC_LOCK RE-READ PER PAGE** — Before generating each SVG page, Executor MUST `read_file <project_path>/spec_lock.md`. All colors / fonts / icons / images MUST come from this file — no values from memory or invented on the fly. Executor MUST also look up the current page's `page_rhythm` tag and apply the matching layout discipline (`anchor` / `dense` / `breathing` — see executor-base.md §2.1). This rule exists to resist context-compression drift on long decks and to break the uniform "every page is a card grid" default
-> 9. **SVG MUST BE HAND-WRITTEN, NOT SCRIPT-GENERATED** — Editable PPTX SVG pages are written by the main agent directly, one page at a time. Do not batch-generate deck SVGs with Python / Node / shell scripts.
+> 2. **CODEX GUIDED INTAKE FOR UNCLEAR REQUESTS** — If the user asks directly in Codex and has not provided enough detail for a real PPT, ask staged questions first. Do not start final-quality production from "帮我做个 PPT" or a similarly vague request unless the user explicitly accepts a draft with assumptions.
+> 3. **STOP ONLY FOR REAL BLOCKERS AFTER INTAKE** — After the brief is clear enough, stop only when a required source, route choice, legal/brand permission, or missing manual asset makes proceeding risky. Otherwise make reasonable assumptions, record them, and continue.
+> 4. **ONE DELIVERY BRIEF AFTER INTAKE** — The guided intake may take multiple short turns when the request is vague; after that, replace further multi-round confirmations with one concise delivery brief. The Strategist still decides canvas, page count, audience, style, colors, icons, typography, and images, but these are recorded as one production contract rather than a chain of user-facing checkpoints.
+> 5. **GATE BEFORE ENTRY** — Each Step has prerequisites (🚧 GATE) listed at the top; these MUST be verified before starting that Step
+> 6. **NO SPECULATIVE EXECUTION** — "Pre-preparing" content for subsequent Steps is FORBIDDEN (e.g., writing SVG code during the Strategist phase)
+> 7. **NO SUB-AGENT SVG GENERATION** — Executor Step 6 SVG generation is context-dependent and MUST be completed by the current main agent end-to-end. Delegating page SVG generation to sub-agents is FORBIDDEN
+> 8. **SEQUENTIAL PAGE GENERATION ONLY** — In Executor Step 6, after the global design context is locked, SVG pages MUST be generated sequentially page by page in one continuous pass. Grouped page batches (for example, 5 pages at a time) are FORBIDDEN
+> 9. **SPEC_LOCK RE-READ PER PAGE** — Before generating each SVG page, Executor MUST `read_file <project_path>/spec_lock.md`. All colors / fonts / icons / images MUST come from this file — no values from memory or invented on the fly. Executor MUST also look up the current page's `page_rhythm` tag and apply the matching layout discipline (`anchor` / `dense` / `breathing` — see executor-base.md §2.1). This rule exists to resist context-compression drift on long decks and to break the uniform "every page is a card grid" default
+> 10. **SVG MUST BE HAND-WRITTEN, NOT SCRIPT-GENERATED** — Editable PPTX SVG pages are written by the main agent directly, one page at a time. Do not batch-generate deck SVGs with Python / Node / shell scripts.
 
 > [!IMPORTANT]
 > ## 🌐 Language & Communication Rule
@@ -299,6 +322,8 @@ Use `${SKILL_DIR}/references/magazine-web/checklist.md` for final QA. P0 issues 
 
 🚧 **GATE**: User has provided source material (PDF / DOCX / EPUB / URL / Markdown file / text description / conversation content — any form is acceptable).
 
+If the user has not provided enough PPT-making context, run the **Brief Clarity Gate** before source conversion. For direct Codex requests, ask staged questions rather than assuming the full frame. If the user provides only "做个 PPT" with no topic, audience, source, or objective, do not enter topic research or production yet.
+
 If the user provides only a topic name or brief requirements with no source files or substantive source content, run `workflows/topic-research.md` first, then return here with the generated Markdown/source materials.
 
 When the user provides non-Markdown content, convert immediately:
@@ -397,7 +422,7 @@ Read references/strategist.md
 
 **Must complete one delivery brief**:
 
-The delivery brief is one compact production decision, not eight separate user-facing confirmations. If the source, audience, and output route are sufficient, record assumptions and continue without waiting. Stop only if a missing answer would materially change the deliverable.
+The delivery brief is one compact production decision, not eight separate user-facing confirmations. For Web handoff projects, read `briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit` from `project-brief.json` first. For direct Codex requests, run guided intake when `expectationFit.readyForProduction` would be false. If the source, audience, and output route are sufficient, record assumptions and continue without waiting. Stop only if a missing answer would materially change the deliverable.
 
 1. Canvas format
 2. Page count range
@@ -407,6 +432,13 @@ The delivery brief is one compact production decision, not eight separate user-f
 6. Icon usage approach
 7. Typography plan
 8. Image usage approach
+
+Also record the expectation contract:
+
+- `briefMode`: `visual-tags`, `codex-guided-intake`, `source-first`, or `draft-with-assumptions`;
+- `visualBrief`: selected tags, pasted background, special requirements, and reference links;
+- `guidedBrief`: scenario, audience, purpose, core message, sources, page count, style, asset rules, output format, must-include, and must-avoid;
+- `expectationFit`: risk level, missing signals, assumptions, conflicts, source adequacy, success criteria, and whether production is ready.
 
 Use plain user-facing words in the brief. Avoid exposing specialist labels unless they are useful: say "可编辑正文", "页面角色", "主视觉", "图文分栏", "图表页", "风险页" instead of relying on `raster_policy`, `page_recipe_id`, or `layout_family` in chat. Keep the technical field names inside `design_spec.md` and `spec_lock.md`.
 

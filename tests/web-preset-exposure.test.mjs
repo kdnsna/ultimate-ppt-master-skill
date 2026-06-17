@@ -193,3 +193,23 @@ test("web experience exposes AI best route and DeckIR page map", async () => {
   assert.match(appSource, /apply_review_plan\.py/);
   assert.match(flowSource, /deckIR/);
 });
+
+test("web experience exposes visual brief tags and expectation fit contract", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+  const cssSource = await readFile("apps/web/src/styles.css", "utf8");
+
+  assert.match(appSource, /type BriefMode = "visual-tags" \| "codex-guided-intake" \| "source-first" \| "draft-with-assumptions"/);
+  assert.match(appSource, /VisualBriefBuilder/);
+  assert.match(appSource, /ExpectationFitCard/);
+  assert.match(appSource, /visualTagGroups/);
+  assert.match(appSource, /visualBriefPresets/);
+  assert.match(appSource, /assessExpectationFit/);
+  assert.match(appSource, /briefMode/);
+  assert.match(appSource, /visualBrief/);
+  assert.match(appSource, /guidedBrief/);
+  assert.match(appSource, /expectationFit/);
+  assert.match(appSource, /readyForProduction/);
+  assert.match(appSource, /Codex Guided Intake|分步需求访谈/);
+  assert.match(cssSource, /visual-brief-builder/);
+  assert.match(cssSource, /expectation-fit-card/);
+});

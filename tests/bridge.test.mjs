@@ -170,10 +170,17 @@ test("handoff writes formal business quality gate and workflow state", async () 
     const brief = JSON.parse(await readFile(join(payload.projectPath, "project-brief.json"), "utf8"));
     assert.deepEqual(brief.qualityGate, qualityGate);
     assert.deepEqual(brief.workflowState, workflowState);
+    assert.ok(brief.briefMode);
+    assert.ok(brief.visualBrief);
+    assert.ok(brief.guidedBrief);
+    assert.ok(brief.expectationFit);
+    assert.equal(typeof brief.expectationFit.readyForProduction, "boolean");
 
     const report = JSON.parse(await readFile(join(payload.projectPath, "quality-report.json"), "utf8"));
     assert.deepEqual(report.qualityGate, qualityGate);
     assert.deepEqual(report.workflowState, workflowState);
+    assert.ok(report.expectationFit);
+    assert.ok(report.checks.some((check) => check.id === "expectation-fit"));
 
     assert.ok(payload.files.includes("codex-task.md"));
     assert.ok(payload.files.includes("AGENTS.md"));
@@ -202,12 +209,16 @@ test("handoff writes formal business quality gate and workflow state", async () 
     assert.match(codexTask, /ChatGPT|image generation|生成素材/i);
     assert.match(codexTask, /visual-element-kit\.md/);
     assert.match(codexTask, /generate_visual_element_kit\.py/);
+    assert.match(codexTask, /Expectation Fit and Guided Intake/);
+    assert.match(codexTask, /readyForProduction/);
     assert.match(codexTask, /Needs-Manual|no image backend|no IMAGE_BACKEND|无 key/i);
     assert.match(codexTask, /micro-assets|small element|小元素|元素素材/i);
     assert.match(codexTask, /web search|联网|公开素材/i);
 
     const codexGuide = await readFile(join(payload.projectPath, "AGENTS.md"), "utf8");
     assert.match(codexGuide, /Codex/);
+    assert.match(codexGuide, /expectationFit/);
+    assert.match(codexGuide, /guided intake/i);
     assert.match(codexGuide, /private source|敏感资料/i);
     assert.match(codexGuide, /asset-plan\.md/);
 
@@ -228,6 +239,8 @@ test("handoff writes formal business quality gate and workflow state", async () 
     assert.match(command, /source-map\.json/);
     assert.match(command, /asset-plan\.md/);
     assert.match(command, /visual-element-kit\.md/);
+    assert.match(command, /expectationFit/);
+    assert.match(command, /guided intake/i);
     assert.match(command, /generate_visual_element_kit\.py/);
     assert.match(command, /Needs-Manual/i);
     assert.match(command, /quality-checklist\.md/);
