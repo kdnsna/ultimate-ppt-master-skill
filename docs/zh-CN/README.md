@@ -30,7 +30,8 @@ Ultimate PPT Master v5 采用分类文档结构。先按你当前要做的事情
 
 | 需求 | 阅读 |
 |---|---|
-| 查看最新发布 | [发布说明 - v5.1.0](./release/release-notes-v5.1.0.md) |
+| 查看最新发布 | [发布说明 - v5.2.0](./release/release-notes-v5.2.0.md) |
+| 查看 v5.2 预期契合合同 | [发布说明 - v5.2.0](./release/release-notes-v5.2.0.md) |
 | 查看 v5.1 分步访谈发布 | [发布说明 - v5.1.0](./release/release-notes-v5.1.0.md) |
 | 查看 v5 交付默认规范发布 | [发布说明 - v5.0.0](./release/release-notes-v5.0.0.md) |
 | 查看渲染审阅闭环发布 | [发布说明 - v4.3.0](./release/release-notes-v4.3.0.md) |
@@ -45,6 +46,7 @@ Ultimate PPT Master v5 采用分类文档结构。先按你当前要做的事情
 | 需求 | 阅读 |
 |---|---|
 | 理解产品定位 | [产品定位反思](./strategy/product-positioning.md) |
+| 深度优化 PRD | [v5.2 深度优化指南 / PRD](./strategy/prd-v5.2-deep-optimization-guide.md) |
 | 改善 GitHub 公开曝光 | [Public Growth Playbook](../strategy/public-growth-playbook.md) |
 | 准备 Skill 市场分发 | [Skill 市场分发](./strategy/skill-market-distribution.md) |
 | 查看内容和模板方向 | [下一步路线 - 内容与模板预设](./strategy/next-roadmap.md) |

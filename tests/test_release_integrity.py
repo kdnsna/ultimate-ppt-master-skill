@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "5.1.0"
+VERSION = "5.2.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -44,6 +44,9 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("npm --prefix apps/web run build", scripts["build:web"])
         self.assertEqual(scripts["audit:docs"], "python3 scripts/audit_docs_links.py")
         self.assertEqual(scripts["audit:web-console"], "python3 scripts/audit_web_console.py")
+        self.assertEqual(scripts["audit:brief"], "python3 scripts/audit_brief_contract.py")
+        self.assertEqual(scripts["audit:visual-intent"], "python3 scripts/audit_visual_intent.py")
+        self.assertEqual(scripts["audit:feedback-loop"], "python3 scripts/audit_feedback_loop.py")
         self.assertEqual(scripts["bridge"], "node apps/bridge/server.mjs")
         self.assertTrue((ROOT / "scripts/bootstrap.sh").is_file())
         self.assertTrue((ROOT / "scripts/doctor.sh").is_file())
@@ -69,6 +72,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/rendered-review-loop-v4.3.md",
+            "docs/release/release-notes-v5.2.0.md",
             "docs/release/release-notes-v5.1.0.md",
             "docs/release/release-notes-v5.0.0.md",
             "docs/release/release-notes-v4.3.0.md",
@@ -82,6 +86,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "docs/zh-CN/release/release-notes-v5.2.0.md",
             "docs/zh-CN/release/release-notes-v5.1.0.md",
             "docs/zh-CN/release/release-notes-v5.0.0.md",
             "docs/zh-CN/release/release-notes-v4.3.0.md",
@@ -117,8 +122,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "Why Teams Use It",
             "What v5 Changes",
             "Product Loop",
-            "v5.1.0 Notes",
+            "v5.2.0 Notes",
+            "Release Notes - v5.2.0",
             "Release Notes - v5.1.0",
+            "sourceConfidence",
+            "deliveryScorecard",
+            "feedbackLoop",
+            "referenceStyle",
             "Editable PPTX first",
             "Visual Brief Builder",
             "Codex Guided Intake",
@@ -151,6 +161,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "./docs/quality/rendered-review-loop-v4.3.md",
+            "./docs/release/release-notes-v5.2.0.md",
             "./docs/release/release-notes-v5.1.0.md",
             "./docs/release/release-notes-v5.0.0.md",
             "./docs/release/release-notes-v4.3.0.md",
@@ -164,8 +175,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "为什么团队会用它",
             "v5 做对了什么",
             "产品闭环",
-            "v5.1.0 说明",
+            "v5.2.0 说明",
+            "发布说明 - v5.2.0",
             "发布说明 - v5.1.0",
+            "sourceConfidence",
+            "deliveryScorecard",
+            "feedbackLoop",
+            "referenceStyle",
             "可编辑 PPTX 优先",
             "Visual Brief Builder",
             "Codex 分步访谈",
@@ -198,6 +214,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "./docs/zh-CN/release/release-notes-v5.2.0.md",
             "./docs/zh-CN/release/release-notes-v5.1.0.md",
             "./docs/zh-CN/release/release-notes-v5.0.0.md",
             "./docs/zh-CN/release/release-notes-v4.3.0.md",
@@ -277,6 +294,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         release_v5_zh = (ROOT / "docs/zh-CN/release/release-notes-v5.0.0.md").read_text(encoding="utf-8")
         release_v51 = (ROOT / "docs/release/release-notes-v5.1.0.md").read_text(encoding="utf-8")
         release_v51_zh = (ROOT / "docs/zh-CN/release/release-notes-v5.1.0.md").read_text(encoding="utf-8")
+        release_v52 = (ROOT / "docs/release/release-notes-v5.2.0.md").read_text(encoding="utf-8")
+        release_v52_zh = (ROOT / "docs/zh-CN/release/release-notes-v5.2.0.md").read_text(encoding="utf-8")
 
         self.assertIn("npm run audit:docs", release_maintenance)
         self.assertIn("npm run audit:web-console", release_maintenance)
@@ -334,6 +353,10 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("project-brief.json", release_v51)
         self.assertIn("expectationFit", release_v51)
         self.assertIn("Plain-Language Update Notes", release_v51)
+        self.assertIn("sourceConfidence", release_v52)
+        self.assertIn("deliveryScorecard", release_v52)
+        self.assertIn("feedbackLoop", release_v52)
+        self.assertIn("Plain-Language Update Notes", release_v52)
         self.assertIn("Codex 原生 GPT 生图", release_v5_zh)
         self.assertIn("主题艺术方向", release_v5_zh)
         self.assertIn("山海交汇 烟火同行", release_v5_zh)
@@ -344,6 +367,10 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("project-brief.json", release_v51_zh)
         self.assertIn("expectationFit", release_v51_zh)
         self.assertIn("白话更新栏", release_v51_zh)
+        self.assertIn("sourceConfidence", release_v52_zh)
+        self.assertIn("deliveryScorecard", release_v52_zh)
+        self.assertIn("feedbackLoop", release_v52_zh)
+        self.assertIn("白话更新栏", release_v52_zh)
 
     def test_web_handoff_panel_has_executable_next_step_ui(self):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
@@ -367,9 +394,9 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v5.1.0", hero)
-        self.assertIn("Guided intake", hero)
-        self.assertIn("expectationFit", hero)
+        self.assertIn("v5.2.0", hero)
+        self.assertIn("Expectation contract", hero)
+        self.assertIn("sourceConfidence", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)
         self.assertNotIn("v2.3.0", combined)

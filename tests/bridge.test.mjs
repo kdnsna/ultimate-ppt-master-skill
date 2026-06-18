@@ -174,13 +174,26 @@ test("handoff writes formal business quality gate and workflow state", async () 
     assert.ok(brief.visualBrief);
     assert.ok(brief.guidedBrief);
     assert.ok(brief.expectationFit);
+    assert.equal(brief.schemaVersion, "v5.2-brief-v1");
+    assert.ok(brief.sourceConfidence);
+    assert.ok(brief.deliveryScorecard);
+    assert.ok(brief.referenceStyle);
+    assert.ok(brief.feedbackLoop);
+    assert.ok(brief.confirmationBrief);
+    assert.ok(brief.imageAcceptance);
     assert.equal(typeof brief.expectationFit.readyForProduction, "boolean");
 
     const report = JSON.parse(await readFile(join(payload.projectPath, "quality-report.json"), "utf8"));
     assert.deepEqual(report.qualityGate, qualityGate);
     assert.deepEqual(report.workflowState, workflowState);
     assert.ok(report.expectationFit);
+    assert.ok(report.sourceConfidence);
+    assert.ok(report.deliveryScorecard);
+    assert.ok(report.feedbackLoop);
     assert.ok(report.checks.some((check) => check.id === "expectation-fit"));
+    assert.ok(report.checks.some((check) => check.id === "source-confidence"));
+    assert.ok(report.checks.some((check) => check.id === "delivery-scorecard"));
+    assert.ok(report.checks.some((check) => check.id === "feedback-loop"));
 
     assert.ok(payload.files.includes("codex-task.md"));
     assert.ok(payload.files.includes("AGENTS.md"));
@@ -211,6 +224,10 @@ test("handoff writes formal business quality gate and workflow state", async () 
     assert.match(codexTask, /generate_visual_element_kit\.py/);
     assert.match(codexTask, /Expectation Fit and Guided Intake/);
     assert.match(codexTask, /readyForProduction/);
+    assert.match(codexTask, /sourceConfidence|Source confidence/);
+    assert.match(codexTask, /deliveryScorecard|Delivery summary/);
+    assert.match(codexTask, /referenceStyle|Reference style/);
+    assert.match(codexTask, /feedbackLoop|Feedback status/);
     assert.match(codexTask, /Needs-Manual|no image backend|no IMAGE_BACKEND|无 key/i);
     assert.match(codexTask, /micro-assets|small element|小元素|元素素材/i);
     assert.match(codexTask, /web search|联网|公开素材/i);
@@ -218,6 +235,9 @@ test("handoff writes formal business quality gate and workflow state", async () 
     const codexGuide = await readFile(join(payload.projectPath, "AGENTS.md"), "utf8");
     assert.match(codexGuide, /Codex/);
     assert.match(codexGuide, /expectationFit/);
+    assert.match(codexGuide, /sourceConfidence|Source confidence/);
+    assert.match(codexGuide, /delivery scorecard|deliveryScorecard/i);
+    assert.match(codexGuide, /feedbackLoop|feedback status/i);
     assert.match(codexGuide, /guided intake/i);
     assert.match(codexGuide, /private source|敏感资料/i);
     assert.match(codexGuide, /asset-plan\.md/);
@@ -240,6 +260,10 @@ test("handoff writes formal business quality gate and workflow state", async () 
     assert.match(command, /asset-plan\.md/);
     assert.match(command, /visual-element-kit\.md/);
     assert.match(command, /expectationFit/);
+    assert.match(command, /sourceConfidence/);
+    assert.match(command, /deliveryScorecard/);
+    assert.match(command, /referenceStyle/);
+    assert.match(command, /feedbackLoop/);
     assert.match(command, /guided intake/i);
     assert.match(command, /generate_visual_element_kit\.py/);
     assert.match(command, /Needs-Manual/i);
@@ -249,7 +273,11 @@ test("handoff writes formal business quality gate and workflow state", async () 
 
     const storyboard = JSON.parse(await readFile(join(payload.projectPath, "storyboard.json"), "utf8"));
     assert.equal(storyboard.deckIRVersion, "1.0");
+    assert.equal(storyboard.schemaVersion, "v5.2-brief-v1");
+    assert.ok(storyboard.sourceConfidence);
+    assert.ok(storyboard.deliveryScorecard);
     assert.ok(storyboard.slides.length >= 4);
+    assert.ok(storyboard.slides.every((slide) => slide.slideTask));
     const sourceMap = JSON.parse(await readFile(join(payload.projectPath, "source-map.json"), "utf8"));
     assert.ok(sourceMap.claims.length > 0);
     const reviewFindings = JSON.parse(await readFile(join(payload.projectPath, "review-findings.json"), "utf8"));

@@ -1,9 +1,9 @@
-# Ultimate PPT Master - v5.1 Guided Intake Delivery System
+# Ultimate PPT Master - v5.2 Expectation-Fit Delivery System
 
-> Local-first AI presentation production for real office work: turn unclear requests, messy source material, or structured briefs into editable PPTX or magazine-style Web Decks with Visual Brief tags, Codex Guided Intake, official/IP asset boundaries, Codex/GPT no-text visuals, Microsoft YaHei typography defaults, rendered review, and formal delivery audits.
+> Local-first AI presentation production for real office work: turn unclear requests, messy source material, or structured briefs into editable PPTX or magazine-style Web Decks with Visual Brief tags, Codex Guided Intake, source confidence, delivery scorecards, reference-style choices, feedback taxonomy, official/IP asset boundaries, Codex/GPT no-text visuals, Microsoft YaHei typography defaults, rendered review, and formal delivery audits.
 
 <p align="center">
-  <strong>v5.1.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/release/release-notes-v5.1.0.md">v5.1 Release Notes</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v5.2.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/release/release-notes-v5.2.0.md">v5.2 Release Notes</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -13,7 +13,7 @@
   ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Benchmark Wall</strong></a>
   ·
-  <a href="./docs/release/release-notes-v5.1.0.md"><strong>v5.1.0 Notes</strong></a>
+  <a href="./docs/release/release-notes-v5.2.0.md"><strong>v5.2.0 Notes</strong></a>
   ·
   <a href="./docs/guides/agent-connect-bridge.md"><strong>Agent Bridge</strong></a>
   ·
@@ -21,8 +21,8 @@
 </p>
 
 <p align="center">
-  <img alt="Version 5.1.0" src="https://img.shields.io/badge/Version-5.1.0-172033?style=for-the-badge">
-  <img alt="Guided intake" src="https://img.shields.io/badge/v5.1-Guided%20Intake-0F766E?style=for-the-badge">
+  <img alt="Version 5.2.0" src="https://img.shields.io/badge/Version-5.2.0-172033?style=for-the-badge">
+  <img alt="Expectation contract" src="https://img.shields.io/badge/v5.2-Expectation%20Contract-0F766E?style=for-the-badge">
   <img alt="Visual Brief tags" src="https://img.shields.io/badge/Web-Visual%20Brief%20Tags-2563EB?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
@@ -36,7 +36,7 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 | Need | What Ultimate PPT Master gives you |
 |---|---|
 | Make a real PowerPoint by default | Generic requests such as "make a deck" or "做个 PPT" default to editable PPTX instead of another route-selection loop. |
-| Avoid expectation drift | v5.1 adds a clarity gate: Web users choose rich tags and paste context; Codex users get staged questions when the brief is too thin. |
+| Avoid expectation drift | v5.2 turns the clarity gate into a contract: tags, guided answers, source confidence, reference style, delivery scorecard, and feedback taxonomy are all written into the handoff. |
 | Ask the right questions | The agent clarifies audience, scenario, purpose, source status, core message, page count, visual style, asset rules, output format, and compliance boundaries before production when those answers matter. |
 | Use better AI visuals | Codex/GPT image generation is treated as a composed visual engine for no-text backgrounds, support scenes, and micro-assets, not element stacking. |
 | Keep brands safe | Official/IP marks such as logos, campaign names, cards, QR codes, and partner marks require official-source, user-provided, text-lockup fallback, or replacement status. |
@@ -47,7 +47,7 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 
 ## Who It Is For
 
-| Audience | Typical work | Why v5.1 fits |
+| Audience | Typical work | Why v5.2 fits |
 |---|---|---|
 | Office teams | Leadership updates, work reports, training decks, project reviews, and sales enablement decks. | Handles vague one-line requests by asking for the missing business context before generating the deck. |
 | Finance, government, and enterprise users | Formal materials that need careful wording, brand boundaries, and traceable source claims. | Keeps official/IP assets documented and blocks fake logo-like placeholders for external release. |
@@ -56,7 +56,7 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 
 ## Typical Scenarios
 
-| Request | v5.1 default behavior |
+| Request | v5.2 default behavior |
 |---|---|
 | "Make me a PPT." | Enter Codex Guided Intake and ask staged questions before production, unless the user explicitly says to draft with assumptions. |
 | "Make this source into a PPT." | If the source has no audience or purpose, ask for scenario, audience, and desired outcome first; then create editable PPTX by default. |
@@ -70,24 +70,26 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 |---|---|---|
 | Editable PPTX | Real text boxes, shapes, charts, tables, speaker notes, and editable brand lockups where safe. | The deck can be handed to a PowerPoint user, not only admired as screenshots. |
 | Web Deck | A single-file browser presentation for talks, showcases, and magazine-style storytelling. | Useful when visual rhythm and sharing matter more than PowerPoint editing. |
-| `project-brief.json` | `briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit` in one handoff contract. | The system knows which signals came from the user, which came from tags, and which are assumptions. |
+| `project-brief.json` | `briefMode`, `visualBrief`, `guidedBrief`, `expectationFit`, `sourceConfidence`, `deliveryScorecard`, `referenceStyle`, `feedbackLoop`, and `confirmationBrief` in one handoff contract. | The system knows which signals came from the user, which came from tags, which are assumptions, and what to fix if the user is unsatisfied. |
 | Visual Brief | Scenario, audience, purpose, content status, visual style, density, asset strategy, output preference, pasted background, links, and extra requirements. | Web users can express a rich PPT request without filling a long form. |
 | Guided Brief | Codex-collected answers for scenario, audience, purpose, core message, sources, page count, outline, style, assets, output, must-include, and must-avoid. | Chat users are walked through the missing essentials before serious production. |
-| Expectation Fit | Green/yellow/red risk level, missing signals, assumptions, and readiness for production. | High-risk vague briefs are visible before the deck is generated. |
+| Expectation Fit | Green/yellow/red risk level, source confidence, missing signals, assumptions, delivery scorecard, and readiness for production. | High-risk vague briefs are visible before the deck is generated. |
 | Source and asset records | `source-map.json`, `image_sources.json`, `image_prompts.json`, and official/IP fallback notes. | Reviewers can see what was sourced, generated, replaced, or left for authorization. |
 | Review package | Rendered previews, findings, repair candidates, and quality status. | Revisions start from observed issues instead of vague "make it better" loops. |
 
 ## What v5 Changes
 
-v5.0.0 made the product a delivery-defaults system. v5.1.0 closes the biggest remaining gap: when the user's PPT need is unclear, the system now collects enough intent before promising a final deck.
+v5.0.0 made the product a delivery-defaults system. v5.1.0 added staged intake for unclear requests. v5.2.0 turns those signals into an expectation-fit contract that records source confidence, reference style, delivery score, image acceptance, and dissatisfaction taxonomy before and after production.
 
 | v5 default | Practical effect |
 |---|---|
+| Expectation-fit contract | `project-brief.json` and `quality-report.json` now carry `sourceConfidence`, `deliveryScorecard`, `referenceStyle`, `feedbackLoop`, `failureTaxonomy`, `confirmationBrief`, and `imageAcceptance`. |
 | Editable PPTX first | Formal reports, consulting decks, finance/government material, and normal "make PPT" requests go straight to PowerPoint-ready output after the brief is clear enough. |
 | Visual Brief Builder | Web users pick diverse tags and paste background material, meeting notes, leadership requirements, links, and special constraints. |
 | Codex Guided Intake | If the request is vague, Codex asks by stage: audience and scenario, content source and core message, page structure, visual style, asset policy, output format, and compliance boundaries. |
 | Unified brief contract | Web tags and Codex interview answers both flow into `project-brief.json`, so Bridge, Desktop Worker, audits, and prompts read the same intent. |
 | Expectation Fit gate | Green means production-ready; yellow means proceed with caveats; red means clarify or explicitly draft with assumptions. |
+| Feedback taxonomy | If the user is unhappy, the next revision classifies the reason first: brief mismatch, source gap, style mismatch, visual-density mismatch, asset/IP boundary, or format mismatch. |
 | Codex-first generated visuals | Generated imagery supports the page as no-text layers or reusable micro-assets; body content remains editable. |
 | Official/IP asset plan | Deterministic marks are sourced or documented. Fake logo-like placeholders are blocked for external release. |
 | Theme art direction | After reading the source, the agent names a subject-fit art concept, such as `山海交汇 烟火同行` for cultural tourism, then carries it through cover/tail pages and title treatment unless the deck is a serious report. |
@@ -177,6 +179,7 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 | Layer | Release | What it protects |
 |---|---|---|
 | Guided intake and expectation fit | [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) | Visual Brief tags, Codex staged questions, unified `project-brief.json`, and readiness risk before generation. |
+| Expectation-fit contract | [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) | Source confidence, reference-style choices, delivery scorecard, feedback taxonomy, confirmation brief, and image acceptance. |
 | Delivery defaults | [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) | Default PPTX route, one delivery brief, official/IP asset handling, Microsoft YaHei layout scale, and Codex-first image generation. |
 | Rendered review and repair brief | [v4.3 Rendered Review Loop](./docs/quality/rendered-review-loop-v4.3.md) | Review after rendering, propose low-risk repairs, generate `revision-brief.md` only after confirmation. |
 | AI planning | [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md) | `scripts/ai_storyboard.py`, `storyboard.json`, evidence refs, editability targets, and no-key fallback. |
@@ -184,7 +187,7 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 | Hybrid-editable generation | [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) | page recipes, no-text generated visual layers, editable PPTX body content, formal raster policy. |
 | Public proof surface | [Quality Workbench v2.5](./docs/quality/quality-workbench-v2.5.md) | Benchmark Wall, synthetic proof packs, Design Doctor reporting, and release checks. |
 
-Historical release notes: [v5.0.0](./docs/release/release-notes-v5.0.0.md), [v4.3.0](./docs/release/release-notes-v4.3.0.md), [v4.2.0](./docs/release/release-notes-v4.2.0.md), [v4.1.0](./docs/release/release-notes-v4.1.0.md), [v4.0.0](./docs/release/release-notes-v4.0.0.md), [v3.0.0](./docs/release/release-notes-v3.0.0.md).
+Historical release notes: [v5.1.0](./docs/release/release-notes-v5.1.0.md), [v5.0.0](./docs/release/release-notes-v5.0.0.md), [v4.3.0](./docs/release/release-notes-v4.3.0.md), [v4.2.0](./docs/release/release-notes-v4.2.0.md), [v4.1.0](./docs/release/release-notes-v4.1.0.md), [v4.0.0](./docs/release/release-notes-v4.0.0.md), [v3.0.0](./docs/release/release-notes-v3.0.0.md).
 
 ## Proofs
 
@@ -192,6 +195,7 @@ The [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmar
 
 | Proof | Link |
 |---|---|
+| v5.2 expectation-fit contract | [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) |
 | v5.1 guided-intake release | [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) |
 | v5 delivery-defaults release | [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) |
 | Rendered review release | [Release Notes - v4.3.0](./docs/release/release-notes-v4.3.0.md) |
@@ -237,6 +241,7 @@ Guide: [Agent Setup](./docs/guides/agent-setup.md). Local connector: [Agent Conn
 | Install and invoke the Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | Choose PPTX vs Web Deck vs Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
 | Configure provider keys locally | [Model and Provider Setup](./docs/guides/model-provider-setup.md) |
+| Review v5.2 expectation contract | [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) |
 | Review v5.1 guided intake | [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) |
 | Review v5 delivery defaults | [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) |
 | Review v4.3 repair flow | [Rendered Review Loop v4.3](./docs/quality/rendered-review-loop-v4.3.md) |

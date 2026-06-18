@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master v5.1.0 Guided intake</title>
-  <desc id="desc">A simplified four-step Web Experience showing visual brief tags, guided intake, expectation fit, official asset boundaries, Codex-first visuals, rendered review, local connector, AI helper, and generated local project folder.</desc>
+  <title id="title">Ultimate PPT Master v5.2.0 Expectation contract</title>
+  <desc id="desc">A simplified four-step Web Experience showing visual brief tags, guided intake, source confidence, delivery scorecard, reference style, feedback loop, official asset boundaries, Codex-first visuals, rendered review, local connector, AI helper, and generated local project folder.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#F8FAFC"/>
@@ -29,7 +29,7 @@
     <circle cx="30" cy="24" r="8" fill="#2563EB"/>
     <circle cx="56" cy="24" r="8" fill="#10B981"/>
     <circle cx="82" cy="24" r="8" fill="#EF5B3F"/>
-    <text x="112" y="30" fill="#526173" font-size="15" font-weight="850">v5.1.0 Guided intake</text>
+    <text x="112" y="30" fill="#526173" font-size="15" font-weight="850">v5.2.0 Expectation contract</text>
 
     <text x="0" y="122" fill="#172033" font-size="66" font-weight="950">Ultimate PPT Master</text>
     <text x="0" y="174" fill="#2563EB" font-size="34" font-weight="900">Brief. Source. Generate. Audit.</text>
@@ -38,11 +38,11 @@
 
   <g transform="translate(1032 102)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" filter="url(#softShadow)">
     <rect width="362" height="172" rx="14" fill="#172033"/>
-    <text x="28" y="42" fill="#FFFFFF" font-size="17" font-weight="900">Guided intake</text>
+    <text x="28" y="42" fill="#FFFFFF" font-size="17" font-weight="900">Expectation contract</text>
     <text x="28" y="72" fill="#B9C6D6" font-size="15" font-weight="720">默认 PPTX</text>
     <text x="28" y="100" fill="#B9C6D6" font-size="15" font-weight="720">可视化标签</text>
     <text x="28" y="128" fill="#B9C6D6" font-size="15" font-weight="720">Codex 分步访谈</text>
-    <text x="28" y="156" fill="#B9C6D6" font-size="15" font-weight="720">expectationFit</text>
+    <text x="28" y="156" fill="#B9C6D6" font-size="15" font-weight="720">sourceConfidence</text>
   </g>
 
   <g transform="translate(124 332)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" filter="url(#softShadow)">

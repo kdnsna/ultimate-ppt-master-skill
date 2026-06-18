@@ -1466,6 +1466,10 @@ def codex_task_text(
     workflow_state: dict[str, str],
     expected_artifacts: list[str],
     expectation_fit: dict[str, Any],
+    source_confidence: dict[str, Any],
+    delivery_scorecard: dict[str, Any],
+    reference_style: dict[str, Any],
+    feedback_loop: dict[str, Any],
     brief_mode: str,
 ) -> str:
     gate_inputs = "\n".join(f"- {item}" for item in quality_gate["requiredInputs"])
@@ -1516,11 +1520,19 @@ Artifact checks:
 - Ready for production: {"yes" if expectation_fit["readyForProduction"] else "no"}
 - Missing signals: {", ".join(expectation_fit["missingSignals"]) or "none"}
 
+## v5.2 Expectation Contract
+- Source confidence: {source_confidence["level"]}
+- Do not invent: {", ".join(source_confidence["doNotInvent"])}
+- Reference style: {reference_style["selectedDirection"]}
+- Delivery summary: {delivery_scorecard["userVisibleSummary"]}
+- Feedback status: {feedback_loop["feedbackStatus"]}
+
 Rules:
-1. Read project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit before production.
+1. Read project-brief.json briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop before production.
 2. If readyForProduction is false, run Codex Guided Intake first. Ask one related question group per turn and clarify audience, usage setting, desired action, content source, core message, slide count/sections, visual style, brand/IP assets, output format, and must-avoid boundaries.
 3. Start final-quality production only after the brief is clear enough or the user explicitly asks for a draft with assumptions.
-4. Record user answers, assumptions, and remaining expectation risk in project-brief.json and quality-report.json.
+4. Record user answers, assumptions, source confidence, reference style changes, feedback taxonomy, and remaining expectation risk in project-brief.json and quality-report.json.
+5. If the user is unsatisfied, classify the reason with feedbackLoop.failureTaxonomy before revising; do not blindly remake the whole deck.
 
 ## Asset Workflow
 1. Inspect sources/source.md and generated previews before searching.
@@ -1555,14 +1567,24 @@ Final response: list generated files, ChatGPT micro-assets inserted, public refe
 """
 
 
-def codex_agent_guide_text(quality_gate: dict[str, Any], expectation_fit: dict[str, Any]) -> str:
+def codex_agent_guide_text(
+    quality_gate: dict[str, Any],
+    expectation_fit: dict[str, Any],
+    source_confidence: dict[str, Any],
+    delivery_scorecard: dict[str, Any],
+    reference_style: dict[str, Any],
+    feedback_loop: dict[str, Any],
+) -> str:
     return f"""# AGENTS.md
 
 ## Codex Local Rules
 - Work in this desktop project and the Ultimate PPT Master repository scripts only.
 - Read codex-task.md before editing or generating deliverables.
-- Read project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit first. Current expectationFit: {expectation_fit["riskLevel"]} / {expectation_fit["score"]}%.
+- Read project-brief.json briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop first. Current expectationFit: {expectation_fit["riskLevel"]} / {expectation_fit["score"]}%.
+- Current sourceConfidence: {source_confidence["level"]}; do not invent: {", ".join(source_confidence["doNotInvent"])}.
+- Current referenceStyle: {reference_style["selectedDirection"]}; delivery scorecard: {delivery_scorecard["userVisibleSummary"]}.
 - If expectationFit.readyForProduction is false, run guided intake before final production. Ask one related question group per turn until audience, setting, purpose, sources, core message, slide count, style, asset boundary, output, and must-avoid rules are clear.
+- If the user is unsatisfied, classify the reason with feedbackLoop.failureTaxonomy before revising. Current feedback status: {feedback_loop["feedbackStatus"]}.
 - Read storyboard.json and source-map.json before final slide generation; they define the DeckIR page map and source evidence boundary.
 - Keep private source material, customer data, internal screenshots, and API keys local unless the user explicitly approves upload.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py first when the deck needs visual richness.
@@ -2293,6 +2315,161 @@ def desktop_expectation_fit(job: dict[str, Any], source_text: str, source_name: 
     }
 
 
+def desktop_reference_style(job: dict[str, Any]) -> dict[str, Any]:
+    style = str(job.get("stylePreset", "business"))
+    if style == "consulting":
+        return {
+            "selectedDirection": "consulting-structured",
+            "positiveReferences": ["McKinsey-style issue tree", "BCG-style recommendation memo", "consulting proposal page rhythm"],
+            "negativeReferences": ["decorative title-card deck", "large unexplained slogans", "flat screenshot-only pages"],
+            "styleConstraints": ["one takeaway per page", "clear section logic", "editable tables and diagrams", "strong evidence captions"],
+        }
+    if style == "editorial":
+        return {
+            "selectedDirection": "culture-tourism-editorial",
+            "positiveReferences": ["city travel magazine", "route recommendation spread", "official destination campaign"],
+            "negativeReferences": ["generic landscape stock", "fake landmarks", "unlicensed mascot/IP usage"],
+            "styleConstraints": ["official or user-provided scenes first", "AI scenes must avoid logos/text", "route map readability", "editorial pacing"],
+        }
+    if style == "academic":
+        return {
+            "selectedDirection": "research-evidence",
+            "positiveReferences": ["research briefing", "expert review deck", "evidence ladder"],
+            "negativeReferences": ["unsupported claims", "unlabeled charts", "marketing-only language"],
+            "styleConstraints": ["source captions", "method notes", "limitations visible", "claim-to-evidence mapping"],
+        }
+    return {
+        "selectedDirection": "financial-steady",
+        "positiveReferences": ["bank executive report", "SOE formal briefing", "financial KPI dashboard"],
+        "negativeReferences": ["high-saturation launch visuals", "cartoon characters", "unlicensed brand marks"],
+        "styleConstraints": ["Microsoft YaHei default", "stable grid", "reserved color usage", "official assets first"],
+    }
+
+
+def desktop_source_confidence(source_text: str, expectation_fit: dict[str, Any]) -> dict[str, Any]:
+    source_adequacy = expectation_fit["sourceAdequacy"]
+    level = {
+        "substantive": "strong",
+        "thin": "partial",
+        "private-unparsed": "partial",
+        "conflicting": "partial",
+        "topic-only": "topic-only",
+        "no-source": "weak",
+    }.get(source_adequacy, "weak")
+    covered = ["source material"] if source_text.strip() else []
+    if len(source_text.strip()) >= 180:
+        covered.extend(["core content", "local source boundary"])
+    return {
+        "level": level,
+        "sourceAdequacy": source_adequacy,
+        "coveredAreas": covered,
+        "missingAreas": [
+            *expectation_fit["missingSignals"],
+            *([] if source_text.strip() else ["no citable source; do not invent facts or numbers"]),
+        ],
+        "claimsNeedingEvidence": [
+            "All numbers, trends, rankings, and policy/business claims must map to sources or be marked as assumptions."
+        ],
+        "doNotInvent": [
+            "Do not invent numbers",
+            "Do not invent customer or institution names",
+            "Do not invent policy sources",
+            "Do not use unlicensed logos/IP",
+            "Do not present AI images as real scenes",
+        ],
+    }
+
+
+def desktop_delivery_scorecard(
+    title: str,
+    expectation_fit: dict[str, Any],
+    source_confidence: dict[str, Any],
+    reference_style: dict[str, Any],
+) -> dict[str, Any]:
+    source_score = {
+        "strong": 92,
+        "partial": 72,
+        "weak": 42,
+        "topic-only": 36,
+    }.get(source_confidence["level"], 42)
+    return {
+        "expectedDeckType": "general-business",
+        "expectationFitBeforeProduction": {
+            "riskLevel": expectation_fit["riskLevel"],
+            "score": expectation_fit["score"],
+            "readyForProduction": expectation_fit["readyForProduction"],
+            "missingSignals": expectation_fit["missingSignals"],
+            "assumptions": expectation_fit["assumptions"],
+        },
+        "qualityDimensions": [
+            {"id": "brief-fit", "label": "Brief clarity", "score": expectation_fit["score"], "evidence": "Desktop expectation fit check."},
+            {"id": "source-confidence", "label": "Source confidence", "score": source_score, "evidence": f"Source adequacy: {source_confidence['sourceAdequacy']}."},
+            {"id": "style-specificity", "label": "Style specificity", "score": 86, "evidence": f"Reference style: {reference_style['selectedDirection']}."},
+            {"id": "asset-boundary", "label": "Asset boundary", "score": 84, "evidence": "Official/user-provided assets first, AI no-text visuals only."},
+            {"id": "output-editability", "label": "Delivery editability", "score": 90, "evidence": "Editable PPTX default unless outputMode is web."},
+        ],
+        "userVisibleSummary": f"Desktop v5.2 scorecard for {title}: expectation {expectation_fit['score']}%, source confidence {source_confidence['level']}.",
+        "knownRisks": [*expectation_fit["missingSignals"], *source_confidence["missingAreas"]],
+        "recommendedNextRevision": [] if expectation_fit["readyForProduction"] else ["Run Codex guided intake before final production and update confirmationBrief."],
+    }
+
+
+def desktop_feedback_loop(expectation_fit: dict[str, Any], source_confidence: dict[str, Any], delivery_scorecard: dict[str, Any]) -> dict[str, Any]:
+    taxonomy = [
+        {"id": "brief-mismatch", "label": "Brief mismatch", "applies": not expectation_fit["readyForProduction"], "improvementTarget": "Clarify audience, setting, purpose, sources, core message, and output."},
+        {"id": "source-gap", "label": "Source gap", "applies": source_confidence["level"] != "strong", "improvementTarget": "Add citable sources or mark assumptions explicitly."},
+        {"id": "style-mismatch", "label": "Style mismatch", "applies": False, "improvementTarget": "Choose a concrete reference style and move-toward / avoid examples."},
+        {"id": "visual-density", "label": "Visual density mismatch", "applies": False, "improvementTarget": "Confirm spacious, standard, dense, dashboard, or text/image balanced layout."},
+        {"id": "asset-boundary", "label": "Asset/IP boundary unclear", "applies": False, "improvementTarget": "Clarify official assets, AI visuals, portrait/IP restrictions, and replacement strategy."},
+        {"id": "format-mismatch", "label": "Format mismatch", "applies": False, "improvementTarget": "Editable PPTX is default; PDF/Web preview must be explicit if needed."},
+    ]
+    return {
+        "feedbackStatus": "requested" if any(item["applies"] for item in taxonomy) else "none",
+        "failureTaxonomy": taxonomy,
+        "nextRevisionIntent": " ".join(delivery_scorecard["recommendedNextRevision"]) or "Proceed with production and record assumptions.",
+        "feedbackTemplate": [
+            "The part that misses expectations most is:",
+            "The reference style/page it should move toward is:",
+            "Content or wording that must stay:",
+            "Content that may be reduced:",
+            "Next revision priority: structure / style / assets / data / slide count / output format",
+        ],
+    }
+
+
+def desktop_confirmation_brief(
+    title: str,
+    guided_brief: dict[str, Any],
+    expectation_fit: dict[str, Any],
+    source_confidence: dict[str, Any],
+    delivery_scorecard: dict[str, Any],
+    reference_style: dict[str, Any],
+) -> str:
+    return (
+        "# Confirmation Brief\n\n"
+        f"- Project: {title}\n"
+        f"- Scenario: {guided_brief.get('scenario') or 'to confirm'}\n"
+        f"- Audience: {guided_brief.get('audience') or 'to confirm'}\n"
+        f"- Purpose: {guided_brief.get('purpose') or 'to confirm'}\n"
+        f"- Core message: {guided_brief.get('coreMessage') or 'to confirm'}\n"
+        f"- Content sources: {', '.join(guided_brief.get('contentSources') or []) or 'to confirm'}\n"
+        f"- Slide count / structure: {guided_brief.get('slideCount') or 'to confirm'}; {guided_brief.get('outlinePreference') or 'to confirm'}\n"
+        f"- Reference style: {reference_style['selectedDirection']}\n"
+        f"- Expectation risk: {expectation_fit['riskLevel']} / {expectation_fit['score']}%\n"
+        f"- Source confidence: {source_confidence['level']}\n"
+        f"- Next step: {'; '.join(delivery_scorecard['recommendedNextRevision']) or 'Production may start after recording assumptions.'}\n"
+    )
+
+
+def desktop_image_acceptance() -> dict[str, Any]:
+    return {
+        "required": True,
+        "defaultPolicy": "AI images are for no-text hero visuals, atmosphere, micro-assets, and textures; factual imagery uses official/user-provided sources first.",
+        "targetSlides": ["cover", "section divider", "process / roadmap", "metric accent", "closing"],
+        "replacementRule": "If an image is unrealistic, contains text, has broken logo/IP, or is unrelated, replace it with editable shapes, official imagery, or a clean no-image layout.",
+    }
+
+
 def write_formal_delivery_files(
     project_path: Path,
     job: dict[str, Any],
@@ -2316,6 +2493,14 @@ def write_formal_delivery_files(
     visual_brief = desktop_visual_brief(job, source_text, outline)
     guided_brief = desktop_guided_brief(job, source_name, source_text, visual_brief)
     expectation_fit = desktop_expectation_fit(job, source_text, source_name)
+    reference_style = desktop_reference_style(job)
+    visual_brief["referenceStyle"] = reference_style
+    source_confidence = desktop_source_confidence(source_text, expectation_fit)
+    delivery_scorecard = desktop_delivery_scorecard(str(title), expectation_fit, source_confidence, reference_style)
+    feedback_loop = desktop_feedback_loop(expectation_fit, source_confidence, delivery_scorecard)
+    failure_taxonomy = feedback_loop["failureTaxonomy"]
+    confirmation_brief = desktop_confirmation_brief(str(title), guided_brief, expectation_fit, source_confidence, delivery_scorecard, reference_style)
+    image_acceptance = desktop_image_acceptance()
     brief_mode = "source-first" if expectation_fit["readyForProduction"] else "codex-guided-intake"
     design_spec_path = project_path / "design_spec.md"
     spec_lock_path = project_path / "spec_lock.md"
@@ -2349,6 +2534,7 @@ def write_formal_delivery_files(
     ]
     brief = {
         "version": "desktop-worker-formal-v1",
+        "schemaVersion": "v5.2-brief-v1",
         "briefMode": brief_mode,
         "title": title,
         "sourceName": source_name,
@@ -2357,6 +2543,13 @@ def write_formal_delivery_files(
         "visualBrief": visual_brief,
         "guidedBrief": guided_brief,
         "expectationFit": expectation_fit,
+        "referenceStyle": reference_style,
+        "sourceConfidence": source_confidence,
+        "deliveryScorecard": delivery_scorecard,
+        "feedbackLoop": feedback_loop,
+        "failureTaxonomy": failure_taxonomy,
+        "confirmationBrief": confirmation_brief,
+        "imageAcceptance": image_acceptance,
         "qualityProfile": quality_profile,
         "qualityGate": quality_gate,
         "workflowState": workflow_state,
@@ -2388,6 +2581,7 @@ def write_formal_delivery_files(
     }
     manifest = {
         "version": "desktop-worker-formal-v1",
+        "schemaVersion": "v5.2-brief-v1",
         "createdAt": now,
         "app": "Ultimate PPT Master Desktop Worker",
         "projectPath": str(project_path),
@@ -2402,6 +2596,13 @@ def write_formal_delivery_files(
         "visualBrief": visual_brief,
         "guidedBrief": guided_brief,
         "expectationFit": expectation_fit,
+        "referenceStyle": reference_style,
+        "sourceConfidence": source_confidence,
+        "deliveryScorecard": delivery_scorecard,
+        "feedbackLoop": feedback_loop,
+        "failureTaxonomy": failure_taxonomy,
+        "confirmationBrief": confirmation_brief,
+        "imageAcceptance": image_acceptance,
         "expectedArtifacts": quality_profile["expectedArtifacts"],
         "reviewCommands": quality_gate["reviewCommands"],
         "artifactChecks": quality_gate["artifactChecks"],
@@ -2432,6 +2633,7 @@ def write_formal_delivery_files(
     }
     report = {
         "version": "desktop-worker-formal-v1",
+        "schemaVersion": "v5.2-brief-v1",
         "status": "pending",
         "createdAt": now,
         "qualityProfile": quality_profile,
@@ -2441,6 +2643,13 @@ def write_formal_delivery_files(
         "visualBrief": visual_brief,
         "guidedBrief": guided_brief,
         "expectationFit": expectation_fit,
+        "referenceStyle": reference_style,
+        "sourceConfidence": source_confidence,
+        "deliveryScorecard": delivery_scorecard,
+        "feedbackLoop": feedback_loop,
+        "failureTaxonomy": failure_taxonomy,
+        "confirmationBrief": confirmation_brief,
+        "imageAcceptance": image_acceptance,
         "reviewCommands": quality_gate["reviewCommands"],
         "visualDirection": visual_direction,
         "pageContractSummary": {
@@ -2485,6 +2694,21 @@ def write_formal_delivery_files(
                 "id": "expectation-fit",
                 "status": "ready" if expectation_fit["readyForProduction"] else "needs-guided-intake",
                 "summary": f"Expectation fit {expectation_fit['score']}%, risk {expectation_fit['riskLevel']}.",
+            },
+            {
+                "id": "source-confidence",
+                "status": "ready" if source_confidence["level"] == "strong" else "needs-evidence",
+                "summary": f"Source confidence {source_confidence['level']}; do-not-invent rules are recorded.",
+            },
+            {
+                "id": "delivery-scorecard",
+                "status": "needs-review" if delivery_scorecard["recommendedNextRevision"] else "ready",
+                "summary": delivery_scorecard["userVisibleSummary"],
+            },
+            {
+                "id": "feedback-loop",
+                "status": feedback_loop["feedbackStatus"],
+                "summary": feedback_loop["nextRevisionIntent"],
             }
         ],
     }
@@ -2507,10 +2731,10 @@ def write_formal_delivery_files(
     page_visual_prompt_md_path.write_text(page_visual_prompt_md, encoding="utf-8")
     written.extend([page_visual_manifest_path, page_visual_prompt_json_path, page_visual_prompt_md_path])
     codex_task_path.write_text(
-        codex_task_text(title, job["outputMode"], quality_gate, workflow_state, quality_profile["expectedArtifacts"], expectation_fit, brief_mode),
+        codex_task_text(title, job["outputMode"], quality_gate, workflow_state, quality_profile["expectedArtifacts"], expectation_fit, source_confidence, delivery_scorecard, reference_style, feedback_loop, brief_mode),
         encoding="utf-8",
     )
-    codex_guide_path.write_text(codex_agent_guide_text(quality_gate, expectation_fit), encoding="utf-8")
+    codex_guide_path.write_text(codex_agent_guide_text(quality_gate, expectation_fit, source_confidence, delivery_scorecard, reference_style, feedback_loop), encoding="utf-8")
     revision_brief_path.write_text(
         (
             "# v4.3 Rendered Review Revision Brief\n\n"

@@ -10,6 +10,9 @@ npm --prefix apps/web ci
 npm run build:web
 npm run audit:docs
 npm run audit:web-console
+npm run audit:brief
+npm run audit:visual-intent
+npm run audit:feedback-loop
 npm run audit:presets
 npm run audit:quality
 npm run audit:market
@@ -63,7 +66,7 @@ It should cover:
 - whitespace checks.
 
 CI should run on the current GitHub Actions JavaScript runtime generation. For
-v5.1.0 that means Node 24 in the workflows and current official action majors
+v5.2.0 that means Node 24 in the workflows and current official action majors
 for checkout, Node, and Python setup.
 
 The Pages workflow lives at:
@@ -141,13 +144,14 @@ When syncing upstream:
 
 ## Version Notes
 
-v5.1.0 positions this repository as:
+v5.2.0 positions this repository as:
 
 - a delivery-defaults presentation workbench for Chinese office users who need formal PPTX and high-impact Web Deck outputs;
 - an office-first Agent Skill where generic PPT requests default to editable PPTX after a clarity gate has enough production intent;
 - a Web Visual Brief Builder where users can choose scenario, audience, purpose, content status, visual style, density, asset strategy, and output tags while still pasting background context;
 - a Codex Guided Intake workflow where vague requests are clarified by stage before serious deck production;
-- a unified `project-brief.json` contract carrying `briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit`;
+- a unified `project-brief.json` contract carrying `briefMode`, `visualBrief`, `guidedBrief`, `expectationFit`, `sourceConfidence`, `deliveryScorecard`, `referenceStyle`, `feedbackLoop`, and `confirmationBrief`;
+- a feedback-first revision loop where dissatisfaction is classified before the deck is revised;
 - a Codex-first generated-visual workflow that uses no-text support visuals and micro-assets without flattening body-slide content;
 - an official/IP asset governance workflow that records brand marks as official-source, user-provided, text-lockup-fallback, or needs-authorized-replacement;
 - a Microsoft YaHei formal typography and layout baseline for practical PowerPoint handoff;

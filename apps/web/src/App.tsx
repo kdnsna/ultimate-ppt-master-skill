@@ -59,6 +59,10 @@ type BriefMode = "visual-tags" | "codex-guided-intake" | "source-first" | "draft
 type VisualTagGroupId = "scenario" | "audience" | "purpose" | "contentState" | "visualStyle" | "layoutDensity" | "assetStrategy" | "outputPreference";
 type ExpectationRiskLevel = "green" | "yellow" | "red";
 type SourceAdequacy = "substantive" | "thin" | "topic-only" | "private-unparsed" | "conflicting" | "no-source";
+type SourceConfidenceLevel = "strong" | "partial" | "weak" | "topic-only";
+type ExpectedDeckType = "executive-report" | "client-proposal" | "training-courseware" | "launch-story" | "research-report" | "general-business";
+type FeedbackStatus = "none" | "requested" | "needs-revision";
+type FailureTaxonomyId = "brief-mismatch" | "source-gap" | "style-mismatch" | "visual-density" | "asset-boundary" | "format-mismatch";
 
 interface StoryItem {
   title: string;
@@ -118,6 +122,7 @@ interface VisualBrief {
   backgroundText: string;
   extraRequirements: string;
   referenceLinks: string[];
+  referenceStyle: ReferenceStyle;
   autoSuggestedTags: string[];
   userEditedTags: boolean;
 }
@@ -147,6 +152,65 @@ interface ExpectationFit {
   successCriteria: string[];
   readyForProduction: boolean;
   nextQuestions: string[];
+}
+
+interface ReferenceStyle {
+  selectedDirection: string;
+  positiveReferences: string[];
+  negativeReferences: string[];
+  styleConstraints: string[];
+}
+
+interface ReferenceStyleOption {
+  id: string;
+  zh: string;
+  en: string;
+  descriptionZh: string;
+  descriptionEn: string;
+  positiveReferences: string[];
+  negativeReferences: string[];
+  styleConstraints: string[];
+}
+
+interface SourceConfidence {
+  level: SourceConfidenceLevel;
+  sourceAdequacy: SourceAdequacy;
+  coveredAreas: string[];
+  missingAreas: string[];
+  claimsNeedingEvidence: string[];
+  doNotInvent: string[];
+}
+
+interface DeliveryScorecard {
+  expectedDeckType: ExpectedDeckType;
+  expectationFitBeforeProduction: {
+    riskLevel: ExpectationRiskLevel;
+    score: number;
+    readyForProduction: boolean;
+    missingSignals: string[];
+    assumptions: string[];
+  };
+  qualityDimensions: Array<{
+    id: string;
+    label: string;
+    score: number;
+    evidence: string;
+  }>;
+  userVisibleSummary: string;
+  knownRisks: string[];
+  recommendedNextRevision: string[];
+}
+
+interface FeedbackLoop {
+  feedbackStatus: FeedbackStatus;
+  failureTaxonomy: Array<{
+    id: FailureTaxonomyId;
+    label: string;
+    applies: boolean;
+    improvementTarget: string;
+  }>;
+  nextRevisionIntent: string;
+  feedbackTemplate: string[];
 }
 
 interface VisualTag {
@@ -279,7 +343,7 @@ const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v4";
-const appVersion = "5.1.0";
+const appVersion = "5.2.0";
 
 const designDoctorScores = [
   {
@@ -506,6 +570,11 @@ const labels = {
     visualBriefPanel: "可视化需求标签",
     visualBriefSubtitle: "用标签快速说明场景、受众、目的、风格、素材和输出偏好；也可以继续粘贴背景和特殊要求。",
     recommendedTagCombos: "推荐组合",
+    referenceStyle: "参考样板方向",
+    referenceStyleSubtitle: "把“正式大气”继续说清楚：更贴近咨询报告、金融汇报、发布会，还是培训课件。",
+    referenceStyleLike: "贴近",
+    referenceStyleAvoid: "避免",
+    referenceStyleRules: "排版约束",
     backgroundContext: "背景 / 相关内容",
     extraVisualRequirements: "特殊要求 / 禁忌",
     referenceLinks: "参考链接 / 官网 / 资料地址",
@@ -514,6 +583,9 @@ const labels = {
     expectationFitYellow: "可制作，但需要记录假设",
     expectationFitRed: "建议先问清楚再制作",
     sourceAdequacy: "资料充分度",
+    sourceConfidence: "来源可信度",
+    deliveryScorecard: "交付评分卡",
+    feedbackLoop: "反馈修订闭环",
     nextCodexQuestion: "Codex 下一步应问",
     readyForProduction: "可正式制作",
     needsGuidedIntake: "需要分步问清",
@@ -750,6 +822,11 @@ const labels = {
     visualBriefPanel: "Visual brief tags",
     visualBriefSubtitle: "Use tags to clarify scenario, audience, purpose, style, assets, and output. Paste background and special constraints when needed.",
     recommendedTagCombos: "Suggested combinations",
+    referenceStyle: "Reference style direction",
+    referenceStyleSubtitle: "Make generic style words concrete: consulting report, financial review, launch keynote, or training deck.",
+    referenceStyleLike: "Move toward",
+    referenceStyleAvoid: "Avoid",
+    referenceStyleRules: "Layout constraints",
     backgroundContext: "Background / related context",
     extraVisualRequirements: "Special requirements / must avoid",
     referenceLinks: "Reference links / official sites / source URLs",
@@ -758,6 +835,9 @@ const labels = {
     expectationFitYellow: "Can proceed with recorded assumptions",
     expectationFitRed: "Clarify before production",
     sourceAdequacy: "Source adequacy",
+    sourceConfidence: "Source confidence",
+    deliveryScorecard: "Delivery scorecard",
+    feedbackLoop: "Feedback revision loop",
     nextCodexQuestion: "Codex should ask next",
     readyForProduction: "Production ready",
     needsGuidedIntake: "Guided intake needed",
@@ -1091,6 +1171,89 @@ const visualBriefPresets: VisualBriefPreset[] = [
   }
 ];
 
+const referenceStyleOptions: ReferenceStyleOption[] = [
+  {
+    id: "consulting-structured",
+    zh: "咨询报告感",
+    en: "Consulting report",
+    descriptionZh: "适合诊断、方案、路线图和客户提案，强调结构清晰、证据分层和结论先行。",
+    descriptionEn: "For diagnosis, solutions, roadmaps, and client proposals with clear structure and evidence layers.",
+    positiveReferences: ["McKinsey-style issue tree", "BCG-style recommendation memo", "consulting proposal page rhythm"],
+    negativeReferences: ["decorative title-card deck", "large unexplained slogans", "flat screenshot-only pages"],
+    styleConstraints: ["one takeaway per page", "clear section logic", "editable tables and diagrams", "strong evidence captions"]
+  },
+  {
+    id: "financial-steady",
+    zh: "金融稳重",
+    en: "Financial steady",
+    descriptionZh: "适合银行、保险、国企和管理层汇报，强调可靠、克制、数据清晰和品牌边界。",
+    descriptionEn: "For banking, insurance, SOE, and executive reporting with restrained, reliable data presentation.",
+    positiveReferences: ["bank executive report", "SOE formal briefing", "financial KPI dashboard"],
+    negativeReferences: ["high-saturation launch visuals", "cartoon characters", "unlicensed brand marks"],
+    styleConstraints: ["Microsoft YaHei default", "stable grid", "reserved color usage", "official assets first"]
+  },
+  {
+    id: "management-dashboard",
+    zh: "经营看板",
+    en: "Management dashboard",
+    descriptionZh: "适合复盘、KPI、项目进度和风险机会，强调指标层级、趋势对比和行动清单。",
+    descriptionEn: "For reviews, KPI updates, project status, and risk/opportunity pages with clear metric hierarchy.",
+    positiveReferences: ["executive KPI cockpit", "balanced scorecard", "monthly operating review"],
+    negativeReferences: ["dense spreadsheet screenshots", "tiny labels", "mixed chart styles"],
+    styleConstraints: ["large numbers with context", "consistent chart grammar", "visible source notes", "decision-ready summary"]
+  },
+  {
+    id: "solution-roadmap",
+    zh: "方案路线图",
+    en: "Solution roadmap",
+    descriptionZh: "适合产品方案、客户解决方案和实施计划，强调现状、路径、阶段和责任。",
+    descriptionEn: "For product solutions, client solutions, and implementation plans with state, path, phase, and ownership.",
+    positiveReferences: ["solution architecture deck", "implementation roadmap", "service journey map"],
+    negativeReferences: ["ambiguous arrows", "decorative process art", "unexplained icons"],
+    styleConstraints: ["editable process nodes", "clear owners and timing", "before/after comparison", "action-oriented closing"]
+  },
+  {
+    id: "product-launch-hero",
+    zh: "发布会主视觉",
+    en: "Launch keynote",
+    descriptionZh: "适合发布、路演和公开传播，强调第一视觉、节奏、场景图和传播记忆点。",
+    descriptionEn: "For launches, pitches, and public communication with hero visuals, pacing, and memorable scenes.",
+    positiveReferences: ["product keynote pacing", "hero image plus simple claim", "demo story flow"],
+    negativeReferences: ["long paragraphs", "ordinary office report grid", "unrelated stock photos"],
+    styleConstraints: ["AI visual prompt per hero page", "no text inside generated images", "editable titles and captions", "strong contrast hierarchy"]
+  },
+  {
+    id: "courseware-clean",
+    zh: "清爽课件",
+    en: "Clean courseware",
+    descriptionZh: "适合培训、课程和知识传达，强调模块化、可读性、练习页和复盘页。",
+    descriptionEn: "For training, courseware, and knowledge transfer with modules, readability, exercises, and recap pages.",
+    positiveReferences: ["corporate learning deck", "module-based courseware", "practice-and-recap slides"],
+    negativeReferences: ["overdesigned hero pages", "tiny dense manuals", "one-slide-only diagrams"],
+    styleConstraints: ["readable body size", "chapter markers", "example boxes", "speaker notes when useful"]
+  },
+  {
+    id: "research-evidence",
+    zh: "研究证据型",
+    en: "Research evidence",
+    descriptionZh: "适合调研、评审、趋势分析和学术答辩，强调来源、方法、限制和结论可信度。",
+    descriptionEn: "For research, review panels, trends, and defenses with sources, method, limits, and confidence.",
+    positiveReferences: ["research briefing", "expert review deck", "evidence ladder"],
+    negativeReferences: ["unsupported claims", "unlabeled charts", "marketing-only language"],
+    styleConstraints: ["source captions", "method notes", "limitations visible", "claim-to-evidence mapping"]
+  },
+  {
+    id: "culture-tourism-editorial",
+    zh: "文旅杂志感",
+    en: "Culture tourism editorial",
+    descriptionZh: "适合城市推介、文旅推荐和活动传播，强调真实场景、路线体验和品牌/IP 合规。",
+    descriptionEn: "For city promotion, culture tourism, and campaigns with real scenes, journeys, and IP boundaries.",
+    positiveReferences: ["city travel magazine", "route recommendation spread", "official destination campaign"],
+    negativeReferences: ["generic landscape stock", "fake landmarks", "unlicensed mascot/IP usage"],
+    styleConstraints: ["official or user-provided scenes first", "AI scenes must avoid logos/text", "route map readability", "editorial pacing"]
+  }
+];
+
 const defaultForm: FormState = {
   language: "zh",
   presetId: "executive_business_review",
@@ -1163,8 +1326,8 @@ export function App() {
   const workflowSteps = useMemo(() => buildWorkflowSteps({ form, sources, readiness, bridge, selectedAgent, handoffResult, labels: t }), [form, sources, readiness, bridge, selectedAgent, handoffResult, t]);
   const workflowState = useMemo(() => buildWorkflowState(workflowSteps), [workflowSteps]);
   const codexTask = useMemo(() => buildCodexTask(form, enginePlan, sources, qualityGate, workflowState, qualityContract, expectationFit), [form, enginePlan, sources, qualityGate, workflowState, qualityContract, expectationFit]);
-  const codexAgentGuide = useMemo(() => buildCodexAgentGuide(form, qualityGate, expectationFit), [form, qualityGate, expectationFit]);
-  const qualityReport = useMemo(() => buildQualityReport(form, qualityContract, qualityGate, workflowState, expectationFit), [form, qualityContract, qualityGate, workflowState, expectationFit]);
+  const codexAgentGuide = useMemo(() => buildCodexAgentGuide(form, sources, qualityGate, expectationFit), [form, sources, qualityGate, expectationFit]);
+  const qualityReport = useMemo(() => buildQualityReport(form, sources, qualityContract, qualityGate, workflowState, expectationFit), [form, sources, qualityContract, qualityGate, workflowState, expectationFit]);
   const manifest = useMemo(() => buildManifest(form, sources, readiness, enginePlan, bridge, qualityContract, qualityGate, workflowState, expectationFit), [form, sources, readiness, enginePlan, bridge, qualityContract, qualityGate, workflowState, expectationFit]);
   const briefObject = useMemo(() => buildBriefObject(form, storyboard, readiness, enginePlan, sources, qualityContract, qualityGate, workflowState, expectationFit), [form, storyboard, readiness, enginePlan, sources, qualityContract, qualityGate, workflowState, expectationFit]);
   const briefJson = useMemo(() => JSON.stringify(briefObject, null, 2), [briefObject]);
@@ -2964,6 +3127,7 @@ function VisualBriefBuilder({
 }) {
   const zh = form.language === "zh";
   const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+  const referenceStyle = normalizeReferenceStyle(form.visualBrief.referenceStyle, referenceStyleForPreset(form.visualBrief.tagPreset).selectedDirection);
 
   return (
     <section className="visual-brief-builder" aria-label={t.visualBriefPanel}>
@@ -2989,6 +3153,39 @@ function VisualBriefBuilder({
             </button>
           ))}
         </div>
+      </div>
+      <div className="reference-style-row" aria-label={t.referenceStyle}>
+        <div>
+          <span>{t.referenceStyle}</span>
+          <p>{t.referenceStyleSubtitle}</p>
+        </div>
+        <div className="reference-style-options">
+          {referenceStyleOptions.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className={referenceStyle.selectedDirection === option.id ? "active" : ""}
+              title={zh ? option.descriptionZh : option.descriptionEn}
+              onClick={() => onUpdateBrief({ referenceStyle: referenceStyleFromOption(option.id) })}
+            >
+              {zh ? option.zh : option.en}
+            </button>
+          ))}
+        </div>
+        <dl className="reference-style-summary">
+          <div>
+            <dt>{t.referenceStyleLike}</dt>
+            <dd>{referenceStyle.positiveReferences.slice(0, 3).join(" · ")}</dd>
+          </div>
+          <div>
+            <dt>{t.referenceStyleAvoid}</dt>
+            <dd>{referenceStyle.negativeReferences.slice(0, 2).join(" · ")}</dd>
+          </div>
+          <div>
+            <dt>{t.referenceStyleRules}</dt>
+            <dd>{referenceStyle.styleConstraints.slice(0, 3).join(" · ")}</dd>
+          </div>
+        </dl>
       </div>
       <div className="tag-group-grid">
         {visualTagGroups.map((group) => (
@@ -3476,6 +3673,52 @@ function normalizeSelectedTags(input?: Partial<Record<VisualTagGroupId, string[]
   return next;
 }
 
+function referenceStyleOptionById(id?: string) {
+  return referenceStyleOptions.find((item) => item.id === id) || referenceStyleOptions[0];
+}
+
+function referenceStyleForPreset(presetId?: string) {
+  const map: Record<string, string> = {
+    "executive-review": "financial-steady",
+    "client-proposal": "consulting-structured",
+    "product-launch": "product-launch-hero",
+    training: "courseware-clean",
+    "research-report": "research-evidence"
+  };
+  return referenceStyleFromOption(map[presetId || ""] || "financial-steady");
+}
+
+function referenceStyleFromOption(id: string): ReferenceStyle {
+  const option = referenceStyleOptionById(id);
+  return {
+    selectedDirection: option.id,
+    positiveReferences: [...option.positiveReferences],
+    negativeReferences: [...option.negativeReferences],
+    styleConstraints: [...option.styleConstraints]
+  };
+}
+
+function normalizeReferenceStyle(input?: Partial<ReferenceStyle>, fallbackId = "financial-steady"): ReferenceStyle {
+  const option = referenceStyleOptionById(input?.selectedDirection || fallbackId);
+  return {
+    selectedDirection: option.id,
+    positiveReferences: Array.isArray(input?.positiveReferences) && input.positiveReferences.length
+      ? input.positiveReferences.map(String).filter(Boolean)
+      : [...option.positiveReferences],
+    negativeReferences: Array.isArray(input?.negativeReferences) && input.negativeReferences.length
+      ? input.negativeReferences.map(String).filter(Boolean)
+      : [...option.negativeReferences],
+    styleConstraints: Array.isArray(input?.styleConstraints) && input.styleConstraints.length
+      ? input.styleConstraints.map(String).filter(Boolean)
+      : [...option.styleConstraints]
+  };
+}
+
+function referenceStyleLabel(style: ReferenceStyle, language: Language) {
+  const option = referenceStyleOptionById(style.selectedDirection);
+  return option[language];
+}
+
 function makeVisualBriefFromPreset(presetId: string, existing?: Partial<VisualBrief>): VisualBrief {
   const preset = visualBriefPresets.find((item) => item.id === presetId) || visualBriefPresets[0];
   return normalizeVisualBrief({
@@ -3484,6 +3727,7 @@ function makeVisualBriefFromPreset(presetId: string, existing?: Partial<VisualBr
     backgroundText: existing?.backgroundText || "",
     extraRequirements: existing?.extraRequirements || "",
     referenceLinks: existing?.referenceLinks || [],
+    referenceStyle: existing?.referenceStyle || referenceStyleForPreset(preset.id),
     autoSuggestedTags: existing?.autoSuggestedTags || [],
     userEditedTags: false
   });
@@ -3491,12 +3735,14 @@ function makeVisualBriefFromPreset(presetId: string, existing?: Partial<VisualBr
 
 function normalizeVisualBrief(input?: Partial<VisualBrief>): VisualBrief {
   const fallback = visualBriefPresets[0];
+  const tagPreset = input?.tagPreset && visualBriefPresets.some((preset) => preset.id === input.tagPreset) ? input.tagPreset : fallback.id;
   return {
     selectedTags: normalizeSelectedTags(input?.selectedTags || fallback.tags),
-    tagPreset: input?.tagPreset && visualBriefPresets.some((preset) => preset.id === input.tagPreset) ? input.tagPreset : fallback.id,
+    tagPreset,
     backgroundText: String(input?.backgroundText || ""),
     extraRequirements: String(input?.extraRequirements || ""),
     referenceLinks: Array.isArray(input?.referenceLinks) ? input.referenceLinks.map(String).filter(Boolean) : [],
+    referenceStyle: normalizeReferenceStyle(input?.referenceStyle, referenceStyleForPreset(tagPreset).selectedDirection),
     autoSuggestedTags: Array.isArray(input?.autoSuggestedTags) ? input.autoSuggestedTags.map(String).filter(Boolean) : [],
     userEditedTags: Boolean(input?.userEditedTags)
   };
@@ -3607,6 +3853,9 @@ function assessExpectationFit(form: FormState, sources: UploadedSource[]): Expec
   if (!selectedTags.visualStyle.length) {
     missingSignals.push(zh ? "缺少视觉风格选择" : "missing visual style");
   }
+  if (selectedTags.visualStyle.includes("formal-business") && !brief.referenceStyle?.selectedDirection) {
+    missingSignals.push(zh ? "缺少具体参考样板方向" : "missing concrete reference style direction");
+  }
   if (!selectedTags.assetStrategy.length) {
     missingSignals.push(zh ? "缺少素材/IP 边界" : "missing asset / IP boundary");
   }
@@ -3709,6 +3958,259 @@ function buildGuidedBrief(form: FormState): GuidedBrief {
   };
 }
 
+function assessSourceConfidence(form: FormState, sources: UploadedSource[], expectationFit: ExpectationFit): SourceConfidence {
+  const zh = form.language === "zh";
+  const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+  const levelByAdequacy: Record<SourceAdequacy, SourceConfidenceLevel> = {
+    substantive: "strong",
+    thin: "partial",
+    "topic-only": "topic-only",
+    "private-unparsed": "partial",
+    conflicting: "partial",
+    "no-source": "weak"
+  };
+  const hasSourceMaterial = sources.length > 0 || Boolean(form.sourceNotes.trim() || form.visualBrief.backgroundText.trim());
+  const coveredAreas = [
+    form.title.trim() ? (zh ? "项目标题" : "project title") : "",
+    form.audience.trim() || selectedTags.audience.length ? (zh ? "目标受众" : "target audience") : "",
+    form.coreMessage.trim() || selectedTags.purpose.length ? (zh ? "核心目的/结论" : "core purpose / message") : "",
+    hasSourceMaterial ? (zh ? "资料来源" : "source material") : "",
+    selectedTags.visualStyle.length ? (zh ? "视觉风格" : "visual style") : "",
+    selectedTags.assetStrategy.length ? (zh ? "素材边界" : "asset boundary") : "",
+    selectedTags.outputPreference.length ? (zh ? "输出偏好" : "output preference") : "",
+    form.visualBrief.referenceStyle?.selectedDirection ? (zh ? "参考样板" : "reference style") : ""
+  ].filter(Boolean);
+  const missingAreas = [
+    ...expectationFit.missingSignals,
+    !hasSourceMaterial ? (zh ? "缺少可引用资料，不能编造数据/事实" : "no citable source; do not invent facts or numbers") : "",
+    expectationFit.conflicts.length ? (zh ? "存在输入冲突，需要用户确认优先级" : "input conflict needs priority confirmation") : ""
+  ].filter(Boolean);
+  const claimsNeedingEvidence = [
+    form.coreMessage.trim() ? (zh ? `核心结论需证据支撑：${form.coreMessage.trim()}` : `Core message needs evidence: ${form.coreMessage.trim()}`) : "",
+    selectedTags.contentState.includes("data-heavy") ? (zh ? "所有数字、趋势、排名和同比环比必须回到资料或明确标注为假设" : "All numbers, trends, rankings, and deltas must map to sources or be marked as assumptions") : "",
+    selectedTags.purpose.includes("decision") || selectedTags.purpose.includes("resource-request")
+      ? (zh ? "决策建议、资源申请和风险判断需要来源或用户确认" : "Decision, resource, and risk claims need source support or user confirmation")
+      : ""
+  ].filter(Boolean);
+  return {
+    level: levelByAdequacy[expectationFit.sourceAdequacy],
+    sourceAdequacy: expectationFit.sourceAdequacy,
+    coveredAreas,
+    missingAreas,
+    claimsNeedingEvidence,
+    doNotInvent: zh
+      ? ["不编造数据", "不编造客户/机构名称", "不编造政策出处", "不使用未授权 logo/IP", "不把 AI 图当真实现场"]
+      : ["Do not invent numbers", "Do not invent customer or institution names", "Do not invent policy sources", "Do not use unlicensed logos/IP", "Do not present AI images as real scenes"]
+  };
+}
+
+function sourceConfidenceLabel(value: SourceConfidenceLevel, language: Language) {
+  const zh: Record<SourceConfidenceLevel, string> = {
+    strong: "可信度高",
+    partial: "部分可信",
+    weak: "可信度低",
+    "topic-only": "仅有主题"
+  };
+  const en: Record<SourceConfidenceLevel, string> = {
+    strong: "strong",
+    partial: "partial",
+    weak: "weak",
+    "topic-only": "topic only"
+  };
+  return language === "zh" ? zh[value] : en[value];
+}
+
+function inferExpectedDeckType(form: FormState): ExpectedDeckType {
+  const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+  if (selectedTags.scenario.includes("consulting-proposal") || form.scenario === "consulting") return "client-proposal";
+  if (selectedTags.scenario.includes("training") || form.scenario === "training") return "training-courseware";
+  if (selectedTags.scenario.includes("product-launch") || form.scenario === "launch") return "launch-story";
+  if (selectedTags.scenario.includes("research-report") || form.presetId === "research_academic_defense") return "research-report";
+  if (selectedTags.scenario.includes("executive-review") || form.scenario === "executive") return "executive-report";
+  return "general-business";
+}
+
+function buildDeliveryScorecard(form: FormState, expectationFit: ExpectationFit, sourceConfidence: SourceConfidence, referenceStyle: ReferenceStyle): DeliveryScorecard {
+  const zh = form.language === "zh";
+  const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+  const sourceScore: Record<SourceConfidenceLevel, number> = {
+    strong: 92,
+    partial: 72,
+    weak: 42,
+    "topic-only": 36
+  };
+  const styleConcrete = Boolean(referenceStyle.selectedDirection && referenceStyle.styleConstraints.length);
+  const assetBoundaryKnown = selectedTags.assetStrategy.length > 0;
+  const outputKnown = selectedTags.outputPreference.length > 0 || form.outputMode === "pptx" || form.outputMode === "both";
+  const qualityDimensions = [
+    {
+      id: "brief-fit",
+      label: zh ? "需求清晰度" : "Brief clarity",
+      score: expectationFit.score,
+      evidence: zh ? "来自标签、自由输入、页数、核心结论和冲突检测。" : "From tags, free text, slide count, core message, and conflict checks."
+    },
+    {
+      id: "source-confidence",
+      label: zh ? "资料可信度" : "Source confidence",
+      score: sourceScore[sourceConfidence.level],
+      evidence: zh ? `资料状态：${sourceAdequacyLabel(sourceConfidence.sourceAdequacy, "zh")}。` : `Source state: ${sourceAdequacyLabel(sourceConfidence.sourceAdequacy, "en")}.`
+    },
+    {
+      id: "style-specificity",
+      label: zh ? "风格具体度" : "Style specificity",
+      score: styleConcrete ? 88 : 58,
+      evidence: zh ? `参考样板：${referenceStyleLabel(referenceStyle, "zh")}。` : `Reference style: ${referenceStyleLabel(referenceStyle, "en")}.`
+    },
+    {
+      id: "asset-boundary",
+      label: zh ? "素材边界" : "Asset boundary",
+      score: assetBoundaryKnown ? 84 : 55,
+      evidence: zh ? "检查官方素材、AI 生图、IP 合规和禁忌选择。" : "Checks official assets, AI visuals, IP compliance, and avoid rules."
+    },
+    {
+      id: "output-editability",
+      label: zh ? "交付可编辑性" : "Delivery editability",
+      score: outputKnown ? 90 : 64,
+      evidence: zh ? "默认 PPTX 可编辑，Web/PDF 作为补充输出。" : "Editable PPTX by default; Web/PDF are supplemental outputs."
+    }
+  ];
+  const knownRisks = [
+    ...expectationFit.missingSignals,
+    ...expectationFit.conflicts,
+    ...sourceConfidence.missingAreas
+  ];
+  const recommendedNextRevision = [
+    expectationFit.readyForProduction ? "" : (zh ? "先完成 Codex 分步需求访谈，再开始正式制作。" : "Run Codex guided intake before final production."),
+    sourceConfidence.level === "strong" ? "" : (zh ? "补充可引用资料或明确允许按假设做草稿。" : "Add citable sources or explicitly allow a draft with assumptions."),
+    styleConcrete ? "" : (zh ? "选择一个具体参考样板方向，避免只写“正式大气”。" : "Choose a concrete reference style; avoid generic style words only."),
+    assetBoundaryKnown ? "" : (zh ? "确认品牌/IP/官方素材边界和是否允许 AI 生图。" : "Confirm brand/IP/official asset boundary and whether AI image generation is allowed.")
+  ].filter(Boolean);
+  return {
+    expectedDeckType: inferExpectedDeckType(form),
+    expectationFitBeforeProduction: {
+      riskLevel: expectationFit.riskLevel,
+      score: expectationFit.score,
+      readyForProduction: expectationFit.readyForProduction,
+      missingSignals: [...expectationFit.missingSignals],
+      assumptions: [...expectationFit.assumptions]
+    },
+    qualityDimensions,
+    userVisibleSummary: zh
+      ? `当前预期契合度 ${expectationFit.score}%，来源可信度为${sourceConfidenceLabel(sourceConfidence.level, "zh")}，参考样板为${referenceStyleLabel(referenceStyle, "zh")}。`
+      : `Expectation fit is ${expectationFit.score}%, source confidence is ${sourceConfidenceLabel(sourceConfidence.level, "en")}, and the reference style is ${referenceStyleLabel(referenceStyle, "en")}.`,
+    knownRisks: knownRisks.length ? Array.from(new Set(knownRisks)) : [zh ? "暂无关键风险，但仍需在 quality-report.json 记录默认假设。" : "No major risk, but quality-report.json must still record assumptions."],
+    recommendedNextRevision
+  };
+}
+
+function buildFeedbackLoop(form: FormState, expectationFit: ExpectationFit, sourceConfidence: SourceConfidence, deliveryScorecard: DeliveryScorecard): FeedbackLoop {
+  const zh = form.language === "zh";
+  const taxonomy: FeedbackLoop["failureTaxonomy"] = [
+    {
+      id: "brief-mismatch",
+      label: zh ? "需求理解偏差" : "Brief mismatch",
+      applies: !expectationFit.readyForProduction || expectationFit.missingSignals.length > 0,
+      improvementTarget: zh ? "回到需求确认稿，补齐受众、场景、目的和核心结论。" : "Return to the confirmation brief and clarify audience, setting, purpose, and message."
+    },
+    {
+      id: "source-gap",
+      label: zh ? "资料不足或证据断裂" : "Source gap",
+      applies: sourceConfidence.level !== "strong",
+      improvementTarget: zh ? "补来源、标注假设，不能把默认判断写成事实。" : "Add sources, mark assumptions, and never turn defaults into facts."
+    },
+    {
+      id: "style-mismatch",
+      label: zh ? "风格不符合预期" : "Style mismatch",
+      applies: (deliveryScorecard.qualityDimensions.find((item) => item.id === "style-specificity")?.score ?? 0) < 80,
+      improvementTarget: zh ? "选择或替换参考样板方向，并列出贴近/避免对象。" : "Choose or replace reference direction and list move-toward / avoid references."
+    },
+    {
+      id: "visual-density",
+      label: zh ? "排版密度不合适" : "Visual density mismatch",
+      applies: normalizeSelectedTags(form.visualBrief.selectedTags).layoutDensity.length === 0,
+      improvementTarget: zh ? "确认是留白型、标准商务、信息密集、看板还是图文均衡。" : "Confirm spacious, standard, dense, dashboard, or text/image balanced layout."
+    },
+    {
+      id: "asset-boundary",
+      label: zh ? "素材/IP 边界不清" : "Asset/IP boundary unclear",
+      applies: normalizeSelectedTags(form.visualBrief.selectedTags).assetStrategy.length === 0,
+      improvementTarget: zh ? "明确官方素材、AI 生图、肖像/IP 禁忌和替代策略。" : "Clarify official assets, AI visuals, portrait/IP restrictions, and replacement strategy."
+    },
+    {
+      id: "format-mismatch",
+      label: zh ? "输出格式不匹配" : "Format mismatch",
+      applies: normalizeSelectedTags(form.visualBrief.selectedTags).outputPreference.length === 0,
+      improvementTarget: zh ? "默认可编辑 PPTX；如需 PDF/Web 预览需显式写入。" : "Editable PPTX is default; PDF/Web preview must be explicit if needed."
+    }
+  ];
+  const activeTaxonomy = taxonomy.filter((item) => item.applies);
+  return {
+    feedbackStatus: activeTaxonomy.length ? "requested" : "none",
+    failureTaxonomy: taxonomy,
+    nextRevisionIntent: activeTaxonomy.length
+      ? activeTaxonomy.map((item) => item.improvementTarget).join(" ")
+      : (zh ? "按当前 brief 进入制作，并在交付审计中记录默认假设。" : "Proceed with production and record assumptions in the delivery audit."),
+    feedbackTemplate: zh
+      ? [
+        "这版最不符合预期的地方是：",
+        "希望更贴近的参考样板/页面是：",
+        "必须保留的内容或表达是：",
+        "可以删减或弱化的内容是：",
+        "下一版优先改：结构 / 风格 / 素材 / 数据 / 页数 / 输出格式"
+      ]
+      : [
+        "The part that misses expectations most is:",
+        "The reference style/page it should move toward is:",
+        "Content or wording that must stay:",
+        "Content that may be reduced:",
+        "Next revision priority: structure / style / assets / data / slide count / output format"
+      ]
+  };
+}
+
+function buildConfirmationBrief(
+  form: FormState,
+  expectationFit: ExpectationFit,
+  sourceConfidence: SourceConfidence,
+  deliveryScorecard: DeliveryScorecard,
+  referenceStyle: ReferenceStyle
+) {
+  const zh = form.language === "zh";
+  const guided = buildGuidedBrief(form);
+  const line = (value: string | string[]) => Array.isArray(value) ? (value.join(", ") || (zh ? "待确认" : "to confirm")) : (value || (zh ? "待确认" : "to confirm"));
+  if (zh) {
+    return `# 需求确认稿\n\n- 目标/场景：${line(guided.scenario)}\n- 目标受众：${line(guided.audience)}\n- 交付目的：${line(guided.purpose)}\n- 核心观点：${line(guided.coreMessage)}\n- 内容来源：${line(guided.contentSources)}\n- 页数/结构：${line(guided.slideCount)}；${line(guided.outlinePreference)}\n- 参考样板：${referenceStyleLabel(referenceStyle, "zh")}\n- 视觉/素材：${line(guided.visualStyle)}；${line(guided.assetRules)}\n- 输出格式：${line(guided.outputFormat)}\n- 预期风险：${expectationFit.riskLevel} / ${expectationFit.score}%\n- 来源可信度：${sourceConfidenceLabel(sourceConfidence.level, "zh")}\n- 下一步：${deliveryScorecard.recommendedNextRevision.join("；") || "可以进入制作，但需要记录默认假设。"}`;
+  }
+  return `# Confirmation Brief\n\n- Scenario: ${line(guided.scenario)}\n- Audience: ${line(guided.audience)}\n- Purpose: ${line(guided.purpose)}\n- Core message: ${line(guided.coreMessage)}\n- Content sources: ${line(guided.contentSources)}\n- Slide count / structure: ${line(guided.slideCount)}; ${line(guided.outlinePreference)}\n- Reference style: ${referenceStyleLabel(referenceStyle, "en")}\n- Visual / assets: ${line(guided.visualStyle)}; ${line(guided.assetRules)}\n- Output format: ${line(guided.outputFormat)}\n- Expectation risk: ${expectationFit.riskLevel} / ${expectationFit.score}%\n- Source confidence: ${sourceConfidenceLabel(sourceConfidence.level, "en")}\n- Next step: ${deliveryScorecard.recommendedNextRevision.join("; ") || "Production may start after recording assumptions."}`;
+}
+
+function buildV52Contract(form: FormState, sources: UploadedSource[], expectationFit: ExpectationFit) {
+  const referenceStyle = normalizeReferenceStyle(form.visualBrief.referenceStyle, referenceStyleForPreset(form.visualBrief.tagPreset).selectedDirection);
+  const sourceConfidence = assessSourceConfidence(form, sources, expectationFit);
+  const deliveryScorecard = buildDeliveryScorecard(form, expectationFit, sourceConfidence, referenceStyle);
+  const feedbackLoop = buildFeedbackLoop(form, expectationFit, sourceConfidence, deliveryScorecard);
+  const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+  return {
+    schemaVersion: "v5.2-brief-v1",
+    referenceStyle,
+    sourceConfidence,
+    deliveryScorecard,
+    feedbackLoop,
+    failureTaxonomy: feedbackLoop.failureTaxonomy,
+    confirmationBrief: buildConfirmationBrief(form, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle),
+    imageAcceptance: {
+      required: selectedTags.assetStrategy.includes("ai-visuals") || selectedTags.outputPreference.includes("visual-impact"),
+      defaultPolicy: form.language === "zh"
+        ? "AI 生成图只能做无文字主视觉、场景气氛、小元素和纹理；事实图片优先使用官方/用户提供来源。"
+        : "AI images are for no-text hero visuals, atmosphere, micro-assets, and textures; factual imagery uses official/user-provided sources first.",
+      targetSlides: ["cover", "section divider", "process / roadmap", "metric accent", "closing"],
+      replacementRule: form.language === "zh"
+        ? "若图片不够真实、含文字、含错误 logo/IP 或与内容无关，改用可编辑图形、官方图片或留白版式。"
+        : "If an image is unrealistic, contains text, has broken logo/IP, or is unrelated, replace it with editable shapes, official imagery, or a clean no-image layout."
+    }
+  };
+}
+
 function determineBriefMode(form: FormState, expectationFit: ExpectationFit, sources: UploadedSource[]): BriefMode {
   if (draftAccepted(form)) return "draft-with-assumptions";
   if (form.agentTool === "codex" && !expectationFit.readyForProduction) return "codex-guided-intake";
@@ -3717,9 +4219,13 @@ function determineBriefMode(form: FormState, expectationFit: ExpectationFit, sou
   return "codex-guided-intake";
 }
 
-function buildVisualBriefMarkdown(form: FormState, expectationFit: ExpectationFit) {
+function buildVisualBriefMarkdown(form: FormState, expectationFit: ExpectationFit, sources: UploadedSource[] = []) {
   const zh = form.language === "zh";
   const grouped = visualTagLabelsByGroup(form.visualBrief, form.language);
+  const v52 = buildV52Contract(form, sources, expectationFit);
+  const referenceStyle = v52.referenceStyle;
+  const scorecard = v52.deliveryScorecard;
+  const sourceConfidence = v52.sourceConfidence;
   const sections = visualTagGroups
     .map((group) => `- ${group[form.language]}: ${grouped[group.id].join(", ") || (zh ? "未选择" : "not selected")}`)
     .join("\n");
@@ -3733,12 +4239,22 @@ function buildVisualBriefMarkdown(form: FormState, expectationFit: ExpectationFi
   const questions = expectationFit.nextQuestions.length
     ? expectationFit.nextQuestions.map((item) => `- ${item}`).join("\n")
     : (zh ? "- 不需要额外问题即可进入制作" : "- No extra question needed before production");
+  const qualityDimensions = scorecard.qualityDimensions
+    .map((item) => `- ${item.label}: ${item.score}% (${item.evidence})`)
+    .join("\n");
+  const sourceMissing = sourceConfidence.missingAreas.length
+    ? sourceConfidence.missingAreas.map((item) => `- ${item}`).join("\n")
+    : (zh ? "- 暂无关键来源缺口" : "- No major source gaps");
+  const sourceClaims = sourceConfidence.claimsNeedingEvidence.length
+    ? sourceConfidence.claimsNeedingEvidence.map((item) => `- ${item}`).join("\n")
+    : (zh ? "- 暂无额外待举证主张" : "- No extra claims needing evidence");
+  const feedbackQuestions = v52.feedbackLoop.feedbackTemplate.map((item) => `- ${item}`).join("\n");
 
   if (zh) {
-    return `## 可视化需求标签\n${sections}\n\n## 背景 / 相关内容\n${form.visualBrief.backgroundText || "未填写"}\n\n## 特殊要求 / 禁忌\n${form.visualBrief.extraRequirements || "未填写"}\n\n## 参考链接\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- 未提供"}\n\n## 预期契合度\n- 风险等级: ${expectationFit.riskLevel}\n- 分数: ${expectationFit.score}%\n- 资料充分度: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- 可正式制作: ${expectationFit.readyForProduction ? "是" : "否，Codex 需要分步问清"}\n\n## 已知缺口\n${missing}\n\n## 冲突点\n${conflicts}\n\n## 默认假设\n${assumptions}\n\n## Codex 下一步问题\n${questions}`;
+    return `## 可视化需求标签\n${sections}\n\n## 参考样板方向\n- 当前方向: ${referenceStyleLabel(referenceStyle, "zh")}\n- 贴近: ${referenceStyle.positiveReferences.join(" / ")}\n- 避免: ${referenceStyle.negativeReferences.join(" / ")}\n- 排版约束: ${referenceStyle.styleConstraints.join(" / ")}\n\n## 背景 / 相关内容\n${form.visualBrief.backgroundText || "未填写"}\n\n## 特殊要求 / 禁忌\n${form.visualBrief.extraRequirements || "未填写"}\n\n## 参考链接\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- 未提供"}\n\n## 预期契合度\n- 风险等级: ${expectationFit.riskLevel}\n- 分数: ${expectationFit.score}%\n- 资料充分度: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- 可正式制作: ${expectationFit.readyForProduction ? "是" : "否，Codex 需要分步问清"}\n\n## v5.2 来源可信度\n- 等级: ${sourceConfidenceLabel(sourceConfidence.level, "zh")}\n- 已覆盖: ${sourceConfidence.coveredAreas.join(" / ") || "暂无"}\n- 不可编造: ${sourceConfidence.doNotInvent.join(" / ")}\n\n### 来源缺口\n${sourceMissing}\n\n### 需要证据支撑的主张\n${sourceClaims}\n\n## v5.2 交付评分卡\n- 预期成品类型: ${scorecard.expectedDeckType}\n- 用户可见摘要: ${scorecard.userVisibleSummary}\n${qualityDimensions}\n\n## v5.2 需求确认稿\n${v52.confirmationBrief}\n\n## 已知缺口\n${missing}\n\n## 冲突点\n${conflicts}\n\n## 默认假设\n${assumptions}\n\n## Codex 下一步问题\n${questions}\n\n## 反馈修订模板\n${feedbackQuestions}`;
   }
 
-  return `## Visual brief tags\n${sections}\n\n## Background / related context\n${form.visualBrief.backgroundText || "Not provided"}\n\n## Special requirements / must avoid\n${form.visualBrief.extraRequirements || "Not provided"}\n\n## Reference links\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- None"}\n\n## Expectation fit\n- Risk level: ${expectationFit.riskLevel}\n- Score: ${expectationFit.score}%\n- Source adequacy: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- Ready for production: ${expectationFit.readyForProduction ? "yes" : "no; Codex must run guided intake"}\n\n## Missing signals\n${missing}\n\n## Conflicts\n${conflicts}\n\n## Assumptions\n${assumptions}\n\n## Codex next questions\n${questions}`;
+  return `## Visual brief tags\n${sections}\n\n## Reference style direction\n- Current direction: ${referenceStyleLabel(referenceStyle, "en")}\n- Move toward: ${referenceStyle.positiveReferences.join(" / ")}\n- Avoid: ${referenceStyle.negativeReferences.join(" / ")}\n- Layout constraints: ${referenceStyle.styleConstraints.join(" / ")}\n\n## Background / related context\n${form.visualBrief.backgroundText || "Not provided"}\n\n## Special requirements / must avoid\n${form.visualBrief.extraRequirements || "Not provided"}\n\n## Reference links\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- None"}\n\n## Expectation fit\n- Risk level: ${expectationFit.riskLevel}\n- Score: ${expectationFit.score}%\n- Source adequacy: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- Ready for production: ${expectationFit.readyForProduction ? "yes" : "no; Codex must run guided intake"}\n\n## v5.2 Source confidence\n- Level: ${sourceConfidenceLabel(sourceConfidence.level, "en")}\n- Covered: ${sourceConfidence.coveredAreas.join(" / ") || "none"}\n- Do not invent: ${sourceConfidence.doNotInvent.join(" / ")}\n\n### Source gaps\n${sourceMissing}\n\n### Claims needing evidence\n${sourceClaims}\n\n## v5.2 Delivery scorecard\n- Expected deck type: ${scorecard.expectedDeckType}\n- User-visible summary: ${scorecard.userVisibleSummary}\n${qualityDimensions}\n\n## v5.2 Confirmation brief\n${v52.confirmationBrief}\n\n## Missing signals\n${missing}\n\n## Conflicts\n${conflicts}\n\n## Assumptions\n${assumptions}\n\n## Codex next questions\n${questions}\n\n## Feedback revision template\n${feedbackQuestions}`;
 }
 
 function loadSavedForm() {
@@ -4031,10 +4547,12 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
   };
 }
 
-function buildQualityReport(form: FormState, qualityContract: QualityContract, qualityGate: QualityGate, workflowState: WorkflowState, expectationFit: ExpectationFit) {
+function buildQualityReport(form: FormState, sources: UploadedSource[], qualityContract: QualityContract, qualityGate: QualityGate, workflowState: WorkflowState, expectationFit: ExpectationFit) {
   const zh = form.language === "zh";
+  const v52 = buildV52Contract(form, sources, expectationFit);
   return JSON.stringify({
     version: appVersion,
+    schemaVersion: v52.schemaVersion,
     presetId: form.presetId,
     status: "pending",
     createdAt: new Date().toISOString(),
@@ -4042,6 +4560,13 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract, q
     qualityGate,
     workflowState,
     expectationFit,
+    referenceStyle: v52.referenceStyle,
+    sourceConfidence: v52.sourceConfidence,
+    deliveryScorecard: v52.deliveryScorecard,
+    feedbackLoop: v52.feedbackLoop,
+    failureTaxonomy: v52.failureTaxonomy,
+    confirmationBrief: v52.confirmationBrief,
+    imageAcceptance: v52.imageAcceptance,
     expectedArtifacts: qualityContract.expectedArtifacts,
     reviewCommands: qualityGate.reviewCommands,
     deckIR: {
@@ -4082,6 +4607,23 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract, q
         summary: zh
           ? `预期契合度 ${expectationFit.score}%，风险 ${expectationFit.riskLevel}；Codex 需说明用户标签、背景资料和默认假设。`
           : `Expectation fit ${expectationFit.score}%, risk ${expectationFit.riskLevel}; Codex must state user tags, background, and assumptions.`
+      },
+      {
+        id: "source-confidence",
+        status: v52.sourceConfidence.level === "strong" ? "ready" : "needs-evidence",
+        summary: zh
+          ? `来源可信度：${sourceConfidenceLabel(v52.sourceConfidence.level, "zh")}；不可编造项：${v52.sourceConfidence.doNotInvent.join("、")}。`
+          : `Source confidence: ${sourceConfidenceLabel(v52.sourceConfidence.level, "en")}; do-not-invent rules: ${v52.sourceConfidence.doNotInvent.join(", ")}.`
+      },
+      {
+        id: "delivery-scorecard",
+        status: v52.deliveryScorecard.recommendedNextRevision.length ? "needs-review" : "ready",
+        summary: v52.deliveryScorecard.userVisibleSummary
+      },
+      {
+        id: "feedback-loop",
+        status: v52.feedbackLoop.feedbackStatus,
+        summary: v52.feedbackLoop.nextRevisionIntent
       }
     ]
   }, null, 2);
@@ -4089,6 +4631,8 @@ function buildQualityReport(form: FormState, qualityContract: QualityContract, q
 
 function buildDeckIRPreview(form: FormState, storyboard: StoryItem[], sources: UploadedSource[], enginePlan: EnginePlan, qualityGate: QualityGate) {
   const claims = buildSourceClaimsForDeckIR(form, sources);
+  const expectationFit = assessExpectationFit(form, sources);
+  const v52 = buildV52Contract(form, sources, expectationFit);
   const slides = storyboard.map((item, index) => {
     const role = inferDeckIRRole(index, storyboard.length, `${item.title} ${item.intent}`);
     const recipe = recipeForDeckIRRole(role);
@@ -4105,6 +4649,14 @@ function buildDeckIRPreview(form: FormState, storyboard: StoryItem[], sources: U
       visualLayer: recipe.visualLayer,
       rasterPolicy: bodyRole ? "prohibited-formal-body" : role === "anchor" ? "allowed-cover" : "allowed-section-tail",
       editabilityTarget: role === "process" ? "editable process nodes, connectors, labels, and notes" : "editable text, shapes, evidence captions, and speaker notes",
+      slideTask: {
+        job: inferSlideTaskJob(role),
+        primaryQuestion: slideTaskQuestion(role, form.language),
+        oneSentenceTakeaway: item.intent,
+        bestLayoutFamily: recipe.layoutFamily,
+        mustStayEditable: bodyRole,
+        evidenceRefs: evidence
+      },
       speakerIntent: item.intent
     };
   });
@@ -4118,11 +4670,11 @@ function buildDeckIRPreview(form: FormState, storyboard: StoryItem[], sources: U
       audience: form.audience,
       qualityGate: qualityGate.level
     },
-    referenceStyle: {
-      mode: "none",
-      functionalTypes: [],
-      layoutFamilies: []
-    },
+    schemaVersion: v52.schemaVersion,
+    referenceStyle: v52.referenceStyle,
+    sourceConfidence: v52.sourceConfidence,
+    deliveryScorecard: v52.deliveryScorecard,
+    imageAcceptance: v52.imageAcceptance,
     pipeline: [
       "source.md",
       "DeckIR/storyboard",
@@ -4248,6 +4800,47 @@ function inferDeckIRRole(index: number, total: number, text: string) {
   return "evidence";
 }
 
+function inferSlideTaskJob(role: string) {
+  const map: Record<string, string> = {
+    anchor: "establish-topic-and-core-message",
+    context: "explain-why-this-matters",
+    evidence: "prove-the-claim",
+    comparison: "show-the-difference",
+    process: "make-the-path-actionable",
+    benefit: "highlight-the-value",
+    risk: "surface-caveats-and-boundaries",
+    action: "turn-insight-into-next-steps",
+    closing: "reinforce-decision-or-call-to-action"
+  };
+  return map[role] || "support-the-story";
+}
+
+function slideTaskQuestion(role: string, language: Language) {
+  const zh: Record<string, string> = {
+    anchor: "听众第一眼必须记住什么？",
+    context: "为什么现在要看这份材料？",
+    evidence: "这页用什么证据证明结论？",
+    comparison: "这页要让差异变得多明显？",
+    process: "听众看完能不能按步骤执行？",
+    benefit: "价值、收益或关键指标是否一眼可见？",
+    risk: "边界、风险或不确定性有没有讲清？",
+    action: "谁在什么时候做什么？",
+    closing: "最后希望听众采取什么行动？"
+  };
+  const en: Record<string, string> = {
+    anchor: "What must the audience remember first?",
+    context: "Why does this matter now?",
+    evidence: "What evidence proves this claim?",
+    comparison: "How visible should the difference be?",
+    process: "Can the audience follow the steps afterward?",
+    benefit: "Is the value, benefit, or key metric immediately visible?",
+    risk: "Are boundaries, risks, and uncertainty clear?",
+    action: "Who does what by when?",
+    closing: "What action should the audience take next?"
+  };
+  return language === "zh" ? (zh[role] || "这页承担什么任务？") : (en[role] || "What job does this slide do?");
+}
+
 function recipeForDeckIRRole(role: string) {
   const map: Record<string, { layoutFamily: string; recipeId: string; visualLayer: string }> = {
     anchor: { layoutFamily: "cover_brand", recipeId: "cover_brand.hero_left_visual", visualLayer: "generated-background | no-text | 16:9" },
@@ -4349,7 +4942,7 @@ function buildPrompt(
   const gateCriteria = qualityGate.acceptanceCriteria.map((item) => `- ${item}`).join("\n");
   const gateChecks = qualityGate.artifactChecks.map((item) => `- ${item}`).join("\n");
   const gateCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
-  const visualBriefText = buildVisualBriefMarkdown(form, expectationFit);
+  const visualBriefText = buildVisualBriefMarkdown(form, expectationFit, sources);
   const briefMode = determineBriefMode(form, expectationFit, sources);
   const presetRoute = `${preset.label[form.language]} (${preset.packPath || "seed direction"})`;
   const activeEngines = [
@@ -4375,7 +4968,7 @@ function buildSourceTemplate(form: FormState, storyboard: StoryItem[], enginePla
   const roster = preset.slideRoster.map((item, index) => `- ${index + 1}. ${item[form.language]}`).join("\n");
   const qualityCriteria = qualityContract.acceptanceCriteria.map((item) => `- ${item}`).join("\n");
   const reviewCommands = qualityContract.reviewCommands.map((item) => `- ${item}`).join("\n");
-  const visualBriefText = buildVisualBriefMarkdown(form, expectationFit);
+  const visualBriefText = buildVisualBriefMarkdown(form, expectationFit, sources);
   const templates = [
     `- layouts: ${preset.templateCandidates.layouts.join(", ")}`,
     preset.templateCandidates.brands?.length ? `- brands: ${preset.templateCandidates.brands.join(", ")}` : "",
@@ -4455,9 +5048,25 @@ function buildQualityChecklist(
   const gateChecks = qualityGate.artifactChecks.map((item) => `- [ ] ${item}`).join("\n");
   const gateCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
   const tagLine = flattenVisualTagLabels(form.visualBrief, form.language).join(" · ") || (form.language === "zh" ? "未选择标签" : "No tags selected");
-  const missingSignals = expectationFit.missingSignals.length
+  const v52 = buildV52Contract(form, sources, expectationFit);
+  const scorecardChecks = v52.deliveryScorecard.qualityDimensions.map((item) => `- [ ] ${item.label}: ${item.score}% - ${item.evidence}`).join("\n");
+  const sourceConfidenceChecks = [
+    `- [ ] ${form.language === "zh" ? "来源可信度" : "Source confidence"}: ${sourceConfidenceLabel(v52.sourceConfidence.level, form.language)}.`,
+    ...v52.sourceConfidence.missingAreas.map((item) => `- [ ] ${item}`),
+    ...v52.sourceConfidence.claimsNeedingEvidence.map((item) => `- [ ] ${item}`)
+  ].join("\n");
+  const referenceStyleChecks = [
+    `- [ ] ${form.language === "zh" ? "参考样板方向" : "Reference style"}: ${referenceStyleLabel(v52.referenceStyle, form.language)}.`,
+    `- [ ] ${form.language === "zh" ? "贴近" : "Move toward"}: ${v52.referenceStyle.positiveReferences.join(" / ")}.`,
+    `- [ ] ${form.language === "zh" ? "避免" : "Avoid"}: ${v52.referenceStyle.negativeReferences.join(" / ")}.`
+  ].join("\n");
+  const missingSignalItems = expectationFit.missingSignals.length
     ? expectationFit.missingSignals.map((item) => `- [ ] ${item}`).join("\n")
     : (form.language === "zh" ? "- [x] 暂无关键缺口" : "- [x] No critical gaps");
+  const v52ChecklistBlock = form.language === "zh"
+    ? `## v5.2 交付契合\n${scorecardChecks}\n\n### 来源可信度\n${sourceConfidenceChecks}\n\n### 参考样板\n${referenceStyleChecks}\n\n### 反馈闭环\n- [ ] quality-report.json 包含 feedbackLoop 和 failureTaxonomy。\n- [ ] 如果用户说不满意，先归类原因再修订：${v52.feedbackLoop.failureTaxonomy.map((item) => item.label).join(" / ")}。`
+    : `## v5.2 Delivery fit\n${scorecardChecks}\n\n### Source confidence\n${sourceConfidenceChecks}\n\n### Reference style\n${referenceStyleChecks}\n\n### Feedback loop\n- [ ] quality-report.json includes feedbackLoop and failureTaxonomy.\n- [ ] If the user says the deck is unsatisfactory, classify the reason before revising: ${v52.feedbackLoop.failureTaxonomy.map((item) => item.label).join(" / ")}.`;
+  const missingSignals = `${v52ChecklistBlock}\n\n${missingSignalItems}`;
   const assumptions = expectationFit.assumptions.map((item) => `- [ ] ${item}`).join("\n");
   if (form.language === "en") {
     return `# Quality checklist\n\n## Selected preset\n${presetChecks}\n\n## Design Doctor contract\n${qualityCriteria}\n\n## Formal Business Delivery Gate\nLevel: ${qualityGate.level}\n\n### Required inputs\n${gateInputs}\n\n### Acceptance criteria\n${gateCriteria}\n\n### Artifact checks\n${gateChecks}\n\n### Gate review commands\n${gateCommands}\n\n## Expected artifacts\n${expectedArtifacts}\n\n## Review commands\n${reviewCommands}\n\n## Expectation fit\n- [ ] Risk level: ${expectationFit.riskLevel}; score: ${expectationFit.score}%; readyForProduction: ${expectationFit.readyForProduction ? "yes" : "no"}.\n- [ ] User-selected tags are reflected in structure, visual style, assets, and output: ${tagLine}.\n- [ ] If readyForProduction is false, Codex runs Guided Intake before final production.\n- [ ] quality-report.json explains user tags, pasted background, assumptions, and remaining expectation risk.\n\n### Missing signals\n${missingSignals}\n\n### Assumptions to verify or record\n${assumptions || "- [ ] No assumptions recorded yet."}\n\n## Source and story\n- [ ] extracted-source.md reflects real source files, not only pasted notes.\n- [ ] Core message appears in the cover and conclusion.\n- [ ] Every slide has one job and one primary takeaway.\n- [ ] Sensitive material stays local unless the user explicitly approves upload.\n- [ ] Brand assets or a documented replacement strategy are locked before generating final files.\n- [ ] Evidence, image choices, chart/data plans, page rhythm, and infographic strategy are explicit.\n\n## Source files\n${sourceLine}\n\n## PPTX route\n- [ ] Route status: ${enginePlan.pptxActive ? "active" : "optional"}.\n- [ ] Text, shapes, charts, and notes remain editable.\n- [ ] No full-slide screenshot replacement for editable PPTX content.\n- [ ] Logos and brand marks are real assets or clean vector/text treatments, not stray fragments.\n- [ ] Run SVG/PPTX rendering checks from the Skill workflow.\n- [ ] Inspect exported pages and repair clipping, overlaps, tiny text, and broken charts.\n\n## Web Deck route\n- [ ] Route status: ${enginePlan.webActive ? "active" : "optional"}.\n- [ ] Use ${enginePlan.styleRoute} consistently.\n- [ ] Desktop and mobile viewports do not overlap text, controls, or media.\n- [ ] Visual completeness includes real images, charts, or an explicit no-image strategy.\n\n## Delivery\n- [ ] Final files are named clearly.\n- [ ] quality-report.json includes the visual review result and Chinese summary.\n- [ ] Include what was generated, what was checked, and which source files were parsed.\n- [ ] Keep upstream license and third-party notices intact.\n`;
@@ -4469,6 +5078,14 @@ function buildAssetPlan(form: FormState, sources: UploadedSource[], qualityGate:
   const zh = form.language === "zh";
   const sourceLine = sourceSummaryMarkdown(sources, form.language);
   const gateInputs = qualityGate.requiredInputs.map((item) => `- ${item}`).join("\n");
+  const expectationFit = assessExpectationFit(form, sources);
+  const v52 = buildV52Contract(form, sources, expectationFit);
+  const referenceLine = zh
+    ? `- 参考样板：${referenceStyleLabel(v52.referenceStyle, "zh")}；贴近 ${v52.referenceStyle.positiveReferences.join(" / ")}；避免 ${v52.referenceStyle.negativeReferences.join(" / ")}。`
+    : `- Reference style: ${referenceStyleLabel(v52.referenceStyle, "en")}; move toward ${v52.referenceStyle.positiveReferences.join(" / ")}; avoid ${v52.referenceStyle.negativeReferences.join(" / ")}.`;
+  const imageAcceptanceLine = zh
+    ? `- 图片验收：${v52.imageAcceptance.defaultPolicy} ${v52.imageAcceptance.replacementRule}`
+    : `- Image acceptance: ${v52.imageAcceptance.defaultPolicy} ${v52.imageAcceptance.replacementRule}`;
   if (zh) {
     return `# asset-plan.md
 
@@ -4477,6 +5094,10 @@ ${form.title}
 
 ## 正式商务门禁输入
 ${gateInputs}
+
+## v5.2 视觉意图与图片验收
+${referenceLine}
+${imageAcceptanceLine}
 
 ## ChatGPT 生成素材
 - [ ] 把 ChatGPT/OpenAI 作为主要视觉素材引擎：先生成页面专用配图和小元素素材，再用公开检索补证据/官方参考。
@@ -4511,6 +5132,10 @@ ${form.title}
 
 ## Formal Business Gate Inputs
 ${gateInputs}
+
+## v5.2 visual intent and image acceptance
+${referenceLine}
+${imageAcceptanceLine}
 
 ## ChatGPT generated assets
 - [ ] Treat ChatGPT/OpenAI as the primary visual asset engine: generate custom slide visuals and small reusable elements first, then use public search for evidence or official references.
@@ -4622,7 +5247,7 @@ function buildCodexTask(
   const expectedArtifacts = qualityContract.expectedArtifacts.map((item) => `- ${item}`).join("\n");
   const reviewCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
   const sourceLine = sourceSummaryMarkdown(sources, form.language);
-  const visualBriefText = buildVisualBriefMarkdown(form, expectationFit);
+  const visualBriefText = buildVisualBriefMarkdown(form, expectationFit, sources);
   const briefMode = determineBriefMode(form, expectationFit, sources);
   if (zh) {
     return `# Codex Task
@@ -4778,16 +5403,20 @@ Final response must list generated files, ChatGPT micro-assets inserted, public 
 `;
 }
 
-function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate, expectationFit: ExpectationFit) {
+function buildCodexAgentGuide(form: FormState, sources: UploadedSource[], qualityGate: QualityGate, expectationFit: ExpectationFit) {
+  const v52 = buildV52Contract(form, sources, expectationFit);
   if (form.language === "zh") {
     return `# AGENTS.md
 
 ## Codex 本地规则
 - 工作范围限于这个 handoff 文件夹和 Ultimate PPT Master 仓库脚本。
 - 编辑或生成前先读 codex-task.md。
-- 先看 project-brief.json 的 briefMode、visualBrief、guidedBrief 和 expectationFit；如果 readyForProduction=false，必须先分步问清需求。
+- 先看 project-brief.json 的 briefMode、visualBrief、guidedBrief、expectationFit、sourceConfidence、deliveryScorecard、referenceStyle 和 feedbackLoop；如果 readyForProduction=false，必须先分步问清需求。
 - 分步问清每轮只问一组相关问题，直到受众、场景、目的、资料、核心观点、页数、风格、素材边界、输出和禁忌明确。
 - 当前 expectationFit：${expectationFit.riskLevel} / ${expectationFit.score}%；${expectationFit.readyForProduction ? "可以进入生产，但仍需记录假设。" : "需要 guided intake 后再生产。"}
+- 当前 sourceConfidence：${sourceConfidenceLabel(v52.sourceConfidence.level, "zh")}；不可编造：${v52.sourceConfidence.doNotInvent.join("、")}。
+- 当前 referenceStyle：${referenceStyleLabel(v52.referenceStyle, "zh")}；贴近 ${v52.referenceStyle.positiveReferences.join(" / ")}；避免 ${v52.referenceStyle.negativeReferences.join(" / ")}。
+- 若用户不满意，先按 feedbackLoop.failureTaxonomy 归因，再写 revision-brief.md；不要直接重做全套。
 - 生成最终页面前先读 storyboard.json 和 source-map.json；它们定义 DeckIR 页面地图、证据边界和可编辑要求。
 - 私有资料、客户数据、内部截图和 API key 默认不上传；除非用户明确同意。
 - ChatGPT/OpenAI 生图是主要视觉素材引擎。先读 visual-element-kit.md，需要视觉丰富度时先运行或处理 scripts/generate_visual_element_kit.py。
@@ -4805,9 +5434,12 @@ function buildCodexAgentGuide(form: FormState, qualityGate: QualityGate, expecta
 ## Codex local rules
 - Work only in this handoff folder and the Ultimate PPT Master repository scripts.
 - Read codex-task.md before editing or generating deliverables.
-- Read briefMode, visualBrief, guidedBrief, and expectationFit in project-brief.json first; if readyForProduction=false, run guided intake before production.
+- Read briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, and feedbackLoop in project-brief.json first; if readyForProduction=false, run guided intake before production.
 - Guided intake asks one related question group at a time until audience, setting, purpose, sources, core message, slide count, style, asset boundary, output, and must-avoid rules are clear.
 - Current expectationFit: ${expectationFit.riskLevel} / ${expectationFit.score}%; ${expectationFit.readyForProduction ? "production may start after recording assumptions." : "guided intake is required before production."}
+- Current sourceConfidence: ${sourceConfidenceLabel(v52.sourceConfidence.level, "en")}; do not invent: ${v52.sourceConfidence.doNotInvent.join(", ")}.
+- Current referenceStyle: ${referenceStyleLabel(v52.referenceStyle, "en")}; move toward ${v52.referenceStyle.positiveReferences.join(" / ")}; avoid ${v52.referenceStyle.negativeReferences.join(" / ")}.
+- If the user is unsatisfied, classify the reason with feedbackLoop.failureTaxonomy before revising; do not blindly remake the whole deck.
 - Read storyboard.json and source-map.json before final slide generation; they define the DeckIR page map, evidence boundary, and editability requirements.
 - Keep private source material, customer data, internal screenshots, and API keys local unless the user explicitly approves upload.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py first when the deck needs visual richness.
@@ -4960,8 +5592,10 @@ function buildBriefObject(
 ) {
   const preset = findPreset(form.presetId);
   const visualBrief = normalizeVisualBrief(form.visualBrief);
+  const v52 = buildV52Contract({ ...form, visualBrief }, sources, expectationFit);
   return {
     version: appVersion,
+    schemaVersion: v52.schemaVersion,
     briefMode: determineBriefMode({ ...form, visualBrief }, expectationFit, sources),
     title: form.title,
     audience: form.audience,
@@ -4991,6 +5625,13 @@ function buildBriefObject(
     },
     guidedBrief: buildGuidedBrief({ ...form, visualBrief }),
     expectationFit,
+    referenceStyle: v52.referenceStyle,
+    sourceConfidence: v52.sourceConfidence,
+    deliveryScorecard: v52.deliveryScorecard,
+    feedbackLoop: v52.feedbackLoop,
+    failureTaxonomy: v52.failureTaxonomy,
+    confirmationBrief: v52.confirmationBrief,
+    imageAcceptance: v52.imageAcceptance,
     deckIR: {
       storyboard: "storyboard.json",
       sourceMap: "source-map.json",
@@ -5027,8 +5668,10 @@ function buildManifest(
 ) {
   const preset = findPreset(form.presetId);
   const visualBrief = normalizeVisualBrief(form.visualBrief);
+  const v52 = buildV52Contract({ ...form, visualBrief }, sources, expectationFit);
   return {
     version: appVersion,
+    schemaVersion: v52.schemaVersion,
     createdAt: new Date().toISOString(),
     app: "Ultimate PPT Master Agent Connect Studio",
     privacy: {
@@ -5074,6 +5717,13 @@ function buildManifest(
     },
     guidedBrief: buildGuidedBrief({ ...form, visualBrief }),
     expectationFit,
+    referenceStyle: v52.referenceStyle,
+    sourceConfidence: v52.sourceConfidence,
+    deliveryScorecard: v52.deliveryScorecard,
+    feedbackLoop: v52.feedbackLoop,
+    failureTaxonomy: v52.failureTaxonomy,
+    confirmationBrief: v52.confirmationBrief,
+    imageAcceptance: v52.imageAcceptance,
     expectedArtifacts: qualityContract.expectedArtifacts,
     reviewCommands: qualityGate.reviewCommands,
     deckIR: {

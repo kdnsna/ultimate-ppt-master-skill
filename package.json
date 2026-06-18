@@ -1,7 +1,7 @@
 {
   "name": "ultimate-ppt-master",
   "private": true,
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "Local-first AI presentation hub for Web Experience, Agent Bridge, editable PowerPoint, and Web Deck workflows.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
@@ -19,6 +19,9 @@
     "package:desktop:homebrew": "bash scripts/package-homebrew-release.sh",
     "audit:docs": "python3 scripts/audit_docs_links.py",
     "audit:web-console": "python3 scripts/audit_web_console.py",
+    "audit:brief": "python3 scripts/audit_brief_contract.py",
+    "audit:visual-intent": "python3 scripts/audit_visual_intent.py",
+    "audit:feedback-loop": "python3 scripts/audit_feedback_loop.py",
     "audit:presets": "python3 scripts/audit_preset_packs.py",
     "audit:quality": "python3 scripts/audit_quality_proofs.py",
     "audit:market": "python3 scripts/audit_skill_market.py",

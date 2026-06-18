@@ -1,9 +1,9 @@
-# Ultimate PPT Master - v5.1 AI PPT 分步访谈交付系统
+# Ultimate PPT Master - v5.2 AI PPT 预期契合交付系统
 
-> 面向真实办公场景的本地优先 AI PPT 生产工具：把一句话需求、杂乱资料或结构化 brief 变成可编辑 PPTX 或杂志风 Web Deck，并用可视化标签、Codex 分步访谈、官方/IP 素材边界、Codex/GPT 无文字生图、微软雅黑默认排版、渲染审阅和正式交付审计来守住可编辑、可追溯、可复盘。
+> 面向真实办公场景的本地优先 AI PPT 生产工具：把一句话需求、杂乱资料或结构化 brief 变成可编辑 PPTX 或杂志风 Web Deck，并用可视化标签、Codex 分步访谈、来源可信度、交付评分卡、参考样板选择、反馈归因、官方/IP 素材边界、Codex/GPT 无文字生图、微软雅黑默认排版、渲染审阅和正式交付审计来守住可编辑、可追溯、可复盘。
 
 <p align="center">
-  <strong>v5.1.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/zh-CN/release/release-notes-v5.1.0.md">v5.1 发布说明</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v5.2.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/zh-CN/release/release-notes-v5.2.0.md">v5.2 发布说明</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -13,7 +13,7 @@
   ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>公开案例墙</strong></a>
   ·
-  <a href="./docs/zh-CN/release/release-notes-v5.1.0.md"><strong>v5.1.0 说明</strong></a>
+  <a href="./docs/zh-CN/release/release-notes-v5.2.0.md"><strong>v5.2.0 说明</strong></a>
   ·
   <a href="./docs/zh-CN/guides/agent-connect-bridge.md"><strong>Agent Bridge</strong></a>
   ·
@@ -21,8 +21,8 @@
 </p>
 
 <p align="center">
-  <img alt="Version 5.1.0" src="https://img.shields.io/badge/Version-5.1.0-172033?style=for-the-badge">
-  <img alt="Guided intake" src="https://img.shields.io/badge/v5.1-Guided%20Intake-0F766E?style=for-the-badge">
+  <img alt="Version 5.2.0" src="https://img.shields.io/badge/Version-5.2.0-172033?style=for-the-badge">
+  <img alt="Expectation contract" src="https://img.shields.io/badge/v5.2-Expectation%20Contract-0F766E?style=for-the-badge">
   <img alt="Visual Brief tags" src="https://img.shields.io/badge/Web-Visual%20Brief%20Tags-2563EB?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
@@ -36,7 +36,7 @@
 | 需求 | Ultimate PPT Master 的做法 |
 |---|---|
 | 默认做真正的 PowerPoint | 泛泛地说“做个 PPT”时默认走可编辑 PPTX，不再先把用户拖进路线选择。 |
-| 避免预期偏差 | v5.1 增加清晰度闸门：Web 用户用多样标签和背景文本表达需求；Codex 在 brief 太薄时分阶段问清楚。 |
+| 避免预期偏差 | v5.2 把清晰度闸门升级成交付契约：标签、访谈答案、来源可信度、参考样板、交付评分卡和反馈归因都写进 handoff。 |
 | 问对关键问题 | 当答案会影响交付物时，Agent 会先问清受众、场景、目的、内容状态、核心观点、页数、风格、素材边界、输出格式和合规禁忌。 |
 | 做出更像设计稿的 AI 视觉 | 默认把 Codex/GPT 生图当成完整构图引擎，用于无文字主视觉、支撑场景和微资产，而不是元素堆叠。 |
 | 守住品牌安全 | Logo、活动 IP、卡面、二维码、合作方标识等确定性素材必须记录官方来源、用户提供、文字锁定 fallback 或待授权替换。 |
@@ -47,7 +47,7 @@
 
 ## 适合谁使用
 
-| 使用者 | 常见任务 | v5.1 为什么适合 |
+| 使用者 | 常见任务 | v5.2 为什么适合 |
 |---|---|---|
 | 办公团队 | 领导汇报、工作总结、培训课件、项目复盘、销售赋能材料。 | 面对一句话需求时先补齐业务上下文，再开始生成正式 deck。 |
 | 金融、政务和企业用户 | 对措辞、品牌边界和资料来源更敏感的正式材料。 | 官方/IP 素材有记录，外部发布不允许假 logo 式占位。 |
@@ -56,7 +56,7 @@
 
 ## 典型使用场景
 
-| 用户请求 | v5.1 默认处理 |
+| 用户请求 | v5.2 默认处理 |
 |---|---|
 | “帮我做个 PPT。” | 进入 Codex 分步访谈，先问清关键要素；除非用户明确说“先按默认做一版草稿”。 |
 | “把这份资料做成 PPT。” | 如果资料没有受众或目的，先问使用场景、目标受众和希望达成的结果；之后默认做可编辑 PPTX。 |
@@ -70,24 +70,26 @@
 |---|---|---|
 | 可编辑 PPTX | 真实文本框、形状、图表、表格、备注，以及安全场景下的可编辑品牌文字锁定。 | 交付物能给 PowerPoint 用户继续改，不是只能看的截图。 |
 | Web Deck | 用于演讲、展示和杂志化表达的单文件浏览器演示。 | 当视觉节奏和快速分享比 PowerPoint 编辑更重要时使用。 |
-| `project-brief.json` | `briefMode`、`visualBrief`、`guidedBrief` 和 `expectationFit` 统一进入 handoff 契约。 | 系统能分清哪些信号来自用户、哪些来自标签、哪些是默认假设。 |
+| `project-brief.json` | `briefMode`、`visualBrief`、`guidedBrief`、`expectationFit`、`sourceConfidence`、`deliveryScorecard`、`referenceStyle`、`feedbackLoop` 和 `confirmationBrief` 统一进入 handoff 契约。 | 系统能分清哪些信号来自用户、哪些来自标签、哪些是默认假设，以及用户不满意时该修哪一层。 |
 | 可视化 brief | 场景、受众、目的、内容状态、视觉风格、排版密度、素材策略、输出偏好、背景文本、链接和特殊要求。 | Web 用户不用填长问卷，也能表达一份足够丰富的 PPT 需求。 |
 | 分步访谈 brief | Codex 收集的场景、受众、目的、核心观点、资料来源、页数、章节、风格、素材、输出、必含和禁忌。 | 聊天入口会把制作 PPT 所需的核心要素一步步问清楚。 |
-| 预期契合度 | 绿色/黄色/红色风险、缺失信号、默认假设和是否可进入正式制作。 | 高风险的模糊 brief 会在生成前暴露出来。 |
+| 预期契合度 | 绿色/黄色/红色风险、来源可信度、缺失信号、默认假设、交付评分卡和是否可进入正式制作。 | 高风险的模糊 brief 会在生成前暴露出来。 |
 | 来源和素材记录 | `source-map.json`、`image_sources.json`、`image_prompts.json` 和官方/IP fallback 说明。 | 审阅者能看到哪些内容来自资料、生成、替换或待授权。 |
 | 审阅包 | 渲染预览、问题清单、修复候选和质量状态。 | 修订从可观察问题出发，而不是反复说“再高级一点”。 |
 
 ## v5 做对了什么
 
-v5.0.0 把产品升级成真实办公 PPT 的交付默认系统。v5.1.0 补上最容易导致不满意的缺口：当用户需求不明确时，系统先收集足够意图，再承诺正式成稿。
+v5.0.0 把产品升级成真实办公 PPT 的交付默认系统。v5.1.0 加入模糊需求的分步访谈。v5.2.0 进一步把这些信号变成预期契合合同，在制作前后记录来源可信度、参考样板、交付评分、图片验收和不满意归因。
 
 | v5 默认 | 实际效果 |
 |---|---|
+| 预期契合合同 | `project-brief.json` 和 `quality-report.json` 会携带 `sourceConfidence`、`deliveryScorecard`、`referenceStyle`、`feedbackLoop`、`failureTaxonomy`、`confirmationBrief` 和 `imageAcceptance`。 |
 | 可编辑 PPTX 优先 | 正式汇报、咨询方案、金融/政务材料和普通“做 PPT”请求，在 brief 足够清晰后直接进入 PowerPoint 可交付路线。 |
 | Visual Brief Builder | Web 端支持多样标签组合，并允许粘贴背景资料、会议纪要、领导要求、参考链接和特殊要求。 |
 | Codex 分步访谈 | 请求模糊时，Codex 分阶段追问：受众和场景、资料和核心观点、页数和章节、视觉风格、素材策略、输出格式和合规边界。 |
 | 统一需求契约 | Web 标签和 Codex 访谈答案都进入 `project-brief.json`，Bridge、Desktop Worker、审计和提示词读同一份意图。 |
 | 预期契合闸门 | 绿色代表可制作；黄色代表带 caveat 推进；红色代表先澄清，或用户明确接受默认假设后再做草稿。 |
+| 反馈归因 | 如果用户不满意，下一版先归因：需求理解偏差、资料不足、风格不符合、排版密度不合适、素材/IP 边界不清或输出格式不匹配。 |
 | Codex-first 生成视觉 | 生图只做无文字支撑层或可复用微资产；正文、数字、图表和表格保持可编辑。 |
 | 官方/IP 素材计划 | 确定性标识必须可溯源或有替代说明；外部发布禁止假 logo 式占位。 |
 | 主题艺术方向 | Agent 读完素材后先命名贴合主题的艺术概念，例如文旅材料可用 `山海交汇 烟火同行`，再把它贯穿首尾页、主标题和必要的章节 motif；严肃汇报场景走克制例外。 |
@@ -177,6 +179,7 @@ npm run bridge
 | 层级 | 发布 | 保护什么 |
 |---|---|---|
 | 分步访谈与预期契合 | [发布说明 - v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md) | 可视化标签、Codex 分阶段追问、统一 `project-brief.json` 和生成前风险判断。 |
+| 预期契合合同 | [发布说明 - v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md) | 来源可信度、参考样板选择、交付评分卡、反馈归因、需求确认稿和图片验收。 |
 | 交付默认规范 | [发布说明 - v5.0.0](./docs/zh-CN/release/release-notes-v5.0.0.md) | 默认 PPTX、一份交付简报、官方/IP 素材处理、微软雅黑版式尺度和 Codex-first 生图。 |
 | 渲染审阅和修订 brief | [v4.3 渲染审阅闭环](./docs/zh-CN/quality/rendered-review-loop-v4.3.md) | 渲染后审阅、低风险修复计划、确认后生成 `revision-brief.md`。 |
 | AI 策划 | [v4.2 DeckIR AI 策划工作流](./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md) | `scripts/ai_storyboard.py`、`storyboard.json`、证据引用、可编辑目标和无 key fallback。 |
@@ -184,7 +187,7 @@ npm run bridge
 | 混合可编辑生成 | [v4.0 混合可编辑视觉工作流](./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md) | 页面配方、无文字生成式视觉层、可编辑 PPTX 正文、正式 raster 策略。 |
 | 公开证明面 | [v2.5 质量工作台](./docs/zh-CN/quality/quality-workbench-v2.5.md) | 公开案例墙、合成 proof packs、Design Doctor 报告和发布检查。 |
 
-历史发布说明：[v5.0.0](./docs/zh-CN/release/release-notes-v5.0.0.md)、[v4.3.0](./docs/zh-CN/release/release-notes-v4.3.0.md)、[v4.2.0](./docs/zh-CN/release/release-notes-v4.2.0.md)、[v4.1.0](./docs/zh-CN/release/release-notes-v4.1.0.md)、[v4.0.0](./docs/zh-CN/release/release-notes-v4.0.0.md)、[v3.0.0](./docs/zh-CN/release/release-notes-v3.0.0.md)。
+历史发布说明：[v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md)、[v5.0.0](./docs/zh-CN/release/release-notes-v5.0.0.md)、[v4.3.0](./docs/zh-CN/release/release-notes-v4.3.0.md)、[v4.2.0](./docs/zh-CN/release/release-notes-v4.2.0.md)、[v4.1.0](./docs/zh-CN/release/release-notes-v4.1.0.md)、[v4.0.0](./docs/zh-CN/release/release-notes-v4.0.0.md)、[v3.0.0](./docs/zh-CN/release/release-notes-v3.0.0.md)。
 
 ## 证明材料
 
@@ -192,6 +195,7 @@ npm run bridge
 
 | 证明 | 链接 |
 |---|---|
+| v5.2 预期契合合同 | [发布说明 - v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md) |
 | v5.1 分步访谈发布 | [发布说明 - v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md) |
 | v5 交付默认规范发布 | [发布说明 - v5.0.0](./docs/zh-CN/release/release-notes-v5.0.0.md) |
 | 渲染审阅发布 | [发布说明 - v4.3.0](./docs/zh-CN/release/release-notes-v4.3.0.md) |
@@ -237,6 +241,7 @@ bash -lc 'set -e; dir="$HOME/.codex/skills/ultimate-ppt-master"; if [ -d "$dir/.
 | 安装和调用 Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | 选择 PPTX / Web Deck / Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
 | 本地配置 provider key | [Model and Provider Setup](./docs/guides/model-provider-setup.md) |
+| 查看 v5.2 预期契合合同 | [发布说明 - v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md) |
 | 查看 v5.1 分步访谈 | [发布说明 - v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md) |
 | 查看 v5 交付默认规范 | [发布说明 - v5.0.0](./docs/zh-CN/release/release-notes-v5.0.0.md) |
 | 查看 v4.3 修订闭环 | [v4.3 渲染审阅闭环](./docs/zh-CN/quality/rendered-review-loop-v4.3.md) |

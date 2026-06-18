@@ -30,7 +30,8 @@ Ultimate PPT Master v5 uses a categorized documentation structure. Start with th
 
 | Need | Read |
 |---|---|
-| See the latest release | [Release Notes - v5.1.0](./release/release-notes-v5.1.0.md) |
+| See the latest release | [Release Notes - v5.2.0](./release/release-notes-v5.2.0.md) |
+| Review the v5.2 expectation-fit contract | [Release Notes - v5.2.0](./release/release-notes-v5.2.0.md) |
 | Review the v5.1 guided-intake release | [Release Notes - v5.1.0](./release/release-notes-v5.1.0.md) |
 | Review the v5 delivery-defaults release | [Release Notes - v5.0.0](./release/release-notes-v5.0.0.md) |
 | Review the rendered-review loop release | [Release Notes - v4.3.0](./release/release-notes-v4.3.0.md) |
@@ -45,6 +46,7 @@ Ultimate PPT Master v5 uses a categorized documentation structure. Start with th
 | Need | Read |
 |---|---|
 | Understand product positioning | [Product Positioning](./strategy/product-positioning.md) |
+| Review the v5.2 deep optimization PRD | [v5.2 Deep Optimization Guide / PRD](./zh-CN/strategy/prd-v5.2-deep-optimization-guide.md) |
 | Improve public GitHub exposure | [Public Growth Playbook](./strategy/public-growth-playbook.md) |
 | Prepare marketplace or agent-directory distribution | [Skill Market Distribution](./strategy/skill-market-distribution.md) |
 | Review content and template direction | [Next Roadmap - Content and Template Presets](./strategy/next-roadmap.md) |

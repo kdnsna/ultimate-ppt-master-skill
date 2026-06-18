@@ -1783,13 +1783,15 @@ textarea {
 
 .visual-brief-head strong,
 .tag-preset-row > span,
+.reference-style-row > div:first-child span,
 .tag-group > strong {
   color: var(--ink);
   font-size: 14px;
   line-height: 1.3;
 }
 
-.visual-brief-head p {
+.visual-brief-head p,
+.reference-style-row > div:first-child p {
   margin: 4px 0 0;
   color: var(--muted);
   font-size: 12px;
@@ -1826,6 +1828,7 @@ textarea {
 }
 
 .tag-preset-row > div,
+.reference-style-options,
 .tag-group > div,
 .expectation-signals {
   display: flex;
@@ -1834,6 +1837,7 @@ textarea {
 }
 
 .tag-preset-row button,
+.reference-style-options button,
 .tag-group button {
   min-height: 30px;
   padding: 0 9px;
@@ -1847,10 +1851,46 @@ textarea {
 }
 
 .tag-preset-row button.active,
+.reference-style-options button.active,
 .tag-group button.active {
   color: #fff;
   border-color: var(--blue);
   background: var(--blue);
+}
+
+.reference-style-row {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.reference-style-summary {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.reference-style-summary div {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.reference-style-summary dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.reference-style-summary dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .tag-group-grid {

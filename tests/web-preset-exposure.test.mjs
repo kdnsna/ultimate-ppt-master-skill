@@ -213,3 +213,27 @@ test("web experience exposes visual brief tags and expectation fit contract", as
   assert.match(cssSource, /visual-brief-builder/);
   assert.match(cssSource, /expectation-fit-card/);
 });
+
+test("web experience exposes the v5.2 expectation-fit contract", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+  const cssSource = await readFile("apps/web/src/styles.css", "utf8");
+
+  assert.match(appSource, /type SourceConfidenceLevel = "strong" \| "partial" \| "weak" \| "topic-only"/);
+  assert.match(appSource, /interface DeliveryScorecard/);
+  assert.match(appSource, /interface FeedbackLoop/);
+  assert.match(appSource, /referenceStyleOptions/);
+  assert.match(appSource, /consulting-structured/);
+  assert.match(appSource, /financial-steady/);
+  assert.match(appSource, /culture-tourism-editorial/);
+  assert.match(appSource, /buildV52Contract/);
+  assert.match(appSource, /schemaVersion: "v5\.2-brief-v1"/);
+  assert.match(appSource, /sourceConfidence/);
+  assert.match(appSource, /deliveryScorecard/);
+  assert.match(appSource, /feedbackLoop/);
+  assert.match(appSource, /confirmationBrief/);
+  assert.match(appSource, /imageAcceptance/);
+  assert.match(appSource, /slideTask/);
+  assert.match(appSource, /Do not invent numbers|不编造数据/);
+  assert.match(cssSource, /reference-style-row/);
+  assert.match(cssSource, /reference-style-summary/);
+});

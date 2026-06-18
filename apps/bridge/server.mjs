@@ -19,7 +19,7 @@ const AGENT_COMMANDS = {
   codex: {
     label: "Codex",
     binary: "codex",
-    prompt: "Read AGENTS.md, codex-task.md, project-brief.json, and visual-element-kit.md first. If expectationFit.readyForProduction is false, run guided intake before final production. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image key is configured, use the Needs-Manual prompts. Execute the ChatGPT-generation-first formal-business workflow, update asset-plan.md and quality-report.json, then list final files."
+    prompt: "Read AGENTS.md, codex-task.md, project-brief.json, and visual-element-kit.md first, including sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop. If expectationFit.readyForProduction is false, run guided intake before final production. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image key is configured, use the Needs-Manual prompts. Execute the ChatGPT-generation-first formal-business workflow, update asset-plan.md and quality-report.json, then list final files."
   },
   claude: {
     label: "Claude Code",
@@ -589,13 +589,29 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   const visualBrief = projectBrief.visualBrief || payload.visualBrief || defaultVisualBrief(payload);
   const guidedBrief = projectBrief.guidedBrief || payload.guidedBrief || defaultGuidedBrief({ payload, visualBrief });
   const expectationFit = projectBrief.expectationFit || payload.expectationFit || defaultExpectationFit({ payload, projectBrief, visualBrief });
+  const referenceStyle = projectBrief.referenceStyle || payload.referenceStyle || visualBrief.referenceStyle || defaultReferenceStyle({ projectBrief, visualBrief });
+  visualBrief.referenceStyle = visualBrief.referenceStyle || referenceStyle;
+  const sourceConfidence = projectBrief.sourceConfidence || payload.sourceConfidence || defaultSourceConfidence({ payload, projectBrief, expectationFit });
+  const deliveryScorecard = projectBrief.deliveryScorecard || payload.deliveryScorecard || defaultDeliveryScorecard({ title, expectationFit, sourceConfidence, referenceStyle });
+  const feedbackLoop = projectBrief.feedbackLoop || payload.feedbackLoop || defaultFeedbackLoop({ expectationFit, sourceConfidence, deliveryScorecard });
+  const failureTaxonomy = projectBrief.failureTaxonomy || payload.failureTaxonomy || feedbackLoop.failureTaxonomy;
+  const confirmationBrief = projectBrief.confirmationBrief || payload.confirmationBrief || defaultConfirmationBrief({ title, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle });
+  const imageAcceptance = projectBrief.imageAcceptance || payload.imageAcceptance || defaultImageAcceptance();
   const briefMode = projectBrief.briefMode || payload.briefMode || (expectationFit.readyForProduction ? "source-first" : "codex-guided-intake");
   const enrichedProjectBrief = {
     ...projectBrief,
+    schemaVersion: projectBrief.schemaVersion || "v5.2-brief-v1",
     briefMode,
     visualBrief,
     guidedBrief,
     expectationFit,
+    referenceStyle,
+    sourceConfidence,
+    deliveryScorecard,
+    feedbackLoop,
+    failureTaxonomy,
+    confirmationBrief,
+    imageAcceptance,
     qualityProfile,
     qualityGate,
     workflowState,
@@ -627,8 +643,8 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   await writeProjectFile("quality-checklist.md", payload.qualityChecklist || "");
   await writeProjectFile("asset-plan.md", payload.assetPlan || defaultAssetPlan({ title, qualityGate }));
   await writeProjectFile("visual-element-kit.md", payload.visualElementKit || defaultVisualElementKit({ title, qualityGate }));
-  await writeProjectFile("codex-task.md", payload.codexTask || defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands, briefMode, expectationFit }));
-  await writeProjectFile("AGENTS.md", payload.codexAgentGuide || defaultCodexAgentGuide({ qualityGate, expectationFit }));
+  await writeProjectFile("codex-task.md", payload.codexTask || defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands, briefMode, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, feedbackLoop }));
+  await writeProjectFile("AGENTS.md", payload.codexAgentGuide || defaultCodexAgentGuide({ qualityGate, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, feedbackLoop }));
   await writeProjectFile("README.md", payload.readme || defaultHandoffReadme());
 
   const extractedSections = [
@@ -659,6 +675,7 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     outputMode: payload?.form?.outputMode || projectBrief.outputMode || "both",
     qualityGate
   });
+  decorateDeckIRV52(deckIRPayload, { referenceStyle, sourceConfidence, deliveryScorecard, imageAcceptance });
   await writeProjectFile("storyboard.json", JSON.stringify(deckIRPayload.storyboard, null, 2));
   await writeProjectFile("source-map.json", JSON.stringify(deckIRPayload.sourceMap, null, 2));
   await writeProjectFile("planning-report.json", JSON.stringify(deckIRPayload.planningReport, null, 2));
@@ -679,6 +696,14 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     visualBrief,
     guidedBrief,
     expectationFit,
+    schemaVersion: "v5.2-brief-v1",
+    referenceStyle,
+    sourceConfidence,
+    deliveryScorecard,
+    feedbackLoop,
+    failureTaxonomy,
+    confirmationBrief,
+    imageAcceptance,
     expectedArtifacts,
     reviewCommands,
     deckIR,
@@ -687,7 +712,7 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   };
 
   await writeProjectFile("extracted-source.md", extractedSource);
-  await writeProjectFile("quality-report.json", JSON.stringify(createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands, deckIR, expectationFit }), null, 2));
+  await writeProjectFile("quality-report.json", JSON.stringify(createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands, deckIR, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, feedbackLoop, failureTaxonomy, confirmationBrief, imageAcceptance }), null, 2));
   await writeProjectFile("manifest.json", JSON.stringify(manifest, null, 2));
 
   return {
@@ -723,6 +748,7 @@ function defaultVisualBrief(payload = {}) {
     backgroundText: payload?.form?.sourceNotes || "",
     extraRequirements: payload?.form?.constraints || "",
     referenceLinks: [],
+    referenceStyle: defaultReferenceStyle({ projectBrief: {}, visualBrief: {} }),
     autoSuggestedTags: [],
     userEditedTags: false
   };
@@ -776,6 +802,142 @@ function defaultExpectationFit({ payload, projectBrief }) {
     nextQuestions: riskLevel === "red"
       ? ["Who is the deck for, what setting will it be used in, what should the audience do afterward, and what source material should be used?"]
       : []
+  };
+}
+
+function defaultReferenceStyle() {
+  return {
+    selectedDirection: "financial-steady",
+    positiveReferences: ["bank executive report", "SOE formal briefing", "financial KPI dashboard"],
+    negativeReferences: ["high-saturation launch visuals", "cartoon characters", "unlicensed brand marks"],
+    styleConstraints: ["Microsoft YaHei default", "stable grid", "reserved color usage", "official assets first"]
+  };
+}
+
+function sourceConfidenceLevel(sourceAdequacy) {
+  return {
+    substantive: "strong",
+    thin: "partial",
+    "private-unparsed": "partial",
+    conflicting: "partial",
+    "topic-only": "topic-only",
+    "no-source": "weak"
+  }[sourceAdequacy] || "weak";
+}
+
+function defaultSourceConfidence({ payload, expectationFit }) {
+  const sourceText = String(payload?.sourceMarkdown || payload?.source || "").trim();
+  const attachmentCount = Array.isArray(payload?.attachments) ? payload.attachments.length : 0;
+  const level = sourceConfidenceLevel(expectationFit?.sourceAdequacy);
+  return {
+    level,
+    sourceAdequacy: expectationFit?.sourceAdequacy || "no-source",
+    coveredAreas: [
+      payload?.form?.title ? "project title" : "",
+      payload?.form?.audience ? "target audience" : "",
+      payload?.form?.coreMessage ? "core message" : "",
+      sourceText || attachmentCount ? "source material" : "",
+      "editable PPTX delivery default"
+    ].filter(Boolean),
+    missingAreas: [
+      ...(expectationFit?.missingSignals || []),
+      !sourceText && !attachmentCount ? "no citable source; do not invent facts or numbers" : ""
+    ].filter(Boolean),
+    claimsNeedingEvidence: payload?.form?.coreMessage ? [`Core message needs evidence: ${payload.form.coreMessage}`] : [],
+    doNotInvent: [
+      "Do not invent numbers",
+      "Do not invent customer or institution names",
+      "Do not invent policy sources",
+      "Do not use unlicensed logos/IP",
+      "Do not present AI images as real scenes"
+    ]
+  };
+}
+
+function defaultDeliveryScorecard({ title, expectationFit, sourceConfidence, referenceStyle }) {
+  const sourceScore = {
+    strong: 92,
+    partial: 72,
+    weak: 42,
+    "topic-only": 36
+  }[sourceConfidence?.level] || 42;
+  return {
+    expectedDeckType: "general-business",
+    expectationFitBeforeProduction: {
+      riskLevel: expectationFit?.riskLevel || "red",
+      score: expectationFit?.score ?? 0,
+      readyForProduction: Boolean(expectationFit?.readyForProduction),
+      missingSignals: expectationFit?.missingSignals || [],
+      assumptions: expectationFit?.assumptions || []
+    },
+    qualityDimensions: [
+      { id: "brief-fit", label: "Brief clarity", score: expectationFit?.score ?? 0, evidence: "Bridge fallback expectationFit." },
+      { id: "source-confidence", label: "Source confidence", score: sourceScore, evidence: `Source adequacy: ${sourceConfidence?.sourceAdequacy || "unknown"}.` },
+      { id: "style-specificity", label: "Style specificity", score: referenceStyle?.selectedDirection ? 86 : 58, evidence: `Reference style: ${referenceStyle?.selectedDirection || "pending"}.` },
+      { id: "asset-boundary", label: "Asset boundary", score: 72, evidence: "Official/user-provided assets first, ChatGPT no-text support visuals." },
+      { id: "output-editability", label: "Delivery editability", score: 90, evidence: "Editable PPTX default." }
+    ],
+    userVisibleSummary: `Bridge prepared v5.2 delivery scorecard for ${title}: expectation ${expectationFit?.score ?? 0}%, source confidence ${sourceConfidence?.level || "unknown"}.`,
+    knownRisks: [
+      ...(expectationFit?.missingSignals || []),
+      ...(expectationFit?.conflicts || []),
+      ...(sourceConfidence?.missingAreas || [])
+    ],
+    recommendedNextRevision: expectationFit?.readyForProduction
+      ? []
+      : ["Run Codex guided intake before final production and update confirmationBrief."]
+  };
+}
+
+function defaultFeedbackLoop({ expectationFit, sourceConfidence, deliveryScorecard }) {
+  const sourceGap = sourceConfidence?.level !== "strong";
+  const briefGap = !expectationFit?.readyForProduction || Boolean((expectationFit?.missingSignals || []).length);
+  const taxonomy = [
+    { id: "brief-mismatch", label: "Brief mismatch", applies: briefGap, improvementTarget: "Clarify audience, setting, purpose, sources, core message, and output." },
+    { id: "source-gap", label: "Source gap", applies: sourceGap, improvementTarget: "Add citable sources or mark assumptions explicitly." },
+    { id: "style-mismatch", label: "Style mismatch", applies: false, improvementTarget: "Choose a concrete reference style and move-toward / avoid examples." },
+    { id: "visual-density", label: "Visual density mismatch", applies: false, improvementTarget: "Confirm spacious, standard, dense, dashboard, or text/image balanced layout." },
+    { id: "asset-boundary", label: "Asset/IP boundary unclear", applies: false, improvementTarget: "Clarify official assets, AI visuals, portrait/IP restrictions, and replacement strategy." },
+    { id: "format-mismatch", label: "Format mismatch", applies: false, improvementTarget: "Editable PPTX is default; PDF/Web preview must be explicit if needed." }
+  ];
+  return {
+    feedbackStatus: taxonomy.some((item) => item.applies) ? "requested" : "none",
+    failureTaxonomy: taxonomy,
+    nextRevisionIntent: deliveryScorecard?.recommendedNextRevision?.join(" ") || "Proceed with production and record assumptions.",
+    feedbackTemplate: [
+      "The part that misses expectations most is:",
+      "The reference style/page it should move toward is:",
+      "Content or wording that must stay:",
+      "Content that may be reduced:",
+      "Next revision priority: structure / style / assets / data / slide count / output format"
+    ]
+  };
+}
+
+function defaultConfirmationBrief({ title, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle }) {
+  return `# Confirmation Brief
+
+- Project: ${title}
+- Scenario: ${guidedBrief?.scenario || "to confirm"}
+- Audience: ${guidedBrief?.audience || "to confirm"}
+- Purpose: ${guidedBrief?.purpose || "to confirm"}
+- Core message: ${guidedBrief?.coreMessage || "to confirm"}
+- Content sources: ${(guidedBrief?.contentSources || []).join(", ") || "to confirm"}
+- Slide count / structure: ${guidedBrief?.slideCount || "to confirm"}; ${guidedBrief?.outlinePreference || "to confirm"}
+- Reference style: ${referenceStyle?.selectedDirection || "financial-steady"}
+- Output format: ${(guidedBrief?.outputFormat || []).join(", ") || "editable PPTX default"}
+- Expectation risk: ${expectationFit?.riskLevel || "unknown"} / ${expectationFit?.score ?? 0}%
+- Source confidence: ${sourceConfidence?.level || "unknown"}
+- Next step: ${(deliveryScorecard?.recommendedNextRevision || []).join("; ") || "Production may start after recording assumptions."}
+`;
+}
+
+function defaultImageAcceptance() {
+  return {
+    required: true,
+    defaultPolicy: "AI images are for no-text hero visuals, atmosphere, micro-assets, and textures; factual imagery uses official/user-provided sources first.",
+    targetSlides: ["cover", "section divider", "process / roadmap", "metric accent", "closing"],
+    replacementRule: "If an image is unrealistic, contains text, has broken logo/IP, or is unrelated, replace it with editable shapes, official imagery, or a clean no-image layout."
   };
 }
 
@@ -929,6 +1091,55 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate }) {
   return { storyboard, sourceMap, planningReport };
 }
 
+function slideTaskQuestion(role) {
+  return {
+    anchor: "What must the audience remember first?",
+    context: "Why does this matter now?",
+    evidence: "What evidence proves this claim?",
+    comparison: "How visible should the difference be?",
+    process: "Can the audience follow the steps afterward?",
+    benefit: "Is the value, benefit, or key metric immediately visible?",
+    risk: "Are boundaries, risks, and uncertainty clear?",
+    action: "Who does what by when?",
+    closing: "What action should the audience take next?"
+  }[role] || "What job does this slide do?";
+}
+
+function slideTaskJob(role) {
+  return {
+    anchor: "establish-topic-and-core-message",
+    context: "explain-why-this-matters",
+    evidence: "prove-the-claim",
+    comparison: "show-the-difference",
+    process: "make-the-path-actionable",
+    benefit: "highlight-the-value",
+    risk: "surface-caveats-and-boundaries",
+    action: "turn-insight-into-next-steps",
+    closing: "reinforce-decision-or-call-to-action"
+  }[role] || "support-the-story";
+}
+
+function decorateDeckIRV52(deckIRPayload, { referenceStyle, sourceConfidence, deliveryScorecard, imageAcceptance }) {
+  if (!deckIRPayload?.storyboard) return deckIRPayload;
+  deckIRPayload.storyboard.schemaVersion = "v5.2-brief-v1";
+  deckIRPayload.storyboard.referenceStyle = referenceStyle;
+  deckIRPayload.storyboard.sourceConfidence = sourceConfidence;
+  deckIRPayload.storyboard.deliveryScorecard = deliveryScorecard;
+  deckIRPayload.storyboard.imageAcceptance = imageAcceptance;
+  deckIRPayload.storyboard.slides = (deckIRPayload.storyboard.slides || []).map((slide) => ({
+    ...slide,
+    slideTask: {
+      job: slideTaskJob(slide.role),
+      primaryQuestion: slideTaskQuestion(slide.role),
+      oneSentenceTakeaway: slide.intent || slide.speakerIntent || "",
+      bestLayoutFamily: slide.layoutFamily,
+      mustStayEditable: slide.rasterPolicy === "prohibited-formal-body",
+      evidenceRefs: slide.evidenceRefs || []
+    }
+  }));
+  return deckIRPayload;
+}
+
 function createPendingReviewFindings({ title, storyboard }) {
   return {
     version: "rendered-review-v1",
@@ -1040,9 +1251,26 @@ function defaultQualityGate() {
   };
 }
 
-function createPendingQualityReport({ title, qualityProfile, qualityGate, workflowState, expectedArtifacts, reviewCommands, deckIR, expectationFit }) {
+function createPendingQualityReport({
+  title,
+  qualityProfile,
+  qualityGate,
+  workflowState,
+  expectedArtifacts,
+  reviewCommands,
+  deckIR,
+  expectationFit,
+  sourceConfidence,
+  deliveryScorecard,
+  referenceStyle,
+  feedbackLoop,
+  failureTaxonomy,
+  confirmationBrief,
+  imageAcceptance
+}) {
   return {
     version: BRIDGE_VERSION,
+    schemaVersion: "v5.2-brief-v1",
     title,
     status: "pending",
     createdAt: new Date().toISOString(),
@@ -1050,6 +1278,13 @@ function createPendingQualityReport({ title, qualityProfile, qualityGate, workfl
     qualityGate,
     workflowState,
     expectationFit,
+    sourceConfidence,
+    deliveryScorecard,
+    referenceStyle,
+    feedbackLoop,
+    failureTaxonomy,
+    confirmationBrief,
+    imageAcceptance,
     expectedArtifacts,
     reviewCommands,
     deckIR,
@@ -1076,6 +1311,21 @@ function createPendingQualityReport({ title, qualityProfile, qualityGate, workfl
         id: "expectation-fit",
         status: expectationFit?.readyForProduction ? "ready" : "needs-guided-intake",
         summary: `Expectation fit ${expectationFit?.score ?? 0}%, risk ${expectationFit?.riskLevel || "unknown"}.`
+      },
+      {
+        id: "source-confidence",
+        status: sourceConfidence?.level === "strong" ? "ready" : "needs-evidence",
+        summary: `Source confidence ${sourceConfidence?.level || "unknown"}; do-not-invent rules: ${(sourceConfidence?.doNotInvent || []).join(", ") || "pending"}.`
+      },
+      {
+        id: "delivery-scorecard",
+        status: deliveryScorecard?.recommendedNextRevision?.length ? "needs-review" : "ready",
+        summary: deliveryScorecard?.userVisibleSummary || "Delivery scorecard pending."
+      },
+      {
+        id: "feedback-loop",
+        status: feedbackLoop?.feedbackStatus || "none",
+        summary: feedbackLoop?.nextRevisionIntent || "Feedback loop pending."
       }
     ]
   };
@@ -1148,7 +1398,19 @@ Use short, specific prompts with transparent/isolated backgrounds when possible:
 `;
 }
 
-function defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands, briefMode, expectationFit }) {
+function defaultCodexTask({
+  title,
+  qualityGate,
+  workflowState,
+  expectedArtifacts,
+  reviewCommands,
+  briefMode,
+  expectationFit,
+  sourceConfidence,
+  deliveryScorecard,
+  referenceStyle,
+  feedbackLoop
+}) {
   const gateInputs = (qualityGate?.requiredInputs || []).map((item) => `- ${item}`).join("\n");
   const gateCriteria = (qualityGate?.acceptanceCriteria || []).map((item) => `- ${item}`).join("\n");
   const gateChecks = (qualityGate?.artifactChecks || []).map((item) => `- ${item}`).join("\n");
@@ -1194,11 +1456,19 @@ ${gateChecks}
 - Ready for production: ${expectationFit?.readyForProduction ? "yes" : "no"}
 - Missing signals: ${(expectationFit?.missingSignals || []).join(", ") || "none"}
 
+## v5.2 Expectation Contract
+- Source confidence: ${sourceConfidence?.level || "unknown"}
+- Do not invent: ${(sourceConfidence?.doNotInvent || []).join(", ") || "pending"}
+- Reference style: ${referenceStyle?.selectedDirection || "pending"}
+- Delivery summary: ${deliveryScorecard?.userVisibleSummary || "pending"}
+- Feedback status: ${feedbackLoop?.feedbackStatus || "none"}
+
 Rules:
-1. Read project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit before production.
+1. Read project-brief.json briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop before production.
 2. If readyForProduction is false, ask one coherent group of questions per turn and clarify audience, usage setting, desired action, content source, core message, slide count, visual style, brand/IP assets, output format, and must-avoid boundaries.
 3. Start final-quality deck production only after the brief is clear enough or the user explicitly asks for a draft with assumptions.
-4. Record user answers, assumptions, and remaining expectation risk in project-brief.json and quality-report.json.
+4. Record user answers, assumptions, source confidence, reference style changes, feedback taxonomy, and remaining expectation risk in project-brief.json and quality-report.json.
+5. If the user is unsatisfied, classify the reason with feedbackLoop.failureTaxonomy before revising; do not blindly remake the whole deck.
 
 ## Asset Workflow
 1. Inspect supplied attachments and extracted-source.md before searching.
@@ -1231,15 +1501,18 @@ Final response: list generated files, generated micro-assets inserted, public re
 `;
 }
 
-function defaultCodexAgentGuide({ qualityGate, expectationFit }) {
+function defaultCodexAgentGuide({ qualityGate, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, feedbackLoop }) {
   const level = qualityGate?.level || "formal-business";
   return `# AGENTS.md
 
 ## Codex Local Rules
 - Work in this handoff folder and the Ultimate PPT Master repository scripts only.
 - Read codex-task.md before editing or generating deliverables.
-- Read project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit first. Current expectationFit: ${expectationFit?.riskLevel || "unknown"} / ${expectationFit?.score ?? 0}%.
+- Read project-brief.json briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop first. Current expectationFit: ${expectationFit?.riskLevel || "unknown"} / ${expectationFit?.score ?? 0}%.
+- Current sourceConfidence: ${sourceConfidence?.level || "unknown"}; do not invent: ${(sourceConfidence?.doNotInvent || []).join(", ") || "pending"}.
+- Current referenceStyle: ${referenceStyle?.selectedDirection || "pending"}; delivery scorecard: ${deliveryScorecard?.userVisibleSummary || "pending"}.
 - If expectationFit.readyForProduction is false, run guided intake before final production. Ask one related question group per turn until audience, setting, purpose, sources, core message, slide count, style, asset boundary, output, and must-avoid rules are clear.
+- If the user is unsatisfied, classify the reason with feedbackLoop.failureTaxonomy before revising. Current feedback status: ${feedbackLoop?.feedbackStatus || "none"}.
 - Read storyboard.json and source-map.json before final slide generation; they define the DeckIR page map and source evidence boundary.
 - Keep private source material local. Do not upload private files, customer data, internal screenshots, or API keys unless the user explicitly approves.
 - ChatGPT/OpenAI image generation is the primary visual asset engine. Read visual-element-kit.md and run or handle scripts/generate_visual_element_kit.py before final slide assembly when the deck needs visual richness.
@@ -1367,7 +1640,7 @@ function relativeFromProject(filePath) {
 
 function suggestedCommands(projectPath) {
   const quotedPath = shellQuote(projectPath);
-  const instruction = "Read AGENTS.md, codex-task.md, storyboard.json, source-map.json, planning-report.json, review-findings.json, repair-plan.json, revision-brief.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Inspect project-brief.json briefMode, visualBrief, guidedBrief, and expectationFit; if expectationFit.readyForProduction is false, run guided intake before final production and ask one related question group per turn. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, keep DeckIR evidence/editability constraints, insert reusable micro-assets when useful, run audit_storyboard.py, formal delivery audit, review_rendered_deck.py, and apply_review_plan.py --safe-only --dry-run, update quality-report.json, then list final files.";
+  const instruction = "Read AGENTS.md, codex-task.md, storyboard.json, source-map.json, planning-report.json, review-findings.json, repair-plan.json, revision-brief.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Inspect project-brief.json briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop; if expectationFit.readyForProduction is false, run guided intake before final production and ask one related question group per turn. If the user is unsatisfied, classify the reason with feedbackLoop.failureTaxonomy before revising. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, keep DeckIR evidence/editability constraints, insert reusable micro-assets when useful, run audit_storyboard.py, formal delivery audit, review_rendered_deck.py, and apply_review_plan.py --safe-only --dry-run, update quality-report.json, then list final files.";
   return {
     codex: `cd ${quotedPath} && codex "${instruction}"`,
     claude: `cd ${quotedPath} && claude "${instruction}"`,
