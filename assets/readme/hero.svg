@@ -1,139 +1,113 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master v5.2.0 中文 README 首图</title>
-  <desc id="desc">中文为主的 README 首图，展示 AI PPT 预期契合交付系统：先问清需求，再生成可编辑 PPTX，并通过来源可信度、交付评分卡、图片验收和审计闭环降低用户预期偏差。</desc>
+  <title id="title">Ultimate PPT Master v5.2.0 创意中文首图</title>
+  <desc id="desc">中文为主的 README 首图，用更通俗、有韵味的方式呈现 Ultimate PPT Master：先听明白，再下笔，把一句话需求做成能开会、能修改、能交付的 PPT。</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#F8FAFC"/>
-      <stop offset="0.52" stop-color="#F4F8F6"/>
-      <stop offset="1" stop-color="#FFF7ED"/>
+    <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F8FBFF"/>
+      <stop offset="0.48" stop-color="#F5FAF7"/>
+      <stop offset="1" stop-color="#FFF8F0"/>
     </linearGradient>
-    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="inkLine" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#2563EB"/>
-      <stop offset="0.46" stop-color="#10B981"/>
+      <stop offset="0.45" stop-color="#14B8A6"/>
       <stop offset="1" stop-color="#F97316"/>
     </linearGradient>
-    <filter id="shadow" x="-12%" y="-14%" width="124%" height="132%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#172033" flood-opacity="0.12"/>
+    <linearGradient id="deckFace" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F6F9FC"/>
+    </linearGradient>
+    <filter id="softShadow" x="-14%" y="-18%" width="128%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="22" stdDeviation="26" flood-color="#172033" flood-opacity="0.13"/>
     </filter>
-    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
-      <path d="M44 0H0V44" fill="none" stroke="#172033" stroke-opacity="0.05"/>
+    <filter id="paperShadow" x="-12%" y="-16%" width="124%" height="136%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#172033" flood-opacity="0.12"/>
+    </filter>
+    <pattern id="quietGrid" width="54" height="54" patternUnits="userSpaceOnUse">
+      <path d="M54 0H0V54" fill="none" stroke="#172033" stroke-opacity="0.035"/>
     </pattern>
   </defs>
 
-  <rect width="1600" height="900" fill="url(#bg)"/>
-  <rect width="1600" height="900" fill="url(#grid)"/>
-  <rect x="76" y="58" width="1448" height="784" rx="28" fill="#FFFFFF" opacity="0.82"/>
+  <rect width="1600" height="900" fill="url(#pageBg)"/>
+  <rect width="1600" height="900" fill="url(#quietGrid)"/>
+  <path d="M96 712C268 610 397 740 560 636C723 532 830 452 1012 520C1194 588 1287 695 1504 574" fill="none" stroke="#2563EB" stroke-opacity="0.08" stroke-width="34" stroke-linecap="round"/>
+  <path d="M96 760C284 658 433 788 598 692C762 596 882 544 1040 604C1198 664 1306 776 1504 660" fill="none" stroke="#F97316" stroke-opacity="0.08" stroke-width="28" stroke-linecap="round"/>
 
   <g font-family="Microsoft YaHei, PingFang SC, Noto Sans CJK SC, Arial, sans-serif">
-    <g transform="translate(126 92)">
-      <rect width="372" height="48" rx="24" fill="#FFFFFF" filter="url(#shadow)"/>
-      <circle cx="31" cy="24" r="8" fill="#2563EB"/>
-      <circle cx="57" cy="24" r="8" fill="#10B981"/>
-      <circle cx="83" cy="24" r="8" fill="#F97316"/>
-      <text x="112" y="31" fill="#526173" font-size="15" font-weight="800">Ultimate PPT Master v5.2.0</text>
+    <g transform="translate(116 82)">
+      <rect width="454" height="52" rx="26" fill="#FFFFFF" filter="url(#paperShadow)"/>
+      <circle cx="33" cy="26" r="8" fill="#2563EB"/>
+      <circle cx="60" cy="26" r="8" fill="#14B8A6"/>
+      <circle cx="87" cy="26" r="8" fill="#F97316"/>
+      <text x="118" y="33" fill="#516173" font-size="16" font-weight="850">Ultimate PPT Master v5.2.0</text>
 
-      <text x="0" y="126" fill="#101828" font-size="64" font-weight="900">AI PPT 预期契合交付系统</text>
-      <text x="0" y="183" fill="#2563EB" font-size="34" font-weight="900">先问清 · 再生成 · 可编辑 · 可审计</text>
-      <text x="0" y="230" fill="#5F6F84" font-size="22" font-weight="650">把一句话需求、杂乱资料和参考样板，整理成可交付、可追溯、可复盘的办公 PPT。</text>
+      <text x="0" y="138" fill="#101828" font-size="68" font-weight="900">一句话，也能做成</text>
+      <text x="0" y="214" fill="#101828" font-size="68" font-weight="900">一份像样的 PPT</text>
+      <rect x="2" y="244" width="560" height="10" rx="5" fill="url(#inkLine)"/>
+      <text x="0" y="304" fill="#2563EB" font-size="31" font-weight="900">先听明白，再下笔；先有章法，再有美感。</text>
+      <text x="0" y="348" fill="#5B6B7E" font-size="21" font-weight="650">把需求、资料、参考风格和素材边界先捋顺，</text>
+      <text x="0" y="384" fill="#5B6B7E" font-size="21" font-weight="650">再交付可编辑、可审阅、可复盘的办公成稿。</text>
     </g>
 
-    <g transform="translate(1050 88)" filter="url(#shadow)">
-      <rect width="360" height="230" rx="18" fill="#101828"/>
-      <text x="28" y="44" fill="#FFFFFF" font-size="21" font-weight="900">交付合同</text>
-      <text x="28" y="78" fill="#B8C4D4" font-size="15" font-weight="720">project-brief.json</text>
-      <g transform="translate(28 104)" font-size="14" font-weight="800">
-        <rect width="138" height="32" rx="16" fill="#243B63"/>
-        <text x="18" y="22" fill="#DCEAFE">visualBrief</text>
-        <rect x="154" width="146" height="32" rx="16" fill="#064E3B"/>
-        <text x="174" y="22" fill="#D1FAE5">guidedBrief</text>
-        <rect y="44" width="162" height="32" rx="16" fill="#7C2D12"/>
-        <text x="18" y="66" fill="#FFEDD5">expectationFit</text>
-        <rect x="178" y="44" width="122" height="32" rx="16" fill="#3B0764"/>
-        <text x="196" y="66" fill="#F3E8FF">feedbackLoop</text>
-      </g>
-      <rect x="28" y="196" width="304" height="8" rx="4" fill="url(#bar)"/>
+    <g transform="translate(114 494)" filter="url(#paperShadow)">
+      <rect width="170" height="58" rx="29" fill="#FFFFFF"/>
+      <text x="36" y="38" fill="#1D4ED8" font-size="20" font-weight="900">不问废话</text>
+      <rect x="192" width="170" height="58" rx="29" fill="#FFFFFF"/>
+      <text x="228" y="38" fill="#047857" font-size="20" font-weight="900">不堆元素</text>
+      <rect x="384" width="170" height="58" rx="29" fill="#FFFFFF"/>
+      <text x="420" y="38" fill="#C2410C" font-size="20" font-weight="900">不交死图</text>
     </g>
 
-    <g transform="translate(124 348)" filter="url(#shadow)">
-      <rect width="1352" height="344" rx="22" fill="#FFFFFF" stroke="#D7DEE8"/>
-      <rect width="1352" height="58" rx="22" fill="#F8FAFC"/>
-      <circle cx="32" cy="29" r="8" fill="#EF4444"/>
-      <circle cx="58" cy="29" r="8" fill="#F59E0B"/>
-      <circle cx="84" cy="29" r="8" fill="#10B981"/>
-      <text x="118" y="36" fill="#607086" font-size="15" font-weight="850">真实办公 PPT 生产流程</text>
+    <g transform="translate(866 82)" filter="url(#softShadow)">
+      <rect x="0" y="42" width="560" height="430" rx="28" fill="#FFFFFF"/>
+      <rect x="34" y="0" width="492" height="338" rx="24" fill="url(#deckFace)" stroke="#D9E2EC"/>
+      <rect x="34" y="0" width="492" height="70" rx="24" fill="#101828"/>
+      <text x="64" y="44" fill="#FFFFFF" font-size="22" font-weight="900">能开会的成稿</text>
+      <text x="326" y="44" fill="#B8C4D4" font-size="16" font-weight="750">PPTX · Web 预览</text>
 
-      <g transform="translate(38 92)">
-        <rect width="260" height="210" rx="14" fill="#EFF6FF" stroke="#BFDBFE"/>
-        <circle cx="38" cy="38" r="20" fill="#2563EB"/>
-        <text x="38" y="46" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="900">1</text>
-        <text x="74" y="46" fill="#101828" font-size="26" font-weight="900">需求输入</text>
-        <text x="26" y="90" fill="#355B91" font-size="17" font-weight="720">标签组合</text>
-        <text x="26" y="120" fill="#355B91" font-size="17" font-weight="720">背景资料粘贴</text>
-        <text x="26" y="150" fill="#355B91" font-size="17" font-weight="720">Codex 分步追问</text>
-        <rect x="26" y="170" width="138" height="24" rx="12" fill="#DBEAFE"/>
-        <text x="45" y="188" fill="#1D4ED8" font-size="13" font-weight="850">少确认但问关键</text>
+      <g transform="translate(70 104)">
+        <text x="0" y="0" fill="#101828" font-size="40" font-weight="900">从想法到成稿</text>
+        <text x="0" y="44" fill="#64748B" font-size="19" font-weight="700">不是把文字塞进模板，而是把观点讲顺、画面做稳。</text>
+        <rect x="0" y="84" width="140" height="46" rx="23" fill="#DBEAFE"/>
+        <text x="30" y="114" fill="#1D4ED8" font-size="18" font-weight="900">问清楚</text>
+        <rect x="158" y="84" width="140" height="46" rx="23" fill="#CCFBF1"/>
+        <text x="188" y="114" fill="#0F766E" font-size="18" font-weight="900">定风格</text>
+        <rect x="316" y="84" width="140" height="46" rx="23" fill="#FFEDD5"/>
+        <text x="346" y="114" fill="#C2410C" font-size="18" font-weight="900">做漂亮</text>
       </g>
 
-      <path d="M326 198H384" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
-      <path d="M374 182L392 198L374 214" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-
-      <g transform="translate(420 92)">
-        <rect width="260" height="210" rx="14" fill="#ECFDF5" stroke="#A7F3D0"/>
-        <circle cx="38" cy="38" r="20" fill="#10B981"/>
-        <text x="38" y="46" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="900">2</text>
-        <text x="74" y="46" fill="#101828" font-size="26" font-weight="900">预期契合</text>
-        <text x="26" y="90" fill="#23684E" font-size="17" font-weight="720">来源可信度</text>
-        <text x="26" y="120" fill="#23684E" font-size="17" font-weight="720">交付评分卡</text>
-        <text x="26" y="150" fill="#23684E" font-size="17" font-weight="720">红黄绿风险</text>
-        <rect x="26" y="170" width="154" height="24" rx="12" fill="#D1FAE5"/>
-        <text x="45" y="188" fill="#047857" font-size="13" font-weight="850">先对齐再开工</text>
+      <g transform="translate(70 276)">
+        <rect width="408" height="14" rx="7" fill="#E2E8F0"/>
+        <rect width="286" height="14" rx="7" fill="url(#inkLine)"/>
       </g>
+      <rect x="86" y="390" width="388" height="34" rx="17" fill="#F8FAFC"/>
+      <text x="136" y="413" fill="#475569" font-size="16" font-weight="800">微软雅黑优先 · 官方素材优先 · GPT 画面不贴字</text>
+    </g>
 
-      <path d="M708 198H766" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
-      <path d="M756 182L774 198L756 214" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-
-      <g transform="translate(802 92)">
-        <rect width="260" height="210" rx="14" fill="#FFF7ED" stroke="#FED7AA"/>
-        <circle cx="38" cy="38" r="20" fill="#F97316"/>
-        <text x="38" y="46" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="900">3</text>
-        <text x="74" y="46" fill="#101828" font-size="26" font-weight="900">生成交付</text>
-        <text x="26" y="90" fill="#8A4B17" font-size="17" font-weight="720">默认可编辑 PPTX</text>
-        <text x="26" y="120" fill="#8A4B17" font-size="17" font-weight="720">微软雅黑排版</text>
-        <text x="26" y="150" fill="#8A4B17" font-size="17" font-weight="720">GPT 无文字生图</text>
-        <rect x="26" y="170" width="168" height="24" rx="12" fill="#FFEDD5"/>
-        <text x="45" y="188" fill="#C2410C" font-size="13" font-weight="850">官方/IP 素材边界</text>
+    <g transform="translate(748 518)">
+      <g transform="rotate(-8 0 0)" filter="url(#paperShadow)">
+        <rect width="214" height="118" rx="18" fill="#EFF6FF"/>
+        <text x="26" y="42" fill="#1D4ED8" font-size="19" font-weight="900">先问三件事</text>
+        <text x="26" y="76" fill="#355B91" font-size="16" font-weight="750">给谁看？</text>
+        <text x="112" y="76" fill="#355B91" font-size="16" font-weight="750">想说服谁？</text>
       </g>
-
-      <path d="M1090 198H1148" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
-      <path d="M1138 182L1156 198L1138 214" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-
-      <g transform="translate(1184 92)">
-        <rect width="130" height="210" rx="14" fill="#F8FAFC" stroke="#D7DEE8"/>
-        <circle cx="34" cy="38" r="20" fill="#101828"/>
-        <text x="34" y="46" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="900">4</text>
-        <text x="26" y="88" fill="#101828" font-size="23" font-weight="900">审阅</text>
-        <text x="26" y="122" fill="#526173" font-size="16" font-weight="720">渲染</text>
-        <text x="26" y="150" fill="#526173" font-size="16" font-weight="720">验收</text>
-        <text x="26" y="178" fill="#526173" font-size="16" font-weight="720">复盘</text>
+      <g transform="translate(178 36) rotate(6)" filter="url(#paperShadow)">
+        <rect width="230" height="126" rx="18" fill="#ECFDF5"/>
+        <text x="26" y="44" fill="#047857" font-size="19" font-weight="900">再定一口气</text>
+        <text x="26" y="80" fill="#23684E" font-size="16" font-weight="750">正式稳重、科技简洁、宣传有感染力</text>
+      </g>
+      <g transform="translate(392 6) rotate(-4)" filter="url(#paperShadow)">
+        <rect width="214" height="118" rx="18" fill="#FFF7ED"/>
+        <text x="26" y="42" fill="#C2410C" font-size="19" font-weight="900">最后看得见</text>
+        <text x="26" y="76" fill="#8A4B17" font-size="16" font-weight="750">图片能用，文字能改，审计留底</text>
       </g>
     </g>
 
-    <g transform="translate(154 730)">
-      <rect width="1292" height="84" rx="18" fill="#FFFFFF" filter="url(#shadow)"/>
-      <g transform="translate(32 22)" font-size="17" font-weight="850">
-        <rect width="204" height="40" rx="20" fill="#EFF6FF"/>
-        <text x="26" y="27" fill="#1D4ED8">可视化标签输入</text>
-        <rect x="228" width="184" height="40" rx="20" fill="#ECFDF5"/>
-        <text x="254" y="27" fill="#047857">分步需求访谈</text>
-        <rect x="436" width="194" height="40" rx="20" fill="#FFF7ED"/>
-        <text x="462" y="27" fill="#C2410C">默认 PPTX 交付</text>
-        <rect x="654" width="184" height="40" rx="20" fill="#F1F5F9"/>
-        <text x="680" y="27" fill="#334155">图片验收清单</text>
-        <rect x="862" width="184" height="40" rx="20" fill="#FDF2F8"/>
-        <text x="888" y="27" fill="#BE185D">不满意归因</text>
-        <rect x="1070" width="160" height="40" rx="20" fill="#FEFCE8"/>
-        <text x="1096" y="27" fill="#A16207">审计闭环</text>
-      </g>
+    <g transform="translate(116 708)" filter="url(#softShadow)">
+      <rect width="1368" height="106" rx="26" fill="#FFFFFF"/>
+      <text x="38" y="43" fill="#101828" font-size="25" font-weight="900">一条更像真实办公的路：</text>
+      <text x="306" y="43" fill="#5B6B7E" font-size="19" font-weight="750">聊清楚需求 → 找准素材 → 画面成体系 → 默认 PPTX → 渲染审阅 → 修改有依据</text>
+      <rect x="38" y="68" width="1292" height="10" rx="5" fill="#E2E8F0"/>
+      <rect x="38" y="68" width="1038" height="10" rx="5" fill="url(#inkLine)"/>
     </g>
   </g>
 </svg>
