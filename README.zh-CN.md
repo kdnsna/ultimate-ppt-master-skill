@@ -209,7 +209,7 @@ npm run bridge
 可复制的 marketplace prompt：
 
 ```text
-Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report. If my brief is incomplete, ask staged questions first.
+Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report.
 ```
 
 熟练用户可以直接安装 Skill：

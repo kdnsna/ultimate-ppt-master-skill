@@ -10,9 +10,9 @@
     "web deck",
     "office productivity"
   ],
-  "shortDescription": "Generate Codex-first quality-checked PPTX and Web Decks from local source files.",
-  "positioning": "A local-first PPT quality workbench for Chinese office users, consultants, operators, trainers, and agent users who need editable deliverables.",
-  "defaultPrompt": "Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report. If my brief is incomplete, ask staged questions first.",
+  "shortDescription": "先听明白再生成 quality-checked PPTX and Web Decks from local source files.",
+  "positioning": "A local-first PPT delivery skill for Chinese office users who need guided intake, editable PPTX/Web Decks, official asset boundaries, and audit-ready deliverables.",
+  "defaultPrompt": "Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report.",
   "metadata": {
     "openai": "agents/openai.yaml",
     "skillEntrypoint": "SKILL.md",

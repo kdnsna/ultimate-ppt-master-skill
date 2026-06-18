@@ -2,7 +2,7 @@
   "name": "ultimate-ppt-master",
   "private": true,
   "version": "5.2.0",
-  "description": "Local-first AI presentation hub for Web Experience, Agent Bridge, editable PowerPoint, and Web Deck workflows.",
+  "description": "AI PPT delivery system that clarifies the brief first, then turns local source material into editable PPTX/Web Decks with visual review and audit trails.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
     "update": "git pull --ff-only && npm run setup",

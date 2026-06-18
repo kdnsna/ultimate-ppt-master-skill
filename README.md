@@ -209,7 +209,7 @@ The [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmar
 Copyable marketplace prompt:
 
 ```text
-Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report. If my brief is incomplete, ask staged questions first.
+Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report.
 ```
 
 Expert users can install the Skill directly:

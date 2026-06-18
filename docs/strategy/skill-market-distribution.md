@@ -6,7 +6,7 @@ Use this checklist when preparing Ultimate PPT Master for a skill marketplace, a
 
 - Name: Ultimate PPT Master / 终极融合PPT大师
 - Category: presentation generation, editable PPTX, Web Deck, office productivity
-- Promise: turn source files into a local handoff project, then produce quality-checked PPTX or magazine-style Web Decks.
+- Promise: clarify the brief first, then turn local source files into quality-checked editable PPTX or magazine-style Web Decks.
 - Primary audience: Chinese office users, consultants, operators, trainers, and agent users who need editable deliverables.
 - Not a black-box cloud generator: source files stay local unless the user explicitly chooses another path.
 
@@ -27,16 +27,16 @@ Use this checklist when preparing Ultimate PPT Master for a skill marketplace, a
 
 Short:
 
-> Generate quality-checked PPTX and magazine-style Web Decks from local source files.
+> 先听明白再生成 quality-checked PPTX and magazine-style Web Decks from local source files.
 
 Long:
 
-> Ultimate PPT Master helps an agent turn PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into an inspectable presentation project. It supports editable PowerPoint and magazine-style Web Deck output, keeps source files local, and includes Design Doctor review commands plus public proof packs.
+> Ultimate PPT Master helps an agent clarify the audience, scenario, purpose, style, and source boundaries before turning PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into an inspectable presentation project. It supports editable PowerPoint and magazine-style Web Deck output, keeps source files local, and includes visual review, audit trails, and public proof packs.
 
 Default prompt:
 
 ```text
-Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report.
+Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report.
 ```
 
 ## Acceptance Gates

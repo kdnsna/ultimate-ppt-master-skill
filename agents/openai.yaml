@@ -1,9 +1,9 @@
 interface:
   display_name: "终极融合PPT大师"
-  short_description: "Codex-first quality-checked PPTX/Web Decks"
+  short_description: "先听明白再生成 quality-checked PPTX/Web Decks"
   icon_small: "./assets/skill-market/ultimate-ppt-master-icon.svg"
   icon_large: "./assets/skill-market/ultimate-ppt-master-card.svg"
   brand_color: "#0F766E"
-  default_prompt: "Use $ultimate-ppt-master to turn my source material into a quality-checked PPTX or Web Deck with a visual review report. If my brief is incomplete, ask staged questions first."
+  default_prompt: "Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report."
 policy:
   allow_implicit_invocation: true
