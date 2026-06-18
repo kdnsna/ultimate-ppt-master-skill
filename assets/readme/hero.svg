@@ -1,119 +1,139 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master v5.2.0 Expectation contract</title>
-  <desc id="desc">A simplified four-step Web Experience showing visual brief tags, guided intake, source confidence, delivery scorecard, reference style, feedback loop, official asset boundaries, Codex-first visuals, rendered review, local connector, AI helper, and generated local project folder.</desc>
+  <title id="title">Ultimate PPT Master v5.2.0 中文 README 首图</title>
+  <desc id="desc">中文为主的 README 首图，展示 AI PPT 预期契合交付系统：先问清需求，再生成可编辑 PPTX，并通过来源可信度、交付评分卡、图片验收和审计闭环降低用户预期偏差。</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#F8FAFC"/>
-      <stop offset="0.56" stop-color="#F1F7F5"/>
+      <stop offset="0.52" stop-color="#F4F8F6"/>
       <stop offset="1" stop-color="#FFF7ED"/>
     </linearGradient>
-    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id="bar" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#2563EB"/>
-      <stop offset="0.48" stop-color="#10B981"/>
-      <stop offset="1" stop-color="#EF5B3F"/>
+      <stop offset="0.46" stop-color="#10B981"/>
+      <stop offset="1" stop-color="#F97316"/>
     </linearGradient>
-    <filter id="softShadow" x="-12%" y="-16%" width="124%" height="136%" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="22" stdDeviation="24" flood-color="#172033" flood-opacity="0.14"/>
+    <filter id="shadow" x="-12%" y="-14%" width="124%" height="132%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#172033" flood-opacity="0.12"/>
     </filter>
-    <pattern id="grid" width="42" height="42" patternUnits="userSpaceOnUse">
-      <path d="M42 0H0V42" fill="none" stroke="#172033" stroke-opacity="0.055"/>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" fill="none" stroke="#172033" stroke-opacity="0.05"/>
     </pattern>
   </defs>
 
   <rect width="1600" height="900" fill="url(#bg)"/>
   <rect width="1600" height="900" fill="url(#grid)"/>
-  <rect x="90" y="72" width="1420" height="756" rx="30" fill="#FFFFFF" opacity="0.72"/>
+  <rect x="76" y="58" width="1448" height="784" rx="28" fill="#FFFFFF" opacity="0.82"/>
 
-  <g transform="translate(124 96)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
-    <rect width="438" height="48" rx="24" fill="#FFFFFF" filter="url(#softShadow)"/>
-    <circle cx="30" cy="24" r="8" fill="#2563EB"/>
-    <circle cx="56" cy="24" r="8" fill="#10B981"/>
-    <circle cx="82" cy="24" r="8" fill="#EF5B3F"/>
-    <text x="112" y="30" fill="#526173" font-size="15" font-weight="850">v5.2.0 Expectation contract</text>
+  <g font-family="Microsoft YaHei, PingFang SC, Noto Sans CJK SC, Arial, sans-serif">
+    <g transform="translate(126 92)">
+      <rect width="372" height="48" rx="24" fill="#FFFFFF" filter="url(#shadow)"/>
+      <circle cx="31" cy="24" r="8" fill="#2563EB"/>
+      <circle cx="57" cy="24" r="8" fill="#10B981"/>
+      <circle cx="83" cy="24" r="8" fill="#F97316"/>
+      <text x="112" y="31" fill="#526173" font-size="15" font-weight="800">Ultimate PPT Master v5.2.0</text>
 
-    <text x="0" y="122" fill="#172033" font-size="66" font-weight="950">Ultimate PPT Master</text>
-    <text x="0" y="174" fill="#2563EB" font-size="34" font-weight="900">Brief. Source. Generate. Audit.</text>
-    <text x="0" y="224" fill="#5F6F84" font-size="22" font-weight="650">把资料整理成本地项目包，再交给 Codex / Hermes / OpenClaw / Claude Code 深加工。</text>
-  </g>
-
-  <g transform="translate(1032 102)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" filter="url(#softShadow)">
-    <rect width="362" height="172" rx="14" fill="#172033"/>
-    <text x="28" y="42" fill="#FFFFFF" font-size="17" font-weight="900">Expectation contract</text>
-    <text x="28" y="72" fill="#B9C6D6" font-size="15" font-weight="720">默认 PPTX</text>
-    <text x="28" y="100" fill="#B9C6D6" font-size="15" font-weight="720">可视化标签</text>
-    <text x="28" y="128" fill="#B9C6D6" font-size="15" font-weight="720">Codex 分步访谈</text>
-    <text x="28" y="156" fill="#B9C6D6" font-size="15" font-weight="720">sourceConfidence</text>
-  </g>
-
-  <g transform="translate(124 332)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif" filter="url(#softShadow)">
-    <rect width="1352" height="404" rx="22" fill="#FFFFFF" stroke="#D7DEE8"/>
-    <rect width="1352" height="58" rx="22" fill="#F8FAFC"/>
-    <circle cx="32" cy="29" r="8" fill="#EF4444"/>
-    <circle cx="58" cy="29" r="8" fill="#F59E0B"/>
-    <circle cx="84" cy="29" r="8" fill="#10B981"/>
-    <text x="118" y="36" fill="#607086" font-size="15" font-weight="850">ultimate-ppt-master / web experience</text>
-
-    <g transform="translate(40 90)">
-      <rect width="224" height="278" rx="14" fill="#EFF6FF" stroke="#BFDBFE"/>
-      <circle cx="34" cy="36" r="18" fill="#2563EB"/>
-      <text x="34" y="43" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">1</text>
-      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Prepare</text>
-      <text x="24" y="116" fill="#355B91" font-size="16" font-weight="720">Pick brief tags</text>
-      <text x="24" y="142" fill="#355B91" font-size="16" font-weight="720">Paste background</text>
-      <text x="24" y="168" fill="#355B91" font-size="16" font-weight="720">Check fit risk</text>
-      <rect x="24" y="212" width="176" height="38" rx="8" fill="#2563EB"/>
-      <text x="112" y="237" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="900">Open Web Experience</text>
+      <text x="0" y="126" fill="#101828" font-size="64" font-weight="900">AI PPT 预期契合交付系统</text>
+      <text x="0" y="183" fill="#2563EB" font-size="34" font-weight="900">先问清 · 再生成 · 可编辑 · 可审计</text>
+      <text x="0" y="230" fill="#5F6F84" font-size="22" font-weight="650">把一句话需求、杂乱资料和参考样板，整理成可交付、可追溯、可复盘的办公 PPT。</text>
     </g>
 
-    <path d="M284 230H352" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
-    <path d="M342 214L360 230L342 246" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-
-    <g transform="translate(382 90)">
-      <rect width="224" height="278" rx="14" fill="#ECFDF5" stroke="#A7F3D0"/>
-      <circle cx="34" cy="36" r="18" fill="#10B981"/>
-      <text x="34" y="43" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">2</text>
-      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Connect</text>
-      <text x="24" y="116" fill="#23684E" font-size="16" font-weight="720">Local connector</text>
-      <text x="24" y="142" fill="#23684E" font-size="16" font-weight="720">127.0.0.1 only</text>
-      <text x="24" y="168" fill="#23684E" font-size="16" font-weight="720">No API key leaks</text>
-      <rect x="24" y="212" width="176" height="38" rx="8" fill="#0F766E"/>
-      <text x="112" y="237" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="900">npm run bridge</text>
+    <g transform="translate(1050 88)" filter="url(#shadow)">
+      <rect width="360" height="230" rx="18" fill="#101828"/>
+      <text x="28" y="44" fill="#FFFFFF" font-size="21" font-weight="900">交付合同</text>
+      <text x="28" y="78" fill="#B8C4D4" font-size="15" font-weight="720">project-brief.json</text>
+      <g transform="translate(28 104)" font-size="14" font-weight="800">
+        <rect width="138" height="32" rx="16" fill="#243B63"/>
+        <text x="18" y="22" fill="#DCEAFE">visualBrief</text>
+        <rect x="154" width="146" height="32" rx="16" fill="#064E3B"/>
+        <text x="174" y="22" fill="#D1FAE5">guidedBrief</text>
+        <rect y="44" width="162" height="32" rx="16" fill="#7C2D12"/>
+        <text x="18" y="66" fill="#FFEDD5">expectationFit</text>
+        <rect x="178" y="44" width="122" height="32" rx="16" fill="#3B0764"/>
+        <text x="196" y="66" fill="#F3E8FF">feedbackLoop</text>
+      </g>
+      <rect x="28" y="196" width="304" height="8" rx="4" fill="url(#bar)"/>
     </g>
 
-    <path d="M626 230H694" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
-    <path d="M684 214L702 230L684 246" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="translate(124 348)" filter="url(#shadow)">
+      <rect width="1352" height="344" rx="22" fill="#FFFFFF" stroke="#D7DEE8"/>
+      <rect width="1352" height="58" rx="22" fill="#F8FAFC"/>
+      <circle cx="32" cy="29" r="8" fill="#EF4444"/>
+      <circle cx="58" cy="29" r="8" fill="#F59E0B"/>
+      <circle cx="84" cy="29" r="8" fill="#10B981"/>
+      <text x="118" y="36" fill="#607086" font-size="15" font-weight="850">真实办公 PPT 生产流程</text>
 
-    <g transform="translate(724 90)">
-      <rect width="224" height="278" rx="14" fill="#FFF7ED" stroke="#FED7AA"/>
-      <circle cx="34" cy="36" r="18" fill="#F97316"/>
-      <text x="34" y="43" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">3</text>
-      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">Deliver</text>
-      <text x="24" y="116" fill="#8A4B17" font-size="16" font-weight="720">project-brief.json</text>
-      <text x="24" y="142" fill="#8A4B17" font-size="16" font-weight="720">storyboard.json</text>
-      <text x="24" y="168" fill="#8A4B17" font-size="16" font-weight="720">quality-report.json</text>
-      <rect x="24" y="212" width="176" height="38" rx="8" fill="#EA580C"/>
-      <text x="112" y="237" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="900">Local project</text>
+      <g transform="translate(38 92)">
+        <rect width="260" height="210" rx="14" fill="#EFF6FF" stroke="#BFDBFE"/>
+        <circle cx="38" cy="38" r="20" fill="#2563EB"/>
+        <text x="38" y="46" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="900">1</text>
+        <text x="74" y="46" fill="#101828" font-size="26" font-weight="900">需求输入</text>
+        <text x="26" y="90" fill="#355B91" font-size="17" font-weight="720">标签组合</text>
+        <text x="26" y="120" fill="#355B91" font-size="17" font-weight="720">背景资料粘贴</text>
+        <text x="26" y="150" fill="#355B91" font-size="17" font-weight="720">Codex 分步追问</text>
+        <rect x="26" y="170" width="138" height="24" rx="12" fill="#DBEAFE"/>
+        <text x="45" y="188" fill="#1D4ED8" font-size="13" font-weight="850">少确认但问关键</text>
+      </g>
+
+      <path d="M326 198H384" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
+      <path d="M374 182L392 198L374 214" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <g transform="translate(420 92)">
+        <rect width="260" height="210" rx="14" fill="#ECFDF5" stroke="#A7F3D0"/>
+        <circle cx="38" cy="38" r="20" fill="#10B981"/>
+        <text x="38" y="46" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="900">2</text>
+        <text x="74" y="46" fill="#101828" font-size="26" font-weight="900">预期契合</text>
+        <text x="26" y="90" fill="#23684E" font-size="17" font-weight="720">来源可信度</text>
+        <text x="26" y="120" fill="#23684E" font-size="17" font-weight="720">交付评分卡</text>
+        <text x="26" y="150" fill="#23684E" font-size="17" font-weight="720">红黄绿风险</text>
+        <rect x="26" y="170" width="154" height="24" rx="12" fill="#D1FAE5"/>
+        <text x="45" y="188" fill="#047857" font-size="13" font-weight="850">先对齐再开工</text>
+      </g>
+
+      <path d="M708 198H766" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
+      <path d="M756 182L774 198L756 214" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <g transform="translate(802 92)">
+        <rect width="260" height="210" rx="14" fill="#FFF7ED" stroke="#FED7AA"/>
+        <circle cx="38" cy="38" r="20" fill="#F97316"/>
+        <text x="38" y="46" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="900">3</text>
+        <text x="74" y="46" fill="#101828" font-size="26" font-weight="900">生成交付</text>
+        <text x="26" y="90" fill="#8A4B17" font-size="17" font-weight="720">默认可编辑 PPTX</text>
+        <text x="26" y="120" fill="#8A4B17" font-size="17" font-weight="720">微软雅黑排版</text>
+        <text x="26" y="150" fill="#8A4B17" font-size="17" font-weight="720">GPT 无文字生图</text>
+        <rect x="26" y="170" width="168" height="24" rx="12" fill="#FFEDD5"/>
+        <text x="45" y="188" fill="#C2410C" font-size="13" font-weight="850">官方/IP 素材边界</text>
+      </g>
+
+      <path d="M1090 198H1148" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
+      <path d="M1138 182L1156 198L1138 214" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <g transform="translate(1184 92)">
+        <rect width="130" height="210" rx="14" fill="#F8FAFC" stroke="#D7DEE8"/>
+        <circle cx="34" cy="38" r="20" fill="#101828"/>
+        <text x="34" y="46" text-anchor="middle" fill="#FFFFFF" font-size="20" font-weight="900">4</text>
+        <text x="26" y="88" fill="#101828" font-size="23" font-weight="900">审阅</text>
+        <text x="26" y="122" fill="#526173" font-size="16" font-weight="720">渲染</text>
+        <text x="26" y="150" fill="#526173" font-size="16" font-weight="720">验收</text>
+        <text x="26" y="178" fill="#526173" font-size="16" font-weight="720">复盘</text>
+      </g>
     </g>
 
-    <path d="M968 230H1036" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round"/>
-    <path d="M1026 214L1044 230L1026 246" stroke="#CBD5E1" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-
-    <g transform="translate(1066 90)">
-      <rect width="224" height="278" rx="14" fill="#F8FAFC" stroke="#D7DEE8"/>
-      <circle cx="34" cy="36" r="18" fill="#172033"/>
-      <text x="34" y="43" text-anchor="middle" fill="#FFFFFF" font-size="18" font-weight="900">4</text>
-      <text x="24" y="82" fill="#172033" font-size="24" font-weight="920">AI helper</text>
-      <text x="24" y="116" fill="#526173" font-size="16" font-weight="720">Codex / Hermes</text>
-      <text x="24" y="142" fill="#526173" font-size="16" font-weight="720">OpenClaw / Claude</text>
-      <text x="24" y="168" fill="#526173" font-size="16" font-weight="720">Skill does final QA</text>
-      <rect x="24" y="212" width="176" height="38" rx="8" fill="#172033"/>
-      <text x="112" y="237" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="900">Produce PPTX / HTML</text>
+    <g transform="translate(154 730)">
+      <rect width="1292" height="84" rx="18" fill="#FFFFFF" filter="url(#shadow)"/>
+      <g transform="translate(32 22)" font-size="17" font-weight="850">
+        <rect width="204" height="40" rx="20" fill="#EFF6FF"/>
+        <text x="26" y="27" fill="#1D4ED8">可视化标签输入</text>
+        <rect x="228" width="184" height="40" rx="20" fill="#ECFDF5"/>
+        <text x="254" y="27" fill="#047857">分步需求访谈</text>
+        <rect x="436" width="194" height="40" rx="20" fill="#FFF7ED"/>
+        <text x="462" y="27" fill="#C2410C">默认 PPTX 交付</text>
+        <rect x="654" width="184" height="40" rx="20" fill="#F1F5F9"/>
+        <text x="680" y="27" fill="#334155">图片验收清单</text>
+        <rect x="862" width="184" height="40" rx="20" fill="#FDF2F8"/>
+        <text x="888" y="27" fill="#BE185D">不满意归因</text>
+        <rect x="1070" width="160" height="40" rx="20" fill="#FEFCE8"/>
+        <text x="1096" y="27" fill="#A16207">审计闭环</text>
+      </g>
     </g>
-  </g>
-
-  <g transform="translate(182 790)" font-family="Inter, Helvetica, Arial, PingFang SC, sans-serif">
-    <rect width="1236" height="56" rx="12" fill="#FFFFFF" filter="url(#softShadow)"/>
-    <rect x="28" y="20" width="160" height="16" rx="8" fill="url(#brand)"/>
-    <text x="214" y="35" fill="#172033" font-size="17" font-weight="850">Visual brief tags · Codex guided intake · expectation fit · editable PPTX · formal audits</text>
   </g>
 </svg>
