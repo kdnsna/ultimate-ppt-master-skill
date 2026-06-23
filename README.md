@@ -1,9 +1,9 @@
-# Ultimate PPT Master - v5.2 Expectation-Fit Delivery System
+# Ultimate PPT Master - v5.3 Best-Effect Brief Enhancer
 
-> Local-first AI presentation production for real office work: turn unclear requests, messy source material, or structured briefs into editable PPTX or magazine-style Web Decks with Visual Brief tags, Codex Guided Intake, source confidence, delivery scorecards, reference-style choices, feedback taxonomy, official/IP asset boundaries, Codex/GPT no-text visuals, Microsoft YaHei typography defaults, rendered review, and formal delivery audits.
+> Local-first AI presentation production for real office work: first expand short prompts into a best-effect brief, then turn unclear requests, messy source material, or structured briefs into editable PPTX or magazine-style Web Decks with a Guizang-like fixed-style fallback, Visual Brief tags, source confidence, delivery scorecards, official/IP asset boundaries, Codex/GPT no-text visuals, rendered review, and formal delivery audits.
 
 <p align="center">
-  <strong>v5.2.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/release/release-notes-v5.2.0.md">v5.2 Release Notes</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v5.3.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/release/release-notes-v5.3.0.md">v5.3 Release Notes</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -13,7 +13,7 @@
   ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Benchmark Wall</strong></a>
   ·
-  <a href="./docs/release/release-notes-v5.2.0.md"><strong>v5.2.0 Notes</strong></a>
+  <a href="./docs/release/release-notes-v5.3.0.md"><strong>v5.3.0 Notes</strong></a>
   ·
   <a href="./docs/guides/agent-connect-bridge.md"><strong>Agent Bridge</strong></a>
   ·
@@ -21,13 +21,32 @@
 </p>
 
 <p align="center">
-  <img alt="Version 5.2.0" src="https://img.shields.io/badge/Version-5.2.0-172033?style=for-the-badge">
-  <img alt="Expectation contract" src="https://img.shields.io/badge/v5.2-Expectation%20Contract-0F766E?style=for-the-badge">
+  <img alt="Version 5.3.0" src="https://img.shields.io/badge/Version-5.3.0-172033?style=for-the-badge">
+  <img alt="Best-effect brief" src="https://img.shields.io/badge/v5.3-Best--Effect%20Brief-0F766E?style=for-the-badge">
   <img alt="Visual Brief tags" src="https://img.shields.io/badge/Web-Visual%20Brief%20Tags-2563EB?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
   <img alt="Web Deck" src="https://img.shields.io/badge/Output-Web%20Deck-F97316?style=for-the-badge">
   <img alt="MIT License" src="https://img.shields.io/badge/License-MIT-172033?style=for-the-badge">
 </p>
+
+## Best Results Prompt
+
+Use this prompt when calling the skill from Codex, ChatGPT, Claude Code, Hermes, OpenClaw, Cursor, or any Agent that can read this repo:
+
+```text
+Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.
+```
+
+What v5.3 does before production:
+
+| User input | v5.3 behavior |
+|---|---|
+| Only a topic or one sentence | Create an **Auto-expanded brief**, then use **Guizang-like Magazine Web Deck fixed style** unless the user explicitly asks for formal editable PPTX. |
+| "Make me a PPT about X" with no sources | Treat it as an **extremely thin prompt**; default to an 8-page Style A editorial/e-ink Web Deck so the first result is stable and visually strong. |
+| Formal report, government/finance/training, or editable file request | Use editable PPTX, Microsoft YaHei, formal-business quality gate, source confidence, official/IP asset plan, and the same best-effect brief record. |
+| Source files or a detailed brief | Preserve the user's intent, write assumptions, and proceed through the normal expectation-fit and quality checks. |
+
+The point is simple: the user should not need to know the perfect prompt. The Agent must first turn a rough instruction into the production brief that would normally lead to the best result.
 
 ## Why Teams Use It
 
@@ -35,7 +54,9 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 
 | Need | What Ultimate PPT Master gives you |
 |---|---|
-| Make a real PowerPoint by default | Generic requests such as "make a deck" or "做个 PPT" default to editable PPTX instead of another route-selection loop. |
+| Make short prompts useful | v5.3 adds a Best-Effect Brief Enhancer so the Agent expands vague requests before choosing route, style, page rhythm, and assumptions. |
+| Get a strong first version from little input | An extremely thin prompt defaults to Guizang-like Magazine Web Deck fixed style instead of a bland generic PPT or another long interrogation. |
+| Make a real PowerPoint when needed | Formal, editable, government, finance, training, and report requests still go to editable PPTX with Microsoft YaHei and formal-business checks. |
 | Avoid expectation drift | v5.2 turns the clarity gate into a contract: tags, guided answers, source confidence, reference style, delivery scorecard, and feedback taxonomy are all written into the handoff. |
 | Ask the right questions | The agent clarifies audience, scenario, purpose, source status, core message, page count, visual style, asset rules, output format, and compliance boundaries before production when those answers matter. |
 | Use better AI visuals | Codex/GPT image generation is treated as a composed visual engine for no-text backgrounds, support scenes, and micro-assets, not element stacking. |
@@ -47,18 +68,18 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 
 ## Who It Is For
 
-| Audience | Typical work | Why v5.2 fits |
+| Audience | Typical work | Why v5.3 fits |
 |---|---|---|
-| Office teams | Leadership updates, work reports, training decks, project reviews, and sales enablement decks. | Handles vague one-line requests by asking for the missing business context before generating the deck. |
+| Office teams | Leadership updates, work reports, training decks, project reviews, and sales enablement decks. | Handles vague one-line requests by auto-expanding a best-effect brief before production. |
 | Finance, government, and enterprise users | Formal materials that need careful wording, brand boundaries, and traceable source claims. | Keeps official/IP assets documented and blocks fake logo-like placeholders for external release. |
 | Consultants and internal strategy teams | Structured narratives, industry scans, solution proposals, and executive summaries. | Builds a single `project-brief.json` contract before page generation so structure, audience, and style stay aligned. |
 | Event and brand teams | Keynotes, campaign decks, culture-tourism decks, product showcases, and public-facing visuals. | Uses Codex/GPT image generation for composed no-text visuals while the business message stays editable. |
 
 ## Typical Scenarios
 
-| Request | v5.2 default behavior |
+| Request | v5.3 default behavior |
 |---|---|
-| "Make me a PPT." | Enter Codex Guided Intake and ask staged questions before production, unless the user explicitly says to draft with assumptions. |
+| "Make me a PPT." | Create `bestEffectBrief`; if it is extremely thin and not explicitly formal/editable, produce the Guizang-like Magazine Web Deck fixed style. |
 | "Make this source into a PPT." | If the source has no audience or purpose, ask for scenario, audience, and desired outcome first; then create editable PPTX by default. |
 | "Use a stronger visual style." | Read the source, name a theme art direction, generate no-text support visuals when useful, then keep titles, numbers, tables, and charts editable. |
 | "This is for an external brand or public event." | Require an official/IP asset plan for logos, campaign marks, cards, QR codes, partner marks, and any generated imagery. |
@@ -68,6 +89,7 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 
 | Deliverable | What is inside | Why it matters |
 |---|---|---|
+| `bestEffectBrief` | Prompt quality, auto-expanded brief, recommended route, Extreme Thin Prompt Fallback state, fixed style, and assumptions. | Agents no longer use the user's rough sentence as the production brief. |
 | Editable PPTX | Real text boxes, shapes, charts, tables, speaker notes, and editable brand lockups where safe. | The deck can be handed to a PowerPoint user, not only admired as screenshots. |
 | Web Deck | A single-file browser presentation for talks, showcases, and magazine-style storytelling. | Useful when visual rhythm and sharing matter more than PowerPoint editing. |
 | `project-brief.json` | `briefMode`, `visualBrief`, `guidedBrief`, `expectationFit`, `sourceConfidence`, `deliveryScorecard`, `referenceStyle`, `feedbackLoop`, and `confirmationBrief` in one handoff contract. | The system knows which signals came from the user, which came from tags, which are assumptions, and what to fix if the user is unsatisfied. |
@@ -79,10 +101,12 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 
 ## What v5 Changes
 
-v5.0.0 made the product a delivery-defaults system. v5.1.0 added staged intake for unclear requests. v5.2.0 turns those signals into an expectation-fit contract that records source confidence, reference style, delivery score, image acceptance, and dissatisfaction taxonomy before and after production.
+v5.0.0 made the product a delivery-defaults system. v5.1.0 added staged intake for unclear requests. v5.2.0 turned those signals into an expectation-fit contract. v5.3.0 adds the layer that was missing for real Agent use: short instructions are auto-expanded into a best-effect brief before route selection, and topic-only prompts get a fixed high-quality Guizang-like Web Deck default.
 
 | v5 default | Practical effect |
 |---|---|
+| Best-Effect Brief Enhancer | Every Agent run starts by writing `bestEffectBrief`: prompt quality, auto-expanded brief, assumptions, route, fixed fallback, and user-visible caveats. |
+| Extreme Thin Prompt Fallback | Topic-only or one-line prompts default to Guizang-like Magazine Web Deck fixed style unless the user explicitly needs formal editable PPTX. |
 | Expectation-fit contract | `project-brief.json` and `quality-report.json` now carry `sourceConfidence`, `deliveryScorecard`, `referenceStyle`, `feedbackLoop`, `failureTaxonomy`, `confirmationBrief`, and `imageAcceptance`. |
 | Editable PPTX first | Formal reports, consulting decks, finance/government material, and normal "make PPT" requests go straight to PowerPoint-ready output after the brief is clear enough. |
 | Visual Brief Builder | Web users pick diverse tags and paste background material, meeting notes, leadership requirements, links, and special constraints. |
@@ -100,6 +124,8 @@ v5.0.0 made the product a delivery-defaults system. v5.1.0 added staged intake f
 
 | Area | Standard |
 |---|---|
+| Best-effect brief first | Agents must expand short requests before production and record the inferred assumptions in `bestEffectBrief`. |
+| Extremely thin prompts | Default to Guizang-like Magazine Web Deck fixed style unless the user explicitly requests formal editable PPTX. |
 | Right questions first | When a missing answer can change the deck, Codex pauses for staged intake instead of silently guessing. |
 | Draft escape hatch | If the user says "draft with defaults" or "先做一版草稿", the system may proceed with assumptions and must record them. |
 | PPTX editability | Business content stays editable. Full-slide raster images are reserved for intentional no-text backgrounds, illustrations, or browser-only Web Deck moments. |
@@ -115,9 +141,10 @@ The production path is intentionally narrow. It should feel like a senior PPT op
 
 ```text
 User request or source material
-  -> clarity gate
+  -> Best-Effect Brief Enhancer
+  -> clarity gate / Extreme Thin Prompt Fallback
   -> Web Visual Brief tags or Codex Guided Intake
-  -> project-brief.json with expectationFit
+  -> project-brief.json with bestEffectBrief + expectationFit
   -> official/IP asset plan
   -> page roles + recipes + editability/raster policy
   -> Codex/GPT no-text visual assets when useful
@@ -129,7 +156,7 @@ User request or source material
 
 Core artifacts in plain language:
 
-- `project-brief.json`: the production brief; v5.1 records `briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit`.
+- `project-brief.json`: the production brief; v5.3 records `bestEffectBrief`, `briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit`.
 - `design_spec.md`: human-readable design contract for visual direction, page roles, typography, assets, expectation risks, and completion caveats.
 - `spec_lock.md`: machine-readable execution lock for page recipes, visual layers, raster policy, brand assets, expectation contract, and aesthetic checks.
 - `storyboard.json`: DeckIR page map with page roles, recipe IDs, evidence refs, raster policy, and editability targets.
@@ -156,6 +183,7 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 
 | Need | Best route | Output |
 |---|---|---|
+| Only a topic or one-line request | Guizang-like fixed Web Deck | Stable 8-page Style A editorial/e-ink HTML deck. |
 | Formal report, consulting deck, training deck, editable business material | Editable PPTX | PowerPoint deck with editable text, shapes, charts, tables, notes, and quality checks. |
 | Talk, showcase, demo day, editorial presentation | Web Deck | Single-file browser deck with stronger visual rhythm and shareable HTML. |
 | Both formal handoff and browser preview | Dual delivery | Separate PPTX and Web projects with shared source and aligned structure. |
@@ -165,6 +193,7 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 
 | Step | What the agent should do |
 |---|---|
+| Expand first | Convert the raw request into `bestEffectBrief`, including route, style, page count, assumptions, and fixed fallback state. |
 | Judge clarity | Decide whether the request is production-ready, yellow-risk, or too vague. |
 | Ask or tag | Use Visual Brief tags on Web; use Codex Guided Intake in chat when essential context is missing. |
 | Confirm brief | Summarize target, audience, content frame, page count, style, assets, output format, and assumptions before production. |
@@ -178,6 +207,7 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 
 | Layer | Release | What it protects |
 |---|---|---|
+| Best-effect brief and fixed fallback | [Release Notes - v5.3.0](./docs/release/release-notes-v5.3.0.md) | Auto-expanded brief, extreme-thin prompt fallback, Guizang-like Magazine Web Deck fixed style, and PPTX exception path. |
 | Guided intake and expectation fit | [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) | Visual Brief tags, Codex staged questions, unified `project-brief.json`, and readiness risk before generation. |
 | Expectation-fit contract | [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) | Source confidence, reference-style choices, delivery scorecard, feedback taxonomy, confirmation brief, and image acceptance. |
 | Delivery defaults | [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) | Default PPTX route, one delivery brief, official/IP asset handling, Microsoft YaHei layout scale, and Codex-first image generation. |
@@ -187,7 +217,7 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 | Hybrid-editable generation | [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) | page recipes, no-text generated visual layers, editable PPTX body content, formal raster policy. |
 | Public proof surface | [Quality Workbench v2.5](./docs/quality/quality-workbench-v2.5.md) | Benchmark Wall, synthetic proof packs, Design Doctor reporting, and release checks. |
 
-Historical release notes: [v5.1.0](./docs/release/release-notes-v5.1.0.md), [v5.0.0](./docs/release/release-notes-v5.0.0.md), [v4.3.0](./docs/release/release-notes-v4.3.0.md), [v4.2.0](./docs/release/release-notes-v4.2.0.md), [v4.1.0](./docs/release/release-notes-v4.1.0.md), [v4.0.0](./docs/release/release-notes-v4.0.0.md), [v3.0.0](./docs/release/release-notes-v3.0.0.md).
+Historical release notes: [v5.2.0](./docs/release/release-notes-v5.2.0.md), [v5.1.0](./docs/release/release-notes-v5.1.0.md), [v5.0.0](./docs/release/release-notes-v5.0.0.md), [v4.3.0](./docs/release/release-notes-v4.3.0.md), [v4.2.0](./docs/release/release-notes-v4.2.0.md), [v4.1.0](./docs/release/release-notes-v4.1.0.md), [v4.0.0](./docs/release/release-notes-v4.0.0.md), [v3.0.0](./docs/release/release-notes-v3.0.0.md).
 
 ## Proofs
 
@@ -195,6 +225,7 @@ The [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmar
 
 | Proof | Link |
 |---|---|
+| v5.3 best-effect brief enhancer | [Release Notes - v5.3.0](./docs/release/release-notes-v5.3.0.md) |
 | v5.2 expectation-fit contract | [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) |
 | v5.1 guided-intake release | [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) |
 | v5 delivery-defaults release | [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) |
@@ -209,7 +240,7 @@ The [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmar
 Copyable marketplace prompt:
 
 ```text
-Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report.
+Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.
 ```
 
 Expert users can install the Skill directly:

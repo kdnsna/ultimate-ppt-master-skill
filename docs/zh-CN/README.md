@@ -30,7 +30,8 @@ Ultimate PPT Master v5 采用分类文档结构。先按你当前要做的事情
 
 | 需求 | 阅读 |
 |---|---|
-| 查看最新发布 | [发布说明 - v5.2.0](./release/release-notes-v5.2.0.md) |
+| 查看最新发布 | [发布说明 - v5.3.0](./release/release-notes-v5.3.0.md) |
+| 查看 v5.3 最佳效果提示增强器 | [发布说明 - v5.3.0](./release/release-notes-v5.3.0.md) |
 | 查看 v5.2 预期契合合同 | [发布说明 - v5.2.0](./release/release-notes-v5.2.0.md) |
 | 查看 v5.1 分步访谈发布 | [发布说明 - v5.1.0](./release/release-notes-v5.1.0.md) |
 | 查看 v5 交付默认规范发布 | [发布说明 - v5.0.0](./release/release-notes-v5.0.0.md) |

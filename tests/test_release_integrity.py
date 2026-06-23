@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "5.2.0"
+VERSION = "5.3.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -72,6 +72,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/rendered-review-loop-v4.3.md",
+            "docs/release/release-notes-v5.3.0.md",
             "docs/release/release-notes-v5.2.0.md",
             "docs/release/release-notes-v5.1.0.md",
             "docs/release/release-notes-v5.0.0.md",
@@ -86,6 +87,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "docs/zh-CN/release/release-notes-v5.3.0.md",
             "docs/zh-CN/release/release-notes-v5.2.0.md",
             "docs/zh-CN/release/release-notes-v5.1.0.md",
             "docs/zh-CN/release/release-notes-v5.0.0.md",
@@ -112,9 +114,11 @@ class ReleaseIntegrityTest(unittest.TestCase):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
         marketplace_prompt = (
-            "Use $ultimate-ppt-master to turn my source material into a "
-            "quality-checked PPTX or Web Deck with a visual review report. "
-            "If my brief is incomplete, ask staged questions first."
+            "Use $ultimate-ppt-master to expand my short request into a "
+            "best-effect brief first. If my prompt is extremely thin, use the "
+            "Guizang-like Magazine Web Deck fixed style by default; if I "
+            "explicitly need a formal editable deck, use PPTX and keep the "
+            "same quality checks."
         )
 
         for expected in (
@@ -122,7 +126,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "Why Teams Use It",
             "What v5 Changes",
             "Product Loop",
-            "v5.2.0 Notes",
+            "v5.3.0 Notes",
             "Release Notes - v5.2.0",
             "Release Notes - v5.1.0",
             "sourceConfidence",
@@ -175,7 +179,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "为什么团队会用它",
             "v5 做对了什么",
             "产品闭环",
-            "v5.2.0 说明",
+            "v5.3.0 说明",
             "发布说明 - v5.2.0",
             "发布说明 - v5.1.0",
             "sourceConfidence",
@@ -249,6 +253,51 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("$ultimate-ppt-master", openai_yaml)
         self.assertIn("quality-checked PPTX", openai_yaml)
 
+    def test_v53_best_effect_brief_enhancer_is_public_and_actionable(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        prompt = (ROOT / "PROMPT.md").read_text(encoding="utf-8")
+        agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        openai_yaml = (ROOT / "agents/openai.yaml").read_text(encoding="utf-8")
+        listing = json.loads((ROOT / "agents/marketplace-listing.json").read_text(encoding="utf-8"))
+
+        best_effect_prompt = (
+            "Use $ultimate-ppt-master to expand my short request into a best-effect brief first. "
+            "If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; "
+            "if I explicitly need a formal editable deck, use PPTX and keep the same quality checks."
+        )
+
+        for expected in (
+            "Best-Effect Brief Enhancer",
+            "Best Results Prompt",
+            "Guizang-like Magazine Web Deck fixed style",
+            "extremely thin prompt",
+            "Auto-expanded brief",
+            best_effect_prompt,
+        ):
+            self.assertIn(expected, readme)
+
+        for expected in (
+            "最佳效果提示增强器",
+            "最佳使用提示",
+            "Guizang-like Magazine Web Deck fixed style",
+            "极短指令",
+            "自动扩写 brief",
+            best_effect_prompt,
+        ):
+            self.assertIn(expected, readme_zh)
+
+        for text in (skill, prompt, agents):
+            self.assertIn("Best-Effect Brief Enhancer", text)
+            self.assertIn("Extreme Thin Prompt Fallback", text)
+            self.assertIn("Guizang-like Magazine Web Deck fixed style", text)
+            self.assertIn("bestEffectBrief", text)
+
+        self.assertIn(best_effect_prompt, openai_yaml)
+        self.assertEqual(listing["defaultPrompt"], best_effect_prompt)
+        self.assertIn("best-effect brief", listing["positioning"])
+
     def test_public_benchmark_page_lists_all_quality_proofs(self):
         benchmark = ROOT / "apps/web/public/benchmark/index.html"
         self.assertTrue(benchmark.is_file())
@@ -296,6 +345,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         release_v51_zh = (ROOT / "docs/zh-CN/release/release-notes-v5.1.0.md").read_text(encoding="utf-8")
         release_v52 = (ROOT / "docs/release/release-notes-v5.2.0.md").read_text(encoding="utf-8")
         release_v52_zh = (ROOT / "docs/zh-CN/release/release-notes-v5.2.0.md").read_text(encoding="utf-8")
+        release_v53 = (ROOT / "docs/release/release-notes-v5.3.0.md").read_text(encoding="utf-8")
+        release_v53_zh = (ROOT / "docs/zh-CN/release/release-notes-v5.3.0.md").read_text(encoding="utf-8")
 
         self.assertIn("npm run audit:docs", release_maintenance)
         self.assertIn("npm run audit:web-console", release_maintenance)
@@ -357,6 +408,9 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("deliveryScorecard", release_v52)
         self.assertIn("feedbackLoop", release_v52)
         self.assertIn("Plain-Language Update Notes", release_v52)
+        self.assertIn("bestEffectBrief", release_v53)
+        self.assertIn("Guizang-like Magazine Web Deck fixed style", release_v53)
+        self.assertIn("Plain-Language Update Notes", release_v53)
         self.assertIn("Codex 原生 GPT 生图", release_v5_zh)
         self.assertIn("主题艺术方向", release_v5_zh)
         self.assertIn("山海交汇 烟火同行", release_v5_zh)
@@ -371,6 +425,9 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("deliveryScorecard", release_v52_zh)
         self.assertIn("feedbackLoop", release_v52_zh)
         self.assertIn("白话更新栏", release_v52_zh)
+        self.assertIn("bestEffectBrief", release_v53_zh)
+        self.assertIn("Guizang-like Magazine Web Deck fixed style", release_v53_zh)
+        self.assertIn("白话更新栏", release_v53_zh)
 
     def test_web_handoff_panel_has_executable_next_step_ui(self):
         app = (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8")
@@ -394,8 +451,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v5.2.0", hero)
-        self.assertIn("Expectation contract", hero)
+        self.assertIn("v5.3.0", hero)
+        self.assertIn("Best-effect", hero)
         self.assertIn("sourceConfidence", hero)
         self.assertIn("Plain-language glossary", web_preview)
         self.assertIn("Write handoff", flow)

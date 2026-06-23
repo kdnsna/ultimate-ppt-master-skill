@@ -66,7 +66,7 @@ It should cover:
 - whitespace checks.
 
 CI should run on the current GitHub Actions JavaScript runtime generation. For
-v5.2.0 that means Node 24 in the workflows and current official action majors
+v5.3.0 that means Node 24 in the workflows and current official action majors
 for checkout, Node, and Python setup.
 
 The Pages workflow lives at:
@@ -144,7 +144,7 @@ When syncing upstream:
 
 ## Version Notes
 
-v5.2.0 positions this repository as:
+v5.3.0 positions this repository as:
 
 - a delivery-defaults presentation workbench for Chinese office users who need formal PPTX and high-impact Web Deck outputs;
 - an office-first Agent Skill where generic PPT requests default to editable PPTX after a clarity gate has enough production intent;

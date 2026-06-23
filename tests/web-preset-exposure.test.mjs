@@ -198,7 +198,7 @@ test("web experience exposes visual brief tags and expectation fit contract", as
   const appSource = await readFile("apps/web/src/App.tsx", "utf8");
   const cssSource = await readFile("apps/web/src/styles.css", "utf8");
 
-  assert.match(appSource, /type BriefMode = "visual-tags" \| "codex-guided-intake" \| "source-first" \| "draft-with-assumptions"/);
+  assert.match(appSource, /type BriefMode = "visual-tags" \| "codex-guided-intake" \| "source-first" \| "draft-with-assumptions" \| "best-effect-expanded" \| "best-effect-fixed-style"/);
   assert.match(appSource, /VisualBriefBuilder/);
   assert.match(appSource, /ExpectationFitCard/);
   assert.match(appSource, /visualTagGroups/);
@@ -236,4 +236,20 @@ test("web experience exposes the v5.2 expectation-fit contract", async () => {
   assert.match(appSource, /Do not invent numbers|不编造数据/);
   assert.match(cssSource, /reference-style-row/);
   assert.match(cssSource, /reference-style-summary/);
+});
+
+test("web experience exposes the v5.3 best-effect brief enhancer contract", async () => {
+  const appSource = await readFile("apps/web/src/App.tsx", "utf8");
+  const cssSource = await readFile("apps/web/src/styles.css", "utf8");
+
+  assert.match(appSource, /interface BestEffectBrief/);
+  assert.match(appSource, /buildBestEffectBrief/);
+  assert.match(appSource, /bestEffectBrief/);
+  assert.match(appSource, /best-effect-expanded/);
+  assert.match(appSource, /best-effect-fixed-style/);
+  assert.match(appSource, /Guizang-like Magazine Web Deck fixed style/);
+  assert.match(appSource, /Extreme Thin Prompt Fallback/);
+  assert.match(appSource, /BestEffectGuide/);
+  assert.match(appSource, /best-effect-guide/);
+  assert.match(cssSource, /best-effect-guide/);
 });

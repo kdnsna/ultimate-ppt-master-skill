@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit the v5.2 project brief contract across Web, Bridge, and Desktop."""
+"""Audit the v5.2/v5.3 project brief contracts across Web, Bridge, and Desktop."""
 
 from __future__ import annotations
 
@@ -16,6 +16,11 @@ CHECKS = {
         "interface DeliveryScorecard",
         "interface FeedbackLoop",
         "buildV52Contract",
+        "interface BestEffectBrief",
+        "buildBestEffectBrief",
+        "bestEffectBrief",
+        "Extreme Thin Prompt Fallback",
+        "Guizang-like Magazine Web Deck fixed style",
         "sourceConfidence",
         "deliveryScorecard",
         "confirmationBrief",
@@ -47,11 +52,11 @@ def main() -> int:
             if needle not in text:
                 failures.append(f"{relative}: missing {needle}")
     if failures:
-        print("v5.2 brief contract audit failed:")
+        print("v5.2/v5.3 brief contract audit failed:")
         for failure in failures:
             print(f"- {failure}")
         return 1
-    print("v5.2 brief contract audit passed.")
+    print("v5.2/v5.3 brief contract audit passed.")
     return 0
 
 

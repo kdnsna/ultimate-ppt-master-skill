@@ -14,12 +14,16 @@ Use this repository as a portable presentation-generation skill package for agen
 
 Use this skill when the user asks to create, rewrite, convert, or polish a PPT, PowerPoint, deck, slide deck, presentation, 演示文稿, or 幻灯片.
 
-For generic requests like “做一个 PPT” or “make a deck”, default to editable PowerPoint and proceed. Mention the web deck option briefly, but do not stop for a mode choice unless the request is genuinely ambiguous.
+Best-Effect Brief Enhancer: before choosing a route or generating files, rewrite the user's short instruction into `bestEffectBrief`. Record prompt quality, auto-expanded audience/scenario/message/page-count/style/source/asset assumptions, recommended route, and which decisions came from the user vs the Agent.
+
+Extreme Thin Prompt Fallback: for generic requests like “做一个 PPT”, “make a deck”, or a topic-only prompt with no formal/editable signal, default to the Guizang-like Magazine Web Deck fixed style. Use Mode 2, Style A · 电子杂志 × 电子墨水, 8 pages by default, and a stable page rhythm: dark cover, light context, dark tension/opportunity, light structure, large divider, evidence/scene, dark point-of-view, light closing.
+
+If the user explicitly asks for a formal editable deck, `.pptx`, government/finance/training/report material, or files that another person must revise, switch to formal editable PPTX while keeping the same `bestEffectBrief` and quality checks.
 
 1. Editable PowerPoint (`.pptx`)
 2. Magazine-style web deck (`index.html`; default editorial/e-ink style, optional Swiss Style)
 
-Use the web deck route only when the user explicitly asks for HTML, web PPT, magazine/editorial/e-ink, Swiss Style, horizontal swipe, keynote/showcase/demo-day, or browser-first delivery.
+Use the web deck route when the user explicitly asks for HTML, web PPT, magazine/editorial/e-ink, Swiss Style, horizontal swipe, keynote/showcase/demo-day, browser-first delivery, or when the Extreme Thin Prompt Fallback selects the Guizang-like Magazine Web Deck fixed style.
 
 ## Runtime
 

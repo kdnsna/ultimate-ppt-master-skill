@@ -2,7 +2,7 @@
   "id": "ultimate-ppt-master",
   "name": "Ultimate PPT Master",
   "displayName": "终极融合PPT大师",
-  "version": "5.2.0",
+  "version": "5.3.0",
   "invocation": "$ultimate-ppt-master",
   "category": [
     "presentation generation",
@@ -10,9 +10,9 @@
     "web deck",
     "office productivity"
   ],
-  "shortDescription": "先听明白再生成 quality-checked PPTX and Web Decks from local source files.",
-  "positioning": "A local-first PPT delivery skill for Chinese office users who need guided intake, editable PPTX/Web Decks, official asset boundaries, and audit-ready deliverables.",
-  "defaultPrompt": "Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report.",
+  "shortDescription": "先自动扩写 best-effect brief，再生成 quality-checked PPTX and Web Decks.",
+  "positioning": "A local-first PPT delivery skill for Chinese office users who need a best-effect brief enhancer, Guizang-like fixed-style Web Deck fallback for short prompts, editable PPTX/Web Decks, official asset boundaries, and audit-ready deliverables.",
+  "defaultPrompt": "Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.",
   "metadata": {
     "openai": "agents/openai.yaml",
     "skillEntrypoint": "SKILL.md",

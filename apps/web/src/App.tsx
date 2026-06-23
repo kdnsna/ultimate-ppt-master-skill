@@ -55,7 +55,7 @@ type StepStatus = "locked" | "ready" | "active" | "complete" | "blocked";
 type QualityGateLevel = "quick" | "formal-business" | "showcase";
 type UploadedSourceKind = "file" | "url";
 type UploadedSourceStatus = "textExtracted" | "attachedOnly" | "urlOnly";
-type BriefMode = "visual-tags" | "codex-guided-intake" | "source-first" | "draft-with-assumptions";
+type BriefMode = "visual-tags" | "codex-guided-intake" | "source-first" | "draft-with-assumptions" | "best-effect-expanded" | "best-effect-fixed-style";
 type VisualTagGroupId = "scenario" | "audience" | "purpose" | "contentState" | "visualStyle" | "layoutDensity" | "assetStrategy" | "outputPreference";
 type ExpectationRiskLevel = "green" | "yellow" | "red";
 type SourceAdequacy = "substantive" | "thin" | "topic-only" | "private-unparsed" | "conflicting" | "no-source";
@@ -152,6 +152,27 @@ interface ExpectationFit {
   successCriteria: string[];
   readyForProduction: boolean;
   nextQuestions: string[];
+}
+
+interface BestEffectBrief {
+  version: "v5.3-best-effect-v1";
+  strategy: "source-confirmed" | "best-effect-expanded" | "best-effect-fixed-style";
+  promptQuality: "complete" | "thin" | "extreme-thin";
+  userRequestSummary: string;
+  recommendedRoute: "formal-editable-pptx" | "guizang-web-fixed-style" | "dual-delivery";
+  defaultStyle: string;
+  autoExpandedBrief: string[];
+  fixedStyleFallback: {
+    trigger: string;
+    routeName: string;
+    outputMode: string;
+    styleName: string;
+    pageRhythm: string[];
+    qualityBar: string[];
+  };
+  assumptions: string[];
+  agentInstructions: string[];
+  userVisibleHint: string;
 }
 
 interface ReferenceStyle {
@@ -343,7 +364,8 @@ const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v4";
-const appVersion = "5.2.0";
+const appVersion = "5.3.0";
+const bestEffectMarketplacePrompt = "Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.";
 
 const designDoctorScores = [
   {
@@ -569,6 +591,13 @@ const labels = {
     constraints: "补充要求",
     visualBriefPanel: "可视化需求标签",
     visualBriefSubtitle: "用标签快速说明场景、受众、目的、风格、素材和输出偏好；也可以继续粘贴背景和特殊要求。",
+    bestEffectTitle: "最佳效果提示增强器",
+    bestEffectSubtitle: "Agent 会先把你的短指令自动扩写成可执行 brief；极短指令默认走 Guizang-like Magazine Web Deck fixed style。",
+    bestEffectDefault: "极短指令稳定默认",
+    bestEffectDefaultText: "只有主题或一句话时：默认 8 页杂志化 Web Deck，Style A · 电子杂志 × 电子墨水，先出稳定高质量版本。",
+    bestEffectFormal: "正式可编辑例外",
+    bestEffectFormalText: "如果明确写了正式汇报、可编辑 PPTX、政府/金融/培训，就改走 PPTX，但仍先自动扩写 brief 和质量约束。",
+    bestEffectCopy: "推荐复制提示",
     recommendedTagCombos: "推荐组合",
     referenceStyle: "参考样板方向",
     referenceStyleSubtitle: "把“正式大气”继续说清楚：更贴近咨询报告、金融汇报、发布会，还是培训课件。",
@@ -821,6 +850,13 @@ const labels = {
     constraints: "Extra requirements",
     visualBriefPanel: "Visual brief tags",
     visualBriefSubtitle: "Use tags to clarify scenario, audience, purpose, style, assets, and output. Paste background and special constraints when needed.",
+    bestEffectTitle: "Best-Effect Brief Enhancer",
+    bestEffectSubtitle: "The Agent expands short requests into an executable brief first; extremely thin prompts default to Guizang-like Magazine Web Deck fixed style.",
+    bestEffectDefault: "Stable default for thin prompts",
+    bestEffectDefaultText: "When there is only a topic or one line: default to an 8-page magazine Web Deck, Style A editorial/e-ink, and produce a stable high-quality version first.",
+    bestEffectFormal: "Formal editable exception",
+    bestEffectFormalText: "If the user explicitly asks for formal reporting, editable PPTX, government/finance, or training, switch to PPTX while preserving the expanded brief and quality checks.",
+    bestEffectCopy: "Recommended prompt",
     recommendedTagCombos: "Suggested combinations",
     referenceStyle: "Reference style direction",
     referenceStyleSubtitle: "Make generic style words concrete: consulting report, financial review, launch keynote, or training deck.",
@@ -3110,6 +3146,35 @@ function SourceList({
   );
 }
 
+function BestEffectGuide({ labels: t }: { labels: typeof labels.zh }) {
+  return (
+    <div className="best-effect-guide">
+      <div className="best-effect-guide-head">
+        <Sparkles size={18} />
+        <div>
+          <strong>{t.bestEffectTitle}</strong>
+          <p>{t.bestEffectSubtitle}</p>
+        </div>
+      </div>
+      <div className="best-effect-guide-grid">
+        <div>
+          <span>{t.bestEffectDefault}</span>
+          <p>{t.bestEffectDefaultText}</p>
+        </div>
+        <div>
+          <span>{t.bestEffectFormal}</span>
+          <p>{t.bestEffectFormalText}</p>
+        </div>
+      </div>
+      <div className="best-effect-prompt">
+        <Clipboard size={16} />
+        <span>{t.bestEffectCopy}</span>
+        <code>{bestEffectMarketplacePrompt}</code>
+      </div>
+    </div>
+  );
+}
+
 function VisualBriefBuilder({
   form,
   expectationFit,
@@ -3131,6 +3196,7 @@ function VisualBriefBuilder({
 
   return (
     <section className="visual-brief-builder" aria-label={t.visualBriefPanel}>
+      <BestEffectGuide labels={t} />
       <div className="visual-brief-head">
         <div>
           <strong>{t.visualBriefPanel}</strong>
@@ -3827,6 +3893,25 @@ function draftAccepted(form: FormState) {
   ].join("\n"));
 }
 
+function explicitFormalEditableRequested(form: FormState) {
+  const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+  const text = [
+    form.title,
+    form.audience,
+    form.coreMessage,
+    form.sourceNotes,
+    form.constraints,
+    form.visualBrief.backgroundText,
+    form.visualBrief.extraRequirements
+  ].join("\n");
+  return (
+    form.outputMode === "pptx" ||
+    selectedTags.outputPreference.includes("editable-pptx") ||
+    selectedTags.visualStyle.includes("formal-business") ||
+    /正式|汇报|报告|可编辑|pptx|powerpoint|政府|金融|培训|课件|formal|editable|business report|government|finance|training/i.test(text)
+  );
+}
+
 function assessExpectationFit(form: FormState, sources: UploadedSource[]): ExpectationFit {
   const zh = form.language === "zh";
   const brief = normalizeVisualBrief(form.visualBrief);
@@ -3898,7 +3983,11 @@ function assessExpectationFit(form: FormState, sources: UploadedSource[]): Expec
   } else if (selectedTags.audience.length) {
     assumptions.push(zh ? `按标签中的目标受众组织内容。` : "Use the selected audience tags as the audience contract.");
   }
-  assumptions.push(zh ? "默认输出可编辑 PPTX，必要时附 Web 预览。" : "Default to editable PPTX, with Web preview when requested.");
+  if (["no-source", "topic-only"].includes(sourceAdequacy) && !explicitFormalEditableRequested({ ...form, visualBrief: brief })) {
+    assumptions.push(zh ? "v5.3 极短指令默认先走 Guizang-like 杂志化 Web Deck 稳定样式；若用户明确要正式可编辑汇报，再改走 PPTX。" : "v5.3 extremely thin prompts default to the Guizang-like Magazine Web Deck fixed style first; switch to PPTX when the user explicitly needs a formal editable report.");
+  } else {
+    assumptions.push(zh ? "默认输出可编辑 PPTX，必要时附 Web 预览。" : "Default to editable PPTX, with Web preview when requested.");
+  }
   assumptions.push(zh ? "默认字体为微软雅黑，正文和关键数据保持可编辑。" : "Use Microsoft YaHei by default and keep body copy and key numbers editable.");
   if (selectedTags.assetStrategy.includes("official-first") || selectedTags.assetStrategy.includes("ip-compliance")) {
     assumptions.push(zh ? "品牌/IP 素材优先使用官方或用户提供来源。" : "Use official or user-provided sources for brand/IP assets first.");
@@ -3933,6 +4022,167 @@ function assessExpectationFit(form: FormState, sources: UploadedSource[]): Expec
     readyForProduction: riskLevel !== "red" || hasDraftApproval,
     nextQuestions
   };
+}
+
+function bestEffectSignalText(form: FormState, sources: UploadedSource[]) {
+  return [
+    form.title,
+    form.audience,
+    form.coreMessage,
+    form.sourceNotes,
+    form.constraints,
+    form.visualBrief.backgroundText,
+    form.visualBrief.extraRequirements,
+    ...form.visualBrief.referenceLinks,
+    ...sources.map((source) => source.text || source.url || source.name)
+  ].join("\n").replace(/\s+/g, " ").trim();
+}
+
+function bestEffectPromptQuality(form: FormState, sources: UploadedSource[], expectationFit: ExpectationFit): BestEffectBrief["promptQuality"] {
+  const signalText = bestEffectSignalText(form, sources);
+  const hasSourceText = sources.some((source) => (source.text || "").trim().length >= 120);
+  const hasUserEditedBrief = form.visualBrief.userEditedTags || form.visualBrief.referenceLinks.length > 0 || form.visualBrief.backgroundText.trim().length >= 50 || form.visualBrief.extraRequirements.trim().length >= 30;
+  if (!hasSourceText && !hasUserEditedBrief && signalText.length < 120 && ["no-source", "topic-only"].includes(expectationFit.sourceAdequacy)) {
+    return "extreme-thin";
+  }
+  if (!expectationFit.readyForProduction || expectationFit.sourceAdequacy !== "substantive" || signalText.length < 260) {
+    return "thin";
+  }
+  return "complete";
+}
+
+function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expectationFit: ExpectationFit): BestEffectBrief {
+  const zh = form.language === "zh";
+  const promptQuality = bestEffectPromptQuality(form, sources, expectationFit);
+  const formalEditable = explicitFormalEditableRequested(form);
+  const strategy: BestEffectBrief["strategy"] =
+    promptQuality === "extreme-thin" && !formalEditable
+      ? "best-effect-fixed-style"
+      : promptQuality === "complete"
+        ? "source-confirmed"
+        : "best-effect-expanded";
+  const recommendedRoute: BestEffectBrief["recommendedRoute"] =
+    strategy === "best-effect-fixed-style"
+      ? "guizang-web-fixed-style"
+      : form.outputMode === "both"
+        ? "dual-delivery"
+        : formalEditable
+          ? "formal-editable-pptx"
+          : "guizang-web-fixed-style";
+  const routeName = "Guizang-like Magazine Web Deck fixed style";
+  const styleName = "Style A · 电子杂志 × 电子墨水";
+  const fixedStyleFallback = {
+    trigger: zh
+      ? "Extreme Thin Prompt Fallback: 用户只给主题、一句话或没有资料，且没有明确要求正式可编辑 PPTX。"
+      : "Extreme Thin Prompt Fallback: the user gives only a topic, one line, or no source material, and did not explicitly ask for formal editable PPTX.",
+    routeName,
+    outputMode: "Mode 2: Magazine Web Deck",
+    styleName,
+    pageRhythm: zh
+      ? [
+        "01 深色封面：一句强标题 + 极简副标题",
+        "02 浅色背景：问题背景 / 趋势 / 现场语境",
+        "03 深色图文页：关键冲突或机会",
+        "04 浅色结构页：三段式框架 / 路径 / 方法",
+        "05 章节分隔：大字短句，制造翻页节奏",
+        "06 证据或场景页：图片 / 数据 / 案例块",
+        "07 深色观点页：最终判断或反问",
+        "08 浅色收束页：行动建议 / 结束语"
+      ]
+      : [
+        "01 dark cover: one strong title plus minimal subtitle",
+        "02 light context: problem, trend, or setting",
+        "03 dark image/text spread: key tension or opportunity",
+        "04 light structure: three-part framework, path, or method",
+        "05 section divider: large short statement with page-turn rhythm",
+        "06 evidence or scene page: image, data, or case block",
+        "07 dark point-of-view page: final judgment or question",
+        "08 light closing: action, takeaway, or ending line"
+      ],
+    qualityBar: zh
+      ? [
+        "不再继续追问风格，直接锁定杂志化 Web Deck 默认样式。",
+        "每页只承担一个叙事任务，避免标题 + 卡片重复。",
+        "图片和生成视觉必须无内嵌文字、无假 logo、无 IP 冒用。",
+        "桌面和移动端都要预览，不能有文字重叠或媒体缺失。"
+      ]
+      : [
+        "Do not keep asking for style; lock the magazine Web Deck default style.",
+        "Each page has one narrative job; avoid repeated title-plus-card layouts.",
+        "Generated visuals contain no embedded text, fake logos, or IP imitation.",
+        "Preview desktop and mobile; no overlap or missing media."
+      ]
+  };
+  const selectedTags = flattenVisualTagLabels(form.visualBrief, form.language);
+  const autoExpandedBrief = zh
+    ? [
+      `主题：${form.title || "按用户一句话主题命名"}`,
+      `目标受众：${form.audience || "默认面向普通业务听众 / 公开分享听众"}`,
+      `核心叙事：${form.coreMessage || "先建立问题，再给出结构化判断和行动建议"}`,
+      `推荐路线：${recommendedRoute === "formal-editable-pptx" ? "正式可编辑 PPTX" : recommendedRoute === "dual-delivery" ? "PPTX + Web Deck 双交付" : routeName}`,
+      `视觉基调：${recommendedRoute === "guizang-web-fixed-style" ? styleName : "正式商务、微软雅黑、可编辑正文和图表"}`,
+      `用户信号：${selectedTags.join(" / ") || "无显式标签，按最佳效果默认补全"}`,
+      "输出前必须把这些假设写入 project-brief.json / quality-report.json。"
+    ]
+    : [
+      `Topic: ${form.title || "name the deck from the user's one-line topic"}`,
+      `Audience: ${form.audience || "default to general business or public-sharing audience"}`,
+      `Narrative: ${form.coreMessage || "establish the problem, then give structured judgment and action"}`,
+      `Recommended route: ${recommendedRoute === "formal-editable-pptx" ? "formal editable PPTX" : recommendedRoute === "dual-delivery" ? "PPTX plus Web Deck" : routeName}`,
+      `Visual direction: ${recommendedRoute === "guizang-web-fixed-style" ? styleName : "formal business, Microsoft YaHei, editable body and charts"}`,
+      `User signals: ${selectedTags.join(" / ") || "no explicit tags; complete with best-effect defaults"}`,
+      "Record these assumptions in project-brief.json / quality-report.json before output."
+    ];
+  const assumptions = [
+    ...expectationFit.assumptions,
+    ...(strategy === "best-effect-fixed-style"
+      ? [zh ? "用户未明确给出正式可编辑需求，因此优先交付固定高质量杂志 Web Deck。" : "No formal editable requirement was explicit, so the fixed high-quality magazine Web Deck route is preferred."]
+      : [zh ? "先自动扩写 brief，再根据来源充分度决定是否需要一轮关键澄清。" : "Expand the brief first, then use source confidence to decide whether one focused clarification is needed."])
+  ];
+  const agentInstructions = zh
+    ? [
+      "Best-Effect Brief Enhancer: 生产前先把用户短指令改写成 bestEffectBrief，不要直接用原句开做。",
+      "Extreme Thin Prompt Fallback: 如果只有主题或一句话，且没有明确要求正式可编辑 PPTX，默认使用 Guizang-like Magazine Web Deck fixed style。",
+      "若用户明确说正式汇报、政府/金融/培训、可编辑 PPTX，则走 formal-editable-pptx，但保留同样的 bestEffectBrief 和质量检查。",
+      "只有事实、品牌/IP、合规或来源边界会实质改变交付时才暂停追问；一般风格和结构由 bestEffectBrief 自动补齐。",
+      "最终交付要说明哪些内容来自用户、哪些是自动扩写假设。"
+    ]
+    : [
+      "Best-Effect Brief Enhancer: rewrite the user's short instruction into bestEffectBrief before production.",
+      "Extreme Thin Prompt Fallback: if there is only a topic or one line, and no explicit formal editable PPTX request, default to Guizang-like Magazine Web Deck fixed style.",
+      "If the user explicitly asks for formal reporting, government/finance/training, or editable PPTX, use formal-editable-pptx while keeping the same bestEffectBrief and quality checks.",
+      "Pause only when missing facts, brand/IP, compliance, or source boundaries would materially change delivery; fill normal style and structure gaps automatically.",
+      "Final delivery must state what came from the user and what was auto-expanded."
+    ];
+
+  return {
+    version: "v5.3-best-effect-v1",
+    strategy,
+    promptQuality,
+    userRequestSummary: bestEffectSignalText(form, sources).slice(0, 320) || (zh ? "用户尚未提供明确文本。" : "No explicit user text yet."),
+    recommendedRoute,
+    defaultStyle: recommendedRoute === "guizang-web-fixed-style" ? styleName : (zh ? "正式商务 PPTX / 微软雅黑 / 可编辑正文" : "formal business PPTX / Microsoft YaHei / editable body"),
+    autoExpandedBrief,
+    fixedStyleFallback,
+    assumptions,
+    agentInstructions,
+    userVisibleHint: zh
+      ? "短提示会先自动补全为最佳效果 brief；极短指令默认用 Guizang-like Magazine Web Deck fixed style 出稳定高质量版本。"
+      : "Short prompts are expanded into a best-effect brief first; extremely thin prompts default to Guizang-like Magazine Web Deck fixed style for a stable high-quality first version."
+  };
+}
+
+function buildBestEffectBriefMarkdown(form: FormState, sources: UploadedSource[], expectationFit: ExpectationFit) {
+  const bestEffectBrief = buildBestEffectBrief(form, sources, expectationFit);
+  const expanded = bestEffectBrief.autoExpandedBrief.map((item) => `- ${item}`).join("\n");
+  const rhythm = bestEffectBrief.fixedStyleFallback.pageRhythm.map((item) => `- ${item}`).join("\n");
+  const quality = bestEffectBrief.fixedStyleFallback.qualityBar.map((item) => `- ${item}`).join("\n");
+  const instructions = bestEffectBrief.agentInstructions.map((item) => `- ${item}`).join("\n");
+  const assumptions = bestEffectBrief.assumptions.map((item) => `- ${item}`).join("\n");
+  if (form.language === "zh") {
+    return `## v5.3 Best-Effect Brief Enhancer\n- 策略：${bestEffectBrief.strategy}\n- 提示质量：${bestEffectBrief.promptQuality}\n- 推荐路线：${bestEffectBrief.recommendedRoute}\n- 默认样式：${bestEffectBrief.defaultStyle}\n\n### Auto-expanded brief\n${expanded}\n\n### Extreme Thin Prompt Fallback\n- 路线：${bestEffectBrief.fixedStyleFallback.routeName}\n- 输出：${bestEffectBrief.fixedStyleFallback.outputMode}\n- 样式：${bestEffectBrief.fixedStyleFallback.styleName}\n- 触发：${bestEffectBrief.fixedStyleFallback.trigger}\n\n### 固定页奏\n${rhythm}\n\n### 质量约束\n${quality}\n\n### Agent 执行规则\n${instructions}\n\n### 自动假设\n${assumptions}`;
+  }
+  return `## v5.3 Best-Effect Brief Enhancer\n- Strategy: ${bestEffectBrief.strategy}\n- Prompt quality: ${bestEffectBrief.promptQuality}\n- Recommended route: ${bestEffectBrief.recommendedRoute}\n- Default style: ${bestEffectBrief.defaultStyle}\n\n### Auto-expanded brief\n${expanded}\n\n### Extreme Thin Prompt Fallback\n- Route: ${bestEffectBrief.fixedStyleFallback.routeName}\n- Output: ${bestEffectBrief.fixedStyleFallback.outputMode}\n- Style: ${bestEffectBrief.fixedStyleFallback.styleName}\n- Trigger: ${bestEffectBrief.fixedStyleFallback.trigger}\n\n### Fixed page rhythm\n${rhythm}\n\n### Quality constraints\n${quality}\n\n### Agent instructions\n${instructions}\n\n### Auto assumptions\n${assumptions}`;
 }
 
 function buildGuidedBrief(form: FormState): GuidedBrief {
@@ -4213,6 +4463,9 @@ function buildV52Contract(form: FormState, sources: UploadedSource[], expectatio
 
 function determineBriefMode(form: FormState, expectationFit: ExpectationFit, sources: UploadedSource[]): BriefMode {
   if (draftAccepted(form)) return "draft-with-assumptions";
+  const bestEffectBrief = buildBestEffectBrief(form, sources, expectationFit);
+  if (bestEffectBrief.strategy === "best-effect-fixed-style") return "best-effect-fixed-style";
+  if (bestEffectBrief.strategy === "best-effect-expanded") return "best-effect-expanded";
   if (form.agentTool === "codex" && !expectationFit.readyForProduction) return "codex-guided-intake";
   if (selectedTagCount(form.visualBrief) > 0 || form.visualBrief.backgroundText || form.visualBrief.referenceLinks.length > 0) return "visual-tags";
   if (sources.length > 0) return "source-first";
@@ -4226,6 +4479,7 @@ function buildVisualBriefMarkdown(form: FormState, expectationFit: ExpectationFi
   const referenceStyle = v52.referenceStyle;
   const scorecard = v52.deliveryScorecard;
   const sourceConfidence = v52.sourceConfidence;
+  const bestEffectText = buildBestEffectBriefMarkdown(form, sources, expectationFit);
   const sections = visualTagGroups
     .map((group) => `- ${group[form.language]}: ${grouped[group.id].join(", ") || (zh ? "未选择" : "not selected")}`)
     .join("\n");
@@ -4251,10 +4505,10 @@ function buildVisualBriefMarkdown(form: FormState, expectationFit: ExpectationFi
   const feedbackQuestions = v52.feedbackLoop.feedbackTemplate.map((item) => `- ${item}`).join("\n");
 
   if (zh) {
-    return `## 可视化需求标签\n${sections}\n\n## 参考样板方向\n- 当前方向: ${referenceStyleLabel(referenceStyle, "zh")}\n- 贴近: ${referenceStyle.positiveReferences.join(" / ")}\n- 避免: ${referenceStyle.negativeReferences.join(" / ")}\n- 排版约束: ${referenceStyle.styleConstraints.join(" / ")}\n\n## 背景 / 相关内容\n${form.visualBrief.backgroundText || "未填写"}\n\n## 特殊要求 / 禁忌\n${form.visualBrief.extraRequirements || "未填写"}\n\n## 参考链接\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- 未提供"}\n\n## 预期契合度\n- 风险等级: ${expectationFit.riskLevel}\n- 分数: ${expectationFit.score}%\n- 资料充分度: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- 可正式制作: ${expectationFit.readyForProduction ? "是" : "否，Codex 需要分步问清"}\n\n## v5.2 来源可信度\n- 等级: ${sourceConfidenceLabel(sourceConfidence.level, "zh")}\n- 已覆盖: ${sourceConfidence.coveredAreas.join(" / ") || "暂无"}\n- 不可编造: ${sourceConfidence.doNotInvent.join(" / ")}\n\n### 来源缺口\n${sourceMissing}\n\n### 需要证据支撑的主张\n${sourceClaims}\n\n## v5.2 交付评分卡\n- 预期成品类型: ${scorecard.expectedDeckType}\n- 用户可见摘要: ${scorecard.userVisibleSummary}\n${qualityDimensions}\n\n## v5.2 需求确认稿\n${v52.confirmationBrief}\n\n## 已知缺口\n${missing}\n\n## 冲突点\n${conflicts}\n\n## 默认假设\n${assumptions}\n\n## Codex 下一步问题\n${questions}\n\n## 反馈修订模板\n${feedbackQuestions}`;
+    return `${bestEffectText}\n\n## 可视化需求标签\n${sections}\n\n## 参考样板方向\n- 当前方向: ${referenceStyleLabel(referenceStyle, "zh")}\n- 贴近: ${referenceStyle.positiveReferences.join(" / ")}\n- 避免: ${referenceStyle.negativeReferences.join(" / ")}\n- 排版约束: ${referenceStyle.styleConstraints.join(" / ")}\n\n## 背景 / 相关内容\n${form.visualBrief.backgroundText || "未填写"}\n\n## 特殊要求 / 禁忌\n${form.visualBrief.extraRequirements || "未填写"}\n\n## 参考链接\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- 未提供"}\n\n## 预期契合度\n- 风险等级: ${expectationFit.riskLevel}\n- 分数: ${expectationFit.score}%\n- 资料充分度: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- 可正式制作: ${expectationFit.readyForProduction ? "是" : "否，Codex 需要分步问清"}\n\n## v5.2 来源可信度\n- 等级: ${sourceConfidenceLabel(sourceConfidence.level, "zh")}\n- 已覆盖: ${sourceConfidence.coveredAreas.join(" / ") || "暂无"}\n- 不可编造: ${sourceConfidence.doNotInvent.join(" / ")}\n\n### 来源缺口\n${sourceMissing}\n\n### 需要证据支撑的主张\n${sourceClaims}\n\n## v5.2 交付评分卡\n- 预期成品类型: ${scorecard.expectedDeckType}\n- 用户可见摘要: ${scorecard.userVisibleSummary}\n${qualityDimensions}\n\n## v5.2 需求确认稿\n${v52.confirmationBrief}\n\n## 已知缺口\n${missing}\n\n## 冲突点\n${conflicts}\n\n## 默认假设\n${assumptions}\n\n## Codex 下一步问题\n${questions}\n\n## 反馈修订模板\n${feedbackQuestions}`;
   }
 
-  return `## Visual brief tags\n${sections}\n\n## Reference style direction\n- Current direction: ${referenceStyleLabel(referenceStyle, "en")}\n- Move toward: ${referenceStyle.positiveReferences.join(" / ")}\n- Avoid: ${referenceStyle.negativeReferences.join(" / ")}\n- Layout constraints: ${referenceStyle.styleConstraints.join(" / ")}\n\n## Background / related context\n${form.visualBrief.backgroundText || "Not provided"}\n\n## Special requirements / must avoid\n${form.visualBrief.extraRequirements || "Not provided"}\n\n## Reference links\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- None"}\n\n## Expectation fit\n- Risk level: ${expectationFit.riskLevel}\n- Score: ${expectationFit.score}%\n- Source adequacy: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- Ready for production: ${expectationFit.readyForProduction ? "yes" : "no; Codex must run guided intake"}\n\n## v5.2 Source confidence\n- Level: ${sourceConfidenceLabel(sourceConfidence.level, "en")}\n- Covered: ${sourceConfidence.coveredAreas.join(" / ") || "none"}\n- Do not invent: ${sourceConfidence.doNotInvent.join(" / ")}\n\n### Source gaps\n${sourceMissing}\n\n### Claims needing evidence\n${sourceClaims}\n\n## v5.2 Delivery scorecard\n- Expected deck type: ${scorecard.expectedDeckType}\n- User-visible summary: ${scorecard.userVisibleSummary}\n${qualityDimensions}\n\n## v5.2 Confirmation brief\n${v52.confirmationBrief}\n\n## Missing signals\n${missing}\n\n## Conflicts\n${conflicts}\n\n## Assumptions\n${assumptions}\n\n## Codex next questions\n${questions}\n\n## Feedback revision template\n${feedbackQuestions}`;
+  return `${bestEffectText}\n\n## Visual brief tags\n${sections}\n\n## Reference style direction\n- Current direction: ${referenceStyleLabel(referenceStyle, "en")}\n- Move toward: ${referenceStyle.positiveReferences.join(" / ")}\n- Avoid: ${referenceStyle.negativeReferences.join(" / ")}\n- Layout constraints: ${referenceStyle.styleConstraints.join(" / ")}\n\n## Background / related context\n${form.visualBrief.backgroundText || "Not provided"}\n\n## Special requirements / must avoid\n${form.visualBrief.extraRequirements || "Not provided"}\n\n## Reference links\n${form.visualBrief.referenceLinks.map((item) => `- ${item}`).join("\n") || "- None"}\n\n## Expectation fit\n- Risk level: ${expectationFit.riskLevel}\n- Score: ${expectationFit.score}%\n- Source adequacy: ${sourceAdequacyLabel(expectationFit.sourceAdequacy, form.language)}\n- Ready for production: ${expectationFit.readyForProduction ? "yes" : "no; Codex must run guided intake"}\n\n## v5.2 Source confidence\n- Level: ${sourceConfidenceLabel(sourceConfidence.level, "en")}\n- Covered: ${sourceConfidence.coveredAreas.join(" / ") || "none"}\n- Do not invent: ${sourceConfidence.doNotInvent.join(" / ")}\n\n### Source gaps\n${sourceMissing}\n\n### Claims needing evidence\n${sourceClaims}\n\n## v5.2 Delivery scorecard\n- Expected deck type: ${scorecard.expectedDeckType}\n- User-visible summary: ${scorecard.userVisibleSummary}\n${qualityDimensions}\n\n## v5.2 Confirmation brief\n${v52.confirmationBrief}\n\n## Missing signals\n${missing}\n\n## Conflicts\n${conflicts}\n\n## Assumptions\n${assumptions}\n\n## Codex next questions\n${questions}\n\n## Feedback revision template\n${feedbackQuestions}`;
 }
 
 function loadSavedForm() {
@@ -4447,6 +4701,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
   const requiredInputs = zh
     ? [
       "品牌资产或明确替代策略",
+      "bestEffectBrief：Agent 自动扩写后的最佳效果 brief、极短指令 fallback 和固定样式选择",
       "visualBrief / guidedBrief / expectationFit：用户标签、背景资料、默认假设和是否需要分步问清",
       "可追溯资料来源和证据口径",
       "DeckIR 页面地图：页面角色、证据引用、页面配方、可编辑目标和 raster 策略",
@@ -4458,6 +4713,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
     ]
     : [
       "brand assets or explicit fallback strategy",
+      "bestEffectBrief with the Agent's auto-expanded best-effect brief, extreme-thin fallback, and fixed-style choice",
       "visualBrief / guidedBrief / expectationFit with user tags, background, assumptions, and guided-intake readiness",
       "traceable source evidence",
       "DeckIR page map with page roles, evidence refs, recipes, editability targets, and raster policy",
@@ -4491,6 +4747,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
   const artifactChecks = zh
     ? [
       "manifest.json 包含 formal-business qualityGate",
+      "project-brief.json 包含 bestEffectBrief、极短指令 fallback 和固定样式选择",
       "project-brief.json 包含 briefMode、visualBrief、guidedBrief 和 expectationFit",
       "storyboard.json / source-map.json 包含 DeckIR 页面角色、证据、配方和可编辑边界",
       "HTML/PPTX 有足够布局类型",
@@ -4502,6 +4759,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
     ]
     : [
       "manifest.json contains formal-business qualityGate",
+      "project-brief.json contains bestEffectBrief, extreme-thin fallback, and fixed-style choice",
       "project-brief.json contains briefMode, visualBrief, guidedBrief, and expectationFit",
       "storyboard.json and source-map.json contain DeckIR roles, evidence, recipes, and editability boundaries",
       "HTML/PPTX expose enough layout types",
@@ -4550,6 +4808,7 @@ function buildQualityGate(form: FormState, qualityContract: QualityContract, eng
 function buildQualityReport(form: FormState, sources: UploadedSource[], qualityContract: QualityContract, qualityGate: QualityGate, workflowState: WorkflowState, expectationFit: ExpectationFit) {
   const zh = form.language === "zh";
   const v52 = buildV52Contract(form, sources, expectationFit);
+  const bestEffectBrief = buildBestEffectBrief(form, sources, expectationFit);
   return JSON.stringify({
     version: appVersion,
     schemaVersion: v52.schemaVersion,
@@ -4560,6 +4819,7 @@ function buildQualityReport(form: FormState, sources: UploadedSource[], qualityC
     qualityGate,
     workflowState,
     expectationFit,
+    bestEffectBrief,
     referenceStyle: v52.referenceStyle,
     sourceConfidence: v52.sourceConfidence,
     deliveryScorecard: v52.deliveryScorecard,
@@ -4600,6 +4860,11 @@ function buildQualityReport(form: FormState, sources: UploadedSource[], qualityC
         id: "quality-contract",
         status: "pending",
         summary: zh ? "等待 Agent 按质量目标验收。" : "Waiting for the Agent to validate against the quality contract."
+      },
+      {
+        id: "best-effect-brief",
+        status: bestEffectBrief.strategy === "best-effect-fixed-style" ? "fixed-style-ready" : "expanded-brief-ready",
+        summary: bestEffectBrief.userVisibleHint
       },
       {
         id: "expectation-fit",
@@ -5049,6 +5314,13 @@ function buildQualityChecklist(
   const gateCommands = qualityGate.reviewCommands.map((item) => `- ${item}`).join("\n");
   const tagLine = flattenVisualTagLabels(form.visualBrief, form.language).join(" · ") || (form.language === "zh" ? "未选择标签" : "No tags selected");
   const v52 = buildV52Contract(form, sources, expectationFit);
+  const bestEffectBrief = buildBestEffectBrief(form, sources, expectationFit);
+  const bestEffectChecks = [
+    `- [ ] ${form.language === "zh" ? "bestEffectBrief 已写入 project-brief.json / quality-report.json" : "bestEffectBrief is written to project-brief.json / quality-report.json"}.`,
+    `- [ ] ${form.language === "zh" ? "策略" : "Strategy"}: ${bestEffectBrief.strategy}; ${form.language === "zh" ? "提示质量" : "prompt quality"}: ${bestEffectBrief.promptQuality}.`,
+    `- [ ] ${form.language === "zh" ? "极短指令默认样式" : "Extreme thin default"}: ${bestEffectBrief.fixedStyleFallback.routeName}.`,
+    `- [ ] ${form.language === "zh" ? "Agent 先自动扩写 brief，再制作" : "Agent expands the brief before production"}.`
+  ].join("\n");
   const scorecardChecks = v52.deliveryScorecard.qualityDimensions.map((item) => `- [ ] ${item.label}: ${item.score}% - ${item.evidence}`).join("\n");
   const sourceConfidenceChecks = [
     `- [ ] ${form.language === "zh" ? "来源可信度" : "Source confidence"}: ${sourceConfidenceLabel(v52.sourceConfidence.level, form.language)}.`,
@@ -5069,9 +5341,9 @@ function buildQualityChecklist(
   const missingSignals = `${v52ChecklistBlock}\n\n${missingSignalItems}`;
   const assumptions = expectationFit.assumptions.map((item) => `- [ ] ${item}`).join("\n");
   if (form.language === "en") {
-    return `# Quality checklist\n\n## Selected preset\n${presetChecks}\n\n## Design Doctor contract\n${qualityCriteria}\n\n## Formal Business Delivery Gate\nLevel: ${qualityGate.level}\n\n### Required inputs\n${gateInputs}\n\n### Acceptance criteria\n${gateCriteria}\n\n### Artifact checks\n${gateChecks}\n\n### Gate review commands\n${gateCommands}\n\n## Expected artifacts\n${expectedArtifacts}\n\n## Review commands\n${reviewCommands}\n\n## Expectation fit\n- [ ] Risk level: ${expectationFit.riskLevel}; score: ${expectationFit.score}%; readyForProduction: ${expectationFit.readyForProduction ? "yes" : "no"}.\n- [ ] User-selected tags are reflected in structure, visual style, assets, and output: ${tagLine}.\n- [ ] If readyForProduction is false, Codex runs Guided Intake before final production.\n- [ ] quality-report.json explains user tags, pasted background, assumptions, and remaining expectation risk.\n\n### Missing signals\n${missingSignals}\n\n### Assumptions to verify or record\n${assumptions || "- [ ] No assumptions recorded yet."}\n\n## Source and story\n- [ ] extracted-source.md reflects real source files, not only pasted notes.\n- [ ] Core message appears in the cover and conclusion.\n- [ ] Every slide has one job and one primary takeaway.\n- [ ] Sensitive material stays local unless the user explicitly approves upload.\n- [ ] Brand assets or a documented replacement strategy are locked before generating final files.\n- [ ] Evidence, image choices, chart/data plans, page rhythm, and infographic strategy are explicit.\n\n## Source files\n${sourceLine}\n\n## PPTX route\n- [ ] Route status: ${enginePlan.pptxActive ? "active" : "optional"}.\n- [ ] Text, shapes, charts, and notes remain editable.\n- [ ] No full-slide screenshot replacement for editable PPTX content.\n- [ ] Logos and brand marks are real assets or clean vector/text treatments, not stray fragments.\n- [ ] Run SVG/PPTX rendering checks from the Skill workflow.\n- [ ] Inspect exported pages and repair clipping, overlaps, tiny text, and broken charts.\n\n## Web Deck route\n- [ ] Route status: ${enginePlan.webActive ? "active" : "optional"}.\n- [ ] Use ${enginePlan.styleRoute} consistently.\n- [ ] Desktop and mobile viewports do not overlap text, controls, or media.\n- [ ] Visual completeness includes real images, charts, or an explicit no-image strategy.\n\n## Delivery\n- [ ] Final files are named clearly.\n- [ ] quality-report.json includes the visual review result and Chinese summary.\n- [ ] Include what was generated, what was checked, and which source files were parsed.\n- [ ] Keep upstream license and third-party notices intact.\n`;
+    return `# Quality checklist\n\n## Selected preset\n${presetChecks}\n\n## Design Doctor contract\n${qualityCriteria}\n\n## Formal Business Delivery Gate\nLevel: ${qualityGate.level}\n\n### Required inputs\n${gateInputs}\n\n### Acceptance criteria\n${gateCriteria}\n\n### Artifact checks\n${gateChecks}\n\n### Gate review commands\n${gateCommands}\n\n## Expected artifacts\n${expectedArtifacts}\n\n## Review commands\n${reviewCommands}\n\n## v5.3 Best-Effect Brief Enhancer\n${bestEffectChecks}\n\n## Expectation fit\n- [ ] Risk level: ${expectationFit.riskLevel}; score: ${expectationFit.score}%; readyForProduction: ${expectationFit.readyForProduction ? "yes" : "no"}.\n- [ ] User-selected tags are reflected in structure, visual style, assets, and output: ${tagLine}.\n- [ ] If readyForProduction is false, Codex runs Guided Intake before final production.\n- [ ] quality-report.json explains user tags, pasted background, assumptions, and remaining expectation risk.\n\n### Missing signals\n${missingSignals}\n\n### Assumptions to verify or record\n${assumptions || "- [ ] No assumptions recorded yet."}\n\n## Source and story\n- [ ] extracted-source.md reflects real source files, not only pasted notes.\n- [ ] Core message appears in the cover and conclusion.\n- [ ] Every slide has one job and one primary takeaway.\n- [ ] Sensitive material stays local unless the user explicitly approves upload.\n- [ ] Brand assets or a documented replacement strategy are locked before generating final files.\n- [ ] Evidence, image choices, chart/data plans, page rhythm, and infographic strategy are explicit.\n\n## Source files\n${sourceLine}\n\n## PPTX route\n- [ ] Route status: ${enginePlan.pptxActive ? "active" : "optional"}.\n- [ ] Text, shapes, charts, and notes remain editable.\n- [ ] No full-slide screenshot replacement for editable PPTX content.\n- [ ] Logos and brand marks are real assets or clean vector/text treatments, not stray fragments.\n- [ ] Run SVG/PPTX rendering checks from the Skill workflow.\n- [ ] Inspect exported pages and repair clipping, overlaps, tiny text, and broken charts.\n\n## Web Deck route\n- [ ] Route status: ${enginePlan.webActive ? "active" : "optional"}.\n- [ ] Use ${enginePlan.styleRoute} consistently.\n- [ ] Desktop and mobile viewports do not overlap text, controls, or media.\n- [ ] Visual completeness includes real images, charts, or an explicit no-image strategy.\n\n## Delivery\n- [ ] Final files are named clearly.\n- [ ] quality-report.json includes the visual review result and Chinese summary.\n- [ ] Include what was generated, what was checked, and which source files were parsed.\n- [ ] Keep upstream license and third-party notices intact.\n`;
   }
-  return `# 质量检查清单\n\n## 当前预设\n${presetChecks}\n\n## Design Doctor 合同\n${qualityCriteria}\n\n## 正式商务交付门禁\n等级：${qualityGate.level}\n\n### 必须输入\n${gateInputs}\n\n### 验收标准\n${gateCriteria}\n\n### 产物检查\n${gateChecks}\n\n### 门禁检查命令\n${gateCommands}\n\n## 预期产物\n${expectedArtifacts}\n\n## 检查命令\n${reviewCommands}\n\n## 预期契合度\n- [ ] 风险等级：${expectationFit.riskLevel}；分数：${expectationFit.score}%；可正式制作：${expectationFit.readyForProduction ? "是" : "否"}。\n- [ ] 用户选择的标签已体现在结构、视觉、素材和输出中：${tagLine}。\n- [ ] 如果 readyForProduction 为 false，Codex 已先完成分步需求访谈。\n- [ ] quality-report.json 说明用户标签、粘贴背景、默认假设和剩余预期风险。\n\n### 已知缺口\n${missingSignals}\n\n### 需确认或记录的默认假设\n${assumptions || "- [ ] 暂无默认假设。"}\n\n## 资料与叙事\n- [ ] extracted-source.md 已根据真实源文件修正，而不只是网页粘贴摘要。\n- [ ] 核心结论出现在封面和收束页。\n- [ ] 每一页只承担一个主要任务，并有清晰 takeaway。\n- [ ] 敏感资料默认留在本地，除非用户明确同意上传。\n- [ ] 生成最终文件前，品牌资产或替代策略已锁定。\n- [ ] 证据来源、图片选择、图表/数据计划、页面节奏和信息图策略已明确。\n\n## 源文件\n${sourceLine}\n\n## PPTX 路线\n- [ ] 路线状态：${enginePlan.pptxActive ? "启用" : "备用"}。\n- [ ] 文本、形状、图表、备注保持可编辑。\n- [ ] 不用整页截图替代 PPTX 可编辑内容。\n- [ ] logo 和品牌标识是真实素材、干净矢量或规范文字处理，不是零散文字碎片。\n- [ ] 按 Skill 工作流运行 SVG / PPTX 渲染检查。\n- [ ] 检查导出页面并修复裁切、重叠、小字和图表损坏。\n\n## Web Deck 路线\n- [ ] 路线状态：${enginePlan.webActive ? "启用" : "备用"}。\n- [ ] 统一使用 ${enginePlan.styleRoute}。\n- [ ] 桌面端和移动端不出现文字、控件或媒体互相遮挡。\n- [ ] 视觉完整度包含真实图片、图表，或明确的无图策略。\n\n## 交付\n- [ ] 最终文件命名清晰。\n- [ ] quality-report.json 包含视觉复查结果和中文摘要。\n- [ ] 简短说明生成了什么、检查了什么、解析了哪些源文件。\n- [ ] 保留上游版权和第三方声明。\n`;
+  return `# 质量检查清单\n\n## 当前预设\n${presetChecks}\n\n## Design Doctor 合同\n${qualityCriteria}\n\n## 正式商务交付门禁\n等级：${qualityGate.level}\n\n### 必须输入\n${gateInputs}\n\n### 验收标准\n${gateCriteria}\n\n### 产物检查\n${gateChecks}\n\n### 门禁检查命令\n${gateCommands}\n\n## 预期产物\n${expectedArtifacts}\n\n## 检查命令\n${reviewCommands}\n\n## v5.3 Best-Effect Brief Enhancer\n${bestEffectChecks}\n\n## 预期契合度\n- [ ] 风险等级：${expectationFit.riskLevel}；分数：${expectationFit.score}%；可正式制作：${expectationFit.readyForProduction ? "是" : "否"}。\n- [ ] 用户选择的标签已体现在结构、视觉、素材和输出中：${tagLine}。\n- [ ] 如果 readyForProduction 为 false，Codex 已先完成分步需求访谈。\n- [ ] quality-report.json 说明用户标签、粘贴背景、默认假设和剩余预期风险。\n\n### 已知缺口\n${missingSignals}\n\n### 需确认或记录的默认假设\n${assumptions || "- [ ] 暂无默认假设。"}\n\n## 资料与叙事\n- [ ] extracted-source.md 已根据真实源文件修正，而不只是网页粘贴摘要。\n- [ ] 核心结论出现在封面和收束页。\n- [ ] 每一页只承担一个主要任务，并有清晰 takeaway。\n- [ ] 敏感资料默认留在本地，除非用户明确同意上传。\n- [ ] 生成最终文件前，品牌资产或替代策略已锁定。\n- [ ] 证据来源、图片选择、图表/数据计划、页面节奏和信息图策略已明确。\n\n## 源文件\n${sourceLine}\n\n## PPTX 路线\n- [ ] 路线状态：${enginePlan.pptxActive ? "启用" : "备用"}。\n- [ ] 文本、形状、图表、备注保持可编辑。\n- [ ] 不用整页截图替代 PPTX 可编辑内容。\n- [ ] logo 和品牌标识是真实素材、干净矢量或规范文字处理，不是零散文字碎片。\n- [ ] 按 Skill 工作流运行 SVG / PPTX 渲染检查。\n- [ ] 检查导出页面并修复裁切、重叠、小字和图表损坏。\n\n## Web Deck 路线\n- [ ] 路线状态：${enginePlan.webActive ? "启用" : "备用"}。\n- [ ] 统一使用 ${enginePlan.styleRoute}。\n- [ ] 桌面端和移动端不出现文字、控件或媒体互相遮挡。\n- [ ] 视觉完整度包含真实图片、图表，或明确的无图策略。\n\n## 交付\n- [ ] 最终文件命名清晰。\n- [ ] quality-report.json 包含视觉复查结果和中文摘要。\n- [ ] 简短说明生成了什么、检查了什么、解析了哪些源文件。\n- [ ] 保留上游版权和第三方声明。\n`;
 }
 
 function buildAssetPlan(form: FormState, sources: UploadedSource[], qualityGate: QualityGate) {
@@ -5249,6 +5521,7 @@ function buildCodexTask(
   const sourceLine = sourceSummaryMarkdown(sources, form.language);
   const visualBriefText = buildVisualBriefMarkdown(form, expectationFit, sources);
   const briefMode = determineBriefMode(form, expectationFit, sources);
+  const bestEffectBrief = buildBestEffectBrief(form, sources, expectationFit);
   if (zh) {
     return `# Codex Task
 
@@ -5256,6 +5529,7 @@ function buildCodexTask(
 当前步骤：${workflowState.currentStep}
 阻塞原因：${workflowState.blockedReason || "无"}
 Brief 模式：${briefMode}
+bestEffectBrief：${bestEffectBrief.strategy} / ${bestEffectBrief.promptQuality} / ${bestEffectBrief.recommendedRoute}
 
 ## 先读这些文件
 1. AGENTS.md
@@ -5287,6 +5561,8 @@ ${gateChecks}
 ${visualBriefText}
 
 ### Codex 执行规则
+- 先执行 Best-Effect Brief Enhancer：不要直接把用户短指令拿去生成，必须先按 project-brief.json.bestEffectBrief 自动扩写最佳效果 brief。
+- 若 bestEffectBrief.strategy=best-effect-fixed-style，执行 Extreme Thin Prompt Fallback，默认走 Guizang-like Magazine Web Deck fixed style，不再追问普通风格偏好。
 - 如果 expectationFit.readyForProduction 为 false，先进入分步需求访谈，不要直接制作正式 PPT。
 - 每轮只问一组相关问题，按顺序问清：给谁看、什么场景、希望对方做什么、内容来源、核心观点、页数/章节、视觉风格、品牌/IP/官方素材、输出格式、禁忌边界。
 - 用户回答后整理一份需求确认稿，写入 project-brief.json / quality-report.json 的 guidedBrief 和 expectationFit。
@@ -5332,6 +5608,7 @@ Project: ${form.title}
 Current step: ${workflowState.currentStep}
 Blocked reason: ${workflowState.blockedReason || "none"}
 Brief mode: ${briefMode}
+bestEffectBrief: ${bestEffectBrief.strategy} / ${bestEffectBrief.promptQuality} / ${bestEffectBrief.recommendedRoute}
 
 ## Read first
 1. AGENTS.md
@@ -5363,6 +5640,8 @@ ${gateChecks}
 ${visualBriefText}
 
 ### Codex execution rules
+- Run the Best-Effect Brief Enhancer first: do not generate directly from the user's short instruction; expand the best-effect brief from project-brief.json.bestEffectBrief.
+- If bestEffectBrief.strategy=best-effect-fixed-style, follow the Extreme Thin Prompt Fallback and use Guizang-like Magazine Web Deck fixed style without asking more ordinary style questions.
 - If expectationFit.readyForProduction is false, run guided intake before final deck production.
 - Ask one coherent group of related questions per turn, covering audience, usage setting, desired action, content source, core message, slide count / sections, visual style, brand/IP/official assets, output format, and must-avoid boundaries.
 - After the user answers, write a concise confirmation brief and update guidedBrief plus expectationFit in project-brief.json / quality-report.json.
@@ -5405,13 +5684,16 @@ Final response must list generated files, ChatGPT micro-assets inserted, public 
 
 function buildCodexAgentGuide(form: FormState, sources: UploadedSource[], qualityGate: QualityGate, expectationFit: ExpectationFit) {
   const v52 = buildV52Contract(form, sources, expectationFit);
+  const bestEffectBrief = buildBestEffectBrief(form, sources, expectationFit);
   if (form.language === "zh") {
     return `# AGENTS.md
 
 ## Codex 本地规则
 - 工作范围限于这个 handoff 文件夹和 Ultimate PPT Master 仓库脚本。
 - 编辑或生成前先读 codex-task.md。
-- 先看 project-brief.json 的 briefMode、visualBrief、guidedBrief、expectationFit、sourceConfidence、deliveryScorecard、referenceStyle 和 feedbackLoop；如果 readyForProduction=false，必须先分步问清需求。
+- 先看 project-brief.json 的 bestEffectBrief、briefMode、visualBrief、guidedBrief、expectationFit、sourceConfidence、deliveryScorecard、referenceStyle 和 feedbackLoop；如果 readyForProduction=false，必须先分步问清需求。
+- Best-Effect Brief Enhancer：生产前先根据 bestEffectBrief 自动扩写最佳效果 brief，不要直接按用户短指令开做。
+- Extreme Thin Prompt Fallback：当前 bestEffectBrief 为 ${bestEffectBrief.strategy} / ${bestEffectBrief.promptQuality}；如果是 best-effect-fixed-style，默认用 Guizang-like Magazine Web Deck fixed style。
 - 分步问清每轮只问一组相关问题，直到受众、场景、目的、资料、核心观点、页数、风格、素材边界、输出和禁忌明确。
 - 当前 expectationFit：${expectationFit.riskLevel} / ${expectationFit.score}%；${expectationFit.readyForProduction ? "可以进入生产，但仍需记录假设。" : "需要 guided intake 后再生产。"}
 - 当前 sourceConfidence：${sourceConfidenceLabel(v52.sourceConfidence.level, "zh")}；不可编造：${v52.sourceConfidence.doNotInvent.join("、")}。
@@ -5434,7 +5716,9 @@ function buildCodexAgentGuide(form: FormState, sources: UploadedSource[], qualit
 ## Codex local rules
 - Work only in this handoff folder and the Ultimate PPT Master repository scripts.
 - Read codex-task.md before editing or generating deliverables.
-- Read briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, and feedbackLoop in project-brief.json first; if readyForProduction=false, run guided intake before production.
+- Read bestEffectBrief, briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, and feedbackLoop in project-brief.json first; if readyForProduction=false, run guided intake before production.
+- Best-Effect Brief Enhancer: auto-expand the best-effect brief from bestEffectBrief before production; do not work directly from the user's short instruction.
+- Extreme Thin Prompt Fallback: current bestEffectBrief is ${bestEffectBrief.strategy} / ${bestEffectBrief.promptQuality}; if it is best-effect-fixed-style, default to Guizang-like Magazine Web Deck fixed style.
 - Guided intake asks one related question group at a time until audience, setting, purpose, sources, core message, slide count, style, asset boundary, output, and must-avoid rules are clear.
 - Current expectationFit: ${expectationFit.riskLevel} / ${expectationFit.score}%; ${expectationFit.readyForProduction ? "production may start after recording assumptions." : "guided intake is required before production."}
 - Current sourceConfidence: ${sourceConfidenceLabel(v52.sourceConfidence.level, "en")}; do not invent: ${v52.sourceConfidence.doNotInvent.join(", ")}.
@@ -5593,6 +5877,7 @@ function buildBriefObject(
   const preset = findPreset(form.presetId);
   const visualBrief = normalizeVisualBrief(form.visualBrief);
   const v52 = buildV52Contract({ ...form, visualBrief }, sources, expectationFit);
+  const bestEffectBrief = buildBestEffectBrief({ ...form, visualBrief }, sources, expectationFit);
   return {
     version: appVersion,
     schemaVersion: v52.schemaVersion,
@@ -5625,6 +5910,7 @@ function buildBriefObject(
     },
     guidedBrief: buildGuidedBrief({ ...form, visualBrief }),
     expectationFit,
+    bestEffectBrief,
     referenceStyle: v52.referenceStyle,
     sourceConfidence: v52.sourceConfidence,
     deliveryScorecard: v52.deliveryScorecard,
@@ -5669,6 +5955,7 @@ function buildManifest(
   const preset = findPreset(form.presetId);
   const visualBrief = normalizeVisualBrief(form.visualBrief);
   const v52 = buildV52Contract({ ...form, visualBrief }, sources, expectationFit);
+  const bestEffectBrief = buildBestEffectBrief({ ...form, visualBrief }, sources, expectationFit);
   return {
     version: appVersion,
     schemaVersion: v52.schemaVersion,
@@ -5717,6 +6004,7 @@ function buildManifest(
     },
     guidedBrief: buildGuidedBrief({ ...form, visualBrief }),
     expectationFit,
+    bestEffectBrief,
     referenceStyle: v52.referenceStyle,
     sourceConfidence: v52.sourceConfidence,
     deliveryScorecard: v52.deliveryScorecard,

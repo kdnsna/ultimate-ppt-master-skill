@@ -6,7 +6,7 @@ Use this checklist when preparing Ultimate PPT Master for a skill marketplace, a
 
 - Name: Ultimate PPT Master / 终极融合PPT大师
 - Category: presentation generation, editable PPTX, Web Deck, office productivity
-- Promise: clarify the brief first, then turn local source files into quality-checked editable PPTX or magazine-style Web Decks.
+- Promise: expand short requests into a best-effect brief first, then turn local source files or thin prompts into quality-checked editable PPTX or magazine-style Web Decks.
 - Primary audience: Chinese office users, consultants, operators, trainers, and agent users who need editable deliverables.
 - Not a black-box cloud generator: source files stay local unless the user explicitly chooses another path.
 
@@ -27,16 +27,16 @@ Use this checklist when preparing Ultimate PPT Master for a skill marketplace, a
 
 Short:
 
-> 先听明白再生成 quality-checked PPTX and magazine-style Web Decks from local source files.
+> 先自动扩写 best-effect brief，再生成 quality-checked PPTX and magazine-style Web Decks.
 
 Long:
 
-> Ultimate PPT Master helps an agent clarify the audience, scenario, purpose, style, and source boundaries before turning PDFs, Word docs, PPTX decks, spreadsheets, URLs, and rough notes into an inspectable presentation project. It supports editable PowerPoint and magazine-style Web Deck output, keeps source files local, and includes visual review, audit trails, and public proof packs.
+> Ultimate PPT Master helps an agent expand short requests into a best-effect brief before turning PDFs, Word docs, PPTX decks, spreadsheets, URLs, rough notes, or topic-only prompts into an inspectable presentation project. Extremely thin prompts use a Guizang-like Magazine Web Deck fixed style by default unless the user explicitly needs a formal editable PPTX. It keeps source files local and includes visual review, audit trails, and public proof packs.
 
 Default prompt:
 
 ```text
-Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report.
+Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.
 ```
 
 ## Acceptance Gates

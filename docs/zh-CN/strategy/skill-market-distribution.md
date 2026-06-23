@@ -6,7 +6,7 @@
 
 - 名称：Ultimate PPT Master / 终极融合PPT大师
 - 分类：PPT 生成、可编辑 PPTX、Web Deck、办公效率
-- 承诺：先问清受众、场景、目的、风格和素材边界，再把本地资料生成经过质量检查的可编辑 PPTX 或杂志风 Web Deck。
+- 承诺：先把短指令自动扩写成 best-effect brief，再把本地资料或极短提示生成经过质量检查的可编辑 PPTX 或杂志风 Web Deck。
 - 主要用户：中文办公用户、咨询顾问、经营/运营负责人、培训讲师，以及需要可编辑交付物的 Agent 用户。
 - 不是黑盒云生成器：源文件默认留在本地，除非用户明确选择其他路径。
 
@@ -27,16 +27,16 @@
 
 短文案：
 
-> 先听明白，再从本地资料生成经过质量检查的 PPTX 和杂志风 Web Deck。
+> 先自动扩写 best-effect brief，再生成经过质量检查的 PPTX 和杂志风 Web Deck。
 
 长文案：
 
-> Ultimate PPT Master 帮助 Agent 先问清受众、场景、目的、风格和素材边界，再把 PDF、Word、PPTX、Excel、URL 和零散笔记整理成可审查的演示项目。它支持可编辑 PowerPoint 和杂志风 Web Deck 输出，默认保持资料本地优先，并附带视觉审阅、审计留痕和公开 proof packs。
+> Ultimate PPT Master 帮助 Agent 先把短指令扩写成最佳效果 brief，再把 PDF、Word、PPTX、Excel、URL、零散笔记或只有主题的提示整理成可审查的演示项目。极短指令默认使用 Guizang-like Magazine Web Deck fixed style；用户明确要正式可编辑 PPTX 时走 PPTX。它默认保持资料本地优先，并附带视觉审阅、审计留痕和公开 proof packs。
 
 默认 prompt：
 
 ```text
-Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report.
+Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.
 ```
 
 ## 上架门禁

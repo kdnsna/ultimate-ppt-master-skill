@@ -52,7 +52,7 @@ def audit_openai_metadata(errors: list[str]) -> None:
 
     require("policy:" in text, "agents/openai.yaml missing policy block", errors)
     require("$ultimate-ppt-master" in interface.get("default_prompt", ""), "default prompt must mention $ultimate-ppt-master", errors)
-    require("quality-checked" in interface.get("default_prompt", ""), "default prompt must promise quality-checked output", errors)
+    require("quality checks" in interface.get("default_prompt", "") or "quality-checked" in interface.get("default_prompt", ""), "default prompt must promise quality checks", errors)
     require(bool(re.fullmatch(r"#[0-9A-Fa-f]{6}", interface.get("brand_color", ""))), "brand_color must be a hex color", errors)
     require(len(interface.get("short_description", "")) <= 80, "short_description should stay marketplace-chip friendly", errors)
 

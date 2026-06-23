@@ -1781,6 +1781,78 @@ textarea {
   align-items: start;
 }
 
+.best-effect-guide {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: 8px;
+  background: #f5fbf9;
+}
+
+.best-effect-guide-head {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.best-effect-guide-head svg {
+  color: #0f766e;
+  margin-top: 1px;
+}
+
+.best-effect-guide strong,
+.best-effect-guide span {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 950;
+  line-height: 1.3;
+}
+
+.best-effect-guide p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.best-effect-guide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.best-effect-guide-grid > div,
+.best-effect-prompt {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.best-effect-prompt {
+  display: grid;
+  grid-template-columns: 18px auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.best-effect-prompt svg {
+  color: #0f766e;
+  margin-top: 1px;
+}
+
+.best-effect-prompt code {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .visual-brief-head strong,
 .tag-preset-row > span,
 .reference-style-row > div:first-child span,
@@ -2604,6 +2676,7 @@ pre {
   .runbook-grid,
   .benchmark-grid,
   .plain-glossary-grid,
+  .best-effect-guide-grid,
   .beginner-steps,
   .guided-step-rail,
   .console-step-rail,
@@ -2658,6 +2731,8 @@ pre {
   .header-actions,
   .primary-action-bar,
   .visual-brief-head,
+  .best-effect-guide-grid,
+  .best-effect-prompt,
   .expectation-fit-card dl,
   .quality-workbench-grid,
   .configuration-actions,

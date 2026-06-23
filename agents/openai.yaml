@@ -1,9 +1,9 @@
 interface:
   display_name: "终极融合PPT大师"
-  short_description: "先听明白再生成 quality-checked PPTX/Web Decks"
+  short_description: "先自动扩写 best-effect brief，再生成 quality-checked PPTX/Web Decks"
   icon_small: "./assets/skill-market/ultimate-ppt-master-icon.svg"
   icon_large: "./assets/skill-market/ultimate-ppt-master-card.svg"
   brand_color: "#0F766E"
-  default_prompt: "Use $ultimate-ppt-master to first clarify my audience, scenario, purpose, style, and source boundaries, then produce a quality-checked editable PPTX or Web Deck with a visual review report."
+  default_prompt: "Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks."
 policy:
   allow_implicit_invocation: true

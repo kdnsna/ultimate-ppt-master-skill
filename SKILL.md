@@ -22,6 +22,41 @@ description: >
 
 **Quality Pipeline Add-on**: stakeholder-facing decks must also pass `Visual Direction → Page Role Contract → Visual Completion Audit`.
 
+## Best-Effect Brief Enhancer
+
+Before route selection or production, convert the user's raw request into a `bestEffectBrief`. This is mandatory for direct Agent use, because many users will only write a short topic or "帮我做个 PPT".
+
+The `bestEffectBrief` must record:
+
+- raw user request summary;
+- prompt quality: `complete`, `thin`, or `extreme-thin`;
+- auto-expanded brief: audience, scenario, core message, page count, narrative arc, output route, style direction, source boundaries, asset/IP policy, and assumptions;
+- recommended route: `guizang-web-fixed-style`, `formal-editable-pptx`, or `dual-delivery`;
+- fixed fallback decision and why it was selected;
+- what came from the user vs what the Agent inferred.
+
+### Extreme Thin Prompt Fallback
+
+If the user provides only a topic, a one-line request, or almost no source material, do not make the user write a perfect prompt first. Unless the user explicitly asks for formal / editable / government / finance / training PPTX, use this stable default:
+
+- Route: `Guizang-like Magazine Web Deck fixed style`;
+- Mode: `Mode 2: Magazine Web Deck`;
+- Style: `Style A · 电子杂志 × 电子墨水`;
+- Length: 8 pages unless the user gives another count;
+- Page rhythm:
+  1. dark cover with one strong title and minimal subtitle;
+  2. light context page for problem, trend, or setting;
+  3. dark image/text spread for tension or opportunity;
+  4. light structure page with a three-part framework, path, or method;
+  5. large-statement section divider;
+  6. evidence / scene / case page;
+  7. dark point-of-view page with final judgment or question;
+  8. light closing page with action, takeaway, or ending line.
+
+This fallback is the "stable high-quality output" path. The Agent may ask one focused question only when missing facts, brand/IP permission, compliance boundaries, or source authority would materially change the deck. Ordinary style gaps are filled by the fixed style.
+
+If the user explicitly asks for a formal editable deck, government/finance/training/report material, or `.pptx`, switch to `formal-editable-pptx`: create a 8-12 page editable PPTX brief with Microsoft YaHei, formal-business quality gate, source confidence, official/IP asset plan, and the same `bestEffectBrief` record.
+
 ## Brief Clarity Gate
 
 Before production, decide whether the request came through a visual Web brief or through direct Codex conversation:
@@ -30,6 +65,8 @@ Before production, decide whether the request came through a visual Web brief or
 - **Codex Guided Intake**: when a direct Codex request does not provide enough detail, do not jump straight into final-quality PPT production. Ask step by step until the production frame is clear.
 - **Source-first**: when strong source files and target context are already present, record assumptions and continue.
 - **Draft-with-assumptions**: only use this when the user explicitly asks for a draft, first pass, or "先按默认做一版".
+
+For direct Agent use, run the Best-Effect Brief Enhancer before guided intake. Ask staged questions only when `bestEffectBrief` cannot safely infer a production path.
 
 Guided intake covers these items in stages, one related question group at a time:
 
@@ -48,15 +85,16 @@ After the user answers, write a concise confirmation brief. Proceed only when `e
 
 The skill is optimized for real office PPT delivery. Keep the route decision simple:
 
-- For generic requests such as "做一个 PPT", "帮我做 PPT", "make a deck", or "turn this into slides", default to **Mode 1: Editable PPTX** and proceed. Say briefly that Web Deck remains available if the user wants a showcase-style browser version.
+- For generic but non-empty business requests with enough formal context, default to **Mode 1: Editable PPTX** and proceed after the `bestEffectBrief`.
+- For extreme-thin requests such as "做一个关于 AI 的 PPT", "帮我做 PPT", "make a deck", or only a topic with no formal/editable signal, default to **Mode 2: Magazine Web Deck** using the **Guizang-like Magazine Web Deck fixed style**.
 - Choose **Mode 1: Editable PPTX** when the user asks for PowerPoint, `.pptx`, editable files, business reports, consulting decks, training material, government/finance material, or anything another person may need to revise.
-- Choose **Mode 2: Magazine Web Deck** only when the user explicitly asks for magazine style, web PPT, HTML slides, horizontal swipe deck, editorial/e-ink, Swiss Style, keynote/showcase/demo-day style, or a browser-first deliverable.
+- Choose **Mode 2: Magazine Web Deck** when the user explicitly asks for magazine style, web PPT, HTML slides, horizontal swipe deck, editorial/e-ink, Swiss Style, keynote/showcase/demo-day style, browser-first delivery, or when the Extreme Thin Prompt Fallback is active.
 - If the user asks for both, produce separate deliverables in separate project folders.
 - Ask the user to choose only when the request is genuinely route-ambiguous and the scenario cannot decide it. Ask one concise question, then continue.
 
 Plain-language wording for generic requests:
 
-> 我会默认做可编辑 PPTX，适合正式汇报和后续修改；如果你想要杂志风网页 PPT，我也可以改走 HTML 版本。
+> 我会先把你的简短指令自动扩写成最佳效果 brief；如果只有主题/一句话且没有明确要求正式可编辑 PPTX，我会默认走 Guizang-like 杂志风网页 PPT，先出一版稳定高质量版本。若你要正式汇报或可编辑文件，我会改走 PPTX。
 
 ## Formal Business Delivery Gate
 
@@ -135,7 +173,7 @@ If the audit fails, report the concrete issues and fix the deck before final del
 > **This workflow is a strict serial pipeline. The following rules have the highest priority — violating any one of them constitutes execution failure:**
 >
 > 1. **LEAN SERIAL EXECUTION** — Steps run in order, but do not manufacture extra waits. Once prerequisites are available, continue through non-blocking steps without asking the user to say "continue".
-> 2. **CODEX GUIDED INTAKE FOR UNCLEAR REQUESTS** — If the user asks directly in Codex and has not provided enough detail for a real PPT, ask staged questions first. Do not start final-quality production from "帮我做个 PPT" or a similarly vague request unless the user explicitly accepts a draft with assumptions.
+> 2. **BEST-EFFECT BRIEF BEFORE GUIDED INTAKE** — If the user asks directly in Codex and has not provided enough detail for a real PPT, first write `bestEffectBrief`. If the prompt is merely thin, ask staged questions only for facts, sources, brand/IP, compliance, or route decisions that materially change the deliverable. If the prompt is `extreme-thin` and the user did not explicitly request formal editable PPTX, use the Extreme Thin Prompt Fallback and produce the Guizang-like Magazine Web Deck fixed style.
 > 3. **STOP ONLY FOR REAL BLOCKERS AFTER INTAKE** — After the brief is clear enough, stop only when a required source, route choice, legal/brand permission, or missing manual asset makes proceeding risky. Otherwise make reasonable assumptions, record them, and continue.
 > 4. **ONE DELIVERY BRIEF AFTER INTAKE** — The guided intake may take multiple short turns when the request is vague; after that, replace further multi-round confirmations with one concise delivery brief. The Strategist still decides canvas, page count, audience, style, colors, icons, typography, and images, but these are recorded as one production contract rather than a chain of user-facing checkpoints.
 > 5. **GATE BEFORE ENTRY** — Each Step has prerequisites (🚧 GATE) listed at the top; these MUST be verified before starting that Step
@@ -422,7 +460,7 @@ Read references/strategist.md
 
 **Must complete one delivery brief**:
 
-The delivery brief is one compact production decision, not eight separate user-facing confirmations. For Web handoff projects, read `briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit` from `project-brief.json` first. For direct Codex requests, run guided intake when `expectationFit.readyForProduction` would be false. If the source, audience, and output route are sufficient, record assumptions and continue without waiting. Stop only if a missing answer would materially change the deliverable.
+The delivery brief is one compact production decision, not eight separate user-facing confirmations. For Web handoff projects, read `bestEffectBrief`, `briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit` from `project-brief.json` first. For direct Codex requests, create `bestEffectBrief` before any guided intake. If `bestEffectBrief.strategy = best-effect-fixed-style`, proceed with the Guizang-like Magazine Web Deck fixed style unless a fact, source, brand/IP, or compliance blocker would materially change the deliverable. Otherwise run guided intake when `expectationFit.readyForProduction` would be false. If the source, audience, and output route are sufficient, record assumptions and continue without waiting.
 
 1. Canvas format
 2. Page count range
@@ -435,7 +473,8 @@ The delivery brief is one compact production decision, not eight separate user-f
 
 Also record the expectation contract:
 
-- `briefMode`: `visual-tags`, `codex-guided-intake`, `source-first`, or `draft-with-assumptions`;
+- `bestEffectBrief`: v5.3 auto-expanded best-effect brief, prompt quality, recommended route, Extreme Thin Prompt Fallback state, fixed style, and assumptions;
+- `briefMode`: `visual-tags`, `codex-guided-intake`, `source-first`, `draft-with-assumptions`, `best-effect-expanded`, or `best-effect-fixed-style`;
 - `visualBrief`: selected tags, pasted background, special requirements, and reference links;
 - `guidedBrief`: scenario, audience, purpose, core message, sources, page count, style, asset rules, output format, must-include, and must-avoid;
 - `expectationFit`: risk level, missing signals, assumptions, conflicts, source adequacy, success criteria, and whether production is ready.
