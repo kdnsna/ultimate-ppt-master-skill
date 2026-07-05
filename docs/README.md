@@ -30,7 +30,8 @@ Ultimate PPT Master v5 uses a categorized documentation structure. Start with th
 
 | Need | Read |
 |---|---|
-| See the latest release | [Release Notes - v5.3.0](./release/release-notes-v5.3.0.md) |
+| See the latest release | [Release Notes - v5.4.0](./release/release-notes-v5.4.0.md) |
+| Review the v5.4 Swiss Deck and Asset Factory release | [Release Notes - v5.4.0](./release/release-notes-v5.4.0.md) |
 | Review the v5.3 best-effect brief enhancer | [Release Notes - v5.3.0](./release/release-notes-v5.3.0.md) |
 | Review the v5.2 expectation-fit contract | [Release Notes - v5.2.0](./release/release-notes-v5.2.0.md) |
 | Review the v5.1 guided-intake release | [Release Notes - v5.1.0](./release/release-notes-v5.1.0.md) |

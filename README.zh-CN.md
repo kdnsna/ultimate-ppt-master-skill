@@ -1,9 +1,9 @@
-# Ultimate PPT Master - v5.3 最佳效果提示增强器
+# Ultimate PPT Master - v5.4 瑞士风 Deck + 资产工厂
 
-> 面向真实办公场景的本地优先 AI PPT 生产工具：先把短指令自动扩写成最佳效果 brief，再把一句话需求、杂乱资料或结构化 brief 变成可编辑 PPTX 或杂志风 Web Deck。v5.3 增加 Guizang-like 固定样式 fallback，让极短指令也能先出稳定高质量版本，同时保留来源可信度、官方/IP 素材边界、渲染审阅和正式交付审计。
+> 面向真实办公场景的本地优先 AI PPT 生产工具：先把短指令自动扩写成最佳效果 brief，再选择可编辑 PPTX、Style A 电子杂志 Web Deck，或 Style B 瑞士国际主义 Web Deck。v5.4 新增可追溯 Asset Factory、来源可信度、官方/IP 素材边界、渲染审阅和正式交付审计。
 
 <p align="center">
-  <strong>v5.3.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/zh-CN/release/release-notes-v5.3.0.md">v5.3 发布说明</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v5.4.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/zh-CN/release/release-notes-v5.4.0.md">v5.4 发布说明</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -13,6 +13,8 @@
   ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>公开案例墙</strong></a>
   ·
+  <a href="./docs/zh-CN/release/release-notes-v5.4.0.md"><strong>v5.4.0 说明</strong></a>
+  ·
   <a href="./docs/zh-CN/release/release-notes-v5.3.0.md"><strong>v5.3.0 说明</strong></a>
   ·
   <a href="./docs/zh-CN/guides/agent-connect-bridge.md"><strong>Agent Bridge</strong></a>
@@ -21,7 +23,8 @@
 </p>
 
 <p align="center">
-  <img alt="Version 5.3.0" src="https://img.shields.io/badge/Version-5.3.0-172033?style=for-the-badge">
+  <img alt="Version 5.4.0" src="https://img.shields.io/badge/Version-5.4.0-172033?style=for-the-badge">
+  <img alt="Swiss Deck" src="https://img.shields.io/badge/v5.4-Swiss%20Deck-DC2626?style=for-the-badge">
   <img alt="Best-effect brief" src="https://img.shields.io/badge/v5.3-Best--Effect%20Brief-0F766E?style=for-the-badge">
   <img alt="Visual Brief tags" src="https://img.shields.io/badge/Web-Visual%20Brief%20Tags-2563EB?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
@@ -46,6 +49,28 @@ v5.3 的核心是：用户不需要会写完美提示词，Agent 必须先做“
 | 正式汇报、政务/金融/培训、必须可编辑 | 改走 PPTX：微软雅黑、formal-business 门禁、来源可信度、官方/IP 素材计划、同样写入 bestEffectBrief。 |
 | 已有资料或详细 brief | 保留用户意图，记录假设，继续走 v5.2 的预期契合合同和质量检查。 |
 
+## v5.4 瑞士风 Deck + 资产工厂
+
+v5.4 把 Web Deck 双风格正式化，并把图片生成从“顺手生成”升级为可审计的资产计划。
+
+| 升级点 | 用户会感受到什么 |
+|---|---|
+| Style A 电子杂志 × 电子墨水 | 极短指令仍默认走稳定的杂志风 Web Deck，适合叙事、观点表达和快速传播。 |
+| Style B 瑞士国际主义 | 当用户提到数据、产品、KPI、方法论、Helvetica、网格或信息设计时，可进入瑞士风正式路线，锁定 `data-layout="Sxx"` 和 `npm run audit:swiss-deck`。 |
+| `asset_plan.json` | 图片工作先规划再生成；每个 asset 记录 slide、slot、类型、比例、文字策略、来源策略、backend、prompt 路径、状态和证据规则。 |
+| `current_generation_evidence` | `Generated` 状态必须有本次生成证据，不能把历史 `generated_images` 当成本次结果。 |
+| Swiss demo | `examples/swiss-v54-demo/index.html` 提供 8 页稳定示例，覆盖封面、KPI、对比、流程、地图/地点关系、S22 21:9 hero、证据页和尾页。 |
+| 上游吸收边界 | 归藏 v1.1.0 启发 Swiss Style 路线；宝玉 Skills v2.5.2 启发图片生成证据链。本 MIT 仓库本地重写，不直接复制 AGPL 后归藏代码。 |
+
+常用命令：
+
+```bash
+python3 scripts/build_asset_plan.py path/to/handoff-project
+npm run audit:image-contracts
+npm run audit:swiss-deck
+node scripts/validate-swiss-deck.mjs examples/swiss-v54-demo/index.html
+```
+
 ## 为什么团队会用它
 
 很多 AI PPT 工具能做出“看起来完成”的页面。办公团队真正需要的是：哪怕用户一开始只说“帮我做个 PPT”，最后仍然可编辑、可追溯、可审计、能二次修订。
@@ -53,6 +78,8 @@ v5.3 的核心是：用户不需要会写完美提示词，Agent 必须先做“
 | 需求 | Ultimate PPT Master 的做法 |
 |---|---|
 | 让短提示也能出好结果 | v5.3 先把一句话自动扩写成 `bestEffectBrief`，再决定路线、风格、页奏和默认假设。 |
+| 明确选择 Web Deck 风格 | v5.4 把 Style A 电子杂志和 Style B 瑞士国际主义拆成正式路线，叙事 deck 和信息设计 deck 不再共用一个松散模板。 |
+| 追踪图片生成 | Asset Factory 先写 `asset_plan.json`，再生成 prompt 文件和 `image_prompts.json`；没有 `current_generation_evidence` 不能标成 Generated。 |
 | 极短指令有稳定默认 | 用户只给主题时，默认用 Guizang-like Magazine Web Deck fixed style，避免产出一套平庸通用 PPT。 |
 | 需要正式可编辑时仍做 PPTX | 明确写正式汇报、可编辑、政务/金融/培训/报告时，走可编辑 PPTX、微软雅黑和 formal-business 检查。 |
 | 避免预期偏差 | v5.2 把清晰度闸门升级成交付契约：标签、访谈答案、来源可信度、参考样板、交付评分卡和反馈归因都写进 handoff。 |
@@ -89,21 +116,23 @@ v5.3 的核心是：用户不需要会写完美提示词，Agent 必须先做“
 |---|---|---|
 | `bestEffectBrief` | 提示质量、自动扩写 brief、推荐路线、Extreme Thin Prompt Fallback、固定样式和默认假设。 | Agent 不再直接拿用户粗略一句话当生产 brief。 |
 | 可编辑 PPTX | 真实文本框、形状、图表、表格、备注，以及安全场景下的可编辑品牌文字锁定。 | 交付物能给 PowerPoint 用户继续改，不是只能看的截图。 |
-| Web Deck | 用于演讲、展示和杂志化表达的单文件浏览器演示。 | 当视觉节奏和快速分享比 PowerPoint 编辑更重要时使用。 |
+| Web Deck | 用于演讲、展示、杂志化表达或瑞士风信息设计的单文件浏览器演示。 | 当视觉节奏和快速分享比 PowerPoint 编辑更重要时使用。 |
 | `project-brief.json` | `briefMode`、`visualBrief`、`guidedBrief`、`expectationFit`、`sourceConfidence`、`deliveryScorecard`、`referenceStyle`、`feedbackLoop` 和 `confirmationBrief` 统一进入 handoff 契约。 | 系统能分清哪些信号来自用户、哪些来自标签、哪些是默认假设，以及用户不满意时该修哪一层。 |
 | 可视化 brief | 场景、受众、目的、内容状态、视觉风格、排版密度、素材策略、输出偏好、背景文本、链接和特殊要求。 | Web 用户不用填长问卷，也能表达一份足够丰富的 PPT 需求。 |
 | 分步访谈 brief | Codex 收集的场景、受众、目的、核心观点、资料来源、页数、章节、风格、素材、输出、必含和禁忌。 | 聊天入口会把制作 PPT 所需的核心要素一步步问清楚。 |
 | 预期契合度 | 绿色/黄色/红色风险、来源可信度、缺失信号、默认假设、交付评分卡和是否可进入正式制作。 | 高风险的模糊 brief 会在生成前暴露出来。 |
-| 来源和素材记录 | `source-map.json`、`image_sources.json`、`image_prompts.json` 和官方/IP fallback 说明。 | 审阅者能看到哪些内容来自资料、生成、替换或待授权。 |
+| 来源和素材记录 | `source-map.json`、`asset_plan.json`、`image_sources.json`、`image_prompts.json` 和官方/IP fallback 说明。 | 审阅者能看到哪些内容来自资料、生成、替换或待授权。 |
 | 审阅包 | 渲染预览、问题清单、修复候选和质量状态。 | 修订从可观察问题出发，而不是反复说“再高级一点”。 |
 
 ## v5 做对了什么
 
-v5.0.0 把产品升级成真实办公 PPT 的交付默认系统。v5.1.0 加入模糊需求的分步访谈。v5.2.0 把这些信号变成预期契合合同。v5.3.0 补上 Agent 真正好用的前置层：短指令先自动扩写为最佳效果 brief，只有主题时用固定高质量 Guizang-like Web Deck 默认样式兜底。
+v5.0.0 把产品升级成真实办公 PPT 的交付默认系统。v5.1.0 加入模糊需求的分步访谈。v5.2.0 把这些信号变成预期契合合同。v5.3.0 补上最佳效果 brief 前置层。v5.4.0 新增 Swiss Deck + Asset Factory：Style B 瑞士国际主义成为正式路线，图片生成有可追踪计划和证据合同。
 
 | v5 默认 | 实际效果 |
 |---|---|
 | 最佳效果提示增强器 | 每次 Agent 运行先写 `bestEffectBrief`：提示质量、自动扩写 brief、默认假设、推荐路线、固定 fallback 和用户可见 caveat。 |
+| 瑞士风正式路线 | Style B 瑞士国际主义会锁定 Swiss 页奏、Sxx 版式编号、图片槽位和 `npm run audit:swiss-deck`。 |
+| 资产工厂 | `asset_plan.json` 成为生成、官方、用户提供、公开检索和手动替换素材的父级合同，再派生 `image_prompts.json`。 |
 | 极短指令 fallback | 只有主题或一句话时，默认走 Guizang-like Magazine Web Deck fixed style；明确正式可编辑时才切 PPTX。 |
 | 预期契合合同 | `project-brief.json` 和 `quality-report.json` 会携带 `sourceConfidence`、`deliveryScorecard`、`referenceStyle`、`feedbackLoop`、`failureTaxonomy`、`confirmationBrief` 和 `imageAcceptance`。 |
 | 可编辑 PPTX 优先 | 正式汇报、咨询方案、金融/政务材料和普通“做 PPT”请求，在 brief 足够清晰后直接进入 PowerPoint 可交付路线。 |
@@ -205,6 +234,7 @@ npm run bridge
 
 | 层级 | 发布 | 保护什么 |
 |---|---|---|
+| 瑞士风 Deck 与资产工厂 | [发布说明 - v5.4.0](./docs/zh-CN/release/release-notes-v5.4.0.md) | Style A/Style B 选择、Swiss Sxx 锁版、`asset_plan.json`、生成证据链和 Swiss validator。 |
 | 最佳效果 brief 与固定 fallback | [发布说明 - v5.3.0](./docs/zh-CN/release/release-notes-v5.3.0.md) | 自动扩写 brief、极短指令 fallback、Guizang-like Magazine Web Deck fixed style 和 PPTX 例外路径。 |
 | 分步访谈与预期契合 | [发布说明 - v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md) | 可视化标签、Codex 分阶段追问、统一 `project-brief.json` 和生成前风险判断。 |
 | 预期契合合同 | [发布说明 - v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md) | 来源可信度、参考样板选择、交付评分卡、反馈归因、需求确认稿和图片验收。 |
@@ -215,7 +245,7 @@ npm run bridge
 | 混合可编辑生成 | [v4.0 混合可编辑视觉工作流](./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md) | 页面配方、无文字生成式视觉层、可编辑 PPTX 正文、正式 raster 策略。 |
 | 公开证明面 | [v2.5 质量工作台](./docs/zh-CN/quality/quality-workbench-v2.5.md) | 公开案例墙、合成 proof packs、Design Doctor 报告和发布检查。 |
 
-历史发布说明：[v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md)、[v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md)、[v5.0.0](./docs/zh-CN/release/release-notes-v5.0.0.md)、[v4.3.0](./docs/zh-CN/release/release-notes-v4.3.0.md)、[v4.2.0](./docs/zh-CN/release/release-notes-v4.2.0.md)、[v4.1.0](./docs/zh-CN/release/release-notes-v4.1.0.md)、[v4.0.0](./docs/zh-CN/release/release-notes-v4.0.0.md)、[v3.0.0](./docs/zh-CN/release/release-notes-v3.0.0.md)。
+历史发布说明：[v5.3.0](./docs/zh-CN/release/release-notes-v5.3.0.md)、[v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md)、[v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md)、[v5.0.0](./docs/zh-CN/release/release-notes-v5.0.0.md)、[v4.3.0](./docs/zh-CN/release/release-notes-v4.3.0.md)、[v4.2.0](./docs/zh-CN/release/release-notes-v4.2.0.md)、[v4.1.0](./docs/zh-CN/release/release-notes-v4.1.0.md)、[v4.0.0](./docs/zh-CN/release/release-notes-v4.0.0.md)、[v3.0.0](./docs/zh-CN/release/release-notes-v3.0.0.md)。
 
 ## 证明材料
 
@@ -223,6 +253,7 @@ npm run bridge
 
 | 证明 | 链接 |
 |---|---|
+| v5.4 瑞士风 Deck + 资产工厂 | [发布说明 - v5.4.0](./docs/zh-CN/release/release-notes-v5.4.0.md) |
 | v5.3 最佳效果提示增强器 | [发布说明 - v5.3.0](./docs/zh-CN/release/release-notes-v5.3.0.md) |
 | v5.2 预期契合合同 | [发布说明 - v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md) |
 | v5.1 分步访谈发布 | [发布说明 - v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md) |
@@ -263,21 +294,23 @@ bash -lc 'set -e; dir="$HOME/.codex/skills/ultimate-ppt-master"; if [ -d "$dir/.
 
 ## 生产稳定性门禁
 
-v5.3 的稳定升级路线先把上游来源、许可证边界和仓库卫生固定下来，再继续吸收归藏和宝玉的新范式。
+v5.4 的稳定升级路线继续固定上游来源、许可证边界和仓库卫生，并把瑞士风 Deck 与图片资产证据链纳入可执行门禁。
 
 | 门禁 | 检查什么 |
 |---|---|
 | `UPSTREAM_SYNC.md` | 记录 PPT Master、归藏和宝玉来源的 `remote_ref`、`local_ref`、`license`、`import_policy`、已吸收能力、暂缓能力和复核日期。 |
 | `npm run audit:repo-hygiene` | 拦截 `README 2.md`、`test_release_integrity 2.py`、复制图标资产等 Finder/WPS 式副本。 |
 | `npm run audit:image-contracts` | 校验生成图片 manifest，确保每个资产记录 `prompt_path`、backend、source、asset type、aspect ratio、status、page role 和 text policy。 |
+| `npm run audit:swiss-deck` | 校验 Swiss demo 和指定 Swiss Deck HTML，拦截缺 `data-layout`、S22 缺图片槽、SVG 可见文字、小字号、裁切风险和底部导航安全区问题。 |
 | 归藏许可证边界 | 不直接复制 AGPL 后的归藏代码；只吸收行为要求，并在本仓库内重新实现。 |
-| 宝玉流程纪律 | 先写 prompt 文件再生成，记录后端选择，并禁止用位图覆盖方式修补生成图文字；文本错误时改 prompt 后重生成。 |
+| 宝玉流程纪律 | 先写 prompt 文件再生成，记录后端选择，要求 `current_generation_evidence`，并禁止用位图覆盖方式修补生成图文字；文本错误时改 prompt 后重生成。 |
 
 ## 文档地图
 
 | 需求 | 阅读 |
 |---|---|
 | 尝试网页入口 | [Web Experience](./docs/zh-CN/guides/web-experience.md) |
+| 查看 v5.4 瑞士风 Deck 与资产工厂 | [发布说明 - v5.4.0](./docs/zh-CN/release/release-notes-v5.4.0.md) |
 | 连接浏览器、本地资料和 Agent | [Agent Connect Bridge](./docs/zh-CN/guides/agent-connect-bridge.md) |
 | 安装和调用 Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | 选择 PPTX / Web Deck / Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
@@ -304,6 +337,7 @@ npm run audit:docs
 npm run audit:web-console
 npm run audit:repo-hygiene
 npm run audit:image-contracts
+npm run audit:swiss-deck
 npm run audit:presets
 npm run audit:quality
 npm run audit:market

@@ -66,7 +66,7 @@ It should cover:
 - whitespace checks.
 
 CI should run on the current GitHub Actions JavaScript runtime generation. For
-v5.3.0 that means Node 24 in the workflows and current official action majors
+v5.4.0 that means Node 24 in the workflows and current official action majors
 for checkout, Node, and Python setup.
 
 The Pages workflow lives at:
@@ -144,11 +144,13 @@ When syncing upstream:
 
 ## Version Notes
 
-v5.3.0 positions this repository as:
+v5.4.0 positions this repository as:
 
 - a delivery-defaults presentation workbench for Chinese office users who need formal PPTX and high-impact Web Deck outputs;
 - an office-first Agent Skill where generic PPT requests default to editable PPTX after a clarity gate has enough production intent;
 - a Web Visual Brief Builder where users can choose scenario, audience, purpose, content status, visual style, density, asset strategy, and output tags while still pasting background context;
+- a dual Web Deck route where Style A handles editorial/e-ink storytelling and Style B Swiss International handles grid-led information design;
+- an Asset Factory workflow where `asset_plan.json` plans image slots, source policies, prompt files, status, and `current_generation_evidence`;
 - a Codex Guided Intake workflow where vague requests are clarified by stage before serious deck production;
 - a unified `project-brief.json` contract carrying `briefMode`, `visualBrief`, `guidedBrief`, `expectationFit`, `sourceConfidence`, `deliveryScorecard`, `referenceStyle`, `feedbackLoop`, and `confirmationBrief`;
 - a feedback-first revision loop where dissatisfaction is classified before the deck is revised;

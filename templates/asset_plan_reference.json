@@ -1,0 +1,32 @@
+{
+  "version": "asset-plan-v5.4",
+  "project": "Example deck",
+  "items": [
+    {
+      "id": "s22-hero",
+      "slide": 6,
+      "slot": "s22-hero-21x9",
+      "asset_type": "hero",
+      "aspect_ratio": "21:9",
+      "text_policy": "none",
+      "source_policy": "generated",
+      "backend": "codex",
+      "prompt_path": "prompts/s22-hero.md",
+      "status": "Pending",
+      "current_generation_evidence": []
+    },
+    {
+      "id": "screenshot-frame",
+      "slide": 3,
+      "slot": "s15-grid-16x10",
+      "asset_type": "screenshot-frame",
+      "aspect_ratio": "16:10",
+      "text_policy": "limited-labels",
+      "source_policy": "needs-manual",
+      "backend": "manual",
+      "prompt_path": "prompts/screenshot-frame.md",
+      "status": "Needs-Manual",
+      "current_generation_evidence": []
+    }
+  ]
+}

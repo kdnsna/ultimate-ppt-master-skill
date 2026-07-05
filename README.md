@@ -1,9 +1,9 @@
-# Ultimate PPT Master - v5.3 Best-Effect Brief Enhancer
+# Ultimate PPT Master - v5.4 Swiss Deck + Asset Factory
 
-> Local-first AI presentation production for real office work: first expand short prompts into a best-effect brief, then turn unclear requests, messy source material, or structured briefs into editable PPTX or magazine-style Web Decks with a Guizang-like fixed-style fallback, Visual Brief tags, source confidence, delivery scorecards, official/IP asset boundaries, Codex/GPT no-text visuals, rendered review, and formal delivery audits.
+> Local-first AI presentation production for real office work: first expand short prompts into a best-effect brief, then choose editable PPTX, Style A editorial/e-ink Web Deck, or Style B Swiss International Web Deck with traceable Asset Factory planning, source confidence, delivery scorecards, official/IP boundaries, Codex/GPT no-text visuals, rendered review, and formal delivery audits.
 
 <p align="center">
-  <strong>v5.3.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/release/release-notes-v5.3.0.md">v5.3 Release Notes</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v5.4.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/release/release-notes-v5.4.0.md">v5.4 Release Notes</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -13,6 +13,8 @@
   ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Benchmark Wall</strong></a>
   ·
+  <a href="./docs/release/release-notes-v5.4.0.md"><strong>v5.4.0 Notes</strong></a>
+  ·
   <a href="./docs/release/release-notes-v5.3.0.md"><strong>v5.3.0 Notes</strong></a>
   ·
   <a href="./docs/guides/agent-connect-bridge.md"><strong>Agent Bridge</strong></a>
@@ -21,7 +23,8 @@
 </p>
 
 <p align="center">
-  <img alt="Version 5.3.0" src="https://img.shields.io/badge/Version-5.3.0-172033?style=for-the-badge">
+  <img alt="Version 5.4.0" src="https://img.shields.io/badge/Version-5.4.0-172033?style=for-the-badge">
+  <img alt="Swiss Deck" src="https://img.shields.io/badge/v5.4-Swiss%20Deck-DC2626?style=for-the-badge">
   <img alt="Best-effect brief" src="https://img.shields.io/badge/v5.3-Best--Effect%20Brief-0F766E?style=for-the-badge">
   <img alt="Visual Brief tags" src="https://img.shields.io/badge/Web-Visual%20Brief%20Tags-2563EB?style=for-the-badge">
   <img alt="Editable PPTX" src="https://img.shields.io/badge/Output-Editable%20PPTX-B7472A?style=for-the-badge&logo=microsoft-powerpoint&logoColor=white">
@@ -48,6 +51,28 @@ What v5.3 does before production:
 
 The point is simple: the user should not need to know the perfect prompt. The Agent must first turn a rough instruction into the production brief that would normally lead to the best result.
 
+## v5.4 Swiss Deck + Asset Factory
+
+v5.4 productizes the Web Deck split and makes image work auditable instead of ad hoc.
+
+| Upgrade | What changes for users |
+|---|---|
+| Style A editorial/e-ink | Extreme-thin prompts still default to the stable magazine Web Deck route when the user did not ask for a formal editable file. |
+| Style B Swiss International | Data, product, KPI, methodology, Helvetica, grid, and information design signals can now route to a locked Swiss Deck plan with `data-layout="Sxx"` and `npm run audit:swiss-deck`. |
+| `asset_plan.json` | Image work starts with a structured Asset Factory plan before `image_prompts.json`; each asset records slide, slot, type, aspect ratio, text policy, source policy, backend, prompt path, status, and evidence rules. |
+| `current_generation_evidence` | A `Generated` asset must record current run evidence. The workflow must not reuse historical `generated_images` as if they were produced in this run. |
+| Swiss demo | `examples/swiss-v54-demo/index.html` is an 8-page demo covering cover, KPI, comparison, process, map/location relationship, S22 21:9 hero, evidence, and closing. |
+| Upstream boundary | Guizang v1.1.0 informs the Swiss Style route; Baoyu Skills v2.5.2 informs the generation evidence chain. The MIT repo keeps its own implementation and does not copy post-AGPL Guizang code. |
+
+Useful commands:
+
+```bash
+python3 scripts/build_asset_plan.py path/to/handoff-project
+npm run audit:image-contracts
+npm run audit:swiss-deck
+node scripts/validate-swiss-deck.mjs examples/swiss-v54-demo/index.html
+```
+
 ## Why Teams Use It
 
 Most AI PPT tools can make something that looks finished. Office teams need something they can trust, edit, audit, and revise, even when the first user request is only "make me a PPT".
@@ -55,6 +80,8 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 | Need | What Ultimate PPT Master gives you |
 |---|---|
 | Make short prompts useful | v5.3 adds a Best-Effect Brief Enhancer so the Agent expands vague requests before choosing route, style, page rhythm, and assumptions. |
+| Choose the right Web Deck style | v5.4 exposes Style A editorial/e-ink and Style B Swiss International routes so narrative decks and information-design decks do not share one loose template. |
+| Trace image generation | Asset Factory writes `asset_plan.json` first, keeps prompt files explicit, and requires `current_generation_evidence` before anything can be called Generated. |
 | Get a strong first version from little input | An extremely thin prompt defaults to Guizang-like Magazine Web Deck fixed style instead of a bland generic PPT or another long interrogation. |
 | Make a real PowerPoint when needed | Formal, editable, government, finance, training, and report requests still go to editable PPTX with Microsoft YaHei and formal-business checks. |
 | Avoid expectation drift | v5.2 turns the clarity gate into a contract: tags, guided answers, source confidence, reference style, delivery scorecard, and feedback taxonomy are all written into the handoff. |
@@ -91,21 +118,23 @@ Most AI PPT tools can make something that looks finished. Office teams need some
 |---|---|---|
 | `bestEffectBrief` | Prompt quality, auto-expanded brief, recommended route, Extreme Thin Prompt Fallback state, fixed style, and assumptions. | Agents no longer use the user's rough sentence as the production brief. |
 | Editable PPTX | Real text boxes, shapes, charts, tables, speaker notes, and editable brand lockups where safe. | The deck can be handed to a PowerPoint user, not only admired as screenshots. |
-| Web Deck | A single-file browser presentation for talks, showcases, and magazine-style storytelling. | Useful when visual rhythm and sharing matter more than PowerPoint editing. |
+| Web Deck | A single-file browser presentation for talks, showcases, magazine-style storytelling, or Swiss information design. | Useful when visual rhythm and sharing matter more than PowerPoint editing. |
 | `project-brief.json` | `briefMode`, `visualBrief`, `guidedBrief`, `expectationFit`, `sourceConfidence`, `deliveryScorecard`, `referenceStyle`, `feedbackLoop`, and `confirmationBrief` in one handoff contract. | The system knows which signals came from the user, which came from tags, which are assumptions, and what to fix if the user is unsatisfied. |
 | Visual Brief | Scenario, audience, purpose, content status, visual style, density, asset strategy, output preference, pasted background, links, and extra requirements. | Web users can express a rich PPT request without filling a long form. |
 | Guided Brief | Codex-collected answers for scenario, audience, purpose, core message, sources, page count, outline, style, assets, output, must-include, and must-avoid. | Chat users are walked through the missing essentials before serious production. |
 | Expectation Fit | Green/yellow/red risk level, source confidence, missing signals, assumptions, delivery scorecard, and readiness for production. | High-risk vague briefs are visible before the deck is generated. |
-| Source and asset records | `source-map.json`, `image_sources.json`, `image_prompts.json`, and official/IP fallback notes. | Reviewers can see what was sourced, generated, replaced, or left for authorization. |
+| Source and asset records | `source-map.json`, `asset_plan.json`, `image_sources.json`, `image_prompts.json`, and official/IP fallback notes. | Reviewers can see what was sourced, generated, replaced, or left for authorization. |
 | Review package | Rendered previews, findings, repair candidates, and quality status. | Revisions start from observed issues instead of vague "make it better" loops. |
 
 ## What v5 Changes
 
-v5.0.0 made the product a delivery-defaults system. v5.1.0 added staged intake for unclear requests. v5.2.0 turned those signals into an expectation-fit contract. v5.3.0 adds the layer that was missing for real Agent use: short instructions are auto-expanded into a best-effect brief before route selection, and topic-only prompts get a fixed high-quality Guizang-like Web Deck default.
+v5.0.0 made the product a delivery-defaults system. v5.1.0 added staged intake for unclear requests. v5.2.0 turned those signals into an expectation-fit contract. v5.3.0 added the best-effect brief layer. v5.4.0 adds Swiss Deck + Asset Factory: Style B Swiss International is now a real route, and image generation has a traceable plan/evidence contract.
 
 | v5 default | Practical effect |
 |---|---|
 | Best-Effect Brief Enhancer | Every Agent run starts by writing `bestEffectBrief`: prompt quality, auto-expanded brief, assumptions, route, fixed fallback, and user-visible caveats. |
+| Swiss Deck route | Style B Swiss International locks Swiss page rhythm, Sxx layout IDs, image slots, and `npm run audit:swiss-deck` for information-design decks. |
+| Asset Factory | `asset_plan.json` becomes the parent contract for generated, official, user-provided, public-search, and manual assets before `image_prompts.json` is produced. |
 | Extreme Thin Prompt Fallback | Topic-only or one-line prompts default to Guizang-like Magazine Web Deck fixed style unless the user explicitly needs formal editable PPTX. |
 | Expectation-fit contract | `project-brief.json` and `quality-report.json` now carry `sourceConfidence`, `deliveryScorecard`, `referenceStyle`, `feedbackLoop`, `failureTaxonomy`, `confirmationBrief`, and `imageAcceptance`. |
 | Editable PPTX first | Formal reports, consulting decks, finance/government material, and normal "make PPT" requests go straight to PowerPoint-ready output after the brief is clear enough. |
@@ -207,6 +236,7 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 
 | Layer | Release | What it protects |
 |---|---|---|
+| Swiss Deck and Asset Factory | [Release Notes - v5.4.0](./docs/release/release-notes-v5.4.0.md) | Style A/Style B choice, locked Swiss Sxx layouts, `asset_plan.json`, generation evidence, and Swiss validator coverage. |
 | Best-effect brief and fixed fallback | [Release Notes - v5.3.0](./docs/release/release-notes-v5.3.0.md) | Auto-expanded brief, extreme-thin prompt fallback, Guizang-like Magazine Web Deck fixed style, and PPTX exception path. |
 | Guided intake and expectation fit | [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) | Visual Brief tags, Codex staged questions, unified `project-brief.json`, and readiness risk before generation. |
 | Expectation-fit contract | [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) | Source confidence, reference-style choices, delivery scorecard, feedback taxonomy, confirmation brief, and image acceptance. |
@@ -217,7 +247,7 @@ Then open the [Web Experience](https://kdnsna.github.io/ultimate-ppt-master-skil
 | Hybrid-editable generation | [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) | page recipes, no-text generated visual layers, editable PPTX body content, formal raster policy. |
 | Public proof surface | [Quality Workbench v2.5](./docs/quality/quality-workbench-v2.5.md) | Benchmark Wall, synthetic proof packs, Design Doctor reporting, and release checks. |
 
-Historical release notes: [v5.2.0](./docs/release/release-notes-v5.2.0.md), [v5.1.0](./docs/release/release-notes-v5.1.0.md), [v5.0.0](./docs/release/release-notes-v5.0.0.md), [v4.3.0](./docs/release/release-notes-v4.3.0.md), [v4.2.0](./docs/release/release-notes-v4.2.0.md), [v4.1.0](./docs/release/release-notes-v4.1.0.md), [v4.0.0](./docs/release/release-notes-v4.0.0.md), [v3.0.0](./docs/release/release-notes-v3.0.0.md).
+Historical release notes: [v5.3.0](./docs/release/release-notes-v5.3.0.md), [v5.2.0](./docs/release/release-notes-v5.2.0.md), [v5.1.0](./docs/release/release-notes-v5.1.0.md), [v5.0.0](./docs/release/release-notes-v5.0.0.md), [v4.3.0](./docs/release/release-notes-v4.3.0.md), [v4.2.0](./docs/release/release-notes-v4.2.0.md), [v4.1.0](./docs/release/release-notes-v4.1.0.md), [v4.0.0](./docs/release/release-notes-v4.0.0.md), [v3.0.0](./docs/release/release-notes-v3.0.0.md).
 
 ## Proofs
 
@@ -225,6 +255,7 @@ The [Benchmark Wall](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmar
 
 | Proof | Link |
 |---|---|
+| v5.4 Swiss Deck + Asset Factory | [Release Notes - v5.4.0](./docs/release/release-notes-v5.4.0.md) |
 | v5.3 best-effect brief enhancer | [Release Notes - v5.3.0](./docs/release/release-notes-v5.3.0.md) |
 | v5.2 expectation-fit contract | [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) |
 | v5.1 guided-intake release | [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) |
@@ -265,7 +296,7 @@ Guide: [Agent Setup](./docs/guides/agent-setup.md). Local connector: [Agent Conn
 
 ## Production Stability Guardrails
 
-The v5.3 stability route keeps upstream inspiration visible without turning the
+The v5.4 stability route keeps upstream inspiration visible without turning the
 package into an unreviewed bundle of copied skills.
 
 | Guardrail | What is checked |
@@ -273,14 +304,16 @@ package into an unreviewed bundle of copied skills.
 | `UPSTREAM_SYNC.md` | Records `remote_ref`, `local_ref`, `license`, `import_policy`, absorbed capabilities, deferred capabilities, and the review date for PPT Master, Guizang, and Baoyu sources. |
 | `npm run audit:repo-hygiene` | Fails on Finder-style duplicate files such as `README 2.md`, `test_release_integrity 2.py`, or copied icon assets. |
 | `npm run audit:image-contracts` | Validates generated-image manifests so every asset records `prompt_path`, backend, source, asset type, aspect ratio, status, page role, and text policy. |
+| `npm run audit:swiss-deck` | Validates the Swiss demo and any supplied Swiss Deck HTML for missing `data-layout`, unsafe S22 image slots, SVG visible text, risky small type, object-position crop risk, and bottom nav safe-zone issues. |
 | Guizang license boundary | Do not copy post-AGPL Guizang code directly; absorb behavior requirements and reimplement locally when needed. |
-| Baoyu workflow discipline | Use prompt files before generation, record backend decisions, and forbid bitmap text overlay repair. Regenerate from corrected prompts instead. |
+| Baoyu workflow discipline | Use prompt files before generation, record backend decisions, require `current_generation_evidence`, and forbid bitmap text overlay repair. Regenerate from corrected prompts instead. |
 
 ## Documentation Map
 
 | Need | Read |
 |---|---|
 | Try the web front door | [Web Experience](./docs/guides/web-experience.md) |
+| Review v5.4 Swiss Deck and Asset Factory | [Release Notes - v5.4.0](./docs/release/release-notes-v5.4.0.md) |
 | Connect browser, local files, and Agents | [Agent Connect Bridge](./docs/guides/agent-connect-bridge.md) |
 | Install and invoke the Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | Choose PPTX vs Web Deck vs Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
@@ -307,6 +340,7 @@ npm run audit:docs
 npm run audit:web-console
 npm run audit:repo-hygiene
 npm run audit:image-contracts
+npm run audit:swiss-deck
 npm run audit:presets
 npm run audit:quality
 npm run audit:market

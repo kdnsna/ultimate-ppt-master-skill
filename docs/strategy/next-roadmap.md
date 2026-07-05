@@ -4,6 +4,14 @@ v2.5 makes the first mile clearer and more checkable: visible input, preset proo
 
 The next product priority is output stability. Ultimate PPT Master should become richer in content patterns and template presets, so users do not start from a blank prompt every time and Agents have stronger defaults before they generate slides.
 
+## Current v5 Roadmap
+
+v5.4 merges the planned Swiss Deck and Asset Factory work into one release: Style A remains the editorial/e-ink default for thin prompts, Style B becomes the Swiss International route for data and information design, and `asset_plan.json` becomes the parent contract for image generation.
+
+v5.5+ should not add more image-backend breadth first. The next research track is HTML Deck to editable PPTX research: preserve the Web Deck's HTML/CSS layout intent, then investigate which parts can map back to editable PowerPoint text, shapes, tables, charts, and image slots without turning the deck into full-slide screenshots.
+
+Keep v5.5+ research gated by the same product rule: formal office output remains editable PPTX first, Web Deck remains HTML/CSS first, and generated images support the deck instead of replacing editable content.
+
 ## Direction
 
 Build a preset system that combines:

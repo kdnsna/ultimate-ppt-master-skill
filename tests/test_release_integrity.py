@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "5.3.0"
+VERSION = "5.4.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -72,6 +72,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/rendered-review-loop-v4.3.md",
+            "docs/release/release-notes-v5.4.0.md",
             "docs/release/release-notes-v5.3.0.md",
             "docs/release/release-notes-v5.2.0.md",
             "docs/release/release-notes-v5.1.0.md",
@@ -87,6 +88,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "docs/zh-CN/release/release-notes-v5.4.0.md",
             "docs/zh-CN/release/release-notes-v5.3.0.md",
             "docs/zh-CN/release/release-notes-v5.2.0.md",
             "docs/zh-CN/release/release-notes-v5.1.0.md",
@@ -250,6 +252,39 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "不直接复制 AGPL 后的归藏代码",
             "先写 prompt 文件再生成",
             "禁止用位图覆盖方式修补生成图文字",
+        ):
+            self.assertIn(expected, readme_zh)
+
+    def test_v54_swiss_deck_asset_factory_surface_is_documented(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+
+        self.assertEqual(
+            package["scripts"]["audit:swiss-deck"],
+            "node scripts/validate-swiss-deck.mjs examples/swiss-v54-demo/index.html",
+        )
+        for expected in (
+            "v5.4 Swiss Deck + Asset Factory",
+            "Style B Swiss International",
+            "asset_plan.json",
+            "current_generation_evidence",
+            "npm run audit:swiss-deck",
+            "examples/swiss-v54-demo/index.html",
+            "Baoyu Skills v2.5.2",
+            "Guizang v1.1.0",
+        ):
+            self.assertIn(expected, readme)
+
+        for expected in (
+            "v5.4 瑞士风 Deck + 资产工厂",
+            "Style B 瑞士国际主义",
+            "asset_plan.json",
+            "current_generation_evidence",
+            "npm run audit:swiss-deck",
+            "examples/swiss-v54-demo/index.html",
+            "宝玉 Skills v2.5.2",
+            "归藏 v1.1.0",
         ):
             self.assertIn(expected, readme_zh)
 
@@ -477,7 +512,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v5.3.0", hero)
+        self.assertIn("v5.4.0", hero)
         self.assertIn("Best-effect", hero)
         self.assertIn("sourceConfidence", hero)
         self.assertIn("Plain-language glossary", web_preview)

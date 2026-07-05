@@ -90,3 +90,21 @@ class UpstreamSyncIntegrityTest(unittest.TestCase):
 
         missing = [snippet for snippet in required_snippets if snippet not in notes]
         self.assertEqual(missing, [])
+
+    def test_v54_upstream_adoption_notes_are_recorded(self):
+        notes = (ROOT / "UPSTREAM_SYNC.md").read_text(encoding="utf-8")
+
+        required_snippets = [
+            "Guizang v1.1.0",
+            "Swiss Style",
+            "Swiss Map",
+            "multi-platform cover",
+            "Baoyu Skills v2.5.2",
+            "current_generation_evidence",
+            "Baoyu Design v1.1.1",
+            "HTML/CSS stays the default",
+            "HTML Deck to editable PPTX research",
+        ]
+
+        missing = [snippet for snippet in required_snippets if snippet not in notes]
+        self.assertEqual(missing, [])

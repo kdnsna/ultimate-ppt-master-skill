@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "apps/web/src/App.tsx"
 FLOW = ROOT / "apps/web/src/consoleFlow.ts"
 CSS = ROOT / "apps/web/src/styles.css"
-VERSION = "5.3.0"
+VERSION = "5.4.0"
 
 
 def read(path: Path) -> str:

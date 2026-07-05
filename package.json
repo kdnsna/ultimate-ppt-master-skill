@@ -1,7 +1,7 @@
 {
   "name": "ultimate-ppt-master",
   "private": true,
-  "version": "5.3.0",
+  "version": "5.4.0",
   "description": "AI PPT delivery system that clarifies the brief first, then turns local source material into editable PPTX/Web Decks with visual review and audit trails.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
@@ -24,6 +24,7 @@
     "audit:feedback-loop": "python3 scripts/audit_feedback_loop.py",
     "audit:repo-hygiene": "python3 scripts/audit_repository_hygiene.py",
     "audit:image-contracts": "python3 scripts/audit_image_contracts.py",
+    "audit:swiss-deck": "node scripts/validate-swiss-deck.mjs examples/swiss-v54-demo/index.html",
     "audit:presets": "python3 scripts/audit_preset_packs.py",
     "audit:quality": "python3 scripts/audit_quality_proofs.py",
     "audit:market": "python3 scripts/audit_skill_market.py",

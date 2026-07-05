@@ -39,8 +39,11 @@ Supported keys:
 Usage:
   python3 image_gen.py "prompt" --aspect_ratio 16:9 --image_size 1K -o images/
   python3 image_gen.py --manifest project/images/image_prompts.json -o project/images/
+  python3 image_gen.py --asset-plan project/asset_plan.json
   python3 image_gen.py --list-backends
 """
+
+from __future__ import annotations
 
 import concurrent.futures
 import json
@@ -428,7 +431,8 @@ def _run_manifest(manifest: dict, manifest_path: str, backend_module, *,
                   initial_concurrency: int,
                   image_size: str,
                   output_dir: str,
-                  model: str | None) -> tuple[int, int, int]:
+                  model: str | None,
+                  backend_name: str = "") -> tuple[int, int, int]:
     """Run Pending/Failed items through the backend with adaptive concurrency.
 
     Strategy:
@@ -504,6 +508,10 @@ def _run_manifest(manifest: dict, manifest_path: str, backend_module, *,
                 with state_lock:
                     if exc is None:
                         item["status"] = STATUS_GENERATED
+                        item["output_file"] = str(saved_path)
+                        item["generated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+                        if backend_name:
+                            item["backend"] = backend_name
                         item.pop("last_error", None)
                         ok_count += 1
                         print(f"  [OK]   {item['filename']}")
@@ -625,6 +633,135 @@ def render_manifest_md_to_file(manifest_path: str, manifest: dict | None = None)
     return md_path
 
 
+def _asset_prompt_text(item: dict) -> str:
+    return "\n".join(
+        [
+            f"Asset id: {item.get('id', 'asset')}",
+            f"Slide: {item.get('slide', 'pending')}",
+            f"Slot: {item.get('slot', 'pending')}",
+            f"Asset type: {item.get('asset_type', 'hero')}",
+            f"Aspect ratio: {item.get('aspect_ratio', '16:9')}",
+            f"Text policy: {item.get('text_policy', 'none')}",
+            "Create only the image asset for this slot, not a full slide.",
+            "No fake logos, no page title, no page number, and no unapproved IP.",
+            "If text is needed, keep it to short labels only and prefer editable deck text.",
+        ]
+    )
+
+
+def load_asset_plan(path: str) -> dict:
+    try:
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"Invalid JSON in {path}: {exc.msg} "
+            f"(line {exc.lineno}, col {exc.colno})"
+        ) from exc
+    if not isinstance(data, dict):
+        raise ValueError(f"{path}: top level must be a JSON object")
+    items = data.get("items")
+    if not isinstance(items, list) or not items:
+        raise ValueError(f"{path}: 'items' must be a non-empty array")
+    return data
+
+
+def save_asset_plan(path: str, data: dict) -> None:
+    save_manifest(path, data)
+
+
+def _asset_output_filename(item: dict) -> str:
+    raw = str(item.get("output_path") or item.get("filename") or f"{item.get('id', 'asset')}.png")
+    return Path(raw).name
+
+
+def _read_or_create_asset_prompt(project_dir: Path, item: dict) -> str:
+    prompt_path = str(item.get("prompt_path") or "").strip()
+    if not prompt_path:
+        raise ValueError(f"{item.get('id', 'asset')}: prompt_path is required")
+    resolved = project_dir / prompt_path
+    if not resolved.is_file():
+        resolved.parent.mkdir(parents=True, exist_ok=True)
+        resolved.write_text(_asset_prompt_text(item) + "\n", encoding="utf-8")
+    return resolved.read_text(encoding="utf-8").strip()
+
+
+def _asset_plan_manifest(asset_plan_path: str, plan: dict, *, regenerate: bool) -> tuple[dict, list[tuple[int, int]]]:
+    project_dir = Path(asset_plan_path).resolve().parent
+    items = plan["items"]
+    manifest_items: list[dict] = []
+    mapping: list[tuple[int, int]] = []
+    for asset_index, item in enumerate(items):
+        if not isinstance(item, dict) or item.get("source_policy") != "generated":
+            continue
+        if not regenerate and item.get("status") not in RETRYABLE_STATUSES:
+            continue
+        prompt = _read_or_create_asset_prompt(project_dir, item)
+        prompt_path = str(item.get("prompt_path"))
+        manifest_index = len(manifest_items)
+        manifest_items.append(
+            {
+                "filename": _asset_output_filename(item),
+                "asset_type": item.get("asset_type", "hero"),
+                "type": item.get("asset_type", "hero"),
+                "page_role": "hero_page" if item.get("asset_type") in {"hero", "cover"} else "local",
+                "text_policy": "embedded" if item.get("text_policy") == "embedded" else "none",
+                "aspect_ratio": item.get("aspect_ratio", "16:9"),
+                "backend": item.get("backend", os.environ.get("IMAGE_BACKEND", "")),
+                "source": "ai",
+                "status": STATUS_PENDING,
+                "prompt_path": f"../{prompt_path}",
+                "prompt": prompt,
+            }
+        )
+        mapping.append((asset_index, manifest_index))
+    return {"project": plan.get("project", Path(asset_plan_path).parent.name), "items": manifest_items}, mapping
+
+
+def _write_asset_plan_prompt_manifest(asset_plan_path: str, manifest: dict) -> str:
+    images_dir = Path(asset_plan_path).resolve().parent / "images"
+    images_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = images_dir / "image_prompts.json"
+    save_manifest(str(manifest_path), manifest)
+    render_manifest_md_to_file(str(manifest_path), manifest)
+    return str(manifest_path)
+
+
+def _mark_asset_plan_needs_manual(plan: dict, mapping: list[tuple[int, int]]) -> None:
+    for asset_index, _ in mapping:
+        item = plan["items"][asset_index]
+        item["status"] = STATUS_NEEDS_MANUAL
+        item["current_generation_evidence"] = item.get("current_generation_evidence") or []
+        item["last_error"] = "No IMAGE_BACKEND configured; use images/image_prompts.md manually."
+
+
+def _mirror_manifest_to_asset_plan(plan: dict, manifest: dict, mapping: list[tuple[int, int]], backend_name: str) -> int:
+    failed = 0
+    for asset_index, manifest_index in mapping:
+        asset_item = plan["items"][asset_index]
+        prompt_item = manifest["items"][manifest_index]
+        status = prompt_item.get("status")
+        if status == STATUS_GENERATED:
+            evidence = {
+                "generated_at": prompt_item.get("generated_at") or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "output_file": prompt_item.get("output_file") or str(Path("images") / prompt_item.get("filename", "")),
+                "backend_run_id": prompt_item.get("backend_run_id") or backend_name,
+            }
+            asset_item["status"] = STATUS_GENERATED
+            asset_item["current_generation_evidence"] = evidence
+            asset_item.pop("last_error", None)
+        elif status == STATUS_FAILED:
+            failed += 1
+            asset_item["status"] = STATUS_FAILED
+            asset_item["last_error"] = prompt_item.get("last_error", "generation failed")
+        elif status == STATUS_NEEDS_MANUAL:
+            asset_item["status"] = STATUS_NEEDS_MANUAL
+    return failed
+
+
+def _has_configured_backend() -> bool:
+    return bool(os.environ.get("IMAGE_BACKEND", "").strip())
+
+
 def main() -> None:
     """Run the CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -668,6 +805,18 @@ def main() -> None:
             "Path to image_prompts.json. Runs every Pending/Failed item in "
             "parallel; writes status back to the manifest as each completes."
         ),
+    )
+    parser.add_argument(
+        "--asset-plan", default=None, metavar="ASSET_PLAN_JSON",
+        help=(
+            "Path to v5.4 asset_plan.json. Builds images/image_prompts.json "
+            "from source_policy=generated assets and writes generation evidence "
+            "back to the asset plan. Without IMAGE_BACKEND, writes Needs-Manual."
+        ),
+    )
+    parser.add_argument(
+        "--regenerate", action="store_true",
+        help="In --asset-plan mode, regenerate generated assets instead of only Pending/Failed items.",
     )
     parser.add_argument(
         "--concurrency", type=int, default=None,
@@ -715,6 +864,54 @@ def main() -> None:
     if args.backend:
         os.environ["IMAGE_BACKEND"] = args.backend
 
+    if args.asset_plan:
+        if not os.path.isfile(args.asset_plan):
+            print(f"Error: asset plan file not found: {args.asset_plan}")
+            sys.exit(1)
+        try:
+            plan = load_asset_plan(args.asset_plan)
+            manifest, mapping = _asset_plan_manifest(args.asset_plan, plan, regenerate=args.regenerate)
+        except ValueError as e:
+            print(f"Error: {e}")
+            sys.exit(1)
+
+        manifest_path = _write_asset_plan_prompt_manifest(args.asset_plan, manifest)
+        if not mapping:
+            print(f"[Asset Plan] Nothing to do. Prompt manifest written: {manifest_path}")
+            save_asset_plan(args.asset_plan, plan)
+            return
+        if not _has_configured_backend():
+            for prompt_item in manifest["items"]:
+                prompt_item["status"] = STATUS_NEEDS_MANUAL
+            _write_asset_plan_prompt_manifest(args.asset_plan, manifest)
+            _mark_asset_plan_needs_manual(plan, mapping)
+            save_asset_plan(args.asset_plan, plan)
+            print(
+                "[Asset Plan] No IMAGE_BACKEND configured; wrote Needs-Manual "
+                f"prompts to {manifest_path}."
+            )
+            return
+
+        backend, backend_name = _resolve_backend()
+        print(f"Using backend: {backend_name}\n")
+        concurrency = _resolve_concurrency(args.concurrency)
+        try:
+            _run_manifest(
+                manifest, manifest_path, backend,
+                initial_concurrency=concurrency,
+                image_size=args.image_size,
+                output_dir=args.output or str(Path(manifest_path).parent),
+                model=args.model,
+                backend_name=backend_name,
+            )
+        except KeyboardInterrupt:
+            print("\n\nInterrupted by user. Partial progress preserved in manifest.")
+            sys.exit(130)
+        failed = _mirror_manifest_to_asset_plan(plan, manifest, mapping, backend_name)
+        save_asset_plan(args.asset_plan, plan)
+        render_manifest_md_to_file(manifest_path, manifest)
+        sys.exit(1 if failed else 0)
+
     backend, backend_name = _resolve_backend()
     print(f"Using backend: {backend_name}\n")
 
@@ -736,6 +933,7 @@ def main() -> None:
                 image_size=args.image_size,
                 output_dir=args.output or str(Path(args.manifest).parent),
                 model=args.model,
+                backend_name=backend_name,
             )
         except KeyboardInterrupt:
             print("\n\nInterrupted by user. Partial progress preserved in manifest.")

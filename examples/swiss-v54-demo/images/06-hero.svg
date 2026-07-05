@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2100 900" role="img" aria-label="Abstract Swiss grid evidence visual">
+  <rect width="2100" height="900" fill="#f7f7f4"/>
+  <rect x="0" y="0" width="2100" height="900" fill="#0047ff" opacity="0.08"/>
+  <g fill="none" stroke="#0047ff" stroke-width="8">
+    <path d="M140 740 L520 280 L900 520 L1280 180 L1960 650"/>
+    <circle cx="520" cy="280" r="54"/>
+    <circle cx="900" cy="520" r="54"/>
+    <circle cx="1280" cy="180" r="54"/>
+    <circle cx="1960" cy="650" r="54"/>
+  </g>
+  <g fill="#0a0a0a" opacity="0.12">
+    <rect x="140" y="120" width="260" height="20"/>
+    <rect x="140" y="168" width="420" height="20"/>
+    <rect x="1540" y="120" width="420" height="20"/>
+    <rect x="1540" y="168" width="260" height="20"/>
+  </g>
+</svg>

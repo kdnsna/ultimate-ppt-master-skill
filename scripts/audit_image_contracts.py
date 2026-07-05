@@ -29,6 +29,25 @@ PROMPT_STATUS_VALUES = {"Pending", "Generated", "Failed", "Needs-Manual"}
 TEXT_POLICY_VALUES = {"none", "embedded"}
 PAGE_ROLE_VALUES = {"local", "hero_page"}
 
+ASSET_PLAN_REQUIRED_FIELDS = {
+    "id",
+    "slide",
+    "slot",
+    "asset_type",
+    "aspect_ratio",
+    "text_policy",
+    "source_policy",
+    "backend",
+    "prompt_path",
+    "status",
+    "current_generation_evidence",
+}
+
+ASSET_TYPE_VALUES = {"hero", "evidence", "infographic", "screenshot-frame", "cover", "micro-asset"}
+ASSET_TEXT_POLICY_VALUES = {"none", "limited-labels", "embedded"}
+SOURCE_POLICY_VALUES = {"generated", "official", "user-provided", "public-search", "needs-manual"}
+ASSET_STATUS_VALUES = {"Pending", "Generated", "Failed", "Needs-Manual"}
+
 SOURCE_REQUIRED_FIELDS = {
     "filename",
     "provider",
@@ -79,6 +98,53 @@ def audit_image_prompts(path: Path, errors: list[str]) -> None:
             require(resolved.is_file(), f"{label}: prompt_path does not exist: {prompt_path}", errors)
 
 
+def evidence_is_current(value: Any) -> bool:
+    if isinstance(value, list):
+        return any(evidence_is_current(item) for item in value)
+    if isinstance(value, str):
+        return bool(value.strip())
+    if not isinstance(value, dict):
+        return False
+
+    current_markers = (
+        "tool_event",
+        "generated_at",
+        "thread_id",
+        "run_id",
+        "backend_run_id",
+        "output_file",
+        "generated_image_path",
+    )
+    return any(bool(value.get(marker)) for marker in current_markers)
+
+
+def audit_asset_plan(path: Path, errors: list[str]) -> None:
+    data = load_json(path)
+    items = manifest_items(data)
+    require(bool(items), f"{path}: asset plan must contain items", errors)
+
+    for index, item in enumerate(items, start=1):
+        label = item.get("id") or f"item {index}"
+        missing = sorted(field for field in ASSET_PLAN_REQUIRED_FIELDS if field not in item or item.get(field) in (None, ""))
+        require(not missing, f"{label}: missing required field(s): {', '.join(missing)}", errors)
+        require(item.get("asset_type") in ASSET_TYPE_VALUES, f"{label}: invalid asset_type {item.get('asset_type')!r}", errors)
+        require(item.get("text_policy") in ASSET_TEXT_POLICY_VALUES, f"{label}: invalid text_policy {item.get('text_policy')!r}", errors)
+        require(item.get("source_policy") in SOURCE_POLICY_VALUES, f"{label}: invalid source_policy {item.get('source_policy')!r}", errors)
+        require(item.get("status") in ASSET_STATUS_VALUES, f"{label}: invalid status {item.get('status')!r}", errors)
+
+        prompt_path = item.get("prompt_path")
+        if isinstance(prompt_path, str) and prompt_path:
+            resolved = (path.parent / prompt_path).resolve()
+            require(resolved.is_file(), f"{label}: prompt_path does not exist: {prompt_path}", errors)
+
+        if item.get("status") == "Generated" and item.get("source_policy") == "generated":
+            require(
+                evidence_is_current(item.get("current_generation_evidence")),
+                f"{label}: Generated assets must record current_generation_evidence from the current generation run",
+                errors,
+            )
+
+
 def audit_image_sources(path: Path, errors: list[str]) -> None:
     data = load_json(path)
     items = manifest_items(data)
@@ -97,7 +163,7 @@ def audit_image_sources(path: Path, errors: list[str]) -> None:
 
 def discover_manifests(root: Path) -> list[Path]:
     manifests: list[Path] = []
-    for name in ("image_prompts.json", "image_sources.json"):
+    for name in ("asset_plan.json", "image_prompts.json", "image_sources.json"):
         for path in root.rglob(name):
             if any(part in IGNORED_PARTS for part in path.parts):
                 continue
@@ -109,7 +175,9 @@ def audit_manifest(path: Path, errors: list[str]) -> None:
     require(path.is_file(), f"manifest does not exist: {path}", errors)
     if errors and not path.is_file():
         return
-    if path.name == "image_sources.json":
+    if path.name == "asset_plan.json":
+        audit_asset_plan(path, errors)
+    elif path.name == "image_sources.json":
         audit_image_sources(path, errors)
     else:
         audit_image_prompts(path, errors)
@@ -120,7 +188,7 @@ def main() -> int:
     parser.add_argument(
         "manifest",
         nargs="*",
-        help="Path(s) to image_prompts.json or image_sources.json. If omitted, scan the repository.",
+        help="Path(s) to asset_plan.json, image_prompts.json, or image_sources.json. If omitted, scan the repository.",
     )
     args = parser.parse_args()
 

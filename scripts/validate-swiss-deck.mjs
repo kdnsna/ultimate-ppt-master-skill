@@ -27,6 +27,47 @@ if (!slides.length) {
   errors.push('No <section class="slide"> pages found.');
 }
 
+function attr(tag, name) {
+  return tag.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1] ?? '';
+}
+
+function roleForTag(tag) {
+  const className = attr(tag, 'class');
+  if (/\b(?:t-meta|meta|kicker|mono|label)\b/i.test(className)) return 'meta';
+  if (/\b(?:caption|img-cap|figcaption|note)\b/i.test(className)) return 'caption';
+  return 'body';
+}
+
+function minFontForRole(role) {
+  if (role === 'meta') return 14;
+  if (role === 'caption') return 16;
+  return 18;
+}
+
+function auditInlineFontSizes(slide) {
+  const styledTags = [...slide.html.matchAll(/<([a-z][\w:-]*)\b[^>]*style="([^"]*font-size\s*:\s*([0-9.]+)px[^"]*)"[^>]*>/gi)];
+  styledTags.forEach((match) => {
+    const tag = match[0];
+    const size = Number.parseFloat(match[3]);
+    if (!Number.isFinite(size)) return;
+
+    const role = roleForTag(tag);
+    const min = minFontForRole(role);
+    if (size < min) {
+      const label = role === 'meta' ? 'meta text' : role === 'caption' ? 'caption text' : 'body text';
+      errors.push(`Slide ${slide.idx}: ${label} below ${min}px Swiss minimum (${size}px).`);
+    }
+  });
+}
+
+function auditBottomSafeZone(slide) {
+  const bottomRisk = /align-(?:self|items)\s*:\s*end|bottom\s*:\s*(?:0|2vh)\b|margin-top\s*:\s*auto/i.test(slide.html);
+  const hasSafeClass = /\bnav-safe-bottom(?:-tight)?\b/.test(slide.html);
+  if (bottomRisk && !hasSafeClass) {
+    errors.push(`Slide ${slide.idx}: bottom-aligned content needs a bottom nav safe zone class.`);
+  }
+}
+
 slides.forEach((slide) => {
   const layout = slide.tag.match(/\bdata-layout="([^"]+)"/)?.[1];
 
@@ -94,6 +135,9 @@ slides.forEach((slide) => {
       errors.push(`Slide ${slide.idx}: S22 photo uses object-position:top center, which commonly crops faces. Use center 35% or center center.`);
     }
   }
+
+  auditInlineFontSizes(slide);
+  auditBottomSafeZone(slide);
 });
 
 if (warnings.length) {

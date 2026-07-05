@@ -1853,6 +1853,113 @@ textarea {
   overflow-wrap: anywhere;
 }
 
+.web-deck-factory {
+  margin-top: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.web-deck-factory-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.web-deck-factory-head strong,
+.style-choice-grid span,
+.web-deck-contract dt {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.web-deck-factory-head p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.web-deck-factory-head > span {
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.style-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.style-choice-grid button {
+  min-height: 96px;
+  padding: 11px;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+}
+
+.style-choice-grid button.active {
+  border-color: var(--blue);
+  background: #eff6ff;
+}
+
+.style-choice-grid small,
+.web-deck-contract dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.web-deck-contract {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.web-deck-contract div {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.asset-factory-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.asset-factory-actions button {
+  min-height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 850;
+}
+
 .visual-brief-head strong,
 .tag-preset-row > span,
 .reference-style-row > div:first-child span,
@@ -2677,6 +2784,7 @@ pre {
   .benchmark-grid,
   .plain-glossary-grid,
   .best-effect-guide-grid,
+  .style-choice-grid,
   .beginner-steps,
   .guided-step-rail,
   .console-step-rail,
@@ -2731,8 +2839,11 @@ pre {
   .header-actions,
   .primary-action-bar,
   .visual-brief-head,
+  .web-deck-factory-head,
   .best-effect-guide-grid,
   .best-effect-prompt,
+  .style-choice-grid,
+  .web-deck-contract,
   .expectation-fit-card dl,
   .quality-workbench-grid,
   .configuration-actions,

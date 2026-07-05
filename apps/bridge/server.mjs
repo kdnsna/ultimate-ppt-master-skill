@@ -19,7 +19,7 @@ const AGENT_COMMANDS = {
   codex: {
     label: "Codex",
     binary: "codex",
-    prompt: "Read AGENTS.md, codex-task.md, project-brief.json, and visual-element-kit.md first, including sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop. If expectationFit.readyForProduction is false, run guided intake before final production. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image key is configured, use the Needs-Manual prompts. Execute the ChatGPT-generation-first formal-business workflow, update asset-plan.md and quality-report.json, then list final files."
+    prompt: "Read AGENTS.md, codex-task.md, project-brief.json, asset_plan.json, asset-plan.md, and visual-element-kit.md first, including sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop. If expectationFit.readyForProduction is false, run guided intake before final production. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image key is configured, use the Needs-Manual prompts. Execute the ChatGPT-generation-first formal-business workflow, update asset_plan.json, asset-plan.md, and quality-report.json, then list final files."
   },
   claude: {
     label: "Claude Code",
@@ -642,6 +642,10 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   await writeProjectFile("engine-plan.md", payload.enginePlanMarkdown || payload.enginePlan || "");
   await writeProjectFile("quality-checklist.md", payload.qualityChecklist || "");
   await writeProjectFile("asset-plan.md", payload.assetPlan || defaultAssetPlan({ title, qualityGate }));
+  await writeProjectFile("asset_plan.json", payload.assetPlanJson || JSON.stringify({ version: "asset-plan-v5.4", project: title, items: [] }, null, 2));
+  for (const promptFile of assetPromptFiles(payload.assetPlanJson || "")) {
+    await writeProjectFile(promptFile.path, promptFile.text);
+  }
   await writeProjectFile("visual-element-kit.md", payload.visualElementKit || defaultVisualElementKit({ title, qualityGate }));
   await writeProjectFile("codex-task.md", payload.codexTask || defaultCodexTask({ title, qualityGate, workflowState, expectedArtifacts, reviewCommands, briefMode, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, feedbackLoop }));
   await writeProjectFile("AGENTS.md", payload.codexAgentGuide || defaultCodexAgentGuide({ qualityGate, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, feedbackLoop }));
@@ -730,6 +734,29 @@ function parseJsonMaybe(value) {
   } catch {
     return {};
   }
+}
+
+function assetPromptText(item) {
+  return [
+    `Asset id: ${String(item.id || "asset")}`,
+    `Slide: ${String(item.slide || "pending")}`,
+    `Slot: ${String(item.slot || "pending")}`,
+    `Asset type: ${String(item.asset_type || "hero")}`,
+    `Aspect ratio: ${String(item.aspect_ratio || "16:9")}`,
+    `Text policy: ${String(item.text_policy || "none")}`,
+    "Create only the image asset for this slot, not a full slide.",
+    "No fake logos, no page title, no page number, and no unapproved IP.",
+    "If text is needed, keep it to short labels only and prefer editable deck text."
+  ].join("\n");
+}
+
+function assetPromptFiles(assetPlanJson) {
+  const plan = parseJsonMaybe(assetPlanJson);
+  if (!Array.isArray(plan.items)) return [];
+  return plan.items
+    .filter((item) => item && typeof item === "object")
+    .map((item) => ({ path: String(item.prompt_path || ""), text: assetPromptText(item) }))
+    .filter((item) => item.path.startsWith("prompts/") && item.path.endsWith(".md"));
 }
 
 function defaultVisualBrief(payload = {}) {
@@ -1478,7 +1505,7 @@ Rules:
 5. Create the visual-element-kit.md micro-assets: section divider, metric badge, process node, connector, icon accent, subtle pattern, and callout sticker.
 6. Save generated assets under assets/generated/ and insert them into the PPTX/Web Deck as real image objects, not flattened full-slide screenshots.
 7. Use public web search mainly for factual evidence, official references, brand boundaries, or source citations.
-8. Record every generated asset prompt and every public source/license note in asset-plan.md.
+8. Record every generated asset prompt, current_generation_evidence, and every public source/license note in asset_plan.json and asset-plan.md.
 9. Keep charts, tables, labels, and PPTX text editable wherever possible.
 
 ## Production Steps
@@ -1640,7 +1667,7 @@ function relativeFromProject(filePath) {
 
 function suggestedCommands(projectPath) {
   const quotedPath = shellQuote(projectPath);
-  const instruction = "Read AGENTS.md, codex-task.md, storyboard.json, source-map.json, planning-report.json, review-findings.json, repair-plan.json, revision-brief.md, visual-element-kit.md, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Inspect project-brief.json briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop; if expectationFit.readyForProduction is false, run guided intake before final production and ask one related question group per turn. If the user is unsatisfied, classify the reason with feedbackLoop.failureTaxonomy before revising. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, keep DeckIR evidence/editability constraints, insert reusable micro-assets when useful, run audit_storyboard.py, formal delivery audit, review_rendered_deck.py, and apply_review_plan.py --safe-only --dry-run, update quality-report.json, then list final files.";
+  const instruction = "Read AGENTS.md, codex-task.md, storyboard.json, source-map.json, planning-report.json, review-findings.json, repair-plan.json, revision-brief.md, visual-element-kit.md, asset_plan.json, asset-plan.md, quality-checklist.md, manifest.json, and project-brief.json first. Inspect project-brief.json briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop; if expectationFit.readyForProduction is false, run guided intake before final production and ask one related question group per turn. If the user is unsatisfied, classify the reason with feedbackLoop.failureTaxonomy before revising. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image backend/key exists, use the Needs-Manual prompts in images/image_prompts.md with ChatGPT. Follow the Ultimate PPT Master Skill with ChatGPT-generation-first assets, keep DeckIR evidence/editability constraints, insert reusable micro-assets when useful, run audit_storyboard.py, formal delivery audit, review_rendered_deck.py, and apply_review_plan.py --safe-only --dry-run, update asset_plan.json and quality-report.json, then list final files.";
   return {
     codex: `cd ${quotedPath} && codex "${instruction}"`,
     claude: `cd ${quotedPath} && claude "${instruction}"`,
@@ -1684,7 +1711,7 @@ function launchAgent(payload, { allowLaunch }) {
 }
 
 function defaultHandoffReadme() {
-  return "# Ultimate PPT Master handoff\n\nFor Codex, open `AGENTS.md`, `codex-task.md`, `storyboard.json`, `repair-plan.json`, `revision-brief.md`, and `visual-element-kit.md` first. Then review `asset-plan.md`, `agent-prompt.md`, and `extracted-source.md`, run or handle `scripts/generate_visual_element_kit.py` for ChatGPT-first visual micro-assets, use `Needs-Manual` prompts when no image key is configured, and run the suggested local Agent command from `manifest.json`.\n";
+  return "# Ultimate PPT Master handoff\n\nFor Codex, open `AGENTS.md`, `codex-task.md`, `storyboard.json`, `repair-plan.json`, `revision-brief.md`, and `visual-element-kit.md` first. Then review `asset_plan.json`, `asset-plan.md`, `agent-prompt.md`, and `extracted-source.md`, run or handle `scripts/generate_visual_element_kit.py` for ChatGPT-first visual micro-assets, use `Needs-Manual` prompts when no image key is configured, and run the suggested local Agent command from `manifest.json`.\n";
 }
 
 function hasValue(value) {

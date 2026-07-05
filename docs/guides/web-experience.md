@@ -14,6 +14,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - groups help, examples, glossary, setup checks, provider status, and generated-file details behind drawers or collapsed sections;
 - accepts pasted source notes, source URLs, and dropped `.md`, `.txt`, `.pdf`, `.docx`, `.pptx`, `.xlsx`, and related files;
 - adds a Visual Brief Builder with diverse selectable tags for scenario, audience, purpose, content state, visual style, layout density, asset strategy, and output preference;
+- adds a Swiss Deck / Asset Factory block for Style A editorial/e-ink, Style B Swiss International, map-page intent, cover derivatives, and generated-visual planning;
 - keeps free-form areas for background context, special requirements, must-avoid rules, official/reference links, and related notes;
 - pre-reads browser-safe text files and marks binary files for local Bridge parsing;
 - generates a slide outline, brief-readiness check, and `expectationFit` risk signal for unclear or conflicting requirements;
@@ -25,7 +26,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - generates copy-ready Agent instructions, `source.md`, `extracted-source.md`, `manifest.json`, and `project-brief.json`;
 - writes `briefMode`, `visualBrief`, `guidedBrief`, and `expectationFit` into `project-brief.json` so Codex knows whether to produce immediately, ask staged clarification questions, or proceed as a draft with assumptions;
 - downloads a full `handoff-kit.zip` or creates a local project through the local connector;
-- includes `source.md`, `extracted-source.md`, `attachments/`, `manifest.json`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, `asset-plan.md`, `visual-element-kit.md`, `codex-task.md`, `AGENTS.md`, `quality-report.json`, and `README.md` in the handoff kit;
+- includes `source.md`, `extracted-source.md`, `attachments/`, `manifest.json`, `agent-prompt.md`, `project-brief.json`, `preview-web-deck.html`, `engine-plan.md`, `quality-checklist.md`, `asset-plan.md`, `asset_plan.json`, generated prompt files, `visual-element-kit.md`, `codex-task.md`, `AGENTS.md`, `quality-report.json`, and `README.md` in the handoff kit;
 - writes a `formal-business` quality gate into the handoff so Codex gets acceptance criteria, artifact checks, and review commands;
 - creates a ChatGPT-generation-first visual element plan for section dividers, metric badges, process nodes, connectors, icon accents, subtle patterns, and callout stickers;
 - shows the exact `generate_visual_element_kit.py` command after Bridge creates a local handoff folder;
@@ -81,11 +82,12 @@ Use these checks before promoting a release:
 | Live Web Deck preview | The preview frame renders `preview-web-deck.html` without backend calls or script dependencies. |
 | Copy Agent prompt | Clipboard receives the generated prompt with outline and kit context. |
 | Select visual tags | `project-brief.json` records `visualBrief.selectedTags`, selected tag labels, background text, special requirements, and reference links. |
+| Select Swiss route | `project-brief.json` records `webDeck.style`, `webDeck.theme`, `webDeck.layoutPolicy`, page rhythm, and `assetPlanRequired`; the handoff includes `asset_plan.json`. |
 | Thin or vague brief | `expectationFit` turns yellow/red and the Agent prompt tells Codex to run Guided Intake before final production. |
 | Copy `source.md` | Clipboard receives the generated source markdown. |
 | Download `source.md` | Browser downloads a Markdown brief with current form values and outline. |
 | Download `preview-web-deck.html` | Browser downloads a standalone HTML preview with the current brief and storyboard. |
-| Download `handoff-kit.zip` | Browser downloads a zip containing source files, manifest, attachments, prompt, preview, engine plan, checklist, asset plan, visual element kit, Codex task, AGENTS guide, quality report, and README. |
+| Download `handoff-kit.zip` | Browser downloads a zip containing source files, manifest, attachments, prompt, preview, engine plan, checklist, asset plan markdown, `asset_plan.json`, prompt files, visual element kit, Codex task, AGENTS guide, quality report, and README. |
 | Create local project | The local connector writes a project folder and returns suggested AI-helper commands. |
 | Delivery details | After the local project is created, the collapsed detail panel shows `python3 scripts/generate_visual_element_kit.py <projectPath>`, the AI-helper command, and the `Needs-Manual` prompt fallback. |
 | Install Skill via local connector | `POST /skill/install` links or updates an allowlisted local Skill target without accepting arbitrary paths. |

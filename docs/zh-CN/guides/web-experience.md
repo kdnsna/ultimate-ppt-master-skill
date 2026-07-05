@@ -12,6 +12,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - 资料类型、使用场景、输出形式、视觉风格、语言、AI 助手和模型偏好默认收进高级设置；
 - 接收粘贴资料、资料 URL，以及拖入的 `.md`、`.txt`、`.pdf`、`.docx`、`.pptx`、`.xlsx` 等文件；
 - 增加 Visual Brief Builder，用多样化标签选择使用场景、受众、目的、内容状态、视觉风格、排版密度、素材策略和输出偏好；
+- 增加 Swiss Deck / Asset Factory 区块，用于选择 Style A 电子杂志、Style B 瑞士国际主义、地图页意图、封面衍生图和生成配图计划；
 - 保留自由输入区，用于粘贴背景、领导要求、特殊禁忌、官方/参考链接和相关内容；
 - 文本资料在浏览器预读，Office/PDF 资料标记为等待本地 Bridge 解析；
 - 生成页纲、brief 完整度检查和 `expectationFit` 预期契合度，用于发现需求模糊或互相冲突；
@@ -21,7 +22,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - 生成可复制的 Agent 指令、`source.md`、`extracted-source.md`、`manifest.json` 和 `project-brief.json`；
 - 在 `project-brief.json` 写入 `briefMode`、`visualBrief`、`guidedBrief` 和 `expectationFit`，让 Codex 判断是直接制作、分步问清，还是带假设草稿；
 - 下载完整 `handoff-kit.zip`，或通过本机连接器生成项目目录；
-- handoff kit 内含 `source.md`、`extracted-source.md`、`attachments/`、`manifest.json`、`agent-prompt.md`、`project-brief.json`、`preview-web-deck.html`、`engine-plan.md`、`quality-checklist.md`、`asset-plan.md`、`visual-element-kit.md`、`codex-task.md`、`AGENTS.md`、`quality-report.json` 和 `README.md`；
+- handoff kit 内含 `source.md`、`extracted-source.md`、`attachments/`、`manifest.json`、`agent-prompt.md`、`project-brief.json`、`preview-web-deck.html`、`engine-plan.md`、`quality-checklist.md`、`asset-plan.md`、`asset_plan.json`、生成 prompt 文件、`visual-element-kit.md`、`codex-task.md`、`AGENTS.md`、`quality-report.json` 和 `README.md`；
 - 写入 `formal-business` 质量门禁，让 Codex 拿到验收标准、产物检查和复查命令；
 - 生成 ChatGPT 生图优先的小元素计划，覆盖章节分隔符、指标徽章、流程节点、连接线、图标点缀、低对比纹理和提示贴片；
 - Bridge 生成本地 handoff 后，显示精确的 `generate_visual_element_kit.py` 命令；
@@ -75,11 +76,12 @@ GITHUB_PAGES=true npm run build:web
 | 实时 Web Deck 预览 | 预览框渲染 `preview-web-deck.html`，不依赖后端或脚本。 |
 | 复制 Agent prompt | 剪贴板获得带页纲和交付包上下文的 prompt。 |
 | 选择可视化标签 | `project-brief.json` 记录 `visualBrief.selectedTags`、标签中文名、背景文本、特殊要求和参考链接。 |
+| 选择瑞士风路线 | `project-brief.json` 记录 `webDeck.style`、`webDeck.theme`、`webDeck.layoutPolicy`、页奏和 `assetPlanRequired`；handoff 包含 `asset_plan.json`。 |
 | brief 很薄或模糊 | `expectationFit` 变为黄/红，Agent prompt 会要求 Codex 先进行分步需求访谈。 |
 | 复制 `source.md` | 剪贴板获得生成后的 source markdown。 |
 | 下载 `source.md` | 浏览器下载带当前表单值和页纲的 Markdown brief。 |
 | 下载 `preview-web-deck.html` | 浏览器下载带当前 brief 和 storyboard 的单文件 HTML 预览。 |
-| 下载 `handoff-kit.zip` | 浏览器下载包含源资料、manifest、attachments、prompt、preview、engine plan、checklist、asset plan、visual element kit、Codex task、AGENTS guide、quality report 和 README 的 zip。 |
+| 下载 `handoff-kit.zip` | 浏览器下载包含源资料、manifest、attachments、prompt、preview、engine plan、checklist、asset plan markdown、`asset_plan.json`、prompt 文件、visual element kit、Codex task、AGENTS guide、quality report 和 README 的 zip。 |
 | 生成本地项目 | 本机连接器写入本地项目文件夹并返回建议 AI 助手命令。 |
 | 交付详情区 | 本地项目生成后，折叠详情中显示 `python3 scripts/generate_visual_element_kit.py <projectPath>`、AI 助手命令和 `Needs-Manual` prompt fallback。 |
 | 打开 Web Deck 示例 | 静态构建中的 `examples/agentic-developer-tools-2026/web-demo.html` 能打开。 |

@@ -63,6 +63,8 @@ type SourceConfidenceLevel = "strong" | "partial" | "weak" | "topic-only";
 type ExpectedDeckType = "executive-report" | "client-proposal" | "training-courseware" | "launch-story" | "research-report" | "general-business";
 type FeedbackStatus = "none" | "requested" | "needs-revision";
 type FailureTaxonomyId = "brief-mismatch" | "source-gap" | "style-mismatch" | "visual-density" | "asset-boundary" | "format-mismatch";
+type WebDeckStyle = "editorial" | "swiss";
+type WebDeckLayoutPolicy = "free-layout-skeletons" | "swiss-locked-sxx";
 
 interface StoryItem {
   title: string;
@@ -173,6 +175,20 @@ interface BestEffectBrief {
   assumptions: string[];
   agentInstructions: string[];
   userVisibleHint: string;
+}
+
+interface WebDeckPlan {
+  style: WebDeckStyle;
+  theme: string;
+  layoutPolicy: WebDeckLayoutPolicy;
+  pageRhythm: Array<{
+    page: number;
+    role: string;
+    theme: string;
+    layout: string;
+    imageSlot?: string;
+  }>;
+  validationCommands: string[];
 }
 
 interface ReferenceStyle {
@@ -364,7 +380,7 @@ const skillDocUrl = `${repoUrl}#use-as-agent-skill`;
 const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v4";
-const appVersion = "5.3.0";
+const appVersion = "5.4.0";
 const bestEffectMarketplacePrompt = "Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.";
 
 const designDoctorScores = [
@@ -978,8 +994,8 @@ const optionText = {
   stylePreset: {
     business: { zh: "商务汇报", en: "Business report" },
     consulting: { zh: "咨询风", en: "Consulting" },
-    editorial: { zh: "电子杂志", en: "Editorial" },
-    swiss: { zh: "Swiss Style", en: "Swiss Style" },
+    editorial: { zh: "Style A · 电子杂志 × 电子墨水", en: "Style A · Editorial/E-ink" },
+    swiss: { zh: "Style B · 瑞士国际主义", en: "Style B · Swiss International" },
     academic: { zh: "学术 / 培训", en: "Academic / training" }
   },
   agentTool: {
@@ -1338,6 +1354,8 @@ export function App() {
   const sourceTemplate = useMemo(() => buildSourceTemplate(form, storyboard, enginePlan, sources, qualityContract, expectationFit), [form, storyboard, enginePlan, sources, qualityContract, expectationFit]);
   const extractedSource = useMemo(() => buildExtractedSource(form, sources), [form, sources]);
   const qualityChecklist = useMemo(() => buildQualityChecklist(form, enginePlan, sources, qualityContract, qualityGate, expectationFit), [form, enginePlan, sources, qualityContract, qualityGate, expectationFit]);
+  const assetPlanObject = useMemo(() => buildAssetPlanObject(form, sources, qualityGate), [form, sources, qualityGate]);
+  const assetPlanJson = useMemo(() => JSON.stringify(assetPlanObject, null, 2), [assetPlanObject]);
   const assetPlan = useMemo(() => buildAssetPlan(form, sources, qualityGate), [form, sources, qualityGate]);
   const visualElementKit = useMemo(() => buildVisualElementKit(form, qualityGate), [form, qualityGate]);
   const deckIRPreview = useMemo(() => buildDeckIRPreview(form, storyboard, sources, enginePlan, qualityGate), [form, storyboard, sources, enginePlan, qualityGate]);
@@ -1623,6 +1641,7 @@ export function App() {
       qualityReport,
       deckIRPreview,
       assetPlan,
+      assetPlanJson,
       visualElementKit,
       codexTask,
       codexAgentGuide,
@@ -1658,6 +1677,7 @@ export function App() {
         qualityReport,
         deckIRPreview,
         assetPlan,
+        assetPlanJson,
         visualElementKit,
         codexTask,
         codexAgentGuide,
@@ -2029,6 +2049,14 @@ export function App() {
               onApplyPreset={applyVisualBriefPreset}
               onToggleTag={toggleVisualTag}
               onUpdateBrief={updateVisualBrief}
+            />
+            <WebDeckAssetFactoryPanel
+              form={form}
+              webDeck={buildWebDeckPlan(form, sources)}
+              onSelectStyle={(style) => update("stylePreset", style)}
+              onSetMapPage={() => update("constraints", appendConstraint(form.constraints, form.language === "zh" ? "需要地图页或地点关系页，优先使用 Swiss Map / S08 关系图。" : "Include a map or location-relationship page, preferably Swiss Map / S08."))}
+              onSetCoverDerivative={() => update("constraints", appendConstraint(form.constraints, form.language === "zh" ? "需要封面衍生图，可用于多平台封面但不得生成假 logo 或内嵌标题。" : "Create a cover derivative for multi-platform cover use, without fake logos or embedded titles."))}
+              onSetGeneratedImages={() => update("constraints", appendConstraint(form.constraints, form.language === "zh" ? "需要生成配图；先写 asset_plan.json，再生成 image_prompts.json，Generated 状态必须写 current_generation_evidence。" : "Generate supporting visuals; write asset_plan.json first, then image_prompts.json, and require current_generation_evidence for Generated assets."))}
             />
             <details className="advanced-settings">
               <summary>
@@ -3175,6 +3203,66 @@ function BestEffectGuide({ labels: t }: { labels: typeof labels.zh }) {
   );
 }
 
+function WebDeckAssetFactoryPanel({
+  form,
+  webDeck,
+  onSelectStyle,
+  onSetMapPage,
+  onSetCoverDerivative,
+  onSetGeneratedImages
+}: {
+  form: FormState;
+  webDeck: WebDeckPlan;
+  onSelectStyle: (style: StylePreset) => void;
+  onSetMapPage: () => void;
+  onSetCoverDerivative: () => void;
+  onSetGeneratedImages: () => void;
+}) {
+  const zh = form.language === "zh";
+  const styleAActive = webDeck.style === "editorial";
+  const rhythmPreview = webDeck.pageRhythm.slice(0, 4).map((page) => page.layout).join(" / ");
+  return (
+    <section className="web-deck-factory" aria-label="Swiss Deck / Asset Factory">
+      <div className="web-deck-factory-head">
+        <div>
+          <strong>Swiss Deck / Asset Factory</strong>
+          <p>{zh ? "选择 Style A 叙事 Web Deck 或 Style B 信息设计路线，并把图片生成升级成可追溯资产计划。" : "Choose Style A narrative Web Deck or Style B information-design route, then stage traceable image assets."}</p>
+        </div>
+        <span>{webDeck.layoutPolicy}</span>
+      </div>
+      <div className="style-choice-grid">
+        <button type="button" className={styleAActive ? "active" : ""} onClick={() => onSelectStyle("editorial")}>
+          <span>{zh ? "Style A · 电子杂志 × 电子墨水" : "Style A · Editorial/E-ink"}</span>
+          <small>{zh ? "适合极短指令、叙事传播、观点页和电子杂志节奏。" : "Best for thin prompts, narrative publishing, point-of-view pages, and magazine pacing."}</small>
+        </button>
+        <button type="button" className={!styleAActive ? "active" : ""} onClick={() => onSelectStyle("swiss")}>
+          <span>{zh ? "Style B · 瑞士国际主义" : "Style B · Swiss International"}</span>
+          <small>{zh ? "适合数据、产品、KPI、方法论、Helvetica、网格与信息设计。" : "Best for data, product, KPI, methodology, Helvetica, grid, and information design."}</small>
+        </button>
+      </div>
+      <dl className="web-deck-contract">
+        <div>
+          <dt>{zh ? "主题" : "Theme"}</dt>
+          <dd>{webDeck.theme}</dd>
+        </div>
+        <div>
+          <dt>{zh ? "页奏" : "Rhythm"}</dt>
+          <dd>{rhythmPreview}</dd>
+        </div>
+        <div>
+          <dt>{zh ? "校验" : "Audit"}</dt>
+          <dd>npm run audit:swiss-deck</dd>
+        </div>
+      </dl>
+      <div className="asset-factory-actions">
+        <button type="button" onClick={onSetMapPage}>{zh ? "需要地图页" : "Map page"}</button>
+        <button type="button" onClick={onSetCoverDerivative}>{zh ? "封面衍生图" : "Cover derivative"}</button>
+        <button type="button" onClick={onSetGeneratedImages}>{zh ? "生成配图" : "Generated visuals"}</button>
+      </div>
+    </section>
+  );
+}
+
 function VisualBriefBuilder({
   form,
   expectationFit,
@@ -3826,6 +3914,12 @@ function splitReferenceLinks(value: string) {
   return value.split(/[\n,，]/).map((item) => item.trim()).filter(Boolean);
 }
 
+function appendConstraint(current: string, addition: string) {
+  const trimmed = current.trim();
+  if (trimmed.includes(addition)) return current;
+  return trimmed ? `${trimmed}\n${addition}` : addition;
+}
+
 function selectedTagCount(brief: VisualBrief) {
   return Object.values(normalizeSelectedTags(brief.selectedTags)).reduce((sum, items) => sum + items.length, 0);
 }
@@ -3909,6 +4003,27 @@ function explicitFormalEditableRequested(form: FormState) {
     selectedTags.outputPreference.includes("editable-pptx") ||
     selectedTags.visualStyle.includes("formal-business") ||
     /正式|汇报|报告|可编辑|pptx|powerpoint|政府|金融|培训|课件|formal|editable|business report|government|finance|training/i.test(text)
+  );
+}
+
+function swissIntentDetected(form: FormState, sources: UploadedSource[] = []) {
+  const selectedTags = normalizeSelectedTags(form.visualBrief.selectedTags);
+  const text = [
+    form.title,
+    form.audience,
+    form.coreMessage,
+    form.sourceNotes,
+    form.constraints,
+    form.visualBrief.backgroundText,
+    form.visualBrief.extraRequirements,
+    ...flattenVisualTagLabels(form.visualBrief, "en"),
+    ...flattenVisualTagLabels(form.visualBrief, "zh"),
+    ...sources.map((source) => `${source.name}\n${source.text || source.url || ""}`)
+  ].join("\n");
+  return (
+    form.stylePreset === "swiss" ||
+    selectedTags.visualStyle.includes("data-heavy") ||
+    /swiss|瑞士风|瑞士国际主义|information design|信息设计|Helvetica|grid|网格|KPI|指标|数据|产品|方法论/i.test(text)
   );
 }
 
@@ -4051,10 +4166,47 @@ function bestEffectPromptQuality(form: FormState, sources: UploadedSource[], exp
   return "complete";
 }
 
+function buildWebDeckPlan(form: FormState, sources: UploadedSource[] = []): WebDeckPlan {
+  const swiss = swissIntentDetected(form, sources);
+  const style: WebDeckStyle = swiss ? "swiss" : "editorial";
+  const theme = swiss ? "swiss-red / black / warm-gray / signal-blue" : "ink-mono / mist / bronze / editorial-blue / night";
+  const layoutPolicy: WebDeckLayoutPolicy = swiss ? "swiss-locked-sxx" : "free-layout-skeletons";
+  const pageRhythm = swiss
+    ? [
+      { page: 1, role: "cover", theme, layout: "SWISS-COVER-ASCII" },
+      { page: 2, role: "KPI", theme, layout: "S04" },
+      { page: 3, role: "comparison", theme, layout: "S11" },
+      { page: 4, role: "process", theme, layout: "S14" },
+      { page: 5, role: "map / location relationship", theme, layout: "S08" },
+      { page: 6, role: "image hero", theme, layout: "S22", imageSlot: "s22-hero-21x9" },
+      { page: 7, role: "evidence close", theme, layout: "S16" },
+      { page: 8, role: "closing", theme, layout: "SWISS-CLOSING-ASCII" }
+    ]
+    : [
+      { page: 1, role: "cover", theme, layout: "editorial-cover" },
+      { page: 2, role: "context", theme, layout: "editorial-context" },
+      { page: 3, role: "image tension", theme, layout: "editorial-spread" },
+      { page: 4, role: "framework", theme, layout: "editorial-framework" },
+      { page: 5, role: "divider", theme, layout: "editorial-divider" },
+      { page: 6, role: "evidence", theme, layout: "editorial-evidence" },
+      { page: 7, role: "point of view", theme, layout: "editorial-pov" },
+      { page: 8, role: "closing", theme, layout: "editorial-close" }
+    ];
+  return {
+    style,
+    theme,
+    layoutPolicy,
+    pageRhythm,
+    validationCommands: swiss ? ["npm run audit:swiss-deck"] : ["npm run audit:web-console"]
+  };
+}
+
 function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expectationFit: ExpectationFit): BestEffectBrief {
   const zh = form.language === "zh";
   const promptQuality = bestEffectPromptQuality(form, sources, expectationFit);
   const formalEditable = explicitFormalEditableRequested(form);
+  const swissIntent = swissIntentDetected(form, sources);
+  const webDeck = buildWebDeckPlan(form, sources);
   const strategy: BestEffectBrief["strategy"] =
     promptQuality === "extreme-thin" && !formalEditable
       ? "best-effect-fixed-style"
@@ -4069,8 +4221,8 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
         : formalEditable
           ? "formal-editable-pptx"
           : "guizang-web-fixed-style";
-  const routeName = "Guizang-like Magazine Web Deck fixed style";
-  const styleName = "Style A · 电子杂志 × 电子墨水";
+  const routeName = swissIntent && !formalEditable ? "Swiss Style Web Deck locked Sxx route" : "Guizang-like Magazine Web Deck fixed style";
+  const styleName = swissIntent && !formalEditable ? "Style B · Swiss International" : "Style A · 电子杂志 × 电子墨水";
   const fixedStyleFallback = {
     trigger: zh
       ? "Extreme Thin Prompt Fallback: 用户只给主题、一句话或没有资料，且没有明确要求正式可编辑 PPTX。"
@@ -4078,7 +4230,9 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
     routeName,
     outputMode: "Mode 2: Magazine Web Deck",
     styleName,
-    pageRhythm: zh
+    pageRhythm: swissIntent && !formalEditable
+      ? webDeck.pageRhythm.map((page) => `${String(page.page).padStart(2, "0")} ${page.layout}: ${page.role}${page.imageSlot ? ` (${page.imageSlot})` : ""}`)
+      : zh
       ? [
         "01 深色封面：一句强标题 + 极简副标题",
         "02 浅色背景：问题背景 / 趋势 / 现场语境",
@@ -4167,8 +4321,8 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
     assumptions,
     agentInstructions,
     userVisibleHint: zh
-      ? "短提示会先自动补全为最佳效果 brief；极短指令默认用 Guizang-like Magazine Web Deck fixed style 出稳定高质量版本。"
-      : "Short prompts are expanded into a best-effect brief first; extremely thin prompts default to Guizang-like Magazine Web Deck fixed style for a stable high-quality first version."
+      ? "短提示会先自动补全为最佳效果 brief；极短指令默认用 Style A，出现瑞士风/数据/KPI/Helvetica/网格/信息设计信号时推荐 Style B；正式可编辑场景仍优先 PPTX。"
+      : "Short prompts are expanded into a best-effect brief first; extremely thin prompts default to Style A, while Swiss/data/KPI/Helvetica/grid/information design signals recommend Style B; formal editable scenarios still prefer PPTX."
   };
 }
 
@@ -5346,12 +5500,116 @@ function buildQualityChecklist(
   return `# 质量检查清单\n\n## 当前预设\n${presetChecks}\n\n## Design Doctor 合同\n${qualityCriteria}\n\n## 正式商务交付门禁\n等级：${qualityGate.level}\n\n### 必须输入\n${gateInputs}\n\n### 验收标准\n${gateCriteria}\n\n### 产物检查\n${gateChecks}\n\n### 门禁检查命令\n${gateCommands}\n\n## 预期产物\n${expectedArtifacts}\n\n## 检查命令\n${reviewCommands}\n\n## v5.3 Best-Effect Brief Enhancer\n${bestEffectChecks}\n\n## 预期契合度\n- [ ] 风险等级：${expectationFit.riskLevel}；分数：${expectationFit.score}%；可正式制作：${expectationFit.readyForProduction ? "是" : "否"}。\n- [ ] 用户选择的标签已体现在结构、视觉、素材和输出中：${tagLine}。\n- [ ] 如果 readyForProduction 为 false，Codex 已先完成分步需求访谈。\n- [ ] quality-report.json 说明用户标签、粘贴背景、默认假设和剩余预期风险。\n\n### 已知缺口\n${missingSignals}\n\n### 需确认或记录的默认假设\n${assumptions || "- [ ] 暂无默认假设。"}\n\n## 资料与叙事\n- [ ] extracted-source.md 已根据真实源文件修正，而不只是网页粘贴摘要。\n- [ ] 核心结论出现在封面和收束页。\n- [ ] 每一页只承担一个主要任务，并有清晰 takeaway。\n- [ ] 敏感资料默认留在本地，除非用户明确同意上传。\n- [ ] 生成最终文件前，品牌资产或替代策略已锁定。\n- [ ] 证据来源、图片选择、图表/数据计划、页面节奏和信息图策略已明确。\n\n## 源文件\n${sourceLine}\n\n## PPTX 路线\n- [ ] 路线状态：${enginePlan.pptxActive ? "启用" : "备用"}。\n- [ ] 文本、形状、图表、备注保持可编辑。\n- [ ] 不用整页截图替代 PPTX 可编辑内容。\n- [ ] logo 和品牌标识是真实素材、干净矢量或规范文字处理，不是零散文字碎片。\n- [ ] 按 Skill 工作流运行 SVG / PPTX 渲染检查。\n- [ ] 检查导出页面并修复裁切、重叠、小字和图表损坏。\n\n## Web Deck 路线\n- [ ] 路线状态：${enginePlan.webActive ? "启用" : "备用"}。\n- [ ] 统一使用 ${enginePlan.styleRoute}。\n- [ ] 桌面端和移动端不出现文字、控件或媒体互相遮挡。\n- [ ] 视觉完整度包含真实图片、图表，或明确的无图策略。\n\n## 交付\n- [ ] 最终文件命名清晰。\n- [ ] quality-report.json 包含视觉复查结果和中文摘要。\n- [ ] 简短说明生成了什么、检查了什么、解析了哪些源文件。\n- [ ] 保留上游版权和第三方声明。\n`;
 }
 
+function buildAssetPlanObject(form: FormState, sources: UploadedSource[], qualityGate: QualityGate) {
+  const webDeck = buildWebDeckPlan(form, sources);
+  const backend = "codex";
+  const baseItems = webDeck.style === "swiss"
+    ? [
+      {
+        id: "s22-hero",
+        slide: 6,
+        slot: "s22-hero-21x9",
+        asset_type: "hero",
+        aspect_ratio: "21:9",
+        text_policy: "none",
+        source_policy: "generated",
+        backend,
+        prompt_path: "prompts/s22-hero.md",
+        status: "Pending",
+        current_generation_evidence: []
+      },
+      {
+        id: "screenshot-frame",
+        slide: 3,
+        slot: "s15-grid-16x10",
+        asset_type: "screenshot-frame",
+        aspect_ratio: "16:10",
+        text_policy: "limited-labels",
+        source_policy: "needs-manual",
+        backend: "manual",
+        prompt_path: "prompts/screenshot-frame.md",
+        status: "Needs-Manual",
+        current_generation_evidence: []
+      },
+      {
+        id: "limited-labels-infographic",
+        slide: 4,
+        slot: "s16-grid-21x9",
+        asset_type: "infographic",
+        aspect_ratio: "21:9",
+        text_policy: "limited-labels",
+        source_policy: "generated",
+        backend,
+        prompt_path: "prompts/limited-labels-infographic.md",
+        status: "Pending",
+        current_generation_evidence: []
+      }
+    ]
+    : [
+      {
+        id: "editorial-hero",
+        slide: 1,
+        slot: "hero-16x9",
+        asset_type: "hero",
+        aspect_ratio: "16:9",
+        text_policy: "none",
+        source_policy: "generated",
+        backend,
+        prompt_path: "prompts/editorial-hero.md",
+        status: "Pending",
+        current_generation_evidence: []
+      }
+    ];
+  return {
+    version: "asset-plan-v5.4",
+    project: {
+      title: form.title,
+      language: form.language,
+      assetPlanRequired: true,
+      webDeckStyle: webDeck.style,
+      qualityGate: qualityGate.level
+    },
+    rules: [
+      "Plan assets before generation.",
+      "image_prompts.json is generated from asset_plan.json generated items only.",
+      "Do not reuse historical generated_images as current output.",
+      "Generated assets require current_generation_evidence.",
+      "If the backend is unavailable, mark Needs-Manual instead of blocking the deck."
+    ],
+    items: baseItems
+  };
+}
+
+function assetPromptText(item: Record<string, unknown>) {
+  return [
+    `Asset id: ${String(item.id || "asset")}`,
+    `Slide: ${String(item.slide || "pending")}`,
+    `Slot: ${String(item.slot || "pending")}`,
+    `Asset type: ${String(item.asset_type || "hero")}`,
+    `Aspect ratio: ${String(item.aspect_ratio || "16:9")}`,
+    `Text policy: ${String(item.text_policy || "none")}`,
+    "Create only the image asset for this slot, not a full slide.",
+    "No fake logos, no page title, no page number, and no unapproved IP.",
+    "If text is needed, keep it to short labels only and prefer editable deck text."
+  ].join("\n");
+}
+
+function assetPromptFiles(assetPlanJson: string) {
+  const plan = safeJson(assetPlanJson) as { items?: unknown[] };
+  if (!Array.isArray(plan.items)) return [] as Array<{ path: string; text: string }>;
+  return plan.items
+    .filter((item): item is Record<string, unknown> => Boolean(item && typeof item === "object"))
+    .map((item) => ({ path: String(item.prompt_path || ""), text: assetPromptText(item) }))
+    .filter((item) => item.path.startsWith("prompts/") && item.path.endsWith(".md"));
+}
+
 function buildAssetPlan(form: FormState, sources: UploadedSource[], qualityGate: QualityGate) {
   const zh = form.language === "zh";
   const sourceLine = sourceSummaryMarkdown(sources, form.language);
   const gateInputs = qualityGate.requiredInputs.map((item) => `- ${item}`).join("\n");
   const expectationFit = assessExpectationFit(form, sources);
   const v52 = buildV52Contract(form, sources, expectationFit);
+  const assetPlanJson = JSON.stringify(buildAssetPlanObject(form, sources, qualityGate), null, 2);
   const referenceLine = zh
     ? `- 参考样板：${referenceStyleLabel(v52.referenceStyle, "zh")}；贴近 ${v52.referenceStyle.positiveReferences.join(" / ")}；避免 ${v52.referenceStyle.negativeReferences.join(" / ")}。`
     : `- Reference style: ${referenceStyleLabel(v52.referenceStyle, "en")}; move toward ${v52.referenceStyle.positiveReferences.join(" / ")}; avoid ${v52.referenceStyle.negativeReferences.join(" / ")}.`;
@@ -5370,6 +5628,11 @@ ${gateInputs}
 ## v5.2 视觉意图与图片验收
 ${referenceLine}
 ${imageAcceptanceLine}
+
+## v5.4 Asset Factory JSON
+\`\`\`json
+${assetPlanJson}
+\`\`\`
 
 ## ChatGPT 生成素材
 - [ ] 把 ChatGPT/OpenAI 作为主要视觉素材引擎：先生成页面专用配图和小元素素材，再用公开检索补证据/官方参考。
@@ -5408,6 +5671,11 @@ ${gateInputs}
 ## v5.2 visual intent and image acceptance
 ${referenceLine}
 ${imageAcceptanceLine}
+
+## v5.4 Asset Factory JSON
+\`\`\`json
+${assetPlanJson}
+\`\`\`
 
 ## ChatGPT generated assets
 - [ ] Treat ChatGPT/OpenAI as the primary visual asset engine: generate custom slide visuals and small reusable elements first, then use public search for evidence or official references.
@@ -5878,6 +6146,7 @@ function buildBriefObject(
   const visualBrief = normalizeVisualBrief(form.visualBrief);
   const v52 = buildV52Contract({ ...form, visualBrief }, sources, expectationFit);
   const bestEffectBrief = buildBestEffectBrief({ ...form, visualBrief }, sources, expectationFit);
+  const webDeck = buildWebDeckPlan({ ...form, visualBrief }, sources);
   return {
     version: appVersion,
     schemaVersion: v52.schemaVersion,
@@ -5911,6 +6180,8 @@ function buildBriefObject(
     guidedBrief: buildGuidedBrief({ ...form, visualBrief }),
     expectationFit,
     bestEffectBrief,
+    webDeck,
+    assetPlanRequired: true,
     referenceStyle: v52.referenceStyle,
     sourceConfidence: v52.sourceConfidence,
     deliveryScorecard: v52.deliveryScorecard,
@@ -5956,6 +6227,7 @@ function buildManifest(
   const visualBrief = normalizeVisualBrief(form.visualBrief);
   const v52 = buildV52Contract({ ...form, visualBrief }, sources, expectationFit);
   const bestEffectBrief = buildBestEffectBrief({ ...form, visualBrief }, sources, expectationFit);
+  const webDeck = buildWebDeckPlan({ ...form, visualBrief }, sources);
   return {
     version: appVersion,
     schemaVersion: v52.schemaVersion,
@@ -6005,6 +6277,8 @@ function buildManifest(
     guidedBrief: buildGuidedBrief({ ...form, visualBrief }),
     expectationFit,
     bestEffectBrief,
+    webDeck,
+    assetPlanRequired: true,
     referenceStyle: v52.referenceStyle,
     sourceConfidence: v52.sourceConfidence,
     deliveryScorecard: v52.deliveryScorecard,
@@ -6053,6 +6327,7 @@ async function buildHandoffZip({
   qualityReport,
   deckIRPreview,
   assetPlan,
+  assetPlanJson,
   visualElementKit,
   codexTask,
   codexAgentGuide,
@@ -6070,6 +6345,7 @@ async function buildHandoffZip({
   qualityReport: string;
   deckIRPreview: string;
   assetPlan: string;
+  assetPlanJson: string;
   visualElementKit: string;
   codexTask: string;
   codexAgentGuide: string;
@@ -6093,6 +6369,10 @@ async function buildHandoffZip({
   zip.file("repair-plan.json", JSON.stringify(deckIR["repair-plan.json"] || {}, null, 2));
   zip.file("revision-brief.md", typeof deckIR["revision-brief.md"] === "string" ? String(deckIR["revision-brief.md"]) : pendingRevisionBrief("Ultimate PPT Master handoff"));
   zip.file("asset-plan.md", assetPlan);
+  zip.file("asset_plan.json", assetPlanJson);
+  for (const promptFile of assetPromptFiles(assetPlanJson)) {
+    zip.file(promptFile.path, promptFile.text);
+  }
   zip.file("visual-element-kit.md", visualElementKit);
   zip.file("codex-task.md", codexTask);
   zip.file("AGENTS.md", codexAgentGuide);
@@ -6123,6 +6403,7 @@ function buildBridgePayload({
   qualityReport,
   deckIRPreview,
   assetPlan,
+  assetPlanJson,
   visualElementKit,
   codexTask,
   codexAgentGuide,
@@ -6143,6 +6424,7 @@ function buildBridgePayload({
   qualityReport: string;
   deckIRPreview: string;
   assetPlan: string;
+  assetPlanJson: string;
   visualElementKit: string;
   codexTask: string;
   codexAgentGuide: string;
@@ -6164,6 +6446,7 @@ function buildBridgePayload({
     qualityReport,
     deckIRPreview,
     assetPlan,
+    assetPlanJson,
     visualElementKit,
     codexTask,
     codexAgentGuide,

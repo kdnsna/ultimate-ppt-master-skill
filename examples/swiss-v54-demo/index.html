@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>v5.4 Swiss Deck + Asset Factory Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; background: #fff; color: #0a0a0a; font-family: Inter, "Helvetica Neue", Arial, sans-serif; }
+    body { overflow: hidden; }
+    #deck { display: flex; width: 100vw; height: 100vh; overflow-x: auto; scroll-snap-type: x mandatory; }
+    .slide { min-width: 100vw; height: 100vh; scroll-snap-align: start; padding: 5.6vh 5vw 4.4vh; display: grid; grid-template-rows: auto 1fr auto; gap: 3vh; border-right: 1px solid #e0e0e0; }
+    .accent { background: #0047ff; color: #fff; }
+    .split { grid-template-columns: 1fr 1fr; gap: 0; padding: 0; }
+    .half { padding: 5.6vh 5vw 4.4vh; display: grid; align-content: center; gap: 3vh; }
+    .b-accent { background: #0047ff; color: #fff; }
+    .t-meta { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .h-hero { margin: 0; max-width: 920px; font-size: min(10vw, 17vh); line-height: .9; font-weight: 200; letter-spacing: -.04em; }
+    .h-xl { margin: 0; max-width: 900px; font-size: min(6.4vw, 11.2vh); line-height: .95; font-weight: 200; letter-spacing: -.04em; }
+    .body { margin: 0; max-width: 820px; font-size: 18px; line-height: 1.5; color: #3f3f46; }
+    .accent .body, .b-accent .body { color: rgba(255,255,255,.78); }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .grid-2 { display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: center; }
+    .card { min-height: 22vh; padding: 24px; background: #f3f4f6; border: 1px solid #e0e0e0; }
+    .card strong { display: block; margin-bottom: 20px; font-size: 32px; font-weight: 300; }
+    .card p, li { margin: 0; font-size: 18px; line-height: 1.45; color: #3f3f46; }
+    .num { font-size: min(8.4vw, 14vh); line-height: .88; font-weight: 200; letter-spacing: -.05em; }
+    .frame-img { width: 100%; overflow: hidden; background: #f7f7f4; }
+    .r-21x9 { aspect-ratio: 21 / 9; }
+    .frame-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .caption { margin: 0; font-size: 16px; line-height: 1.45; color: #52525b; }
+    .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .timeline div { border-top: 2px solid #0047ff; padding-top: 16px; }
+    .map-box { min-height: 42vh; border: 1px solid #d4d4d8; display: grid; place-items: center; background: linear-gradient(135deg, #fff, #f7f7f4); }
+    .map-node { width: 12px; height: 12px; background: #0047ff; display: inline-block; margin: 0 32px; }
+    .foot { margin: 0; font-size: 14px; color: #71717a; }
+    .accent .foot, .b-accent .foot { color: rgba(255,255,255,.7); }
+  </style>
+</head>
+<body>
+<main id="deck">
+  <section class="slide accent" data-layout="SWISS-COVER-ASCII">
+    <p class="t-meta">V5.4 / SWISS DECK</p>
+    <h1 class="h-hero">Swiss Deck + Asset Factory</h1>
+    <p class="body">A strict-grid web deck route with auditable visual assets before generation.</p>
+    <p class="foot">Style B demo / IKB anchor / local HTML</p>
+  </section>
+
+  <section class="slide light" data-layout="S04">
+    <p class="t-meta">KPI TOWER</p>
+    <div class="grid-3">
+      <div class="card"><strong class="num">01</strong><p>Choose Style A or Style B before template copy.</p></div>
+      <div class="card"><strong class="num">02</strong><p>Plan every generated visual in asset_plan.json.</p></div>
+      <div class="card"><strong class="num">03</strong><p>Validate Swiss layout locks before delivery.</p></div>
+    </div>
+    <p class="foot">Minimum body text is 18px; captions are 16px; meta labels are 14px.</p>
+  </section>
+
+  <section class="slide light" data-layout="S11">
+    <p class="t-meta">DUO COMPARE</p>
+    <div class="grid-2">
+      <div>
+        <h2 class="h-xl">Before</h2>
+        <p class="body">A web deck could look Swiss but still invent structures, miss image slots, or hide asset provenance.</p>
+      </div>
+      <div>
+        <h2 class="h-xl">After</h2>
+        <p class="body">Every Swiss page has a registered layout, a clear asset slot, and a validator-backed QA path.</p>
+      </div>
+    </div>
+    <p class="foot">This page demonstrates comparison content without custom centered title hacks.</p>
+  </section>
+
+  <section class="slide light" data-layout="S14">
+    <p class="t-meta">FLOW</p>
+    <h2 class="h-xl">Brief to asset to deck</h2>
+    <div class="timeline">
+      <div><p>project-brief.json</p></div>
+      <div><p>asset_plan.json</p></div>
+      <div><p>image_prompts.json</p></div>
+      <div><p>validated web deck</p></div>
+    </div>
+    <p class="foot">Generated status requires current_generation_evidence.</p>
+  </section>
+
+  <section class="slide light" data-layout="S08">
+    <p class="t-meta">MAP COMPONENT</p>
+    <div class="grid-2">
+      <div>
+        <h2 class="h-xl">Place relations stay readable</h2>
+        <p class="body">Swiss Map pages use an S08 slot extension instead of an invented map poster.</p>
+      </div>
+      <div class="map-box" aria-label="Static map relationship placeholder">
+        <span class="map-node"></span><span class="map-node"></span><span class="map-node"></span>
+      </div>
+    </div>
+    <p class="foot">Production pages can replace this with the full Swiss Map component.</p>
+  </section>
+
+  <section class="slide light nav-safe-bottom" data-layout="S22">
+    <p class="t-meta">IMAGE HERO</p>
+    <h2 class="h-xl">21:9 evidence slot</h2>
+    <div class="frame-img r-21x9">
+      <img src="images/06-hero.svg" data-image-slot="s22-hero-21x9" style="object-position:center 35%" alt="Abstract Swiss grid evidence visual">
+    </div>
+    <p class="caption">S22 hero visuals bind to data-image-slot and avoid top-center cropping.</p>
+  </section>
+
+  <section class="slide light" data-layout="S16">
+    <p class="t-meta">ASSET FACTORY</p>
+    <div class="grid-3">
+      <div class="card"><strong>Hero</strong><p>21:9 no-text visual for S22.</p></div>
+      <div class="card"><strong>Screenshot</strong><p>16:10 framed evidence, never redrawn when fidelity matters.</p></div>
+      <div class="card"><strong>Infographic</strong><p>Limited labels only when editability is not required.</p></div>
+    </div>
+    <p class="foot">Failed generation becomes Needs-Manual, not a broken deck.</p>
+  </section>
+
+  <section class="slide split" data-layout="SWISS-CLOSING-ASCII">
+    <div class="half b-accent">
+      <p class="t-meta">CLOSING</p>
+      <h2 class="h-xl">可选 可验 可追溯</h2>
+      <p class="body">The release turns Swiss and images into production contracts.</p>
+    </div>
+    <div class="half">
+      <p class="t-meta">TAKEAWAYS</p>
+      <p class="body">Style route is explicit. Asset provenance is written before generation. Validation catches the expensive mistakes first.</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

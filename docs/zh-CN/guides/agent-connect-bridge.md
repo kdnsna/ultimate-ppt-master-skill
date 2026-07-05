@@ -42,12 +42,14 @@ Bridge 会在本地写入项目：
 - `engine-plan.md`：PPTX / Web Deck / Fusion 路线分工。
 - `quality-checklist.md`：交付前检查清单。
 - `asset-plan.md`：公开参考、ChatGPT 生成素材、来源/授权和插入位置。
+- `asset_plan.json`：v5.4 Asset Factory 合同，记录 slide、slot、类型、比例、来源策略、prompt 路径、状态和 `current_generation_evidence` 规则。
+- `prompts/*.md`：`asset_plan.json` 引用的逐资产 prompt 文件。
 - `visual-element-kit.md`：ChatGPT 生图优先的小元素素材清单。
 - `codex-task.md`：Codex 专用生产步骤。
 - `AGENTS.md`：Codex 本地隐私、素材和质量门禁规则。
 - `quality-report.json`：Design Doctor / 正式商务复查状态。
 
-Codex 应先读 `AGENTS.md`、`codex-task.md`、`visual-element-kit.md`、`asset-plan.md`、`quality-checklist.md`、`manifest.json` 和 `project-brief.json`。如果 `expectationFit.readyForProduction` 为 false，Codex 应先进行分步需求访谈，每轮只问一组相关问题，直到受众、场景、目的、资料、核心观点、页数、风格、素材边界、输出格式和禁忌都明确。brief 可生产后，下一条本地命令是：
+Codex 应先读 `AGENTS.md`、`codex-task.md`、`visual-element-kit.md`、`asset-plan.md`、`asset_plan.json`、`quality-checklist.md`、`manifest.json` 和 `project-brief.json`。如果 `expectationFit.readyForProduction` 为 false，Codex 应先进行分步需求访谈，每轮只问一组相关问题，直到受众、场景、目的、资料、核心观点、页数、风格、素材边界、输出格式和禁忌都明确。brief 可生产后，下一条本地命令是：
 
 ```bash
 cd <repoRoot> && python3 scripts/generate_visual_element_kit.py <projectPath>
