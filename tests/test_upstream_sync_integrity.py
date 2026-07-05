@@ -68,3 +68,25 @@ class UpstreamSyncIntegrityTest(unittest.TestCase):
 
         missing = [snippet for snippet in required_snippets if snippet not in requirements]
         self.assertEqual(missing, [])
+
+    def test_upstream_sync_notes_record_reviewable_license_and_import_policy(self):
+        notes = (ROOT / "UPSTREAM_SYNC.md").read_text(encoding="utf-8")
+
+        required_snippets = [
+            "remote_ref",
+            "local_ref",
+            "local_path",
+            "license",
+            "import_policy",
+            "last_reviewed",
+            "absorbed_capabilities",
+            "deferred_capabilities",
+            "AGPL-3.0",
+            "Do not copy post-AGPL Guizang code directly",
+            "baoyu-skills",
+            "prompt files before generation",
+            "forbid bitmap text overlay repair",
+        ]
+
+        missing = [snippet for snippet in required_snippets if snippet not in notes]
+        self.assertEqual(missing, [])

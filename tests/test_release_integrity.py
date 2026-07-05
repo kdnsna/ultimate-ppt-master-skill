@@ -227,6 +227,32 @@ class ReleaseIntegrityTest(unittest.TestCase):
         ):
             self.assertIn(expected, readme_zh)
 
+    def test_stability_upgrade_surface_is_documented(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+
+        for expected in (
+            "Production Stability Guardrails",
+            "UPSTREAM_SYNC.md",
+            "audit:repo-hygiene",
+            "audit:image-contracts",
+            "Do not copy post-AGPL Guizang code directly",
+            "prompt files before generation",
+            "forbid bitmap text overlay repair",
+        ):
+            self.assertIn(expected, readme)
+
+        for expected in (
+            "生产稳定性门禁",
+            "UPSTREAM_SYNC.md",
+            "audit:repo-hygiene",
+            "audit:image-contracts",
+            "不直接复制 AGPL 后的归藏代码",
+            "先写 prompt 文件再生成",
+            "禁止用位图覆盖方式修补生成图文字",
+        ):
+            self.assertIn(expected, readme_zh)
+
     def test_skill_market_distribution_surface_is_ready(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")

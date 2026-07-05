@@ -261,6 +261,18 @@ bash -lc 'set -e; dir="$HOME/.codex/skills/ultimate-ppt-master"; if [ -d "$dir/.
 | `docs/` | 使用指南、发布说明、质量工作流、策略文档和中文文档。 |
 | `tests/` | 发布完整性、审计、worker 行为、bridge 行为和公开承诺检查。 |
 
+## 生产稳定性门禁
+
+v5.3 的稳定升级路线先把上游来源、许可证边界和仓库卫生固定下来，再继续吸收归藏和宝玉的新范式。
+
+| 门禁 | 检查什么 |
+|---|---|
+| `UPSTREAM_SYNC.md` | 记录 PPT Master、归藏和宝玉来源的 `remote_ref`、`local_ref`、`license`、`import_policy`、已吸收能力、暂缓能力和复核日期。 |
+| `npm run audit:repo-hygiene` | 拦截 `README 2.md`、`test_release_integrity 2.py`、复制图标资产等 Finder/WPS 式副本。 |
+| `npm run audit:image-contracts` | 校验生成图片 manifest，确保每个资产记录 `prompt_path`、backend、source、asset type、aspect ratio、status、page role 和 text policy。 |
+| 归藏许可证边界 | 不直接复制 AGPL 后的归藏代码；只吸收行为要求，并在本仓库内重新实现。 |
+| 宝玉流程纪律 | 先写 prompt 文件再生成，记录后端选择，并禁止用位图覆盖方式修补生成图文字；文本错误时改 prompt 后重生成。 |
+
 ## 文档地图
 
 | 需求 | 阅读 |
@@ -290,6 +302,8 @@ bash -lc 'set -e; dir="$HOME/.codex/skills/ultimate-ppt-master"; if [ -d "$dir/.
 ```bash
 npm run audit:docs
 npm run audit:web-console
+npm run audit:repo-hygiene
+npm run audit:image-contracts
 npm run audit:presets
 npm run audit:quality
 npm run audit:market

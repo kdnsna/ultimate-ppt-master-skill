@@ -61,7 +61,7 @@ After all rows reach terminal status:
 
 - Every non-skipped row has a file at `project/images/<filename>`, or is marked `Needs-Manual`
 - No `Pending` rows remain
-- `image_prompts.json` exists when ≥1 ai row processed; every entry has `status ∈ {Generated, Failed, Needs-Manual}` (no `Pending` remaining)
+- `image_prompts.json` exists when ≥1 ai row processed; every entry has `status ∈ {Generated, Failed, Needs-Manual}` (no `Pending` remaining), `prompt_path`, `asset_type`, `backend`, `source`, `aspect_ratio`, `page_role`, and `text_policy`
 - `image_sources.json` exists when ≥1 web row processed; every entry has `license_tier ∈ {no-attribution, attribution-required}`
 
 > `Needs-Manual` is a legitimate terminal state for ai rows — Step 7 entry waits for the user to place the file. See [`image-generator.md`](./image-generator.md) §7 Offline Manual Mode.

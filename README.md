@@ -263,6 +263,19 @@ Guide: [Agent Setup](./docs/guides/agent-setup.md). Local connector: [Agent Conn
 | `docs/` | User guides, release notes, quality workflows, strategy docs, and Chinese documentation. |
 | `tests/` | Release integrity, audits, worker behavior, bridge behavior, and public-surface guarantees. |
 
+## Production Stability Guardrails
+
+The v5.3 stability route keeps upstream inspiration visible without turning the
+package into an unreviewed bundle of copied skills.
+
+| Guardrail | What is checked |
+|---|---|
+| `UPSTREAM_SYNC.md` | Records `remote_ref`, `local_ref`, `license`, `import_policy`, absorbed capabilities, deferred capabilities, and the review date for PPT Master, Guizang, and Baoyu sources. |
+| `npm run audit:repo-hygiene` | Fails on Finder-style duplicate files such as `README 2.md`, `test_release_integrity 2.py`, or copied icon assets. |
+| `npm run audit:image-contracts` | Validates generated-image manifests so every asset records `prompt_path`, backend, source, asset type, aspect ratio, status, page role, and text policy. |
+| Guizang license boundary | Do not copy post-AGPL Guizang code directly; absorb behavior requirements and reimplement locally when needed. |
+| Baoyu workflow discipline | Use prompt files before generation, record backend decisions, and forbid bitmap text overlay repair. Regenerate from corrected prompts instead. |
+
 ## Documentation Map
 
 | Need | Read |
@@ -292,6 +305,8 @@ Run these maintainer checks before publishing a README, version, Skill, Web, or 
 ```bash
 npm run audit:docs
 npm run audit:web-console
+npm run audit:repo-hygiene
+npm run audit:image-contracts
 npm run audit:presets
 npm run audit:quality
 npm run audit:market

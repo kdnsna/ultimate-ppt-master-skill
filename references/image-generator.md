@@ -233,12 +233,16 @@ Write `project/images/image_prompts.json` with this shape:
   "items": [
     {
       "filename": "cover_bg.png",
+      "asset_type": "generated-image",
       "purpose": "Cover background (Slide 01)",
       "type": "background",
       "page_role": "local",
       "text_policy": "none",
       "aspect_ratio": "16:9",
       "image_size": "2K",
+      "backend": "codex",
+      "source": "ai",
+      "prompt_path": "prompts/cover_bg.md",
       "prompt": "{fully assembled paragraph per §4}",
       "alt_text": "Modern tech abstract background with deep blue gradient and digital waves",
       "status": "Pending"
@@ -255,10 +259,14 @@ Write `project/images/image_prompts.json` with this shape:
 | `deck_palette` | yes | Step 2 lock | Single palette name shared by all items |
 | `color_scheme` | yes | `design_spec.md §III` | HEX triplet from Strategist |
 | `items[].filename` | yes | `§VIII` resource list | Output filename with extension |
+| `items[].asset_type` | yes | Image_Generator | Stable category such as `generated-image`, `cover`, `scene`, `diagram`, or `micro-asset` |
 | `items[].type` | yes | Step 3 per-image | One of: `background`, `hero`, `portrait`, `typography`, `infographic`, `flowchart`, `framework`, `matrix`, `cycle`, `funnel`, `pyramid`, `comparison`, `timeline`, `map`, `scene` |
 | `items[].page_role` | yes | Step 3 per-image | `local` (default — region block on SVG page) or `hero_page` (image is page's main voice; SVG overlay minimal or empty) |
 | `items[].text_policy` | yes | Step 3 per-image | `none` (default — no text in image) or `embedded` (image contains decorative lettering, designed title, or hand-lettered keywords) |
-| `items[].aspect_ratio` | yes | Container sizing | Passed to `image_gen.py --aspect_ratio` |
+| `items[].aspect_ratio` | yes | Container sizing | Generation aspect such as `16:9`, `4:3`, `1:1`, or `9:16`; passed to `image_gen.py --aspect_ratio` |
+| `items[].backend` | yes | Generation dispatch | Runtime/backend actually selected or intended, e.g. `codex`, `gemini`, `openai`, `manual` |
+| `items[].source` | yes | Acquisition path | Always `ai` for this manifest |
+| `items[].prompt_path` | yes | Image_Generator | Relative path to the durable prompt file written before generation |
 | `items[].prompt` | yes | §4 assembly | The full assembled paragraph |
 | `items[].image_size` | no | Container sizing | `512px` / `1K` / `2K` / `4K` |
 | `items[].alt_text` | no | Accessibility | Short caption |
