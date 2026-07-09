@@ -44,6 +44,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("npm --prefix apps/web run build", scripts["build:web"])
         self.assertEqual(scripts["audit:docs"], "python3 scripts/audit_docs_links.py")
         self.assertEqual(scripts["audit:web-console"], "python3 scripts/audit_web_console.py")
+        self.assertIn(f'VERSION = "{VERSION}"', (ROOT / "scripts/audit_web_console.py").read_text(encoding="utf-8"))
         self.assertEqual(scripts["audit:brief"], "python3 scripts/audit_brief_contract.py")
         self.assertEqual(scripts["audit:visual-intent"], "python3 scripts/audit_visual_intent.py")
         self.assertEqual(scripts["audit:feedback-loop"], "python3 scripts/audit_feedback_loop.py")
