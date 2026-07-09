@@ -381,7 +381,7 @@ const bridgeDocUrl = `${repoUrl}/blob/main/docs/guides/agent-connect-bridge.md`;
 const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-web-brief-v4";
 const appVersion = "5.4.0";
-const bestEffectMarketplacePrompt = "Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.";
+const bestEffectMarketplacePrompt = "Use $ultimate-ppt-master with any natural-language presentation request. It will expand the request into a best-effect brief, choose PPTX or Web Deck, and run the matching quality checks.";
 
 const designDoctorScores = [
   {
@@ -608,7 +608,7 @@ const labels = {
     visualBriefPanel: "可视化需求标签",
     visualBriefSubtitle: "用标签快速说明场景、受众、目的、风格、素材和输出偏好；也可以继续粘贴背景和特殊要求。",
     bestEffectTitle: "最佳效果提示增强器",
-    bestEffectSubtitle: "Agent 会先把你的短指令自动扩写成可执行 brief；极短指令默认走 Guizang-like Magazine Web Deck fixed style。",
+    bestEffectSubtitle: "Agent 会先把你的短指令自动扩写成可执行 brief；极短指令默认走 Style A Editorial Fixed Rhythm。",
     bestEffectDefault: "极短指令稳定默认",
     bestEffectDefaultText: "只有主题或一句话时：默认 8 页杂志化 Web Deck，Style A · 电子杂志 × 电子墨水，先出稳定高质量版本。",
     bestEffectFormal: "正式可编辑例外",
@@ -867,7 +867,7 @@ const labels = {
     visualBriefPanel: "Visual brief tags",
     visualBriefSubtitle: "Use tags to clarify scenario, audience, purpose, style, assets, and output. Paste background and special constraints when needed.",
     bestEffectTitle: "Best-Effect Brief Enhancer",
-    bestEffectSubtitle: "The Agent expands short requests into an executable brief first; extremely thin prompts default to Guizang-like Magazine Web Deck fixed style.",
+    bestEffectSubtitle: "The Agent expands short requests into an executable brief first; extremely thin prompts default to Style A Editorial Fixed Rhythm.",
     bestEffectDefault: "Stable default for thin prompts",
     bestEffectDefaultText: "When there is only a topic or one line: default to an 8-page magazine Web Deck, Style A editorial/e-ink, and produce a stable high-quality version first.",
     bestEffectFormal: "Formal editable exception",
@@ -4099,7 +4099,7 @@ function assessExpectationFit(form: FormState, sources: UploadedSource[]): Expec
     assumptions.push(zh ? `按标签中的目标受众组织内容。` : "Use the selected audience tags as the audience contract.");
   }
   if (["no-source", "topic-only"].includes(sourceAdequacy) && !explicitFormalEditableRequested({ ...form, visualBrief: brief })) {
-    assumptions.push(zh ? "v5.3 极短指令默认先走 Guizang-like 杂志化 Web Deck 稳定样式；若用户明确要正式可编辑汇报，再改走 PPTX。" : "v5.3 extremely thin prompts default to the Guizang-like Magazine Web Deck fixed style first; switch to PPTX when the user explicitly needs a formal editable report.");
+    assumptions.push(zh ? "v5.3 极短指令默认先走 Style A Editorial Fixed Rhythm；若用户明确要正式可编辑汇报，再改走 PPTX。" : "v5.3 extremely thin prompts default to Style A Editorial Fixed Rhythm first; switch to PPTX when the user explicitly needs a formal editable report.");
   } else {
     assumptions.push(zh ? "默认输出可编辑 PPTX，必要时附 Web 预览。" : "Default to editable PPTX, with Web preview when requested.");
   }
@@ -4221,7 +4221,7 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
         : formalEditable
           ? "formal-editable-pptx"
           : "guizang-web-fixed-style";
-  const routeName = swissIntent && !formalEditable ? "Swiss Style Web Deck locked Sxx route" : "Guizang-like Magazine Web Deck fixed style";
+  const routeName = swissIntent && !formalEditable ? "Swiss Style Web Deck locked Sxx route" : "Style A Editorial Fixed Rhythm";
   const styleName = swissIntent && !formalEditable ? "Style B · Swiss International" : "Style A · 电子杂志 × 电子墨水";
   const fixedStyleFallback = {
     trigger: zh
@@ -4296,14 +4296,14 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
   const agentInstructions = zh
     ? [
       "Best-Effect Brief Enhancer: 生产前先把用户短指令改写成 bestEffectBrief，不要直接用原句开做。",
-      "Extreme Thin Prompt Fallback: 如果只有主题或一句话，且没有明确要求正式可编辑 PPTX，默认使用 Guizang-like Magazine Web Deck fixed style。",
+      "Extreme Thin Prompt Fallback: 如果只有主题或一句话，且没有明确要求正式可编辑 PPTX，默认使用 Style A Editorial Fixed Rhythm。",
       "若用户明确说正式汇报、政府/金融/培训、可编辑 PPTX，则走 formal-editable-pptx，但保留同样的 bestEffectBrief 和质量检查。",
       "只有事实、品牌/IP、合规或来源边界会实质改变交付时才暂停追问；一般风格和结构由 bestEffectBrief 自动补齐。",
       "最终交付要说明哪些内容来自用户、哪些是自动扩写假设。"
     ]
     : [
       "Best-Effect Brief Enhancer: rewrite the user's short instruction into bestEffectBrief before production.",
-      "Extreme Thin Prompt Fallback: if there is only a topic or one line, and no explicit formal editable PPTX request, default to Guizang-like Magazine Web Deck fixed style.",
+      "Extreme Thin Prompt Fallback: if there is only a topic or one line, and no explicit formal editable PPTX request, default to Style A Editorial Fixed Rhythm.",
       "If the user explicitly asks for formal reporting, government/finance/training, or editable PPTX, use formal-editable-pptx while keeping the same bestEffectBrief and quality checks.",
       "Pause only when missing facts, brand/IP, compliance, or source boundaries would materially change delivery; fill normal style and structure gaps automatically.",
       "Final delivery must state what came from the user and what was auto-expanded."
@@ -5830,7 +5830,7 @@ ${visualBriefText}
 
 ### Codex 执行规则
 - 先执行 Best-Effect Brief Enhancer：不要直接把用户短指令拿去生成，必须先按 project-brief.json.bestEffectBrief 自动扩写最佳效果 brief。
-- 若 bestEffectBrief.strategy=best-effect-fixed-style，执行 Extreme Thin Prompt Fallback，默认走 Guizang-like Magazine Web Deck fixed style，不再追问普通风格偏好。
+- 若 bestEffectBrief.strategy=best-effect-fixed-style，执行 Extreme Thin Prompt Fallback，默认走 Style A Editorial Fixed Rhythm，不再追问普通风格偏好。
 - 如果 expectationFit.readyForProduction 为 false，先进入分步需求访谈，不要直接制作正式 PPT。
 - 每轮只问一组相关问题，按顺序问清：给谁看、什么场景、希望对方做什么、内容来源、核心观点、页数/章节、视觉风格、品牌/IP/官方素材、输出格式、禁忌边界。
 - 用户回答后整理一份需求确认稿，写入 project-brief.json / quality-report.json 的 guidedBrief 和 expectationFit。
@@ -5909,7 +5909,7 @@ ${visualBriefText}
 
 ### Codex execution rules
 - Run the Best-Effect Brief Enhancer first: do not generate directly from the user's short instruction; expand the best-effect brief from project-brief.json.bestEffectBrief.
-- If bestEffectBrief.strategy=best-effect-fixed-style, follow the Extreme Thin Prompt Fallback and use Guizang-like Magazine Web Deck fixed style without asking more ordinary style questions.
+- If bestEffectBrief.strategy=best-effect-fixed-style, follow the Extreme Thin Prompt Fallback and use Style A Editorial Fixed Rhythm without asking more ordinary style questions.
 - If expectationFit.readyForProduction is false, run guided intake before final deck production.
 - Ask one coherent group of related questions per turn, covering audience, usage setting, desired action, content source, core message, slide count / sections, visual style, brand/IP/official assets, output format, and must-avoid boundaries.
 - After the user answers, write a concise confirmation brief and update guidedBrief plus expectationFit in project-brief.json / quality-report.json.
@@ -5961,7 +5961,7 @@ function buildCodexAgentGuide(form: FormState, sources: UploadedSource[], qualit
 - 编辑或生成前先读 codex-task.md。
 - 先看 project-brief.json 的 bestEffectBrief、briefMode、visualBrief、guidedBrief、expectationFit、sourceConfidence、deliveryScorecard、referenceStyle 和 feedbackLoop；如果 readyForProduction=false，必须先分步问清需求。
 - Best-Effect Brief Enhancer：生产前先根据 bestEffectBrief 自动扩写最佳效果 brief，不要直接按用户短指令开做。
-- Extreme Thin Prompt Fallback：当前 bestEffectBrief 为 ${bestEffectBrief.strategy} / ${bestEffectBrief.promptQuality}；如果是 best-effect-fixed-style，默认用 Guizang-like Magazine Web Deck fixed style。
+- Extreme Thin Prompt Fallback：当前 bestEffectBrief 为 ${bestEffectBrief.strategy} / ${bestEffectBrief.promptQuality}；如果是 best-effect-fixed-style，默认用 Style A Editorial Fixed Rhythm。
 - 分步问清每轮只问一组相关问题，直到受众、场景、目的、资料、核心观点、页数、风格、素材边界、输出和禁忌明确。
 - 当前 expectationFit：${expectationFit.riskLevel} / ${expectationFit.score}%；${expectationFit.readyForProduction ? "可以进入生产，但仍需记录假设。" : "需要 guided intake 后再生产。"}
 - 当前 sourceConfidence：${sourceConfidenceLabel(v52.sourceConfidence.level, "zh")}；不可编造：${v52.sourceConfidence.doNotInvent.join("、")}。
@@ -5986,7 +5986,7 @@ function buildCodexAgentGuide(form: FormState, sources: UploadedSource[], qualit
 - Read codex-task.md before editing or generating deliverables.
 - Read bestEffectBrief, briefMode, visualBrief, guidedBrief, expectationFit, sourceConfidence, deliveryScorecard, referenceStyle, and feedbackLoop in project-brief.json first; if readyForProduction=false, run guided intake before production.
 - Best-Effect Brief Enhancer: auto-expand the best-effect brief from bestEffectBrief before production; do not work directly from the user's short instruction.
-- Extreme Thin Prompt Fallback: current bestEffectBrief is ${bestEffectBrief.strategy} / ${bestEffectBrief.promptQuality}; if it is best-effect-fixed-style, default to Guizang-like Magazine Web Deck fixed style.
+- Extreme Thin Prompt Fallback: current bestEffectBrief is ${bestEffectBrief.strategy} / ${bestEffectBrief.promptQuality}; if it is best-effect-fixed-style, default to Style A Editorial Fixed Rhythm.
 - Guided intake asks one related question group at a time until audience, setting, purpose, sources, core message, slide count, style, asset boundary, output, and must-avoid rules are clear.
 - Current expectationFit: ${expectationFit.riskLevel} / ${expectationFit.score}%; ${expectationFit.readyForProduction ? "production may start after recording assumptions." : "guided intake is required before production."}
 - Current sourceConfidence: ${sourceConfidenceLabel(v52.sourceConfidence.level, "en")}; do not invent: ${v52.sourceConfidence.doNotInvent.join(", ")}.

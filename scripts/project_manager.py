@@ -20,6 +20,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 try:
+    from pipeline_state import init_pipeline_state
     from project_utils import (
         CANVAS_FORMATS,
         get_project_info as get_project_info_common,
@@ -31,6 +32,7 @@ except ImportError:
     tools_dir = Path(__file__).resolve().parent
     if str(tools_dir) not in sys.path:
         sys.path.insert(0, str(tools_dir))
+    from pipeline_state import init_pipeline_state  # type: ignore
     from project_utils import (  # type: ignore
         CANVAS_FORMATS,
         get_project_info as get_project_info_common,
@@ -168,6 +170,7 @@ class ProjectManager:
             ),
             encoding="utf-8",
         )
+        init_pipeline_state(project_path)
 
         print(f"Project created: {project_path}")
         print(f"Canvas: {canvas_info['name']} ({canvas_info['dimensions']})")

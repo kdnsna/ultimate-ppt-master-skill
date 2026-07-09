@@ -247,7 +247,7 @@ test("web experience exposes the v5.3 best-effect brief enhancer contract", asyn
   assert.match(appSource, /bestEffectBrief/);
   assert.match(appSource, /best-effect-expanded/);
   assert.match(appSource, /best-effect-fixed-style/);
-  assert.match(appSource, /Guizang-like Magazine Web Deck fixed style/);
+  assert.match(appSource, /Style A Editorial Fixed Rhythm/);
   assert.match(appSource, /Extreme Thin Prompt Fallback/);
   assert.match(appSource, /BestEffectGuide/);
   assert.match(appSource, /best-effect-guide/);

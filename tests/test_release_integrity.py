@@ -112,148 +112,103 @@ class ReleaseIntegrityTest(unittest.TestCase):
             self.assertTrue("Document Moved" in text or "文档已迁移" in text)
             self.assertIn(canonical, text)
 
-    def test_v5_readmes_are_refactored_as_delivery_homepages(self):
+    def test_v5_readmes_are_refactored_as_truthful_homepages(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
-        marketplace_prompt = (
-            "Use $ultimate-ppt-master to expand my short request into a "
-            "best-effect brief first. If my prompt is extremely thin, use the "
-            "Guizang-like Magazine Web Deck fixed style by default; if I "
-            "explicitly need a formal editable deck, use PPTX and keep the "
-            "same quality checks."
-        )
 
         for expected in (
             "60-second quickstart",
-            "Why Teams Use It",
-            "What v5 Changes",
-            "Product Loop",
-            "v5.3.0 Notes",
+            "Real Proof Packs",
+            "Routes",
+            "Dependencies and Degradation",
+            "Known Limits",
+            "Acknowledgments",
+            "Style A Editorial Fixed Rhythm",
+            "Proof Packs",
             "Release Notes - v5.2.0",
             "Release Notes - v5.1.0",
-            "sourceConfidence",
-            "deliveryScorecard",
-            "feedbackLoop",
-            "referenceStyle",
-            "Editable PPTX first",
-            "Visual Brief Builder",
-            "Codex Guided Intake",
+            "self-assessed by Design Doctor",
             "project-brief.json",
+            "asset_plan.json",
+            "current_generation_evidence",
+            "pipeline-state.json",
+            "Needs-Manual",
             "expectationFit",
-            "one delivery brief",
-            "official/IP asset plan",
-            "Codex-first generated visuals",
-            "Theme art direction",
-            "山海交汇 烟火同行",
-            "Microsoft YaHei",
-            "formal delivery audits",
-            "v4.3 Rendered Review Loop",
-            "revision-brief.md",
-            "repair-plan.json",
-            "Simplified Web Console v4.1",
-            "DeckIR AI Planning Workflow v4.2",
-            "Hybrid-Editable Visual Workflow v4.0",
-            "one primary next action",
-            "storyboard.json",
-            "scripts/ai_storyboard.py",
-            "scripts/apply_review_plan.py",
-            "page recipes",
-            "no-text generated visual layers",
-            "npm run audit:web-console",
-            "scripts/audit_visual_recipes.py",
-            "Benchmark Wall",
-            "Skill Market Distribution",
-            "npm run audit:docs",
-            "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
-            "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
-            "./docs/quality/rendered-review-loop-v4.3.md",
             "./docs/release/release-notes-v5.2.0.md",
             "./docs/release/release-notes-v5.1.0.md",
             "./docs/release/release-notes-v5.0.0.md",
-            "./docs/release/release-notes-v4.3.0.md",
-            "./docs/strategy/skill-market-distribution.md",
-            marketplace_prompt,
         ):
             self.assertIn(expected, readme)
 
         for expected in (
             "60 秒开箱即用",
-            "为什么团队会用它",
-            "v5 做对了什么",
-            "产品闭环",
-            "v5.3.0 说明",
+            "真实 Proof Packs",
+            "路线选择",
+            "依赖与降级",
+            "已知限制",
+            "致谢",
+            "Style A Editorial Fixed Rhythm",
+            "Proof Packs",
             "发布说明 - v5.2.0",
             "发布说明 - v5.1.0",
-            "sourceConfidence",
-            "deliveryScorecard",
-            "feedbackLoop",
-            "referenceStyle",
-            "可编辑 PPTX 优先",
-            "Visual Brief Builder",
-            "Codex 分步访谈",
+            "Design Doctor 自评",
             "project-brief.json",
+            "asset_plan.json",
+            "current_generation_evidence",
+            "pipeline-state.json",
+            "Needs-Manual",
             "expectationFit",
-            "一份交付简报",
-            "官方/IP 素材计划",
-            "Codex-first 生成视觉",
-            "主题艺术方向",
-            "山海交汇 烟火同行",
-            "微软雅黑",
-            "正式交付审计",
-            "v4.3 渲染审阅闭环",
-            "revision-brief.md",
-            "repair-plan.json",
-            "v4.1 精简网页控制台",
-            "v4.2 DeckIR AI 策划工作流",
-            "v4.0 混合可编辑视觉工作流",
-            "一个状态驱动主按钮",
-            "storyboard.json",
-            "scripts/ai_storyboard.py",
-            "scripts/apply_review_plan.py",
-            "页面配方",
-            "无文字生成式视觉层",
-            "npm run audit:web-console",
-            "scripts/audit_visual_recipes.py",
-            "公开案例墙",
-            "Skill 市场分发",
-            "npm run audit:docs",
-            "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
-            "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
-            "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
             "./docs/zh-CN/release/release-notes-v5.2.0.md",
             "./docs/zh-CN/release/release-notes-v5.1.0.md",
             "./docs/zh-CN/release/release-notes-v5.0.0.md",
-            "./docs/zh-CN/release/release-notes-v4.3.0.md",
-            "./docs/zh-CN/strategy/skill-market-distribution.md",
-            marketplace_prompt,
         ):
             self.assertIn(expected, readme_zh)
 
-    def test_stability_upgrade_surface_is_documented(self):
+        for banned in (
+            "Best Results Prompt",
+            "What v5 Changes",
+            "v5 Delivery Standard",
+            "Repository Map",
+            "Production Stability Guardrails",
+            "Quality Gates",
+            "Guizang-like",
+            "Benchmark Wall",
+            "Skill Market Distribution",
+        ):
+            self.assertNotIn(banned, readme)
+            self.assertNotIn(banned, readme_zh)
+
+        self.assertLessEqual(len(readme.splitlines()), 230)
+        self.assertLessEqual(len(readme_zh.splitlines()), 230)
+
+    def test_maintainer_guardrails_live_outside_readme(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        release_maintenance = (ROOT / "docs/release/release-maintenance.md").read_text(encoding="utf-8")
 
         for expected in (
-            "Production Stability Guardrails",
             "UPSTREAM_SYNC.md",
             "audit:repo-hygiene",
-            "audit:image-contracts",
             "Do not copy post-AGPL Guizang code directly",
             "prompt files before generation",
             "forbid bitmap text overlay repair",
         ):
-            self.assertIn(expected, readme)
+            self.assertIn(expected, release_maintenance)
+            self.assertNotIn(expected, readme)
+
+        self.assertIn("audit:image-contracts", release_maintenance)
+        self.assertIn("audit:image-contracts", readme)
 
         for expected in (
-            "生产稳定性门禁",
             "UPSTREAM_SYNC.md",
             "audit:repo-hygiene",
-            "audit:image-contracts",
             "不直接复制 AGPL 后的归藏代码",
             "先写 prompt 文件再生成",
             "禁止用位图覆盖方式修补生成图文字",
         ):
-            self.assertIn(expected, readme_zh)
+            self.assertNotIn(expected, readme_zh)
+
+        self.assertIn("audit:image-contracts", readme_zh)
 
     def test_v54_swiss_deck_asset_factory_surface_is_documented(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -264,8 +219,12 @@ class ReleaseIntegrityTest(unittest.TestCase):
             package["scripts"]["audit:swiss-deck"],
             "node scripts/validate-swiss-deck.mjs examples/swiss-v54-demo/index.html",
         )
+        self.assertEqual(
+            package["scripts"]["audit:magazine-deck"],
+            "node scripts/validate-magazine-deck.mjs examples/magazine-v54-demo/index.html",
+        )
         for expected in (
-            "v5.4 Swiss Deck + Asset Factory",
+            "v5.4 Swiss Deck and Asset Factory",
             "Style B Swiss International",
             "asset_plan.json",
             "current_generation_evidence",
@@ -277,14 +236,14 @@ class ReleaseIntegrityTest(unittest.TestCase):
             self.assertIn(expected, readme)
 
         for expected in (
-            "v5.4 瑞士风 Deck + 资产工厂",
+            "v5.4 瑞士风 Deck 与资产工厂",
             "Style B 瑞士国际主义",
             "asset_plan.json",
             "current_generation_evidence",
             "npm run audit:swiss-deck",
             "examples/swiss-v54-demo/index.html",
-            "宝玉 Skills v2.5.2",
-            "归藏 v1.1.0",
+            "Baoyu Skills v2.5.2",
+            "Guizang v1.1.0",
         ):
             self.assertIn(expected, readme_zh)
 
@@ -298,8 +257,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         self.assertTrue((ROOT / "docs/strategy/skill-market-distribution.md").is_file())
         self.assertTrue((ROOT / "docs/zh-CN/strategy/skill-market-distribution.md").is_file())
-        self.assertIn("Skill Market Distribution", readme)
-        self.assertIn("Skill 市场分发", readme_zh)
+        self.assertNotIn("Skill Market Distribution", readme)
+        self.assertNotIn("Skill 市场分发", readme_zh)
         self.assertIn("Skill Market Distribution", docs_index)
         self.assertIn("Skill 市场分发", docs_index_zh)
         self.assertEqual(listing["metadata"]["distributionGuide"], "docs/strategy/skill-market-distribution.md")
@@ -324,49 +283,90 @@ class ReleaseIntegrityTest(unittest.TestCase):
         listing = json.loads((ROOT / "agents/marketplace-listing.json").read_text(encoding="utf-8"))
 
         best_effect_prompt = (
-            "Use $ultimate-ppt-master to expand my short request into a best-effect brief first. "
-            "If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; "
-            "if I explicitly need a formal editable deck, use PPTX and keep the same quality checks."
+            "Use $ultimate-ppt-master with any natural-language presentation request. "
+            "It will expand the request into a best-effect brief, choose PPTX or Web Deck, "
+            "and run the matching quality checks."
         )
 
         for expected in (
             "Best-Effect Brief Enhancer",
-            "Best Results Prompt",
-            "Guizang-like Magazine Web Deck fixed style",
+            "Style A Editorial Fixed Rhythm",
             "extremely thin prompt",
             "Auto-expanded brief",
-            best_effect_prompt,
         ):
             self.assertIn(expected, readme)
 
         for expected in (
             "最佳效果提示增强器",
-            "最佳使用提示",
-            "Guizang-like Magazine Web Deck fixed style",
+            "Style A Editorial Fixed Rhythm",
             "极短指令",
             "自动扩写 brief",
-            best_effect_prompt,
         ):
             self.assertIn(expected, readme_zh)
 
-        for text in (skill, prompt, agents):
+        for text in (prompt, agents):
             self.assertIn("Best-Effect Brief Enhancer", text)
             self.assertIn("Extreme Thin Prompt Fallback", text)
-            self.assertIn("Guizang-like Magazine Web Deck fixed style", text)
+            self.assertIn("Style A Editorial Fixed Rhythm", text)
+            self.assertNotIn("Guizang-like Magazine Web Deck fixed style", text)
             self.assertIn("bestEffectBrief", text)
 
-        self.assertIn(best_effect_prompt, openai_yaml)
+        self.assertIn("Best-Effect Brief Enhancer", skill)
+        self.assertIn("Extreme Thin Prompt Fallback", skill)
+        self.assertIn("guizang-web-fixed-style", skill)
+        self.assertIn("bestEffectBrief", skill)
+
         self.assertEqual(listing["defaultPrompt"], best_effect_prompt)
         self.assertIn("best-effect brief", listing["positioning"])
 
-    def test_public_benchmark_page_lists_all_quality_proofs(self):
+    def test_skill_workflow_wires_route_asset_and_execution_guards(self):
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+
+        for expected in (
+            "Route Decision Order",
+            "explicit-formal-signal",
+            "formal/editable keywords outrank prompt thinness",
+            "python3 ${SKILL_DIR}/scripts/best_effect_router.py",
+            "scripts/build_asset_plan.py",
+            "asset_plan.json",
+            "python3 ${SKILL_DIR}/scripts/image_gen.py --asset-plan",
+            "current_generation_evidence",
+            "pipeline-state.json",
+            "scripts/spec_lock_slice.py",
+            "scripts/execution_budget.py",
+            "spec_lock.md line budget",
+            "resume-execute",
+            "node \"${SKILL_DIR}/scripts/validate-magazine-deck.mjs\"",
+            "references/magazine-web/swiss-layout-registry.json",
+            "Needs-Manual image rows block Step 6",
+        ):
+            self.assertIn(expected, skill)
+
+        for script in (
+            "scripts/build_asset_plan.py",
+            "scripts/best_effect_router.py",
+            "scripts/spec_lock_slice.py",
+            "scripts/execution_budget.py",
+            "scripts/validate-magazine-deck.mjs",
+            "references/magazine-web/swiss-layout-registry.json",
+        ):
+            self.assertTrue((ROOT / script).is_file(), script)
+
+        self.assertIn("audit:magazine-deck", package["scripts"])
+
+    def test_public_proof_packs_page_lists_all_quality_proofs(self):
         benchmark = ROOT / "apps/web/public/benchmark/index.html"
         self.assertTrue(benchmark.is_file())
         page = benchmark.read_text(encoding="utf-8")
 
-        self.assertIn("Ultimate PPT Master Benchmark Wall", page)
-        self.assertIn("input → preset → output → review", page)
-        self.assertIn("Skill Market Distribution", page)
+        self.assertIn("Ultimate PPT Master Proof Packs", page)
+        self.assertIn("input -> preset -> output -> review", page)
+        self.assertIn("self-assessed by Design Doctor", page)
+        self.assertIn("Input excerpt", page)
+        self.assertIn("Rubric", page)
+        self.assertNotIn("Skill Market Distribution", page)
+        self.assertNotIn("Benchmark Wall", page)
         for path in (
             "examples/executive-business-review-starter/web-demo.html",
             "examples/consulting-proposal-starter/web-demo.html",

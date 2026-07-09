@@ -146,9 +146,9 @@ def audit_readme_surfaces(errors: list[str]) -> None:
     for needle in (
         "60-second quickstart",
         "Hybrid-Editable Visual Workflow v4.0",
+        "Proof Packs",
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
-        "Skill Market Distribution",
-        "./docs/strategy/skill-market-distribution.md",
+        "Known Limits",
         "./docs/release/release-notes-v5.1.0.md",
         "./docs/quality/rendered-review-loop-v4.3.md",
     ):
@@ -157,9 +157,9 @@ def audit_readme_surfaces(errors: list[str]) -> None:
     for needle in (
         "60 秒开箱即用",
         "v4.0 混合可编辑视觉工作流",
+        "Proof Packs",
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
-        "Skill 市场分发",
-        "./docs/zh-CN/strategy/skill-market-distribution.md",
+        "已知限制",
         "./docs/zh-CN/release/release-notes-v5.1.0.md",
         "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
     ):
@@ -173,9 +173,14 @@ def audit_benchmark_wall(errors: list[str]) -> None:
         return
 
     text = read_text(benchmark)
-    require("Ultimate PPT Master Benchmark Wall" in text, "benchmark page missing title", errors)
-    require("input → preset → output → review" in text, "benchmark page missing proof chain", errors)
-    require("Skill Market Distribution" in text, "benchmark page missing skill-market link", errors)
+    require("Ultimate PPT Master Proof Packs" in text, "proof packs page missing title", errors)
+    require("input -> preset -> output -> review" in text, "proof packs page missing proof chain", errors)
+    require("self-assessed by Design Doctor" in text, "proof packs page missing self-assessment disclosure", errors)
+    require("Input excerpt" in text, "proof packs page missing input excerpts", errors)
+    require("Rubric" in text, "proof packs page missing rubric link", errors)
+    require("Skill Market Distribution" not in text, "proof packs page should not link marketplace strategy", errors)
+    old_branding = "Benchmark" + " Wall"
+    require(old_branding not in text, "proof packs page should not use old branding", errors)
     require("Design Doctor scorecard" in text, "benchmark page missing Design Doctor scorecard", errors)
     require("report-only repair policy" in text, "benchmark page missing report-only repair policy", errors)
 

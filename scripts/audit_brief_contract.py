@@ -20,7 +20,7 @@ CHECKS = {
         "buildBestEffectBrief",
         "bestEffectBrief",
         "Extreme Thin Prompt Fallback",
-        "Guizang-like Magazine Web Deck fixed style",
+        "Style A Editorial Fixed Rhythm",
         "sourceConfidence",
         "deliveryScorecard",
         "confirmationBrief",

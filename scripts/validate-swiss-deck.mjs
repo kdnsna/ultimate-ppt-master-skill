@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const file = process.argv[2];
 const allowExperimental = process.argv.includes('--allow-experimental');
@@ -11,29 +13,36 @@ if (!file) {
 
 const html = readFileSync(file, 'utf8');
 const htmlForSlides = html.replace(/<!--[\s\S]*?-->/g, '');
+const styleBlock = [...htmlForSlides.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join('\n');
+const htmlWithoutStyles = htmlForSlides.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
 const errors = [];
 const warnings = [];
 
-const allowedLayouts = new Set([
-  'SWISS-COVER-ASCII',
-  'SWISS-CLOSING-ASCII',
-  ...Array.from({ length: 22 }, (_, i) => `S${String(i + 1).padStart(2, '0')}`),
-]);
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const registryPath = join(scriptDir, '..', 'references', 'magazine-web', 'swiss-layout-registry.json');
+const layoutRegistry = JSON.parse(readFileSync(registryPath, 'utf8'));
+const layouts = layoutRegistry.layouts ?? {};
+const allowedLayouts = new Set(Object.keys(layouts));
 
 const slideRe = /<section\b[^>]*class="[^"]*\bslide\b[^"]*"[^>]*>[\s\S]*?<\/section>/g;
+const slideStartCount = [...htmlForSlides.matchAll(/<section\b[^>]*class="[^"]*\bslide\b[^"]*"[^>]*>/g)].length;
 const slides = [...htmlForSlides.matchAll(slideRe)].map((m, idx) => ({ idx: idx + 1, html: m[0], tag: m[0].match(/<section\b[^>]*>/)?.[0] ?? '' }));
+
+if (slideStartCount !== slides.length) {
+  errors.push(`slide section count mismatch: found ${slideStartCount} slide opening tag(s) but ${slides.length} complete slide section(s).`);
+}
 
 if (!slides.length) {
   errors.push('No <section class="slide"> pages found.');
 }
 
 function attr(tag, name) {
-  return tag.match(new RegExp(`\\b${name}="([^"]*)"`))?.[1] ?? '';
+  return tag.match(new RegExp(`\\b${name}=["']([^"']*)["']`))?.[1] ?? '';
 }
 
 function roleForTag(tag) {
   const className = attr(tag, 'class');
-  if (/\b(?:t-meta|meta|kicker|mono|label)\b/i.test(className)) return 'meta';
+  if (/\b(?:t-meta|meta|kicker|mono|label|foot)\b/i.test(className)) return 'meta';
   if (/\b(?:caption|img-cap|figcaption|note)\b/i.test(className)) return 'caption';
   return 'body';
 }
@@ -44,12 +53,58 @@ function minFontForRole(role) {
   return 18;
 }
 
+function collectDefinedClasses(css) {
+  return new Set([...css.matchAll(/\.([_a-zA-Z][\w-]*)/g)].map((match) => match[1]));
+}
+
+function collectClassFontSizes(css) {
+  const classSizes = new Map();
+  for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+    const selector = rule[1];
+    const body = rule[2];
+    const font = body.match(/font-size\s*:\s*([0-9.]+)\s*(px|rem|em|vh|vw)\b/i);
+    if (!font) continue;
+    for (const classMatch of selector.matchAll(/\.([_a-zA-Z][\w-]*)/g)) {
+      classSizes.set(classMatch[1], {
+        size: Number.parseFloat(font[1]),
+        unit: font[2].toLowerCase(),
+      });
+    }
+  }
+  return classSizes;
+}
+
+const definedClasses = collectDefinedClasses(styleBlock);
+const classFontSizes = collectClassFontSizes(styleBlock);
+
+function classList(tag) {
+  return attr(tag, 'class').split(/\s+/).map((value) => value.trim()).filter(Boolean);
+}
+
+function auditUndefinedClasses(slide) {
+  const classAttrs = [...slide.html.matchAll(/\bclass=["']([^"']+)["']/gi)];
+  const missing = new Set();
+  classAttrs.forEach((match) => {
+    match[1].split(/\s+/).filter(Boolean).forEach((name) => {
+      if (!definedClasses.has(name)) missing.add(name);
+    });
+  });
+  if (missing.size) {
+    errors.push(`Slide ${slide.idx}: undefined CSS class(es): ${[...missing].sort().join(', ')}.`);
+  }
+}
+
 function auditInlineFontSizes(slide) {
-  const styledTags = [...slide.html.matchAll(/<([a-z][\w:-]*)\b[^>]*style="([^"]*font-size\s*:\s*([0-9.]+)px[^"]*)"[^>]*>/gi)];
+  const styledTags = [...slide.html.matchAll(/<([a-z][\w:-]*)\b[^>]*style="([^"]*font-size\s*:\s*([0-9.]+)\s*(px|rem|em|vh|vw)[^"]*)"[^>]*>/gi)];
   styledTags.forEach((match) => {
     const tag = match[0];
     const size = Number.parseFloat(match[3]);
+    const unit = match[4].toLowerCase();
     if (!Number.isFinite(size)) return;
+    if (unit !== 'px') {
+      warnings.push(`Slide ${slide.idx}: inline non-px font-size ${size}${unit}; confirm Swiss minimum after conversion.`);
+      return;
+    }
 
     const role = roleForTag(tag);
     const min = minFontForRole(role);
@@ -60,12 +115,63 @@ function auditInlineFontSizes(slide) {
   });
 }
 
+function auditClassFontSizes(slide) {
+  const tags = [...slide.html.matchAll(/<([a-z][\w:-]*)\b[^>]*\bclass=["'][^"']+["'][^>]*>/gi)];
+  const warned = new Set();
+  tags.forEach((match) => {
+    const tag = match[0];
+    for (const name of classList(tag)) {
+      const font = classFontSizes.get(name);
+      if (!font || !Number.isFinite(font.size)) continue;
+      if (font.unit !== 'px') {
+        const key = `${slide.idx}:${name}:${font.size}${font.unit}`;
+        if (!warned.has(key)) {
+          warnings.push(`Slide ${slide.idx}: class .${name} uses non-px font-size ${font.size}${font.unit}; confirm Swiss minimum after conversion.`);
+          warned.add(key);
+        }
+        continue;
+      }
+      const role = roleForTag(tag);
+      const min = minFontForRole(role);
+      if (font.size < min) {
+        const label = role === 'meta' ? 'meta text' : role === 'caption' ? 'caption text' : 'body text';
+        errors.push(`Slide ${slide.idx}: ${label} below ${min}px Swiss minimum (${font.size}px via .${name}).`);
+      }
+    }
+  });
+}
+
 function auditBottomSafeZone(slide) {
-  const bottomRisk = /align-(?:self|items)\s*:\s*end|bottom\s*:\s*(?:0|2vh)\b|margin-top\s*:\s*auto/i.test(slide.html);
+  const bottomRisk = /align-(?:self|items)\s*:\s*(?:flex-)?end|bottom\s*:\s*(?:0|[0-4](?:\.\d+)?(?:vh|%|px|rem))\b|margin-top\s*:\s*auto/i.test(slide.html);
   const hasSafeClass = /\bnav-safe-bottom(?:-tight)?\b/.test(slide.html);
   if (bottomRisk && !hasSafeClass) {
     errors.push(`Slide ${slide.idx}: bottom-aligned content needs a bottom nav safe zone class.`);
   }
+}
+
+function auditLayoutSignature(slide, layout) {
+  const signature = layouts[layout] ?? {};
+  const requiredClasses = Array.isArray(signature.requiredClasses) ? signature.requiredClasses : [];
+  const requiredImageSlots = Array.isArray(signature.requiredImageSlots) ? signature.requiredImageSlots : [];
+  const classNames = new Set([...slide.html.matchAll(/\bclass=["']([^"']+)["']/gi)].flatMap((match) => match[1].split(/\s+/).filter(Boolean)));
+  const missingClasses = requiredClasses.filter((name) => !classNames.has(name));
+  const missingSlots = requiredImageSlots.filter((slot) => !new RegExp(`\\bdata-image-slot=["']${slot}["']`).test(slide.html));
+  if (missingClasses.length || missingSlots.length) {
+    const parts = [];
+    if (missingClasses.length) parts.push(`class ${missingClasses.join(', ')}`);
+    if (missingSlots.length) parts.push(`image slot ${missingSlots.join(', ')}`);
+    errors.push(`Slide ${slide.idx}: layout signature for ${layout} missing ${parts.join('; ')}.`);
+  }
+}
+
+function objectPositionCropsTop(value) {
+  const parts = value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return false;
+  if (parts.includes('top')) return true;
+  const vertical = parts.length === 1 ? parts[0] : parts[1];
+  const numeric = vertical.match(/^([0-9]+(?:\.[0-9]+)?)(%|px|rem|vh)?$/);
+  if (!numeric) return false;
+  return Number.parseFloat(numeric[1]) <= 10;
 }
 
 slides.forEach((slide) => {
@@ -74,8 +180,9 @@ slides.forEach((slide) => {
   if (!layout) {
     errors.push(`Slide ${slide.idx}: missing data-layout. Swiss locked mode requires S01-S22 or SWISS-COVER-ASCII/SWISS-CLOSING-ASCII.`);
   } else if (!allowedLayouts.has(layout)) {
-    errors.push(`Slide ${slide.idx}: data-layout="${layout}" is not registered in swiss-layout-lock.md.`);
+    errors.push(`Slide ${slide.idx}: data-layout="${layout}" is not registered in swiss-layout-registry.json.`);
   }
+  if (layout && allowedLayouts.has(layout)) auditLayoutSignature(slide, layout);
 
   if (!allowExperimental && /\bdata-layout="P2[34]\b|Swiss Image Split|Swiss Evidence Grid|swiss-img-split|swiss-img-grid/.test(slide.html)) {
     errors.push(`Slide ${slide.idx}: uses experimental P23/P24 image structure. Use S22 or S15/S16 image-grid adaptations instead.`);
@@ -131,12 +238,17 @@ slides.forEach((slide) => {
     if (!/data-image-slot="s22-hero-21x9"/.test(slide.html)) {
       errors.push(`Slide ${slide.idx}: S22 must use data-image-slot="s22-hero-21x9".`);
     }
-    if (/object-position\s*:\s*top center/i.test(slide.html)) {
-      errors.push(`Slide ${slide.idx}: S22 photo uses object-position:top center, which commonly crops faces. Use center 35% or center center.`);
+    for (const match of slide.html.matchAll(/object-position\s*:\s*([^;"']+)/gi)) {
+      const value = match[1].trim();
+      if (objectPositionCropsTop(value)) {
+        errors.push(`Slide ${slide.idx}: S22 photo uses object-position:${value}, which commonly crops faces. Use center 35% or center center.`);
+      }
     }
   }
 
+  auditUndefinedClasses(slide);
   auditInlineFontSizes(slide);
+  auditClassFontSizes(slide);
   auditBottomSafeZone(slide);
 });
 

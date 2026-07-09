@@ -5,8 +5,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any
+
+
+SWISS_TAGS = {
+    "swiss",
+    "swiss-style",
+    "swiss style",
+    "style b",
+    "style-b",
+    "瑞士",
+    "瑞士风",
+    "information-design",
+    "information design",
+    "信息设计",
+}
 
 
 def load_project_context(project: Path) -> dict[str, Any]:
@@ -21,13 +36,87 @@ def load_project_context(project: Path) -> dict[str, Any]:
     return {"title": project.name, "source": "defaults"}
 
 
+def normalize_tag(value: Any) -> str:
+    return re.sub(r"\s+", " ", str(value or "").strip().lower())
+
+
 def wants_swiss(context: dict[str, Any]) -> bool:
     web_deck = context.get("webDeck") if isinstance(context.get("webDeck"), dict) else {}
-    if web_deck.get("style") == "swiss":
+    if normalize_tag(web_deck.get("style")) in SWISS_TAGS:
         return True
-    style = str(context.get("stylePreset") or "").lower()
-    text = json.dumps(context, ensure_ascii=False).lower()
-    return style == "swiss" or any(marker in text for marker in ("swiss", "瑞士", "helvetica", "kpi", "information design"))
+
+    if normalize_tag(context.get("stylePreset")) in SWISS_TAGS:
+        return True
+
+    tags: list[Any] = []
+    visual_brief = context.get("visualBrief") if isinstance(context.get("visualBrief"), dict) else {}
+    guided_brief = context.get("guidedBrief") if isinstance(context.get("guidedBrief"), dict) else {}
+    if isinstance(visual_brief.get("styleTags"), list):
+        tags.extend(visual_brief["styleTags"])
+    if guided_brief.get("style"):
+        tags.append(guided_brief.get("style"))
+
+    return any(normalize_tag(tag) in SWISS_TAGS for tag in tags)
+
+
+def parse_slide_number(value: Any, fallback: int) -> int:
+    text = str(value or "")
+    match = re.search(r"(\d+)", text)
+    if not match:
+        return fallback
+    return int(match.group(1))
+
+
+def storyboard_items(project: Path) -> list[dict[str, Any]]:
+    storyboard_path = project / "storyboard.json"
+    if not storyboard_path.is_file():
+        return []
+
+    data = json.loads(storyboard_path.read_text(encoding="utf-8"))
+    slides = data.get("slides")
+    if not isinstance(slides, list):
+        return []
+
+    items: list[dict[str, Any]] = []
+    for index, slide in enumerate(slides, start=1):
+        if not isinstance(slide, dict):
+            continue
+        raw_requirements: list[Any] = []
+        for key in ("assetRequirement", "asset_requirement", "assetRequirements", "asset_requirements"):
+            value = slide.get(key)
+            if isinstance(value, list):
+                raw_requirements.extend(value)
+            elif isinstance(value, dict):
+                raw_requirements.append(value)
+
+        for req_index, requirement in enumerate(raw_requirements, start=1):
+            if not isinstance(requirement, dict):
+                continue
+            slot = str(requirement.get("slot") or requirement.get("imageSlot") or "").strip()
+            if not slot:
+                continue
+            slide_number = parse_slide_number(slide.get("page") or slide.get("slide") or index, index)
+            item_id = str(requirement.get("id") or f"p{slide_number:02d}-{slot}").strip()
+            source_policy = str(requirement.get("source_policy") or requirement.get("sourcePolicy") or "generated").strip()
+            status = "Needs-Manual" if source_policy == "needs-manual" else "Pending"
+            backend = "manual" if source_policy == "needs-manual" else str(requirement.get("backend") or "codex")
+            prompt_path = str(requirement.get("prompt_path") or requirement.get("promptPath") or f"prompts/{item_id}.md")
+            items.append(
+                {
+                    "id": item_id,
+                    "slide": slide_number,
+                    "slot": slot,
+                    "asset_type": str(requirement.get("asset_type") or requirement.get("assetType") or "hero"),
+                    "aspect_ratio": str(requirement.get("aspect_ratio") or requirement.get("aspectRatio") or "16:9"),
+                    "text_policy": str(requirement.get("text_policy") or requirement.get("textPolicy") or "none"),
+                    "source_policy": source_policy,
+                    "backend": backend,
+                    "prompt_path": prompt_path,
+                    "status": status,
+                    "current_generation_evidence": [],
+                }
+            )
+    return items
 
 
 def default_items(context: dict[str, Any]) -> list[dict[str, Any]]:
@@ -120,7 +209,8 @@ def write_outputs(project: Path, plan: dict[str, Any], context: dict[str, Any]) 
     for item in plan["items"]:
         prompt_path = project / item["prompt_path"]
         prompt_path.parent.mkdir(parents=True, exist_ok=True)
-        prompt_path.write_text(prompt_for(item, context) + "\n", encoding="utf-8")
+        if item.get("status") == "Pending" or not prompt_path.exists():
+            prompt_path.write_text(prompt_for(item, context) + "\n", encoding="utf-8")
 
     generated_items = [
         {
@@ -128,7 +218,7 @@ def write_outputs(project: Path, plan: dict[str, Any], context: dict[str, Any]) 
             "asset_type": item["asset_type"],
             "type": item["asset_type"],
             "page_role": "hero_page" if item["asset_type"] in {"hero", "cover"} else "local",
-            "text_policy": "embedded" if item["text_policy"] == "embedded" else "none",
+            "text_policy": item["text_policy"],
             "aspect_ratio": item["aspect_ratio"],
             "backend": item["backend"],
             "source": "ai",
@@ -150,19 +240,63 @@ def write_outputs(project: Path, plan: dict[str, Any], context: dict[str, Any]) 
     )
 
 
+def merge_existing(project: Path, plan: dict[str, Any]) -> dict[str, Any]:
+    path = project / "asset_plan.json"
+    if not path.is_file():
+        return plan
+
+    try:
+        previous = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return plan
+
+    old_items = {
+        item.get("id"): item
+        for item in previous.get("items", [])
+        if isinstance(item, dict) and item.get("id")
+    }
+    for item in plan["items"]:
+        prev = old_items.get(item["id"])
+        if not prev:
+            continue
+        item["status"] = prev.get("status", item["status"])
+        item["current_generation_evidence"] = prev.get(
+            "current_generation_evidence",
+            item["current_generation_evidence"],
+        )
+        for optional_field in ("output_path", "filename", "last_error"):
+            if optional_field in prev:
+                item[optional_field] = prev[optional_field]
+    return plan
+
+
+def validate_project_folder(project: Path) -> None:
+    if not project.is_dir():
+        raise SystemExit(f"Project folder must already exist: {project}")
+    context_files = ("project-brief.json", "spec_lock.md", "storyboard.json")
+    if not any((project / name).is_file() for name in context_files):
+        raise SystemExit(
+            "Project folder must contain project-brief.json, spec_lock.md, "
+            f"or storyboard.json: {project}"
+        )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("project", help="Project folder containing project-brief.json or spec_lock.md")
     args = parser.parse_args()
 
     project = Path(args.project).resolve()
-    project.mkdir(parents=True, exist_ok=True)
+    validate_project_folder(project)
     context = load_project_context(project)
+    items = storyboard_items(project)
     plan = {
         "version": "asset-plan-v5.4",
         "project": context.get("title") or project.name,
-        "items": default_items(context),
+        "derived_from": "storyboard.json" if items else "defaults",
+        "items": items or default_items(context),
     }
+    plan = merge_existing(project, plan)
     write_outputs(project, plan, context)
     print(f"Asset plan written: {project / 'asset_plan.json'}")
     print(f"Image prompt manifest written: {project / 'images/image_prompts.json'}")

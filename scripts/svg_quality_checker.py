@@ -10,6 +10,8 @@ Usage:
     python3 scripts/svg_quality_checker.py --all examples
 """
 
+from __future__ import annotations
+
 import sys
 import re
 import json
@@ -22,10 +24,13 @@ from xml.etree import ElementTree as ET
 try:
     from project_utils import CANVAS_FORMATS
     from error_helper import ErrorHelper
+    from pipeline_state import project_from_target, record_quality_check
 except ImportError:
     print("Warning: Unable to import dependency modules")
     CANVAS_FORMATS = {}
     ErrorHelper = None
+    project_from_target = None
+    record_quality_check = None
 
 try:
     from update_spec import parse_lock as _parse_spec_lock
@@ -1402,6 +1407,19 @@ def main() -> None:
 
     # Print summary
     checker.print_summary()
+    if (
+        target != '--all'
+        and not template_mode
+        and project_from_target is not None
+        and record_quality_check is not None
+    ):
+        project = project_from_target(Path(target))
+        if project is not None:
+            record_quality_check(
+                project,
+                passed=checker.summary['errors'] == 0,
+                summary=dict(checker.summary),
+            )
 
     # Export report (if specified)
     if '--export' in sys.argv:

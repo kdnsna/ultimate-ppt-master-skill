@@ -142,6 +142,22 @@ When syncing upstream:
 4. run the release verification commands;
 5. update README/CHANGELOG-style notes if user-visible behavior changed.
 
+## Stability Guardrails
+
+These checks are maintainer-facing and should stay out of the README homepage.
+
+| Guardrail | Rule |
+|---|---|
+| `UPSTREAM_SYNC.md` | Track source repository, reference, license, import policy, absorbed capabilities, deferred capabilities, and review date. |
+| `npm run audit:repo-hygiene` | Block duplicate Finder-style files and copied repo residue before release. |
+| `npm run audit:image-contracts` | Validate `asset_plan.json`, `image_prompts.json`, statuses, `text_policy`, and `current_generation_evidence`. |
+| `npm run audit:swiss-deck` | Validate locked Swiss Sxx layouts, image slots, safe zones, and layout signatures. |
+| `npm run audit:magazine-deck` | Validate Style A fixed rhythm structure, local images, and unresolved `[必填]` markers. |
+
+Do not copy post-AGPL Guizang code directly. Absorb behavior requirements and reimplement locally.
+
+Baoyu workflow discipline stays as a release rule: use prompt files before generation, record backend decisions, require `current_generation_evidence`, and forbid bitmap text overlay repair. Regenerate from corrected prompts instead.
+
 ## Version Notes
 
 v5.4.0 positions this repository as:

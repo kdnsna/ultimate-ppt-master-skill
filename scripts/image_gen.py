@@ -46,6 +46,7 @@ Usage:
 from __future__ import annotations
 
 import concurrent.futures
+import hashlib
 import json
 import os
 import sys
@@ -53,6 +54,7 @@ import argparse
 import tempfile
 import threading
 import time
+import uuid
 from pathlib import Path
 
 from config import load_prefixed_env_file, resolve_env_path
@@ -674,6 +676,34 @@ def _asset_output_filename(item: dict) -> str:
     return Path(raw).name
 
 
+def _sha256_text(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _sha256_file(path: str | Path) -> str:
+    file_path = Path(path)
+    if not file_path.is_file():
+        return ""
+    digest = hashlib.sha256()
+    with file_path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _image_dimensions(path: str | Path) -> tuple[int | None, int | None]:
+    file_path = Path(path)
+    if not file_path.is_file():
+        return None, None
+    try:
+        from PIL import Image
+
+        with Image.open(file_path) as image:
+            return image.size
+    except Exception:
+        return None, None
+
+
 def _read_or_create_asset_prompt(project_dir: Path, item: dict) -> str:
     prompt_path = str(item.get("prompt_path") or "").strip()
     if not prompt_path:
@@ -704,7 +734,7 @@ def _asset_plan_manifest(asset_plan_path: str, plan: dict, *, regenerate: bool) 
                 "asset_type": item.get("asset_type", "hero"),
                 "type": item.get("asset_type", "hero"),
                 "page_role": "hero_page" if item.get("asset_type") in {"hero", "cover"} else "local",
-                "text_policy": "embedded" if item.get("text_policy") == "embedded" else "none",
+                "text_policy": item.get("text_policy", "none"),
                 "aspect_ratio": item.get("aspect_ratio", "16:9"),
                 "backend": item.get("backend", os.environ.get("IMAGE_BACKEND", "")),
                 "source": "ai",
@@ -741,10 +771,19 @@ def _mirror_manifest_to_asset_plan(plan: dict, manifest: dict, mapping: list[tup
         prompt_item = manifest["items"][manifest_index]
         status = prompt_item.get("status")
         if status == STATUS_GENERATED:
+            timestamp = prompt_item.get("generated_at") or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            output_file = prompt_item.get("output_file") or str(Path("images") / prompt_item.get("filename", ""))
+            width, height = _image_dimensions(output_file)
+            prompt_sha256 = _sha256_text(str(prompt_item.get("prompt") or ""))
+            file_sha256 = _sha256_file(output_file)
             evidence = {
-                "generated_at": prompt_item.get("generated_at") or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                "output_file": prompt_item.get("output_file") or str(Path("images") / prompt_item.get("filename", "")),
-                "backend_run_id": prompt_item.get("backend_run_id") or backend_name,
+                "run_id": prompt_item.get("backend_run_id") or f"{backend_name}-{uuid.uuid4().hex[:12]}",
+                "timestamp": timestamp,
+                "backend": backend_name,
+                "prompt_sha256": prompt_sha256,
+                "file_sha256": file_sha256,
+                "width": width,
+                "height": height,
             }
             asset_item["status"] = STATUS_GENERATED
             asset_item["current_generation_evidence"] = evidence

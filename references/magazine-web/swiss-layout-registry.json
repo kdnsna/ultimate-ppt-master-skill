@@ -1,0 +1,39 @@
+{
+  "version": "swiss-layout-registry-v1",
+  "layouts": {
+    "SWISS-COVER-ASCII": {
+      "name": "IKB ASCII Cover",
+      "requiredClasses": []
+    },
+    "SWISS-CLOSING-ASCII": {
+      "name": "IKB ASCII Closing",
+      "requiredClasses": []
+    },
+    "S01": {"name": "Index Cover", "requiredClasses": []},
+    "S02": {"name": "Vertical Timeline + KPI", "requiredClasses": []},
+    "S03": {"name": "Split Statement", "requiredClasses": []},
+    "S04": {"name": "Six Cells", "requiredClasses": []},
+    "S05": {"name": "Three Layers", "requiredClasses": []},
+    "S06": {"name": "KPI Tower", "requiredClasses": []},
+    "S07": {"name": "Horizontal Bar", "requiredClasses": []},
+    "S08": {"name": "Duo Compare", "requiredClasses": []},
+    "S09": {"name": "Dot Matrix Statement", "requiredClasses": []},
+    "S10": {"name": "Split Closing", "requiredClasses": []},
+    "S11": {"name": "Horizontal Timeline", "requiredClasses": []},
+    "S12": {"name": "Manifesto + Ink Banner", "requiredClasses": []},
+    "S13": {"name": "Three Forces", "requiredClasses": []},
+    "S14": {"name": "Loop Form", "requiredClasses": []},
+    "S15": {"name": "Matrix + Hero Stat", "requiredClasses": []},
+    "S16": {"name": "Multi-card Brief", "requiredClasses": []},
+    "S17": {"name": "System Diagram", "requiredClasses": []},
+    "S18": {"name": "Why Now", "requiredClasses": []},
+    "S19": {"name": "Four Cards", "requiredClasses": []},
+    "S20": {"name": "Stacked KPI Ledger", "requiredClasses": []},
+    "S21": {"name": "Tech Spec Sheet", "requiredClasses": []},
+    "S22": {
+      "name": "Image Hero",
+      "requiredClasses": ["frame-img", "r-21x9"],
+      "requiredImageSlots": ["s22-hero-21x9"]
+    }
+  }
+}

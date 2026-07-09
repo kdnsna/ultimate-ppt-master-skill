@@ -19,7 +19,7 @@
 | 小图标 | `assets/skill-market/ultimate-ppt-master-icon.svg` |
 | 列表卡片 | `assets/skill-market/ultimate-ppt-master-card.svg` |
 | 首次上手路径 | `README.zh-CN.md#60-秒开箱即用` |
-| 证明案例 | `README.zh-CN.md#证明材料`、`apps/web/public/benchmark/index.html` 和 `docs/zh-CN/quality/quality-workbench-v2.5.md` |
+| 证明案例 | `README.zh-CN.md#真实-proof-packs`、`apps/web/public/benchmark/index.html` 和 `docs/zh-CN/quality/quality-workbench-v2.5.md` |
 | v4 工作流 | `docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md` |
 | 安装说明 | `docs/guides/agent-setup.md` |
 
@@ -31,20 +31,20 @@
 
 长文案：
 
-> Ultimate PPT Master 帮助 Agent 先把短指令扩写成最佳效果 brief，再把 PDF、Word、PPTX、Excel、URL、零散笔记或只有主题的提示整理成可审查的演示项目。极短指令默认使用 Guizang-like Magazine Web Deck fixed style；用户明确要正式可编辑 PPTX 时走 PPTX。它默认保持资料本地优先，并附带视觉审阅、审计留痕和公开 proof packs。
+> Ultimate PPT Master 帮助 Agent 先把短指令扩写成最佳效果 brief，再把 PDF、Word、PPTX、Excel、URL、零散笔记或只有主题的提示整理成可审查的演示项目。极短指令默认使用 Style A Editorial Fixed Rhythm；用户明确要正式可编辑 PPTX 时走 PPTX。它默认保持资料本地优先，并附带视觉审阅、审计留痕和公开 proof packs。
 
 默认 prompt：
 
 ```text
-Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.
+Use $ultimate-ppt-master with any natural-language presentation request. It will expand the request into a best-effect brief, choose PPTX or Web Deck, and run the matching quality checks.
 ```
 
 ## 上架门禁
 
 - `agents/openai.yaml` 包含展示名、短描述、品牌色、图标和 `$ultimate-ppt-master` 默认 prompt。
 - `agents/marketplace-listing.json` 同步调用方式、公开链接、证明案例和验收门禁，方便市场目录读取。
-- README 首屏展示开箱路径、v4 混合可编辑工作流、证明链接和 Skill 市场分发入口。
-- Web Experience 展示开箱跑通、Design Doctor 视觉评分和公开 benchmark 案例墙。
+- README 首屏展示开箱路径、证明链接、路线选择、依赖说明和已知限制。
+- Web Experience 展示开箱跑通、Design Doctor 视觉评分和公开 proof packs。
 - 每个 public proof pack 都有 source、生成输出、截图/封面和 `quality-report.json`。
 - 发布检查继续运行 `npm run audit:docs`、`npm run audit:presets`、`npm run audit:quality`、`npm run audit:market`、`npm run test:node`、`npm run test:worker`、`npm run build:web`。
 - 正式推广前用 `npm run audit:market` 机器检查市场元数据、公开案例墙和上架资产。

@@ -19,7 +19,7 @@ Use this checklist when preparing Ultimate PPT Master for a skill marketplace, a
 | Small icon | `assets/skill-market/ultimate-ppt-master-icon.svg` |
 | Listing card | `assets/skill-market/ultimate-ppt-master-card.svg` |
 | First-run path | `README.md#60-second-quickstart` |
-| Proof cases | `README.md#proofs`, `apps/web/public/benchmark/index.html`, and `docs/quality/quality-workbench-v2.5.md` |
+| Proof cases | `README.md#real-proof-packs`, `apps/web/public/benchmark/index.html`, and `docs/quality/quality-workbench-v2.5.md` |
 | v4 workflow | `docs/quality/hybrid-editable-visual-workflow-v4.0.md` |
 | Install guide | `docs/guides/agent-setup.md` |
 
@@ -31,20 +31,20 @@ Short:
 
 Long:
 
-> Ultimate PPT Master helps an agent expand short requests into a best-effect brief before turning PDFs, Word docs, PPTX decks, spreadsheets, URLs, rough notes, or topic-only prompts into an inspectable presentation project. Extremely thin prompts use a Guizang-like Magazine Web Deck fixed style by default unless the user explicitly needs a formal editable PPTX. It keeps source files local and includes visual review, audit trails, and public proof packs.
+> Ultimate PPT Master helps an agent expand short requests into a best-effect brief before turning PDFs, Word docs, PPTX decks, spreadsheets, URLs, rough notes, or topic-only prompts into an inspectable presentation project. Extremely thin prompts use Style A Editorial Fixed Rhythm by default unless the user explicitly needs a formal editable PPTX. It keeps source files local and includes visual review, audit trails, and public proof packs.
 
 Default prompt:
 
 ```text
-Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.
+Use $ultimate-ppt-master with any natural-language presentation request. It will expand the request into a best-effect brief, choose PPTX or Web Deck, and run the matching quality checks.
 ```
 
 ## Acceptance Gates
 
 - `agents/openai.yaml` includes display name, short description, brand color, icons, and a `$ultimate-ppt-master` default prompt.
 - `agents/marketplace-listing.json` mirrors the invocation, public links, proof cases, and acceptance gates for marketplace ingestion.
-- README first screen shows the quickstart, v4 hybrid-editable workflow, proof links, and skill-market link.
-- Web Experience shows first-run path, Design Doctor scoring, and benchmark case wall.
+- README first screen shows the quickstart, proof links, route choices, dependencies, and known limits.
+- Web Experience shows first-run path, Design Doctor scoring, and public proof packs.
 - Public proof packs include source, generated output, screenshot/cover, and `quality-report.json`.
 - Release checklist runs `npm run audit:docs`, `npm run audit:presets`, `npm run audit:quality`, `npm run audit:market`, `npm run test:node`, `npm run test:worker`, and `npm run build:web`.
 - Marketplace readiness is machine-checked with `npm run audit:market` before public promotion.
@@ -54,4 +54,4 @@ Use $ultimate-ppt-master to expand my short request into a best-effect brief fir
 - Lead with the Web Experience for non-technical visitors.
 - Lead with `$ultimate-ppt-master` for agent marketplaces where users already know how to invoke skills.
 - Keep market copy honest: the skill orchestrates local production and quality review; it is not a hosted one-click PPT SaaS.
-- Add every new stable preset to the public benchmark wall before promoting it in a marketplace.
+- Add every new stable preset to the public proof packs before promoting it in a marketplace.

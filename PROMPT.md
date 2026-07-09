@@ -13,7 +13,7 @@ For user-facing setup, configuration, or troubleshooting questions, read SKILL_D
 
 Best-Effect Brief Enhancer: before route selection or production, rewrite the user's short instruction into `bestEffectBrief`. Record prompt quality (`complete`, `thin`, or `extreme-thin`), auto-expanded audience/scenario/message/page-count/style/source/asset assumptions, recommended route, and what was inferred.
 
-Extreme Thin Prompt Fallback: for a generic request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", "turn this into slides", or only a topic with no source material, do not make the user write a perfect prompt. Unless the user explicitly asks for formal / editable / government / finance / training PPTX, use the Guizang-like Magazine Web Deck fixed style by default:
+Extreme Thin Prompt Fallback: for a generic request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", "turn this into slides", or only a topic with no source material, do not make the user write a perfect prompt. Unless the user explicitly asks for formal / editable / government / finance / training PPTX, use Style A Editorial Fixed Rhythm by default:
 
 - Mode 2: Magazine Web Deck;
 - Style A · 电子杂志 × 电子墨水;
@@ -29,7 +29,7 @@ If the user explicitly asks for a formal editable deck, government/finance/train
 2. Magazine-style web deck (HTML)
    Best for talks, launches, demo days, personal keynotes, and highly visual presentations. Output is a single index.html with horizontal navigation, WebGL background, editorial magazine / e-ink visual style, and motion. The original editorial/e-ink style is the default; Swiss Style is available when the user asks for Swiss, grid, Helvetica, product, data, or engineering presentation aesthetics.
 
-Use the web deck route when the user explicitly asks for HTML, web PPT, magazine/editorial/e-ink, Swiss Style, horizontal swipe, keynote/showcase/demo-day, browser-first delivery, or when the Extreme Thin Prompt Fallback selects the Guizang-like Magazine Web Deck fixed style.
+Use the web deck route when the user explicitly asks for HTML, web PPT, magazine/editorial/e-ink, Swiss Style, horizontal swipe, keynote/showcase/demo-day, browser-first delivery, or when the Extreme Thin Prompt Fallback selects Style A Editorial Fixed Rhythm.
 
 For editable PPTX mode, follow SKILL_DIR/SKILL.md "Mode 1: Editable PPTX Workflow".
 For magazine web deck mode, follow SKILL_DIR/SKILL.md "Mode 2: Magazine Web Deck Workflow".

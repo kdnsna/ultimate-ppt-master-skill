@@ -11,8 +11,8 @@
     "office productivity"
   ],
   "shortDescription": "先自动扩写 best-effect brief，再生成 quality-checked PPTX and Web Decks.",
-  "positioning": "A local-first PPT delivery skill for Chinese office users who need a best-effect brief enhancer, Guizang-like fixed-style Web Deck fallback for short prompts, editable PPTX/Web Decks, official asset boundaries, and audit-ready deliverables.",
-  "defaultPrompt": "Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks.",
+  "positioning": "A local-first PPT delivery skill for Chinese office users who need a best-effect brief enhancer, Style A Editorial Fixed Rhythm Web Deck fallback for short prompts, editable PPTX/Web Decks, official asset boundaries, and audit-ready deliverables.",
+  "defaultPrompt": "Use $ultimate-ppt-master with any natural-language presentation request. It will expand the request into a best-effect brief, choose PPTX or Web Deck, and run the matching quality checks.",
   "metadata": {
     "openai": "agents/openai.yaml",
     "skillEntrypoint": "SKILL.md",

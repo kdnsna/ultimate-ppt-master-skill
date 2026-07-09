@@ -14,6 +14,7 @@ from .pptx_builder import create_pptx_with_native_svg
 from .pptx_narration import NARRATION_EXTENSIONS, find_narration_files, probe_audio_duration
 from .pptx_slide_xml import TRANSITIONS
 from .animation_config import load_animation_config, validate_animation_config
+from pipeline_state import verify_quality_gate
 
 try:
     from pptx_animations import ANIMATIONS as _ANIMATIONS
@@ -236,6 +237,10 @@ Recorded narration:
     project_path = Path(args.project_path)
     if not project_path.exists():
         print(f"Error: Path does not exist: {project_path}")
+        sys.exit(1)
+    gate_ok, gate_error = verify_quality_gate(project_path)
+    if not gate_ok:
+        print(gate_error, file=sys.stderr)
         sys.exit(1)
 
     try:

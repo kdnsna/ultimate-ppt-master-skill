@@ -12,6 +12,27 @@ from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "5.4.0"
+README_BANNED_PHRASES = (
+    "Best Results Prompt",
+    "What v5 Changes",
+    "v5 Delivery Standard",
+    "Repository Map",
+    "Production Stability Guardrails",
+    "Quality Gates",
+    "Guizang-like",
+    "Benchmark Wall",
+    "Skill Market Distribution",
+    "UPSTREAM_SYNC.md",
+    "audit:repo-hygiene",
+)
+README_CLAIM_ARTIFACTS = (
+    "asset_plan.json",
+    "current_generation_evidence",
+    "pipeline-state.json",
+    "Needs-Manual",
+    "bestEffectBrief",
+    "quality-report.json",
+)
 
 MOVED_DOCS = {
     "docs/web-experience.md": "docs/guides/web-experience.md",
@@ -165,6 +186,52 @@ def audit_local_links(errors: list[str]) -> None:
             require(candidate.exists(), f"broken local link in {path.relative_to(ROOT)} -> {target}", errors)
 
 
+def support_corpus() -> str:
+    files: list[Path] = [ROOT / "SKILL.md"]
+    for folder in ("scripts", "tests"):
+        for suffix in ("*.py", "*.mjs", "*.js", "*.json"):
+            files.extend((ROOT / folder).rglob(suffix))
+    self_path = Path(__file__).resolve()
+    return "\n".join(read(path) for path in files if path.is_file() and path.resolve() != self_path)
+
+
+def count_doc_map_rows(text: str, heading: str) -> int:
+    lines = text.splitlines()
+    try:
+        start = lines.index(heading)
+    except ValueError:
+        return -1
+    count = 0
+    for line in lines[start + 1:]:
+        if line.startswith("## "):
+            break
+        stripped = line.strip()
+        if stripped.startswith("|") and not stripped.startswith("|---") and "Read" not in stripped and "阅读" not in stripped:
+            count += 1
+    return count
+
+
+def audit_readme_truthfulness(errors: list[str]) -> None:
+    readmes = {
+        "README.md": read(ROOT / "README.md"),
+        "README.zh-CN.md": read(ROOT / "README.zh-CN.md"),
+    }
+    corpus = support_corpus()
+
+    for label, text in readmes.items():
+        for phrase in README_BANNED_PHRASES:
+            require(phrase not in text, f"{label} contains banned public README phrase: {phrase}", errors)
+
+        for artifact in README_CLAIM_ARTIFACTS:
+            if f"`{artifact}`" in text or artifact in text:
+                require(artifact in corpus, f"{label} claims {artifact} but no SKILL/scripts/tests anchor exists", errors)
+
+    require(count_doc_map_rows(readmes["README.md"], "## Documentation Map") <= 8, "README documentation map must stay capped at 8 rows", errors)
+    require(count_doc_map_rows(readmes["README.md"], "## Documentation Map") >= 0, "README missing Documentation Map", errors)
+    require(count_doc_map_rows(readmes["README.zh-CN.md"], "## 文档地图") <= 8, "Chinese README documentation map must stay capped at 8 rows", errors)
+    require(count_doc_map_rows(readmes["README.zh-CN.md"], "## 文档地图") >= 0, "Chinese README missing 文档地图", errors)
+
+
 def audit_canonical_public_paths(errors: list[str]) -> None:
     readme = read(ROOT / "README.md")
     readme_zh = read(ROOT / "README.zh-CN.md")
@@ -176,14 +243,13 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/guides/agent-setup.md",
         "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/quality/rendered-review-loop-v4.3.md",
+        "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
         "./docs/release/release-notes-v5.4.0.md",
         "./docs/release/release-notes-v5.3.0.md",
         "./docs/release/release-notes-v5.2.0.md",
         "./docs/release/release-notes-v5.1.0.md",
         "./docs/release/release-notes-v5.0.0.md",
-        "./docs/release/release-notes-v4.2.0.md",
-        "./docs/release/release-notes-v4.3.0.md",
-        "./docs/strategy/skill-market-distribution.md",
+        "./docs/release/release-notes-v4.1.0.md",
     ]
     for link in required:
         require(link in readme, f"README missing canonical link {link}", errors)
@@ -192,14 +258,13 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/zh-CN/guides/agent-connect-bridge.md",
         "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+        "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
         "./docs/zh-CN/release/release-notes-v5.4.0.md",
         "./docs/zh-CN/release/release-notes-v5.3.0.md",
         "./docs/zh-CN/release/release-notes-v5.2.0.md",
         "./docs/zh-CN/release/release-notes-v5.1.0.md",
         "./docs/zh-CN/release/release-notes-v5.0.0.md",
-        "./docs/zh-CN/release/release-notes-v4.2.0.md",
-        "./docs/zh-CN/release/release-notes-v4.3.0.md",
-        "./docs/zh-CN/strategy/skill-market-distribution.md",
+        "./docs/zh-CN/release/release-notes-v4.1.0.md",
     ]
     for link in required_zh:
         require(link in readme_zh, f"Chinese README missing canonical link {link}", errors)
@@ -217,6 +282,7 @@ def main() -> int:
     audit_version_markers(errors)
     audit_moved_stubs(errors)
     audit_local_links(errors)
+    audit_readme_truthfulness(errors)
     audit_canonical_public_paths(errors)
     if errors:
         print("Documentation audit failed:")

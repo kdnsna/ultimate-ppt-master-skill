@@ -26,7 +26,7 @@ PROMPT_REQUIRED_FIELDS = {
 }
 
 PROMPT_STATUS_VALUES = {"Pending", "Generated", "Failed", "Needs-Manual"}
-TEXT_POLICY_VALUES = {"none", "embedded"}
+TEXT_POLICY_VALUES = {"none", "limited-labels", "embedded"}
 PAGE_ROLE_VALUES = {"local", "hero_page"}
 
 ASSET_PLAN_REQUIRED_FIELDS = {
@@ -98,24 +98,26 @@ def audit_image_prompts(path: Path, errors: list[str]) -> None:
             require(resolved.is_file(), f"{label}: prompt_path does not exist: {prompt_path}", errors)
 
 
+EVIDENCE_REQUIRED_FIELDS = {
+    "run_id",
+    "timestamp",
+    "backend",
+    "prompt_sha256",
+    "file_sha256",
+    "width",
+    "height",
+}
+
+
 def evidence_is_current(value: Any) -> bool:
     if isinstance(value, list):
         return any(evidence_is_current(item) for item in value)
-    if isinstance(value, str):
-        return bool(value.strip())
     if not isinstance(value, dict):
         return False
 
-    current_markers = (
-        "tool_event",
-        "generated_at",
-        "thread_id",
-        "run_id",
-        "backend_run_id",
-        "output_file",
-        "generated_image_path",
-    )
-    return any(bool(value.get(marker)) for marker in current_markers)
+    if not EVIDENCE_REQUIRED_FIELDS.issubset(value):
+        return False
+    return all(value.get(field) not in (None, "") for field in EVIDENCE_REQUIRED_FIELDS)
 
 
 def audit_asset_plan(path: Path, errors: list[str]) -> None:

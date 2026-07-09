@@ -4,6 +4,6 @@ interface:
   icon_small: "./assets/skill-market/ultimate-ppt-master-icon.svg"
   icon_large: "./assets/skill-market/ultimate-ppt-master-card.svg"
   brand_color: "#0F766E"
-  default_prompt: "Use $ultimate-ppt-master to expand my short request into a best-effect brief first. If my prompt is extremely thin, use the Guizang-like Magazine Web Deck fixed style by default; if I explicitly need a formal editable deck, use PPTX and keep the same quality checks."
+  default_prompt: "Use $ultimate-ppt-master with any natural-language presentation request. It will expand the request into a best-effect brief, choose PPTX or Web Deck, and run the matching quality checks."
 policy:
   allow_implicit_invocation: true

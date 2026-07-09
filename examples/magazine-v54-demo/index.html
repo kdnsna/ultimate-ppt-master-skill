@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>v5.4 Magazine Deck Validator Demo</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; font-family: Georgia, "Noto Serif SC", serif; background: #0a0a0b; color: #f1efea; }
+    #deck { display: flex; width: 100vw; height: 100vh; overflow-x: auto; scroll-snap-type: x mandatory; }
+    .slide { min-width: 100vw; height: 100vh; scroll-snap-align: start; padding: 7vh 7vw; display: grid; align-content: center; gap: 3vh; }
+    .light { background: #f1efea; color: #0a0a0b; }
+    .dark { background: #0a0a0b; color: #f1efea; }
+    .hero { align-content: center; }
+    .body { max-width: 760px; font-size: 20px; line-height: 1.55; }
+    .kicker { font-family: ui-monospace, monospace; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; }
+    .headline { max-width: 880px; font-size: clamp(56px, 8vw, 128px); line-height: .95; margin: 0; }
+    .frame-img { width: min(760px, 70vw); overflow: hidden; border: 1px solid currentColor; }
+    .frame-img img { width: 100%; display: block; }
+  </style>
+</head>
+<body>
+<main id="deck">
+  <section class="slide hero dark"><p class="kicker">Cover</p><h1 class="headline">Magazine Proof</h1><p class="body">A valid Style A deck used by audit:magazine-deck.</p></section>
+  <section class="slide light"><p class="kicker">Context</p><p class="body">The validator checks placeholders, classes, rhythm, and images.</p></section>
+  <section class="slide dark"><p class="kicker">Tension</p><p class="body">Undefined classes can silently break the whole rendered deck.</p></section>
+  <section class="slide light"><p class="kicker">Structure</p><p class="body">A fixed eight-page fallback needs a stable light/dark cadence.</p></section>
+  <section class="slide hero light"><p class="kicker">Divider</p><h2 class="headline">Pause</h2></section>
+  <section class="slide dark"><p class="kicker">Evidence</p><figure class="frame-img"><img src="images/scene.svg" alt="Abstract editorial scene"></figure></section>
+  <section class="slide dark"><p class="kicker">Point of View</p><p class="body">Automation should catch brittle HTML before a user opens it.</p></section>
+  <section class="slide light"><p class="kicker">Close</p><p class="body">The output remains a single index.html with traceable local images.</p></section>
+</main>
+</body>
+</html>

@@ -35,6 +35,24 @@ The `bestEffectBrief` must record:
 - fixed fallback decision and why it was selected;
 - what came from the user vs what the Agent inferred.
 
+### Route Decision Order
+
+Use this deterministic order before Default Delivery Route. First match wins; formal/editable keywords outrank prompt thinness.
+
+| Order | Decision key | Trigger | Result |
+|---:|---|---|---|
+| 1 | `explicit-formal-signal` | `pptx`, `.pptx`, `PowerPoint`, 可编辑, 汇报, 报告, 政府, 金融, 培训, 审计, consulting/business report, or a stakeholder-revised file | `formal-editable-pptx` |
+| 2 | `explicit-web-signal` | 杂志风, 网页PPT, HTML, 横滑, Swiss/瑞士风, editorial/e-ink, browser-first, keynote/showcase/demo-day | `magazine-web-deck` |
+| 3 | `extreme-thin-fallback` | only a topic, or <=25 characters/words with no audience, scenario, source, page count, style, or core-message signal | `guizang-web-fixed-style` |
+| 4 | `thin-guided-intake` | has a topic plus at least one signal above, but lacks source or core content | staged questions |
+| 5 | `complete-source-first` | source and production context are sufficient | continue source-first |
+
+When in doubt, run the fixture-backed classifier:
+
+```bash
+python3 ${SKILL_DIR}/scripts/best_effect_router.py "<raw user request>"
+```
+
 ### Extreme Thin Prompt Fallback
 
 If the user provides only a topic, a one-line request, or almost no source material, do not make the user write a perfect prompt first. Unless the user explicitly asks for formal / editable / government / finance / training PPTX, use this stable default:
@@ -216,13 +234,19 @@ If the audit fails, report the concrete issues and fix the deck before final del
 | `${SKILL_DIR}/scripts/source_to_md/web_to_md.py` | Web page to Markdown (supports WeChat/high-security pages via `curl_cffi`) |
 | `${SKILL_DIR}/scripts/source_to_md/web_to_md.cjs` | Legacy Node.js fallback kept for this fusion package; prefer `web_to_md.py` first |
 | `${SKILL_DIR}/scripts/project_manager.py` | Project init / validate / manage |
+| `${SKILL_DIR}/scripts/best_effect_router.py` | Deterministic Best-Effect route classifier backed by routing fixtures |
 | `${SKILL_DIR}/scripts/analyze_images.py` | Image analysis |
+| `${SKILL_DIR}/scripts/build_asset_plan.py` | Build / merge `asset_plan.json`, prompt files, and generated-item manifests before image generation |
 | `${SKILL_DIR}/scripts/image_gen.py` | AI image generation (multi-provider) |
 | `${SKILL_DIR}/scripts/image_search.py` | Web image search helper for PPTX image acquisition |
 | `${SKILL_DIR}/scripts/svg_quality_checker.py` | SVG quality check |
+| `${SKILL_DIR}/scripts/spec_lock_slice.py` | Enforce `spec_lock.md` line budget and return a per-page lock slice |
+| `${SKILL_DIR}/scripts/execution_budget.py` | Require `resume-execute` split mode for decks above the page threshold |
 | `${SKILL_DIR}/scripts/total_md_split.py` | Speaker notes splitting |
 | `${SKILL_DIR}/scripts/finalize_svg.py` | SVG post-processing (unified entry) |
 | `${SKILL_DIR}/scripts/svg_to_pptx.py` | Export to PPTX |
+| `${SKILL_DIR}/scripts/validate-magazine-deck.mjs` | Static Style A magazine deck validation: placeholders, classes, rhythm, and image refs |
+| `${SKILL_DIR}/scripts/validate-swiss-deck.mjs` | Static Style B Swiss deck validation using `references/magazine-web/swiss-layout-registry.json` |
 | `${SKILL_DIR}/scripts/animation_config.py` | Optional object-level PPTX animation sidecar scaffolding |
 | `${SKILL_DIR}/scripts/notes_to_audio.py` | Optional recorded narration audio generation |
 | `${SKILL_DIR}/scripts/update_spec.py` | Propagate a `spec_lock.md` color / font_family change across all generated SVGs |
@@ -315,6 +339,7 @@ Read only the needed magazine references based on selected style:
 - Style B theme choice: `${SKILL_DIR}/references/magazine-web/themes-swiss.md`
 - Style B locked layout skeletons: `${SKILL_DIR}/references/magazine-web/layouts-swiss.md`
 - Style B layout lock rules: `${SKILL_DIR}/references/magazine-web/swiss-layout-lock.md`
+- Style B layout registry: `${SKILL_DIR}/references/magazine-web/swiss-layout-registry.json`
 - Shared component details: `${SKILL_DIR}/references/magazine-web/components.md`
 - Screenshot framing: `${SKILL_DIR}/references/magazine-web/screenshot-framing.md` (only when screenshots/UI captures are used)
 - Optional generated image prompts: `${SKILL_DIR}/references/magazine-web/image-prompts.md`
@@ -327,7 +352,7 @@ Rules:
 - Use the layout skeletons instead of writing slides from scratch.
 - Before adding slide markup, inspect the `<style>` block in `index.html` and confirm every class used by the chosen skeleton exists.
 - Put images under `ppt/images/` and reference them with relative paths like `images/01-cover.jpg`.
-- For Style B, every slide should carry a registered `data-layout` value from `swiss-layout-lock.md`, and local images should include `data-image-slot` when the layout defines an image slot.
+- For Style B, every slide should carry a registered `data-layout` value from `swiss-layout-registry.json`, and local images should include `data-image-slot` when the layout defines an image slot.
 
 ### Web Step 4: Generate, Preview, and Check
 
@@ -336,6 +361,7 @@ Fill `<main id="deck">` with the selected sections, then run these checks:
 ```bash
 grep -n "\\[必填\\]" "<project_path>/ppt/index.html"
 grep -n 'class="slide' "<project_path>/ppt/index.html"
+node "${SKILL_DIR}/scripts/validate-magazine-deck.mjs" "<project_path>/ppt/index.html"
 ```
 
 For Style B, also run the static Swiss lock validator:
@@ -483,6 +509,15 @@ Use plain user-facing words in the brief. Avoid exposing specialist labels unles
 
 For large page counts or bulky sources, add one short split-mode note in the user's language recommending `workflows/resume-execute.md` after Step 5 by opening a fresh chat and entering `继续生成 projects/<project_name>`. For normal scale, continuous mode is the default.
 
+Before finalizing `spec_lock.md`, enforce the context budget:
+
+```bash
+python3 ${SKILL_DIR}/scripts/spec_lock_slice.py --check-budget <project_path>
+python3 ${SKILL_DIR}/scripts/execution_budget.py --page-count <N>
+```
+
+`spec_lock.md line budget`: keep `spec_lock.md` at <=120 lines. If it must grow, Executor uses `python3 ${SKILL_DIR}/scripts/spec_lock_slice.py <project_path> PNN` before each page instead of rereading the whole lock. Decks over 16 pages must use `workflows/resume-execute.md` after Step 5; the `execution_budget.py` result is authoritative.
+
 If the user has provided images, run the analysis script **before outputting the design spec** (do NOT directly read/open image files — use the script output only):
 ```bash
 python3 ${SKILL_DIR}/scripts/analyze_images.py <project_path>/images
@@ -512,6 +547,14 @@ python3 ${SKILL_DIR}/scripts/analyze_images.py <project_path>/images
 
 > **Trigger condition**: at least one Design Spec image row needs `Acquire Via: ai` and/or `Acquire Via: web`. If every row is `user` or `placeholder`, skip directly to Step 6.
 
+First build or merge the Asset Factory parent contract:
+
+```bash
+python3 ${SKILL_DIR}/scripts/build_asset_plan.py <project_path>
+```
+
+`asset_plan.json` is the source of truth. `asset-plan.md` is only the human-readable view. The builder preserves existing item `status`, `current_generation_evidence`, and completed prompt files by id; it must never wipe Generated evidence on a rerun.
+
 Always read the common framework first:
 
 ```
@@ -522,9 +565,17 @@ Then lazy-load only the needed path-specific reference:
 
 | Acquire Via | Load reference | Run |
 |---|---|---|
-| `ai` | `references/image-generator.md` | Default to Codex native GPT image generation (`image2` when available); otherwise run `python3 ${SKILL_DIR}/scripts/image_gen.py --manifest <project_path>/images/image_prompts.json` |
+| `ai` | `references/image-generator.md` | Default to Codex native GPT image generation (`image2` when available); otherwise run `python3 ${SKILL_DIR}/scripts/image_gen.py --asset-plan <project_path>/asset_plan.json` |
 | `web` | `references/image-searcher.md` | `python3 ${SKILL_DIR}/scripts/image_search.py ...` |
 | `user` / `placeholder` | skip | skip |
+
+Generated asset evidence schema:
+
+```json
+{"run_id":"...","timestamp":"...","backend":"...","prompt_sha256":"...","file_sha256":"...","width":1792,"height":1024}
+```
+
+Every Generated `asset_plan.json.items[]` row must have non-empty `current_generation_evidence` matching this schema. Run `python3 ${SKILL_DIR}/scripts/audit_image_contracts.py <project_path>/asset_plan.json` before Step 6.
 
 **✅ Checkpoint — Confirm image generation attempted for every row, proceed to Step 6**:
 ```markdown
@@ -536,11 +587,13 @@ Then lazy-load only the needed path-specific reference:
 
 > On generation failure, do NOT halt — follow the Failure Handling rule in `references/image-generator.md`: retry once, fall back between Codex/image2 and configured backend when possible, then mark the row `Needs-Manual`, report filename + reason, and continue to Step 6.
 
+🚧 **Needs-Manual image rows block Step 6**: if any `asset_plan.json` item is `Needs-Manual`, the expected file must exist at `project/images/<filename>` or the Executor must draw a clearly labeled placeholder box with the expected filename. Do not start SVG generation with silent missing image references.
+
 ---
 
 ### Step 6: Executor Phase
 
-🚧 **GATE**: Step 4 (and Step 5 if triggered) complete; all prerequisite deliverables are ready.
+🚧 **GATE**: Step 4 (and Step 5 if triggered) complete; `asset_plan.json` has no unresolved `Pending` row; any `Needs-Manual` row has a real file or an explicit labeled-placeholder plan; all prerequisite deliverables are ready.
 
 Read the role definition based on the selected style:
 ```
@@ -566,10 +619,9 @@ python3 ${SKILL_DIR}/scripts/svg_editor/server.py <project_path> --live
 
 **Pre-generation Batch Read (Mandatory)**: before the first SVG, batch-read every distinct layout SVG referenced in `spec_lock.page_layouts` and every distinct chart SVG referenced in `spec_lock.page_charts` (plus backup chart references). One read per file, up front.
 
-**Per-page spec_lock re-read (Mandatory)**: Before generating **each** SVG page, Executor MUST `read_file <project_path>/spec_lock.md` and use only the colors / fonts / icons / images listed there, plus the per-page `page_rhythm`, `page_layouts`, and `page_charts` lookups. This resists context-compression drift on long decks. See executor-base.md §2.1 for details.
+**Per-page spec_lock re-read (Mandatory)**: Before generating **each** SVG page, Executor MUST read the lock. If the lock is within budget, `read_file <project_path>/spec_lock.md`; if it exceeds the budget or the deck resumed in a fresh chat, run `python3 ${SKILL_DIR}/scripts/spec_lock_slice.py <project_path> PNN` and use that slice. Use only the colors / fonts / icons / images listed there, plus the per-page `page_rhythm`, `page_layouts`, and `page_charts` lookups. See executor-base.md §2.1 for details.
 
-> ⚠️ **Main-agent only rule**: SVG generation in Step 6 MUST remain with the current main agent because page design depends on full upstream context (source content, design spec, template mapping, image decisions, and cross-page consistency). Do NOT delegate any slide SVG generation to sub-agents.
-> ⚠️ **Generation rhythm rule**: After confirming the global design parameters, the Executor MUST generate pages sequentially, one page at a time, while staying in the same continuous main-agent context. Do NOT split Step 6 into grouped page batches such as 5 pages per batch.
+Generation discipline comes from Global Execution Discipline rules 7-10: main agent only, sequential page generation, per-page lock read/slice, and hand-written SVG.
 
 **Visual Construction Phase**:
 - Generate SVG pages sequentially, one page at a time, in one continuous pass → `<project_path>/svg_output/`
@@ -581,6 +633,7 @@ python3 ${SKILL_DIR}/scripts/svg_quality_checker.py <project_path>
 - Any `error` (banned SVG features, viewBox mismatch, spec_lock drift, etc.) MUST be fixed on the offending page before proceeding — go back to Visual Construction, re-generate that page, re-run the check.
 - `warning` entries (e.g., low-resolution image, non-PPT-safe font tail) should be reviewed and fixed when straightforward; may be acknowledged and released otherwise.
 - Running the checker against `svg_output/` is required — running it only after `finalize_svg.py` is too late (finalize rewrites SVG and some violations get masked).
+- On success, the checker writes `pipeline-state.json` with the `svg_output` digest. `svg_to_pptx.py` blocks export if SVG files changed after the last passing check.
 
 **Logic Construction Phase**:
 - Generate speaker notes → `<project_path>/notes/total.md`
@@ -599,7 +652,7 @@ python3 ${SKILL_DIR}/scripts/svg_quality_checker.py <project_path>
 
 ### Step 7: Post-processing & Export
 
-🚧 **GATE**: Step 6 complete; all SVGs generated to `svg_output/`; speaker notes `notes/total.md` generated.
+🚧 **GATE**: Step 6 complete; all SVGs generated to `svg_output/`; speaker notes `notes/total.md` generated; `pipeline-state.json` records a passing SVG quality check for the current `svg_output` digest.
 
 🚧 **Image readiness GATE**: if Step 5 left any `Needs-Manual` image rows, every expected file must exist at `project/images/<filename>` before running Step 7.1. If files are missing, pause and report filenames plus required locations.
 
