@@ -1,9 +1,9 @@
-# Ultimate PPT Master - v5.4.0
+# Ultimate PPT Master - v5.4.1
 
 Local-first AI presentation production for real office work. Give it a natural-language request, notes, a file, or a URL; the agent first writes a `bestEffectBrief`, then chooses editable PPTX, Style A Editorial Fixed Rhythm Web Deck, or Style B Swiss International Web Deck with source, image, and quality records.
 
 <p align="center">
-  <strong>v5.4.0</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/release/release-notes-v5.4.0.md">v5.4 Release Notes</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v5.4.1</strong> · English · <a href="./README.zh-CN.md">中文 README</a> · <a href="./docs">Docs</a> · <a href="./docs/release/release-notes-v5.4.1.md">v5.4.1 Release Notes</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -13,7 +13,7 @@ Local-first AI presentation production for real office work. Give it a natural-l
   ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Proof Packs</strong></a>
   ·
-  <a href="./docs/release/release-notes-v5.4.0.md"><strong>v5.4.0 Notes</strong></a>
+  <a href="./docs/release/release-notes-v5.4.1.md"><strong>v5.4.1 Notes</strong></a>
   ·
   <a href="./docs/guides/agent-connect-bridge.md"><strong>Agent Bridge</strong></a>
 </p>
@@ -149,7 +149,7 @@ Use $ultimate-ppt-master with any natural-language presentation request. It will
 
 | Layer | Proof |
 |---|---|
-| v5.4 Swiss Deck and Asset Factory | [Release Notes - v5.4.0](./docs/release/release-notes-v5.4.0.md) |
+| v5.4 Swiss Deck and Asset Factory | [Release Notes - v5.4.1](./docs/release/release-notes-v5.4.1.md) |
 | v5.3 Best-Effect Brief Enhancer | [Release Notes - v5.3.0](./docs/release/release-notes-v5.3.0.md) |
 | v5.2 expectation-fit contract | [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) |
 | v5.1 guided intake | [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) |

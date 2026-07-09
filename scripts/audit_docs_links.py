@@ -11,7 +11,7 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "5.4.0"
+VERSION = "5.4.1"
 README_BANNED_PHRASES = (
     "Best Results Prompt",
     "What v5 Changes",
@@ -244,7 +244,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/quality/rendered-review-loop-v4.3.md",
         "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
-        "./docs/release/release-notes-v5.4.0.md",
+        "./docs/release/release-notes-v5.4.1.md",
         "./docs/release/release-notes-v5.3.0.md",
         "./docs/release/release-notes-v5.2.0.md",
         "./docs/release/release-notes-v5.1.0.md",
@@ -259,7 +259,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
         "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
-        "./docs/zh-CN/release/release-notes-v5.4.0.md",
+        "./docs/zh-CN/release/release-notes-v5.4.1.md",
         "./docs/zh-CN/release/release-notes-v5.3.0.md",
         "./docs/zh-CN/release/release-notes-v5.2.0.md",
         "./docs/zh-CN/release/release-notes-v5.1.0.md",

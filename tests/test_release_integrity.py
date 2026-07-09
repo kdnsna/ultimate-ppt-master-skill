@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "5.4.0"
+VERSION = "5.4.1"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -72,7 +72,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/rendered-review-loop-v4.3.md",
-            "docs/release/release-notes-v5.4.0.md",
+            "docs/release/release-notes-v5.4.1.md",
             "docs/release/release-notes-v5.3.0.md",
             "docs/release/release-notes-v5.2.0.md",
             "docs/release/release-notes-v5.1.0.md",
@@ -88,7 +88,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
-            "docs/zh-CN/release/release-notes-v5.4.0.md",
+            "docs/zh-CN/release/release-notes-v5.4.1.md",
             "docs/zh-CN/release/release-notes-v5.3.0.md",
             "docs/zh-CN/release/release-notes-v5.2.0.md",
             "docs/zh-CN/release/release-notes-v5.1.0.md",
@@ -512,7 +512,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v5.4.0", hero)
+        self.assertIn("v5.4.1", hero)
         self.assertIn("Best-effect", hero)
         self.assertIn("sourceConfidence", hero)
         self.assertIn("Plain-language glossary", web_preview)

@@ -1,9 +1,9 @@
-# Ultimate PPT Master - v5.4.0
+# Ultimate PPT Master - v5.4.1
 
 本地优先的 AI 演示文稿生产系统。你可以给一句自然语言、笔记、文件或 URL；Agent 会先写 `bestEffectBrief`，再选择可编辑 PPTX、Style A Editorial Fixed Rhythm 网页 Deck，或 Style B 瑞士国际主义网页 Deck，并留下来源、图片和质量记录。
 
 <p align="center">
-  <strong>v5.4.0</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/zh-CN/release/release-notes-v5.4.0.md">v5.4 发布说明</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
+  <strong>v5.4.1</strong> · <a href="./README.md">English README</a> · 中文 · <a href="./docs/zh-CN">中文文档</a> · <a href="./docs/zh-CN/release/release-notes-v5.4.1.md">v5.4.1 发布说明</a> · <a href="./docs/guides/agent-setup.md">Agent Skill</a>
 </p>
 
 ![Ultimate PPT Master Web Experience](assets/readme/hero.svg)
@@ -13,7 +13,7 @@
   ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Proof Packs</strong></a>
   ·
-  <a href="./docs/zh-CN/release/release-notes-v5.4.0.md"><strong>v5.4.0 说明</strong></a>
+  <a href="./docs/zh-CN/release/release-notes-v5.4.1.md"><strong>v5.4.1 说明</strong></a>
   ·
   <a href="./docs/guides/agent-connect-bridge.md"><strong>Agent Bridge</strong></a>
 </p>
@@ -149,7 +149,7 @@ Use $ultimate-ppt-master with any natural-language presentation request. It will
 
 | 层级 | 证明 |
 |---|---|
-| v5.4 瑞士风 Deck 与资产工厂 | [发布说明 - v5.4.0](./docs/zh-CN/release/release-notes-v5.4.0.md) |
+| v5.4 瑞士风 Deck 与资产工厂 | [发布说明 - v5.4.1](./docs/zh-CN/release/release-notes-v5.4.1.md) |
 | v5.3 最佳效果提示增强器 | [发布说明 - v5.3.0](./docs/zh-CN/release/release-notes-v5.3.0.md) |
 | v5.2 期望匹配合同 | [发布说明 - v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md) |
 | v5.1 分步需求访谈 | [发布说明 - v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md) |

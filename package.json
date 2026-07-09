@@ -1,7 +1,7 @@
 {
   "name": "ultimate-ppt-master",
   "private": true,
-  "version": "5.4.0",
+  "version": "5.4.1",
   "description": "AI PPT delivery system that clarifies the brief first, then turns local source material into editable PPTX/Web Decks with visual review and audit trails.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
