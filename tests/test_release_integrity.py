@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "6.0.0"
+VERSION = "6.1.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -74,7 +74,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/rendered-review-loop-v4.3.md",
-            "docs/release/release-notes-v6.0.0.md",
+            "docs/release/release-notes-v6.1.0.md",
             "docs/release/release-notes-v5.4.1.md",
             "docs/release/release-notes-v5.3.0.md",
             "docs/release/release-notes-v5.2.0.md",
@@ -91,7 +91,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
-            "docs/zh-CN/release/release-notes-v6.0.0.md",
+            "docs/zh-CN/release/release-notes-v6.1.0.md",
             "docs/zh-CN/release/release-notes-v5.4.1.md",
             "docs/zh-CN/release/release-notes-v5.3.0.md",
             "docs/zh-CN/release/release-notes-v5.2.0.md",
@@ -234,8 +234,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "current_generation_evidence",
             "npm run audit:swiss-deck",
             "examples/swiss-v54-demo/index.html",
-            "Baoyu Skills v2.5.2",
-            "Guizang v1.1.0",
+            "Baoyu Design",
+            "latest Guizang PPT Skill",
         ):
             self.assertIn(expected, readme)
 
@@ -246,8 +246,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "current_generation_evidence",
             "npm run audit:swiss-deck",
             "examples/swiss-v54-demo/index.html",
-            "Baoyu Skills v2.5.2",
-            "Guizang v1.1.0",
+            "Baoyu Design",
+            "最新版 Guizang PPT Skill",
         ):
             self.assertIn(expected, readme_zh)
 
@@ -411,6 +411,38 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertTrue((ROOT / "apps/web/public/benchmark/showcase.html").is_file())
         self.assertTrue((ROOT / "assets/readme/v6-finished-decks.png").is_file())
 
+        design_system = (ROOT / "DESIGN.md").read_text(encoding="utf-8")
+        for heading in (
+            "Visual theme and atmosphere",
+            "Color palette and roles",
+            "Typography rules",
+            "Component styling",
+            "Layout principles",
+            "Depth and elevation",
+            "Do / do not",
+            "Responsive behavior",
+            "Agent prompt guide",
+        ):
+            self.assertIn(heading, design_system)
+
+        directions = json.loads((ROOT / "templates/visual-directions/v6-direction-manifest.json").read_text(encoding="utf-8"))
+        required = {
+            "atmosphere", "colors", "typography", "compositionModel", "surfaceRhythm",
+            "depthModel", "shapeGrammar", "componentGrammar", "imageBehavior",
+            "antiPatterns", "responsiveBehavior", "agentPrompt",
+        }
+        for direction in directions["directions"]:
+            self.assertTrue(required.issubset(direction), direction["id"])
+
+        guardrails = directions["generationGuardrails"]
+        for key in ("titleSequence", "visualProtagonist", "layoutRegistry", "layoutDiversity", "surfaceRhythm", "imageGeometry", "browserReview"):
+            self.assertTrue(guardrails[key], key)
+
+        recipes = json.loads((ROOT / "templates/page-recipes/index.json").read_text(encoding="utf-8"))
+        self.assertGreaterEqual(len(recipes), 18)
+        for recipe in ("image_story.text_image_7_5", "image_proof.uniform_grid", "product_stage.full_bleed_safe", "native_chart.direct_label", "source_colophon.editorial"):
+            self.assertIn(recipe, recipes)
+
     def test_release_docs_include_v3_and_v4_generation_loops(self):
         release_maintenance = (ROOT / "docs/release/release-maintenance.md").read_text(encoding="utf-8")
         growth_playbook = (ROOT / "docs/strategy/public-growth-playbook.md").read_text(encoding="utf-8")
@@ -541,7 +573,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v6.0.0", hero)
+        self.assertIn("v6.1.0", hero)
         self.assertIn("Best-effect", hero)
         self.assertIn("sourceConfidence", hero)
         self.assertIn("Plain-language glossary", web_preview)

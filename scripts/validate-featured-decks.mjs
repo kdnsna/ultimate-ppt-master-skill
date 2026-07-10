@@ -13,6 +13,8 @@ const cases = [
   { file: 'claude-fable-5.html', title: 'Claude Fable 5', source: 'anthropic.com/claude/fable' }
 ];
 const errors = [];
+const designSystemPath = path.join(root, 'DESIGN.md');
+if (!fs.existsSync(designSystemPath)) errors.push('DESIGN.md: missing agent-readable design system');
 
 for (const item of cases) {
   const filePath = path.join(caseRoot, item.file);
@@ -37,6 +39,14 @@ for (const shared of ['deck.css', 'deck.js']) {
   if (!fs.existsSync(path.join(caseRoot, shared))) errors.push(`shared runtime missing: ${shared}`);
 }
 
+const deckCss = fs.readFileSync(path.join(caseRoot, 'deck.css'), 'utf8');
+for (const marker of ['IBM Plex Sans', 'Noto Serif SC', '.theme-sol', '.theme-grok', '.theme-fable']) {
+  if (!deckCss.includes(marker)) errors.push(`deck.css: missing design-system marker ${marker}`);
+}
+for (const generic of ['Avenir Next', 'DIN Condensed', 'font-size: clamp(56px, 8.6vw, 146px)']) {
+  if (deckCss.includes(generic)) errors.push(`deck.css: legacy generic styling remains: ${generic}`);
+}
+
 const benchmarkPath = path.join(root, 'apps/web/public/benchmark/index.html');
 const benchmark = fs.readFileSync(benchmarkPath, 'utf8');
 for (const item of cases) {
@@ -49,4 +59,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`Featured deck validation passed: ${cases.length} decks, 27 slides.`);
+console.log(`Featured deck validation passed: ${cases.length} decks, 27 slides, 3 distinct visual systems.`);

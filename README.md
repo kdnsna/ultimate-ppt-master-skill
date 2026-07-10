@@ -6,18 +6,18 @@
   <a href="./README.zh-CN.md"><strong>中文</strong></a> ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Live Workspace</strong></a> ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Proof Packs</strong></a> ·
-  <a href="./docs/release/release-notes-v6.0.0.md"><strong>v6 Release Notes</strong></a>
+  <a href="./docs/release/release-notes-v6.1.0.md"><strong>v6.1 Release Notes</strong></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square"></a>
   <a href="./LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-172033?style=flat-square"></a>
-  <img alt="version 6.0.0" src="https://img.shields.io/badge/version-6.0.0-EF5B3F?style=flat-square">
+  <img alt="version 6.1.0" src="https://img.shields.io/badge/version-6.1.0-CC785C?style=flat-square">
   <img alt="local first" src="https://img.shields.io/badge/local--first-yes-10B981?style=flat-square">
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-2563EB?style=flat-square">
 </p>
 
-![Ultimate PPT Master v6 finished presentation cases](assets/readme/v6-finished-decks.png)
+![Ultimate PPT Master v6 design systems and finished presentation cases](assets/readme/v6-finished-decks.png)
 
 Most AI presentation tools optimize for the first preview. Ultimate PPT Master optimizes for the moment the deck is opened in a real meeting, revised in PowerPoint, challenged on its sources, and handed to someone else.
 
@@ -93,9 +93,13 @@ You do not need a special prompt. v6 infers low-risk settings and asks only when
 - Local-first source handling, provider-secret isolation and explicit official/IP asset rules.
 - Web and Desktop surfaces sharing the same `DeckSession` stages and design tokens.
 
+## A design system agents can actually follow
+
+The root-level [`DESIGN.md`](./DESIGN.md) locks atmosphere, semantic color, typography roles, component grammar, layout, depth, anti-patterns, responsive behavior, and the fields every Agent writes before generation. Six visual directions are executable contracts—not recolored themes—and each carries its own type personality, composition model, surface rhythm, image behavior, shape grammar, and prompt. The system was informed by [`awesome-design-md`](https://github.com/VoltAgent/awesome-design-md) and adopts the strongest production disciplines from the latest [`guizang-ppt-skill`](https://github.com/op7418/guizang-ppt-skill) and [`baoyu-design`](https://github.com/JimLiu/baoyu-design): title sequence first, registered recipes, one visual protagonist per slide, planned light/dark/image rhythm, standard image geometry, projection-scale type, bottom safe space, and rendered browser review. These are workflow principles, not copied templates or brand identities.
+
 ## Finished presentations · Real Proof Packs
 
-Start with the public [presentation gallery](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/): three complete nine-slide editorial decks sit above the stable Proof Packs. GPT-5.6 and Claude Fable 5 use official release material; the requested “Grok 4.6” was corrected to the latest verified official release, Grok 4.5, as of 10 July 2026. Proof Pack scores remain self-assessed by Design Doctor, not external benchmarks.
+Start with the public [presentation gallery](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/): three complete nine-slide decks now demonstrate three materially different systems—Precision Evidence, Cinematic Product, and Editorial Intelligence—above the stable Proof Packs. GPT-5.6 and Claude Fable 5 use official release material; the requested “Grok 4.6” was corrected to the latest verified official release, Grok 4.5, as of 10 July 2026. Proof Pack scores remain self-assessed by Design Doctor, not external benchmarks.
 
 | Case | Inspectable output |
 |---|---|
@@ -194,14 +198,13 @@ The legacy contracts (`project-brief.json`, `storyboard.json`, `asset_plan.json`
 
 ## Known Limits
 
-- The production-quality generation path is still Agent/orchestrator-led; the Bridge is not yet a multi-tenant headless generation service.
-- Decks above roughly 16 pages should use the resume workflow after planning.
+- The production-quality path remains Agent/orchestrator-led; the Bridge is not a multi-tenant headless service, and decks above roughly 16 pages should use the resume workflow after planning.
 - PowerPoint-specific rendering can vary by Office version and installed fonts; use the native-object and visual checks before external delivery.
 - Free-form Canva-style canvas editing, deal-room analytics and complex multiplayer collaboration are intentionally out of scope for v6.
 
 <details><summary><strong>Capability history and canonical release links</strong></summary>
 
-[Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) · [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md) · [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md) · [v4.3 Rendered Review Loop](./docs/quality/rendered-review-loop-v4.3.md) · [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) · [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) · [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) · [Release Notes - v5.3.0](./docs/release/release-notes-v5.3.0.md) · [v5.4 Swiss Deck and Asset Factory](./docs/release/release-notes-v5.4.1.md) (`examples/swiss-v54-demo/index.html`, `npm run audit:swiss-deck`) · [v6.0.0](./docs/release/release-notes-v6.0.0.md)
+[Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) · [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md) · [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md) · [v4.3 Rendered Review Loop](./docs/quality/rendered-review-loop-v4.3.md) · [Release Notes - v5.0.0](./docs/release/release-notes-v5.0.0.md) · [Release Notes - v5.1.0](./docs/release/release-notes-v5.1.0.md) · [Release Notes - v5.2.0](./docs/release/release-notes-v5.2.0.md) · [Release Notes - v5.3.0](./docs/release/release-notes-v5.3.0.md) · [v5.4 Swiss Deck and Asset Factory](./docs/release/release-notes-v5.4.1.md) (`examples/swiss-v54-demo/index.html`, `npm run audit:swiss-deck`) · [v6.1.0](./docs/release/release-notes-v6.1.0.md)
 </details>
 
 ## Documentation Map
@@ -213,7 +216,7 @@ The legacy contracts (`project-brief.json`, `storyboard.json`, `asset_plan.json`
 | Install the Agent Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | Choose PPTX, Web Deck or Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
 | Configure models and providers | [Model and Provider Setup](./docs/guides/model-provider-setup.md) |
-| Review v6 changes | [v6.0.0 Release Notes](./docs/release/release-notes-v6.0.0.md) |
+| Review v6 changes | [v6.1.0 Release Notes](./docs/release/release-notes-v6.1.0.md) |
 | Troubleshoot | [Troubleshooting](./docs/guides/troubleshooting.md) |
 
 ## Contributing
@@ -222,6 +225,6 @@ Issues, reproducible source examples, proof packs, layout directions, provider a
 
 ## License and Acknowledgments
 
-MIT. Guizang v1.1.0 informed the fixed editorial rhythm; Baoyu Skills v2.5.2 informed parts of the generation-evidence chain. This repository maintains its own implementation, safety rules and quality contracts.
+MIT. The latest Guizang PPT Skill and Baoyu Design methods informed parts of the registered-layout, rhythm, editable-delivery, and review discipline. This repository maintains its own design directions, implementation, safety rules, and quality contracts.
 
 If this project helps you turn “AI-generated slides” into something you can actually deliver, consider starring the repository — it makes the work easier for the next person to discover.

@@ -61,5 +61,96 @@
     "visualLayer": "generated-background",
     "rasterPolicy": "allowed-section-tail",
     "summary": "Brand-tail closing page with editable closing statement and controlled background."
+  },
+  "section_divider.hero_light": {
+    "role": "section",
+    "layoutFamily": "section_divider",
+    "visualLayer": "quiet-light-atmosphere",
+    "rasterPolicy": "allowed-section-tail",
+    "requiredSlots": ["section-number", "short-title", "one-line-orientation"],
+    "summary": "Light breathing page that resets rhythm between dense sequences; no card grid."
+  },
+  "section_divider.hero_dark": {
+    "role": "section",
+    "layoutFamily": "section_divider",
+    "visualLayer": "controlled-dark-atmosphere",
+    "rasterPolicy": "allowed-section-tail",
+    "requiredSlots": ["section-number", "short-title", "one-line-orientation"],
+    "summary": "Dark breathing page used as a deliberate act break, not as a repeated title slide."
+  },
+  "image_story.text_image_7_5": {
+    "role": "context",
+    "layoutFamily": "image_story",
+    "visualLayer": "real-or-generated-image",
+    "rasterPolicy": "prohibited-formal-body",
+    "requiredSlots": ["governing-title", "body-or-quote", "standard-ratio-image", "caption"],
+    "imageContract": "16:10 or 4:3; align the image with body content, preserve a crop-safe focal point",
+    "summary": "Asymmetric 7:5 story spread with editable text and one evidence-bearing image."
+  },
+  "image_proof.uniform_grid": {
+    "role": "evidence",
+    "layoutFamily": "image_proof",
+    "visualLayer": "real-images-or-screenshots",
+    "rasterPolicy": "prohibited-formal-body",
+    "requiredSlots": ["governing-title", "2-to-6-equal-height-images", "captions", "source-note"],
+    "imageContract": "All peers use one standard ratio and one crop policy; screenshots use contain when labels matter",
+    "summary": "Uniform evidence wall for screenshots, field photos, or before/after states; captions are mandatory."
+  },
+  "product_stage.full_bleed_safe": {
+    "role": "hero",
+    "layoutFamily": "product_stage",
+    "visualLayer": "full-bleed-real-or-generated-image",
+    "rasterPolicy": "allowed-cover",
+    "requiredSlots": ["subject-image", "safe-title-zone", "short-proof-or-date"],
+    "imageContract": "16:9 subject-first image with explicit desktop and mobile focal point",
+    "summary": "Cinematic product or place stage with one visual protagonist and restrained editable copy."
+  },
+  "data_hero.single_kpi": {
+    "role": "data",
+    "layoutFamily": "data_hero",
+    "visualLayer": "none",
+    "rasterPolicy": "prohibited-formal-body",
+    "requiredSlots": ["one-kpi", "unit", "definition", "comparison", "source"],
+    "summary": "One projection-scale metric with its meaning and source; not a collage of unrelated numbers."
+  },
+  "native_chart.direct_label": {
+    "role": "chart",
+    "layoutFamily": "native_chart",
+    "visualLayer": "native-editable-chart",
+    "rasterPolicy": "prohibited-formal-body",
+    "requiredSlots": ["governing-title", "editable-chart", "direct-labels", "conclusion-annotation", "source"],
+    "summary": "Editable PowerPoint chart with direct labels and one explicit conclusion."
+  },
+  "editorial_quote.pull_quote": {
+    "role": "breathing",
+    "layoutFamily": "editorial_quote",
+    "visualLayer": "none-or-subtle-atmosphere",
+    "rasterPolicy": "prohibited-formal-body",
+    "requiredSlots": ["quote-or-judgment", "attribution-or-context"],
+    "summary": "Low-density editorial pause with a real quote or independently useful judgment."
+  },
+  "timeline.vertical_kpi": {
+    "role": "context",
+    "layoutFamily": "timeline",
+    "visualLayer": "editable-schematic",
+    "rasterPolicy": "prohibited-formal-body",
+    "requiredSlots": ["ordered-events", "time-labels", "one-linked-kpi", "source"],
+    "summary": "Vertical chronology plus one metric; avoids squeezing a long story into equal cards."
+  },
+  "system_map.layered": {
+    "role": "action",
+    "layoutFamily": "system_map",
+    "visualLayer": "editable-schematic",
+    "rasterPolicy": "prohibited-formal-body",
+    "requiredSlots": ["layers-or-nodes", "relationships", "owner-or-boundary", "legend"],
+    "summary": "Editable system architecture or ecosystem map with a single reading direction."
+  },
+  "source_colophon.editorial": {
+    "role": "closing",
+    "layoutFamily": "source_colophon",
+    "visualLayer": "none",
+    "rasterPolicy": "prohibited-formal-body",
+    "requiredSlots": ["primary-sources", "verification-date", "interpretation-boundary", "next-update-trigger"],
+    "summary": "Editorial source colophon that keeps facts, interpretation, and future update triggers separate."
   }
 }

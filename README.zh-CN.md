@@ -6,18 +6,18 @@
   <a href="./README.md"><strong>English</strong></a> ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>在线体验工作台</strong></a> ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>查看 Proof Packs</strong></a> ·
-  <a href="./docs/zh-CN/release/release-notes-v6.0.0.md"><strong>v6 发布说明</strong></a>
+  <a href="./docs/zh-CN/release/release-notes-v6.1.0.md"><strong>v6.1 发布说明</strong></a>
 </p>
 
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square"></a>
   <a href="./LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-172033?style=flat-square"></a>
-  <img alt="version 6.0.0" src="https://img.shields.io/badge/version-6.0.0-EF5B3F?style=flat-square">
+  <img alt="version 6.1.0" src="https://img.shields.io/badge/version-6.1.0-CC785C?style=flat-square">
   <img alt="local first" src="https://img.shields.io/badge/本地优先-是-10B981?style=flat-square">
   <img alt="editable PPTX" src="https://img.shields.io/badge/输出-可编辑_PPTX-2563EB?style=flat-square">
 </p>
 
-![Ultimate PPT Master v6 完整演示案例](assets/readme/v6-finished-decks.png)
+![Ultimate PPT Master v6 设计系统与完整演示案例](assets/readme/v6-finished-decks.png)
 
 多数 AI PPT 产品优化的是“第一眼看起来像成品”。Ultimate PPT Master 更在意另一刻：这份文件被带进真实会议、在 PowerPoint 里继续修改、被追问数据来源，并最终交给另一个人使用。
 
@@ -93,9 +93,13 @@ npm run bridge
 - 本地优先的资料处理、Provider 密钥隔离和明确的官方/IP 素材规则。
 - Web 与 Desktop 共用 `DeckSession` 阶段和设计令牌。
 
+## 一套 Agent 真能执行的设计系统
+
+根目录 [`DESIGN.md`](./DESIGN.md) 统一锁定氛围、语义色、字体角色、组件语法、版式、层次、反模式、响应式行为和生成前必填字段。六套视觉方向是可执行合同，不再是同一模板换色；每套都有自己的字体性格、构图模型、表面节奏、图片行为、形状语法和 Prompt。系统的表达方式借鉴了 [`awesome-design-md`](https://github.com/VoltAgent/awesome-design-md)，并吸收最新版 [`guizang-ppt-skill`](https://github.com/op7418/guizang-ppt-skill) 与 [`baoyu-design`](https://github.com/JimLiu/baoyu-design) 的生产纪律：先写标题序列、使用登记配方、每页一个视觉主角、预先规划亮/暗/图片节奏、使用标准图片槽位、保持投影级字号与底部安全留白，最后逐页进行浏览器渲染审阅。这里借鉴的是方法，不复制模板或第三方品牌身份。
+
 ## 完整演示与真实 Proof Packs
 
-先打开 [演示成品库](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/)：上层是三套各 9 页、视觉方向完全不同的完整 Deck，下层保留稳定 Proof Packs 的证明链。GPT-5.6 和 Claude Fable 5 使用官方发布资料；用户提到的“Grok 4.6”截至 2026-07-10 未找到官方发布，案例因此改为官方最新可核验版本 Grok 4.5。Proof Pack 分数仍是 Design Doctor 自评，不包装成第三方 benchmark。
+先打开 [演示成品库](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/)：上层三套各 9 页的完整 Deck，分别验证“证据精密、影像产品、编辑叙事”三种真正不同的系统；下层保留稳定 Proof Packs 的证明链。GPT-5.6 和 Claude Fable 5 使用官方发布资料；用户提到的“Grok 4.6”截至 2026-07-10 未找到官方发布，案例因此改为官方最新可核验版本 Grok 4.5。Proof Pack 分数仍是 Design Doctor 自评，不包装成第三方 benchmark。
 
 | 案例 | 可检查产物 |
 |---|---|
@@ -194,14 +198,13 @@ Agent / 编排器 ── 故事板 · 素材计划 · 生成 · 审计
 
 ## 已知限制
 
-- 生产级生成仍由 Agent/编排器牵引；Bridge 暂时不是多租户无头生成服务。
-- 超过约 16 页的项目建议在策划完成后使用断点续跑流程。
+- 生产级生成仍由 Agent/编排器牵引；Bridge 暂时不是多租户无头服务，超过约 16 页的项目建议在策划完成后使用断点续跑流程。
 - PowerPoint 渲染会受到 Office 版本和本机字体影响，对外交付前应运行原生对象与视觉检查。
 - Canva 式自由画布、复杂多人协作和营销 Deal Room 暂不属于 v6 范围。
 
 <details><summary><strong>历史能力与规范发布入口</strong></summary>
 
-[v4.0 混合可编辑视觉工作流](./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md) · [v4.1 精简网页控制台](./docs/zh-CN/release/release-notes-v4.1.0.md) · [v4.2 DeckIR AI 策划工作流](./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md) · [v4.3 渲染审阅闭环](./docs/zh-CN/quality/rendered-review-loop-v4.3.md) · [发布说明 - v5.0.0](./docs/zh-CN/release/release-notes-v5.0.0.md) · [发布说明 - v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md) · [发布说明 - v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md) · [发布说明 - v5.3.0](./docs/zh-CN/release/release-notes-v5.3.0.md) · [v5.4 瑞士风 Deck 与资产工厂](./docs/zh-CN/release/release-notes-v5.4.1.md)（`examples/swiss-v54-demo/index.html`、`npm run audit:swiss-deck`）· [v6.0.0](./docs/zh-CN/release/release-notes-v6.0.0.md)
+[v4.0 混合可编辑视觉工作流](./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md) · [v4.1 精简网页控制台](./docs/zh-CN/release/release-notes-v4.1.0.md) · [v4.2 DeckIR AI 策划工作流](./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md) · [v4.3 渲染审阅闭环](./docs/zh-CN/quality/rendered-review-loop-v4.3.md) · [发布说明 - v5.0.0](./docs/zh-CN/release/release-notes-v5.0.0.md) · [发布说明 - v5.1.0](./docs/zh-CN/release/release-notes-v5.1.0.md) · [发布说明 - v5.2.0](./docs/zh-CN/release/release-notes-v5.2.0.md) · [发布说明 - v5.3.0](./docs/zh-CN/release/release-notes-v5.3.0.md) · [v5.4 瑞士风 Deck 与资产工厂](./docs/zh-CN/release/release-notes-v5.4.1.md)（`examples/swiss-v54-demo/index.html`、`npm run audit:swiss-deck`）· [v6.1.0](./docs/zh-CN/release/release-notes-v6.1.0.md)
 </details>
 
 ## 文档地图
@@ -213,7 +216,7 @@ Agent / 编排器 ── 故事板 · 素材计划 · 生成 · 审计
 | 安装 Agent Skill | [Agent Setup](./docs/guides/agent-setup.md) |
 | 选择 PPTX、Web Deck 或 Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
 | 配置模型与 Provider | [Model and Provider Setup](./docs/guides/model-provider-setup.md) |
-| 查看 v6 变化 | [v6.0.0 发布说明](./docs/zh-CN/release/release-notes-v6.0.0.md) |
+| 查看 v6 变化 | [v6.1.0 发布说明](./docs/zh-CN/release/release-notes-v6.1.0.md) |
 | 排查问题 | [Troubleshooting](./docs/guides/troubleshooting.md) |
 
 ## 参与贡献
@@ -222,6 +225,6 @@ Agent / 编排器 ── 故事板 · 素材计划 · 生成 · 审计
 
 ## 许可与致谢
 
-MIT。Guizang v1.1.0 启发了固定编辑节奏，Baoyu Skills v2.5.2 启发了部分生成证据链；本仓库保留自己的实现、安全规则和质量合同。
+MIT。最新版 Guizang PPT Skill 与 Baoyu Design 的方法启发了登记版式、节奏、可编辑交付和审阅纪律；本仓库保持原创视觉方向、独立实现、安全规则和质量合同。
 
 如果这个项目帮你把“AI 生成的幻灯片”变成了真正能交付的文件，欢迎点一个 Star——它会让下一个需要它的人更容易发现。

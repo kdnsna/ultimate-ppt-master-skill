@@ -29,6 +29,13 @@
 ## visual_direction
 - id: finance_internal_report
 - benchmark: Formal banking report with source-grounded evidence pages and restrained brand-color structure.
+- atmosphere: quiet institutional authority with the feel of a management and audit report
+- typography_personality: light evidence sans for conclusions; office-safe CJK sans for body; mono only for source IDs
+- composition_model: asymmetric 4:8 conclusion/evidence columns on a 12-column grid
+- surface_rhythm: warm-paper; white-evidence; deep-blue-section; warm-paper
+- depth_model: no shadows; paper contrast, rules, crop, and scale create hierarchy
+- component_grammar: evidence-strip; management-ledger; native-chart; risk-rail; source-footnote
+- image_behavior: proof-bearing scenes only; record focal point, crop-safe zone, and authorized replacement
 - theme_art_direction: restrained-title-lockup
 - theme_motif: brand-color rule lines; source-grounded evidence panels; quiet negative space
 - theme_scope: cover+section+tail
@@ -38,6 +45,7 @@
 
 > `id` must match `templates/visual-directions/index.json`, or be `custom`.
 > `benchmark` is a one-sentence visual target.
+> The design-system fields (`atmosphere`, `typography_personality`, `composition_model`, `surface_rhythm`, `depth_model`, `component_grammar`, `image_behavior`) come from the selected direction in `templates/visual-directions/v6-direction-manifest.json`. They prevent a direction from collapsing into a color preset.
 > `theme_art_direction` is the named subject-fit concept chosen after reading the source, e.g. `山海交汇 烟火同行` for cultural-tourism or `restrained-title-lockup` for serious work reports.
 > `theme_motif` lists the visual motifs Executor may reuse. Keep them specific and source-linked, not generic decoration.
 > `theme_scope` is one of `deck-wide`, `cover+section+tail`, `cover+tail`, or `restrained-title-only`.
