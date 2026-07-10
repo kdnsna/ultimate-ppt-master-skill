@@ -1,139 +1,91 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ultimate PPT Master Proof Packs</title>
-  <meta name="description" content="Public proof packs for Ultimate PPT Master: input, preset, output, and Design Doctor review." />
-  <link rel="icon" href="../brand.svg" type="image/svg+xml" />
+  <meta name="description" content="Finished presentation cases and inspectable proof packs for Ultimate PPT Master v6.">
+  <link rel="icon" href="../brand.svg" type="image/svg+xml">
   <style>
-    :root {
-      color: #172033;
-      background: #f3f5f7;
-      font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-      --line: #d8e0ea;
-      --muted: #617085;
-      --green: #0f766e;
-      --blue: #2563eb;
-      --paper: #fff;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #f7fafc; }
-    main { max-width: 1180px; margin: 0 auto; padding: 36px 20px 54px; }
-    header, article, .note {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: rgba(255,255,255,.96);
-      box-shadow: 0 16px 38px rgba(23,32,51,.08);
-    }
-    header { padding: 28px; display: grid; gap: 14px; }
-    .eyebrow { margin: 0; color: var(--green); font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0; }
-    h1 { margin: 0; font-size: clamp(32px, 6vw, 64px); line-height: 1.03; letter-spacing: 0; }
-    p { margin: 0; color: var(--muted); line-height: 1.6; }
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
-    a {
-      min-height: 38px;
-      padding: 0 12px;
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      color: #172033;
-      background: #fff;
-      font-weight: 800;
-      text-decoration: none;
-    }
-    a.primary { color: #fff; background: #172033; border-color: #172033; }
-    .grid { margin-top: 18px; display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
-    article { padding: 20px; display: grid; gap: 14px; }
-    article h2 { margin: 0; font-size: 24px; line-height: 1.16; }
-    dl { margin: 0; display: grid; gap: 10px; }
-    div.row { display: grid; grid-template-columns: 112px minmax(0,1fr); gap: 10px; }
-    dt { color: var(--blue); font-size: 12px; font-weight: 900; text-transform: uppercase; }
-    dd { margin: 0; color: #172033; line-height: 1.45; }
-    .scorecard { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; }
-    .scorecard span { padding: 8px; border-radius: 8px; color: #fff; background: var(--green); font-weight: 900; text-align: center; }
-    .note { margin-top: 18px; padding: 18px; display: grid; gap: 10px; }
-    code { padding: 2px 5px; border-radius: 5px; background: #eef2f7; }
-    @media (max-width: 760px) {
-      .grid { grid-template-columns: 1fr; }
-      div.row { grid-template-columns: 1fr; }
-      .scorecard { grid-template-columns: 1fr; }
-    }
+    :root { --ink:#111318; --paper:#f4f0e7; --muted:#687078; --line:rgba(17,19,24,.18); --orange:#ef6a3c; --blue:#275fd0; --green:#173d34; --red:#e52237; color:var(--ink); background:var(--paper); font-family:"Avenir Next","PingFang SC",sans-serif; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; background:var(--paper); }
+    a { color:inherit; }
+    .shell { max-width:1500px; margin:0 auto; padding:0 32px 70px; }
+    .topbar { min-height:78px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--ink); font-family:Menlo,monospace; font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+    .topbar nav { display:flex; gap:20px; }
+    .topbar a { text-decoration:none; }
+    .hero { min-height:430px; display:grid; grid-template-columns:8fr 4fr; gap:7vw; align-items:end; padding:72px 0 48px; border-bottom:1px solid var(--ink); position:relative; overflow:hidden; }
+    .hero::after { content:"06"; position:absolute; right:-.02em; bottom:-.18em; z-index:-1; font-size:390px; font-weight:800; line-height:1; letter-spacing:-.1em; opacity:.045; }
+    .eyebrow { margin:0 0 22px; color:var(--orange); font-family:Menlo,monospace; font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { margin-bottom:26px; max-width:12ch; font-size:clamp(56px,7.5vw,118px); line-height:.88; letter-spacing:-.055em; }
+    .hero p:not(.eyebrow) { max-width:38em; margin-bottom:0; color:var(--muted); font-size:clamp(17px,1.35vw,22px); line-height:1.6; }
+    .manifesto { display:grid; gap:0; border-top:1px solid var(--ink); }
+    .manifesto span { display:grid; grid-template-columns:42px 1fr; gap:12px; padding:16px 0; border-bottom:1px solid var(--ink); font-size:14px; line-height:1.4; }
+    .manifesto b { color:var(--orange); font-family:Menlo,monospace; }
+    .section-head { display:grid; grid-template-columns:4fr 8fr; gap:3vw; align-items:end; padding:70px 0 28px; }
+    .section-head h2 { margin:0; font-size:clamp(38px,4.8vw,72px); line-height:.96; letter-spacing:-.04em; }
+    .section-head p { max-width:42em; margin:0; color:var(--muted); font-size:17px; line-height:1.6; }
+    .featured { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .case { border-top:5px solid var(--case); background:#fff; }
+    .preview { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; background:#111; border-bottom:1px solid var(--line); }
+    .preview img { width:100%; height:100%; display:block; object-fit:cover; }
+    .preview a { position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:flex-end; padding:16px; color:#fff; background:linear-gradient(transparent 62%,rgba(0,0,0,.62)); text-decoration:none; font-family:Menlo,monospace; font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; }
+    .case-copy { padding:22px; }
+    .case-copy small { color:var(--case); font-family:Menlo,monospace; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .case-copy h3 { margin:10px 0 12px; font-size:28px; line-height:1.05; }
+    .case-copy p { min-height:72px; margin-bottom:20px; color:var(--muted); line-height:1.55; }
+    .case-copy a { display:inline-flex; min-height:40px; align-items:center; padding:0 14px; border:1px solid var(--ink); text-decoration:none; font-weight:800; }
+    .proof-grid { display:grid; grid-template-columns:repeat(2,1fr); border-top:1px solid var(--ink); border-left:1px solid var(--ink); }
+    .proof { padding:26px; border-right:1px solid var(--ink); border-bottom:1px solid var(--ink); background:rgba(255,255,255,.48); }
+    .proof h3 { margin-bottom:10px; font-size:25px; }
+    .proof > p { color:var(--muted); line-height:1.55; }
+    dl { margin:22px 0 0; display:grid; gap:10px; }
+    .row { display:grid; grid-template-columns:112px 1fr; gap:12px; padding-top:10px; border-top:1px solid var(--line); }
+    dt { color:var(--blue); font-family:Menlo,monospace; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+    dd { margin:0; line-height:1.45; overflow-wrap:anywhere; }
+    dd a { font-weight:750; }
+    .scorecard { margin-top:20px; display:flex; flex-wrap:wrap; gap:8px; }
+    .scorecard span { padding:7px 10px; color:#fff; background:var(--green); font-family:Menlo,monospace; font-size:11px; font-weight:800; }
+    .note { margin-top:34px; display:grid; grid-template-columns:4fr 8fr; gap:3vw; padding:30px 0; border-top:5px solid var(--orange); border-bottom:1px solid var(--ink); }
+    .note h2 { margin:0; font-size:34px; }.note p { color:var(--muted); line-height:1.6; }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
+    .actions a { min-height:42px; padding:0 15px; display:inline-flex; align-items:center; border:1px solid var(--ink); text-decoration:none; font-weight:800; }
+    .actions .primary { color:#fff; background:var(--ink); }
+    a:focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
+    @media (max-width:900px) { .shell{padding-inline:18px}.topbar nav a:nth-child(2){display:none}.hero{grid-template-columns:1fr;min-height:auto;padding:54px 0 34px}.manifesto{margin-top:12px}.section-head{grid-template-columns:1fr;padding-top:48px}.featured{grid-template-columns:1fr}.case-copy p{min-height:auto}.proof-grid{grid-template-columns:1fr}.note{grid-template-columns:1fr}.row{grid-template-columns:1fr} }
   </style>
 </head>
 <body>
-  <main>
-    <header>
-      <p class="eyebrow">public proof packs</p>
-      <h1>Ultimate PPT Master Proof Packs</h1>
-      <p>Every stable proof pack shows the same chain: input -> preset -> output -> review. Scores are self-assessed by Design Doctor, with source files and quality reports visible before installation.</p>
-      <div class="actions">
-        <a class="primary" href="../">Open Web Experience</a>
-        <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/blob/main/docs/quality/quality-workbench-v2.5.md">Rubric</a>
-        <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/blob/main/README.md">README</a>
-      </div>
+  <div class="shell">
+    <div class="topbar"><span>Ultimate PPT Master · v6.0.0</span><nav><a href="#finished">Finished decks</a><a href="#proof">Proof packs</a><a href="../">Workspace →</a></nav></div>
+    <header class="hero">
+      <div><p class="eyebrow">Presentation cases · proof before promise</p><h1>先看成品，<br>再相信流程。</h1><p>Three current AI topics, three complete visual systems, 27 source-grounded slides. Below them, every stable pack keeps the same inspectable chain: input -> preset -> output -> review.</p><div class="actions"><a class="primary" href="#finished">Open finished decks</a><a href="https://github.com/kdnsna/ultimate-ppt-master-skill/blob/main/README.md">README</a><a href="https://github.com/kdnsna/ultimate-ppt-master-skill/blob/main/docs/quality/quality-workbench-v2.5.md">Rubric</a></div></div>
+      <div class="manifesto"><span><b>01</b>Not three recolored templates.</span><span><b>02</b>Primary sources separated from interpretation.</span><span><b>03</b>Keyboard, wheel and touch navigation.</span><span><b>04</b>Built to demonstrate a finished delivery bar.</span></div>
     </header>
 
-    <section class="grid" aria-label="Proof pack cases">
-      <article>
-        <h2>Executive Business Review / 经营复盘</h2>
-        <p>KPI reality, management conclusion, owner-led next actions.</p>
-        <dl>
-          <div class="row"><dt>Input</dt><dd><a href="../examples/executive-business-review-starter/source.sanitized.md">source.sanitized.md</a>, 159 words.</dd></div>
-          <div class="row"><dt>Input excerpt</dt><dd>Executive Business Review Starter Source. Topic: quarterly operating review.</dd></div>
-          <div class="row"><dt>Preset</dt><dd>executive_business_review stable pack</dd></div>
-          <div class="row"><dt>Output</dt><dd><a href="../examples/executive-business-review-starter/web-demo.html">examples/executive-business-review-starter/web-demo.html</a></dd></div>
-          <div class="row"><dt>Review</dt><dd><a href="../examples/executive-business-review-starter/quality-report.json">examples/executive-business-review-starter/quality-report.json</a></dd></div>
-        </dl>
-        <div class="scorecard"><span>Layout 92</span><span>Evidence 90</span><span>Editability 86</span></div>
-      </article>
-
-      <article>
-        <h2>Consulting Proposal / 咨询方案</h2>
-        <p>Decision question, option comparison, recommendation, roadmap.</p>
-        <dl>
-          <div class="row"><dt>Input</dt><dd><a href="../examples/consulting-proposal-starter/source.sanitized.md">source.sanitized.md</a>, 120 words.</dd></div>
-          <div class="row"><dt>Input excerpt</dt><dd>Consulting Proposal Starter Source. Topic: operating model transformation.</dd></div>
-          <div class="row"><dt>Preset</dt><dd>consulting_proposal stable pack</dd></div>
-          <div class="row"><dt>Output</dt><dd><a href="../examples/consulting-proposal-starter/web-demo.html">examples/consulting-proposal-starter/web-demo.html</a></dd></div>
-          <div class="row"><dt>Review</dt><dd><a href="../examples/consulting-proposal-starter/quality-report.json">examples/consulting-proposal-starter/quality-report.json</a></dd></div>
-        </dl>
-        <div class="scorecard"><span>Layout 91</span><span>Evidence 88</span><span>Editability 87</span></div>
-      </article>
-
-      <article>
-        <h2>Product Pitch / 产品路演</h2>
-        <p>Product wedge, workflow proof, adoption ask.</p>
-        <dl>
-          <div class="row"><dt>Input</dt><dd><a href="../examples/product-pitch-starter/source.sanitized.md">source.sanitized.md</a>, 127 words.</dd></div>
-          <div class="row"><dt>Input excerpt</dt><dd>Product Pitch Starter Source. Topic: product workflow and adoption ask.</dd></div>
-          <div class="row"><dt>Preset</dt><dd>product_pitch stable pack</dd></div>
-          <div class="row"><dt>Output</dt><dd><a href="../examples/product-pitch-starter/web-demo.html">examples/product-pitch-starter/web-demo.html</a></dd></div>
-          <div class="row"><dt>Review</dt><dd><a href="../examples/product-pitch-starter/quality-report.json">examples/product-pitch-starter/quality-report.json</a></dd></div>
-        </dl>
-        <div class="scorecard"><span>Layout 90</span><span>Evidence 86</span><span>Editability 85</span></div>
-      </article>
-
-      <article>
-        <h2>Tech Trend Web Deck / 科技趋势</h2>
-        <p>Public signals, interpretation, implications, Web Deck rhythm.</p>
-        <dl>
-          <div class="row"><dt>Input</dt><dd><a href="../examples/tech-trend-web-deck-starter/source.sanitized.md">source.sanitized.md</a>, 128 words.</dd></div>
-          <div class="row"><dt>Input excerpt</dt><dd>Tech Trend Web Deck Starter Source. Topic: public trend briefing.</dd></div>
-          <div class="row"><dt>Preset</dt><dd>tech_trend_web_deck stable pack</dd></div>
-          <div class="row"><dt>Output</dt><dd><a href="../examples/tech-trend-web-deck-starter/web-demo.html">examples/tech-trend-web-deck-starter/web-demo.html</a></dd></div>
-          <div class="row"><dt>Review</dt><dd><a href="../examples/tech-trend-web-deck-starter/quality-report.json">examples/tech-trend-web-deck-starter/quality-report.json</a></dd></div>
-        </dl>
-        <div class="scorecard"><span>Layout 93</span><span>Evidence 89</span><span>Editability 82</span></div>
-      </article>
+    <section id="finished">
+      <div class="section-head"><div><p class="eyebrow">Featured · July 2026</p><h2>Three finished decks</h2></div><p>Each case is nine slides long, has its own art direction, and ends with primary sources. Grok uses the latest verified release, 4.5; no official Grok 4.6 release was found as of 10 July 2026.</p></div>
+      <div class="featured">
+        <article class="case" style="--case:#ef6a3c"><div class="preview"><img src="./previews/gpt-5-6.png" alt="GPT-5.6 finished deck cover"><a href="../examples/ai-frontier-2026/gpt-5-6.html">Open 9-slide deck →</a></div><div class="case-copy"><small>Orbit technology annual</small><h3>GPT-5.6 · Three Orbits</h3><p>Sol, Terra and Luna as a task-routing architecture: capability, preview pricing, workflow and boundaries.</p><a href="../examples/ai-frontier-2026/gpt-5-6.html">View presentation</a></div></article>
+        <article class="case" style="--case:#e52237"><div class="preview"><img src="./previews/grok-4-5.png" alt="Grok 4.5 finished deck cover"><a href="../examples/ai-frontier-2026/grok-4-5.html">Open 9-slide deck →</a></div><div class="case-copy"><small>Industrial signal log</small><h3>Grok 4.5 · Efficiency Curve</h3><p>A fact-checked engineering brief on task completion, 80 TPS, token efficiency and native Office work.</p><a href="../examples/ai-frontier-2026/grok-4-5.html">View presentation</a></div></article>
+        <article class="case" style="--case:#b94832"><div class="preview"><img src="./previews/claude-fable-5.png" alt="Claude Fable 5 finished deck cover"><a href="../examples/ai-frontier-2026/claude-fable-5.html">Open 9-slide deck →</a></div><div class="case-copy"><small>Long-form research folio</small><h3>Claude Fable 5 · Long Horizon</h3><p>A warm editorial story about long-running work, project coherence, economics, safeguards and adoption.</p><a href="../examples/ai-frontier-2026/claude-fable-5.html">View presentation</a></div></article>
+      </div>
     </section>
 
-    <section class="note">
-      <h2>Design Doctor scorecard</h2>
-      <p>The scorecard is a self-assessed by Design Doctor proof contract, not a claim of automatic repair or external comparison. The default is a <strong>report-only repair policy</strong>: generate `quality-report.json`, name risks in plain language, and only repair SVG files when the user explicitly asks for it.</p>
-      <p>Rubric fields include layout structure, source evidence, editability, public-demo safety, and whether the proof chain keeps input, preset, output, and review inspectable.</p>
+    <section id="proof">
+      <div class="section-head"><div><p class="eyebrow">Stable preset evidence</p><h2>Inspectable Proof Packs</h2></div><p>The following packs remain the contract tests for public presets. Scores are self-assessed by Design Doctor; they are not external benchmark claims.</p></div>
+      <div class="proof-grid" aria-label="Proof pack cases">
+        <article class="proof"><h3>Executive Business Review / 经营复盘</h3><p>KPI reality, management conclusion, owner-led next actions.</p><dl><div class="row"><dt>Input</dt><dd><a href="../examples/executive-business-review-starter/source.sanitized.md">source.sanitized.md</a>, 159 words.</dd></div><div class="row"><dt>Input excerpt</dt><dd>Executive Business Review Starter Source. Topic: quarterly operating review.</dd></div><div class="row"><dt>Preset</dt><dd>executive_business_review stable pack</dd></div><div class="row"><dt>Output</dt><dd><a href="../examples/executive-business-review-starter/web-demo.html">examples/executive-business-review-starter/web-demo.html</a></dd></div><div class="row"><dt>Review</dt><dd><a href="../examples/executive-business-review-starter/quality-report.json">examples/executive-business-review-starter/quality-report.json</a></dd></div></dl><div class="scorecard"><span>Layout 92</span><span>Evidence 90</span><span>Editability 86</span></div></article>
+        <article class="proof"><h3>Consulting Proposal / 咨询方案</h3><p>Decision question, option comparison, recommendation, roadmap.</p><dl><div class="row"><dt>Input</dt><dd><a href="../examples/consulting-proposal-starter/source.sanitized.md">source.sanitized.md</a>, 120 words.</dd></div><div class="row"><dt>Input excerpt</dt><dd>Consulting Proposal Starter Source. Topic: operating model transformation.</dd></div><div class="row"><dt>Preset</dt><dd>consulting_proposal stable pack</dd></div><div class="row"><dt>Output</dt><dd><a href="../examples/consulting-proposal-starter/web-demo.html">examples/consulting-proposal-starter/web-demo.html</a></dd></div><div class="row"><dt>Review</dt><dd><a href="../examples/consulting-proposal-starter/quality-report.json">examples/consulting-proposal-starter/quality-report.json</a></dd></div></dl><div class="scorecard"><span>Layout 91</span><span>Evidence 88</span><span>Editability 87</span></div></article>
+        <article class="proof"><h3>Product Pitch / 产品路演</h3><p>Product wedge, workflow proof, adoption ask.</p><dl><div class="row"><dt>Input</dt><dd><a href="../examples/product-pitch-starter/source.sanitized.md">source.sanitized.md</a>, 127 words.</dd></div><div class="row"><dt>Input excerpt</dt><dd>Product Pitch Starter Source. Topic: product workflow and adoption ask.</dd></div><div class="row"><dt>Preset</dt><dd>product_pitch stable pack</dd></div><div class="row"><dt>Output</dt><dd><a href="../examples/product-pitch-starter/web-demo.html">examples/product-pitch-starter/web-demo.html</a></dd></div><div class="row"><dt>Review</dt><dd><a href="../examples/product-pitch-starter/quality-report.json">examples/product-pitch-starter/quality-report.json</a></dd></div></dl><div class="scorecard"><span>Layout 90</span><span>Evidence 86</span><span>Editability 85</span></div></article>
+        <article class="proof"><h3>Tech Trend Web Deck / 科技趋势</h3><p>Public signals, interpretation, implications, Web Deck rhythm.</p><dl><div class="row"><dt>Input</dt><dd><a href="../examples/tech-trend-web-deck-starter/source.sanitized.md">source.sanitized.md</a>, 128 words.</dd></div><div class="row"><dt>Input excerpt</dt><dd>Tech Trend Web Deck Starter Source. Topic: public trend briefing.</dd></div><div class="row"><dt>Preset</dt><dd>tech_trend_web_deck stable pack</dd></div><div class="row"><dt>Output</dt><dd><a href="../examples/tech-trend-web-deck-starter/web-demo.html">examples/tech-trend-web-deck-starter/web-demo.html</a></dd></div><div class="row"><dt>Review</dt><dd><a href="../examples/tech-trend-web-deck-starter/quality-report.json">examples/tech-trend-web-deck-starter/quality-report.json</a></dd></div></dl><div class="scorecard"><span>Layout 93</span><span>Evidence 89</span><span>Editability 82</span></div></article>
+      </div>
     </section>
-  </main>
+
+    <section class="note"><h2>Design Doctor scorecard</h2><div><p>The scorecard is a self-assessed by Design Doctor proof contract, not a claim of automatic repair or external comparison. The default is a <strong>report-only repair policy</strong>: generate <code>quality-report.json</code>, name risks in plain language, and only repair SVG files when the user explicitly asks for it.</p><p>Rubric fields include layout structure, source evidence, editability, public-demo safety, and whether the proof chain keeps input, preset, output, and review inspectable.</p></div></section>
+  </div>
 </body>
 </html>
