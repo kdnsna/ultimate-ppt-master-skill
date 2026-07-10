@@ -1,22 +1,22 @@
 :root {
-  color: #172033;
-  background: #fff8ec;
-  font-family: "Avenir Next", "SF Pro Display", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--upm-ink);
+  background: var(--upm-surface);
+  font-family: var(--upm-font-ui);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --paper: #fff8ec;
-  --paper-2: #f4f8ff;
-  --ink: #172033;
-  --muted: #667085;
-  --line: rgba(23, 32, 51, 0.12);
+  --paper: var(--upm-paper);
+  --paper-2: var(--upm-surface);
+  --ink: var(--upm-ink);
+  --muted: var(--upm-muted);
+  --line: var(--upm-line);
   --glass: rgba(255, 255, 255, 0.72);
-  --orange: #f97316;
-  --green: #10b981;
-  --blue: #2563eb;
-  --violet: #7c3aed;
-  --rose: #e11d48;
-  --shadow: 0 24px 60px rgba(57, 72, 102, 0.16);
+  --orange: var(--upm-coral);
+  --green: var(--upm-green);
+  --blue: var(--upm-blue);
+  --violet: var(--upm-blue);
+  --rose: var(--upm-coral);
+  --shadow: var(--upm-shadow);
 }
 
 * {
@@ -28,8 +28,8 @@ body {
   min-width: 1040px;
   min-height: 720px;
   background:
-    linear-gradient(130deg, rgba(255, 248, 236, 0.98), rgba(244, 248, 255, 0.92) 56%, rgba(255, 243, 232, 0.98)),
-    radial-gradient(circle at 78% 16%, rgba(37, 99, 235, 0.15), transparent 34%);
+    linear-gradient(90deg, rgba(23, 32, 51, 0.022) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(180deg, #f8f9fa 0%, var(--upm-surface) 70%, var(--upm-warm) 100%);
 }
 
 button,

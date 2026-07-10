@@ -1,7 +1,7 @@
 {
   "name": "ultimate-ppt-master",
   "private": true,
-  "version": "5.4.1",
+  "version": "6.0.0",
   "description": "AI PPT delivery system that clarifies the brief first, then turns local source material into editable PPTX/Web Decks with visual review and audit trails.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
@@ -19,6 +19,7 @@
     "package:desktop:homebrew": "bash scripts/package-homebrew-release.sh",
     "audit:docs": "python3 scripts/audit_docs_links.py",
     "audit:web-console": "python3 scripts/audit_web_console.py",
+    "audit:v6-workspace": "python3 scripts/audit_v6_workspace.py",
     "audit:brief": "python3 scripts/audit_brief_contract.py",
     "audit:visual-intent": "python3 scripts/audit_visual_intent.py",
     "audit:feedback-loop": "python3 scripts/audit_feedback_loop.py",

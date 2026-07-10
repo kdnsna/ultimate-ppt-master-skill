@@ -1,0 +1,15 @@
+:root {
+  --upm-font-ui: "PingFang SC", "Avenir Next", Inter, sans-serif;
+  --upm-ink: #172033;
+  --upm-muted: #647083;
+  --upm-line: #d9e0e8;
+  --upm-paper: #ffffff;
+  --upm-surface: #f3f5f7;
+  --upm-warm: #f7f3ea;
+  --upm-coral: #ef5b3f;
+  --upm-green: #10b981;
+  --upm-blue: #2563eb;
+  --upm-amber: #d69020;
+  --upm-radius: 10px;
+  --upm-shadow: 0 18px 45px rgba(23, 32, 51, 0.07);
+}

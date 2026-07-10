@@ -1,6 +1,6 @@
 # 中文文档索引
 
-Ultimate PPT Master v5 采用分类文档结构。先按你当前要做的事情选择入口。
+Ultimate PPT Master v6 采用分类文档结构。先按你当前要做的事情选择入口。
 
 ## 使用指南
 
@@ -30,7 +30,7 @@ Ultimate PPT Master v5 采用分类文档结构。先按你当前要做的事情
 
 | 需求 | 阅读 |
 |---|---|
-| 查看最新发布 | [发布说明 - v5.4.1](./release/release-notes-v5.4.1.md) |
+| 查看最新发布 | [发布说明 - v6.0.0](./release/release-notes-v6.0.0.md) |
 | 查看 v5.4 瑞士风 Deck 与资产工厂 | [发布说明 - v5.4.1](./release/release-notes-v5.4.1.md) |
 | 查看 v5.3 最佳效果提示增强器 | [发布说明 - v5.3.0](./release/release-notes-v5.3.0.md) |
 | 查看 v5.2 预期契合合同 | [发布说明 - v5.2.0](./release/release-notes-v5.2.0.md) |

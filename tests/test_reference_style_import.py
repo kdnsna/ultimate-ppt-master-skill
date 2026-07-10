@@ -54,6 +54,7 @@ class ReferenceStyleImportTest(unittest.TestCase):
         self.assertIn("evidence_board", style["layoutFamilies"])
         self.assertIn("process_flow", style["layoutFamilies"])
         self.assertEqual(style["brandConstraints"]["fonts"]["major"], "Aptos Display")
+        self.assertEqual(style["slideSchemas"][0]["slideId"], "P01")
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "5.4.1"
+VERSION = "6.0.0"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -23,7 +23,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertEqual(listing["version"], version)
         self.assertIn(f"v{version}", (ROOT / "README.md").read_text(encoding="utf-8"))
         self.assertIn(f"v{version}", (ROOT / "README.zh-CN.md").read_text(encoding="utf-8"))
-        self.assertIn(f'appVersion = "{version}"', (ROOT / "apps/web/src/App.tsx").read_text(encoding="utf-8"))
+        self.assertIn(f'appVersion = "{version}"', (ROOT / "apps/web/src/V6Workspace.tsx").read_text(encoding="utf-8"))
         self.assertTrue((ROOT / f"docs/release/release-notes-v{version}.md").is_file())
         self.assertTrue((ROOT / f"docs/zh-CN/release/release-notes-v{version}.md").is_file())
         self.assertIn(
@@ -44,7 +44,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("npm --prefix apps/web run build", scripts["build:web"])
         self.assertEqual(scripts["audit:docs"], "python3 scripts/audit_docs_links.py")
         self.assertEqual(scripts["audit:web-console"], "python3 scripts/audit_web_console.py")
-        self.assertIn(f'VERSION = "{VERSION}"', (ROOT / "scripts/audit_web_console.py").read_text(encoding="utf-8"))
+        self.assertEqual(scripts["audit:v6-workspace"], "python3 scripts/audit_v6_workspace.py")
+        self.assertIn(f'appVersion = "{VERSION}"', (ROOT / "apps/web/src/V6Workspace.tsx").read_text(encoding="utf-8"))
         self.assertEqual(scripts["audit:brief"], "python3 scripts/audit_brief_contract.py")
         self.assertEqual(scripts["audit:visual-intent"], "python3 scripts/audit_visual_intent.py")
         self.assertEqual(scripts["audit:feedback-loop"], "python3 scripts/audit_feedback_loop.py")
@@ -73,6 +74,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/rendered-review-loop-v4.3.md",
+            "docs/release/release-notes-v6.0.0.md",
             "docs/release/release-notes-v5.4.1.md",
             "docs/release/release-notes-v5.3.0.md",
             "docs/release/release-notes-v5.2.0.md",
@@ -89,6 +91,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+            "docs/zh-CN/release/release-notes-v6.0.0.md",
             "docs/zh-CN/release/release-notes-v5.4.1.md",
             "docs/zh-CN/release/release-notes-v5.3.0.md",
             "docs/zh-CN/release/release-notes-v5.2.0.md",
@@ -513,7 +516,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v5.4.1", hero)
+        self.assertIn("v6.0.0", hero)
         self.assertIn("Best-effect", hero)
         self.assertIn("sourceConfidence", hero)
         self.assertIn("Plain-language glossary", web_preview)

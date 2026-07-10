@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master v5.4.1 创意中文首图</title>
-  <desc id="desc">中文为主的 README 首图，用更通俗、有韵味的方式呈现 Ultimate PPT Master：Best-effect brief 先自动扩写，再把一句话需求做成能开会、能修改、能交付的 PPT。</desc>
+  <title id="title">Ultimate PPT Master v6.0.0 任务型演示文稿工作台</title>
+  <desc id="desc">Ultimate PPT Master v6 从真实资料出发；Best-effect brief 与 sourceConfidence 先确认故事板和证据，再选择视觉方向、逐页生成和局部精修，最终交付可编辑 PPTX 或 Web Deck。</desc>
   <defs>
     <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#F8FBFF"/>
@@ -38,41 +38,41 @@
       <circle cx="33" cy="26" r="8" fill="#2563EB"/>
       <circle cx="60" cy="26" r="8" fill="#14B8A6"/>
       <circle cx="87" cy="26" r="8" fill="#F97316"/>
-      <text x="118" y="33" fill="#516173" font-size="16" font-weight="850">Ultimate PPT Master v5.4.1</text>
+      <text x="118" y="33" fill="#516173" font-size="16" font-weight="850">Ultimate PPT Master v6.0.0</text>
 
-      <text x="0" y="138" fill="#101828" font-size="68" font-weight="900">一句话，也能做成</text>
-      <text x="0" y="214" fill="#101828" font-size="68" font-weight="900">一份像样的 PPT</text>
+      <text x="0" y="138" fill="#101828" font-size="68" font-weight="900">从真实资料，到一份</text>
+      <text x="0" y="214" fill="#101828" font-size="68" font-weight="900">能放心交付的 PPT</text>
       <rect x="2" y="244" width="560" height="10" rx="5" fill="url(#inkLine)"/>
-      <text x="0" y="304" fill="#2563EB" font-size="31" font-weight="900">Best-effect brief 先扩写，再下笔。</text>
-      <text x="0" y="348" fill="#5B6B7E" font-size="21" font-weight="650">把需求、资料、参考风格和素材边界先捋顺，</text>
-      <text x="0" y="384" fill="#5B6B7E" font-size="21" font-weight="650">再交付可编辑、可审阅、可复盘的办公成稿。</text>
+      <text x="0" y="304" fill="#2563EB" font-size="31" font-weight="900">先确认故事与证据，再生成画面。</text>
+      <text x="0" y="348" fill="#5B6B7E" font-size="21" font-weight="650">输入 → 故事板 → 设计与生成 → 精修与交付，</text>
+      <text x="0" y="384" fill="#5B6B7E" font-size="21" font-weight="650">生成后按页修改，最后回到 PowerPoint 完成正式交付。</text>
     </g>
 
     <g transform="translate(114 494)" filter="url(#paperShadow)">
       <rect width="170" height="58" rx="29" fill="#FFFFFF"/>
-      <text x="36" y="38" fill="#1D4ED8" font-size="20" font-weight="900">不问废话</text>
+      <text x="36" y="38" fill="#1D4ED8" font-size="20" font-weight="900">内容可编辑</text>
       <rect x="192" width="170" height="58" rx="29" fill="#FFFFFF"/>
-      <text x="228" y="38" fill="#047857" font-size="20" font-weight="900">不堆元素</text>
+      <text x="228" y="38" fill="#047857" font-size="20" font-weight="900">来源可追溯</text>
       <rect x="384" width="170" height="58" rx="29" fill="#FFFFFF"/>
-      <text x="420" y="38" fill="#C2410C" font-size="20" font-weight="900">不交死图</text>
+      <text x="420" y="38" fill="#C2410C" font-size="20" font-weight="900">单页可重做</text>
     </g>
 
     <g transform="translate(866 82)" filter="url(#softShadow)">
       <rect x="0" y="42" width="560" height="430" rx="28" fill="#FFFFFF"/>
       <rect x="34" y="0" width="492" height="338" rx="24" fill="url(#deckFace)" stroke="#D9E2EC"/>
       <rect x="34" y="0" width="492" height="70" rx="24" fill="#101828"/>
-      <text x="64" y="44" fill="#FFFFFF" font-size="22" font-weight="900">能开会的成稿</text>
-      <text x="326" y="44" fill="#B8C4D4" font-size="16" font-weight="750">PPTX · Web 预览</text>
+      <text x="64" y="44" fill="#FFFFFF" font-size="22" font-weight="900">v6 本地演示工作台</text>
+      <text x="326" y="44" fill="#B8C4D4" font-size="16" font-weight="750">PPTX · Web · QA</text>
 
       <g transform="translate(70 104)">
-        <text x="0" y="0" fill="#101828" font-size="40" font-weight="900">从想法到成稿</text>
-        <text x="0" y="44" fill="#64748B" font-size="19" font-weight="700">不是把文字塞进模板，而是把观点讲顺、画面做稳。</text>
+        <text x="0" y="0" fill="#101828" font-size="40" font-weight="900">先结构，后精修</text>
+        <text x="0" y="44" fill="#64748B" font-size="19" font-weight="700">快速结构稿先可点可改，高成本视觉只精修需要的页面。</text>
         <rect x="0" y="84" width="140" height="46" rx="23" fill="#DBEAFE"/>
-        <text x="30" y="114" fill="#1D4ED8" font-size="18" font-weight="900">问清楚</text>
+        <text x="30" y="114" fill="#1D4ED8" font-size="18" font-weight="900">故事板</text>
         <rect x="158" y="84" width="140" height="46" rx="23" fill="#CCFBF1"/>
-        <text x="188" y="114" fill="#0F766E" font-size="18" font-weight="900">定风格</text>
+        <text x="188" y="114" fill="#0F766E" font-size="18" font-weight="900">三种方向</text>
         <rect x="316" y="84" width="140" height="46" rx="23" fill="#FFEDD5"/>
-        <text x="346" y="114" fill="#C2410C" font-size="18" font-weight="900">做漂亮</text>
+        <text x="346" y="114" fill="#C2410C" font-size="18" font-weight="900">逐页精修</text>
       </g>
 
       <g transform="translate(70 276)">
@@ -86,26 +86,28 @@
     <g transform="translate(748 518)">
       <g transform="rotate(-8 0 0)" filter="url(#paperShadow)">
         <rect width="214" height="118" rx="18" fill="#EFF6FF"/>
-        <text x="26" y="42" fill="#1D4ED8" font-size="19" font-weight="900">先问三件事</text>
-        <text x="26" y="76" fill="#355B91" font-size="16" font-weight="750">给谁看？</text>
-        <text x="112" y="76" fill="#355B91" font-size="16" font-weight="750">想说服谁？</text>
+      <text x="26" y="42" fill="#1D4ED8" font-size="19" font-weight="900">最多三个问题</text>
+      <text x="26" y="76" fill="#355B91" font-size="14" font-weight="750">只问真正改变结果</text>
+      <text x="26" y="99" fill="#355B91" font-size="14" font-weight="750">的关键信息</text>
       </g>
       <g transform="translate(178 36) rotate(6)" filter="url(#paperShadow)">
         <rect width="230" height="126" rx="18" fill="#ECFDF5"/>
-        <text x="26" y="44" fill="#047857" font-size="19" font-weight="900">再定一口气</text>
-        <text x="26" y="80" fill="#23684E" font-size="16" font-weight="750">正式稳重、科技简洁、宣传有感染力</text>
+        <text x="26" y="44" fill="#047857" font-size="19" font-weight="900">真实方向预览</text>
+        <text x="26" y="80" fill="#23684E" font-size="14" font-weight="750">封面、正文、数据</text>
+        <text x="26" y="103" fill="#23684E" font-size="14" font-weight="750">图表一起看</text>
       </g>
       <g transform="translate(392 6) rotate(-4)" filter="url(#paperShadow)">
         <rect width="214" height="118" rx="18" fill="#FFF7ED"/>
-        <text x="26" y="42" fill="#C2410C" font-size="19" font-weight="900">最后看得见</text>
-        <text x="26" y="76" fill="#8A4B17" font-size="16" font-weight="750">图片能用，文字能改，审计留底</text>
+        <text x="26" y="42" fill="#C2410C" font-size="19" font-weight="900">交付有底气</text>
+        <text x="26" y="76" fill="#8A4B17" font-size="14" font-weight="750">图片能用，文字能改</text>
+        <text x="26" y="99" fill="#8A4B17" font-size="14" font-weight="750">审阅留底</text>
       </g>
     </g>
 
     <g transform="translate(116 708)" filter="url(#softShadow)">
       <rect width="1368" height="106" rx="26" fill="#FFFFFF"/>
-      <text x="38" y="43" fill="#101828" font-size="25" font-weight="900">一条更像真实办公的路：</text>
-      <text x="306" y="43" fill="#5B6B7E" font-size="19" font-weight="750">bestEffectBrief → sourceConfidence → 画面成体系 → PPTX / Web Deck → 渲染审阅</text>
+      <text x="38" y="43" fill="#101828" font-size="25" font-weight="900">工程能力，最终要变成使用体验：</text>
+      <text x="420" y="43" fill="#5B6B7E" font-size="19" font-weight="750">少输入也能放心生成 · 生成后可以局部改 · 交付前有证据和质量门禁</text>
       <rect x="38" y="68" width="1292" height="10" rx="5" fill="#E2E8F0"/>
       <rect x="38" y="68" width="1038" height="10" rx="5" fill="url(#inkLine)"/>
     </g>

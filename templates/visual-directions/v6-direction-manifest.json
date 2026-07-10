@@ -1,0 +1,89 @@
+{
+  "schemaVersion": "visual-direction-pack-v6",
+  "directions": [
+    {
+      "id": "formal-finance",
+      "label": "正式金融",
+      "officeFonts": ["Microsoft YaHei", "Arial"],
+      "examples": {
+        "cover": "品牌锚点、结论标题、报告期",
+        "body": "左侧结论、右侧来源证据",
+        "data": "核心数字、同比差异、口径备注",
+        "chart": "原生柱线组合图与可编辑注释",
+        "image": "服务场景图、裁切安全区、替换说明",
+        "section": "深色章节幕与单句判断",
+        "closing": "责任人、时间点、审阅状态"
+      }
+    },
+    {
+      "id": "consulting-evidence",
+      "label": "咨询证据",
+      "officeFonts": ["Microsoft YaHei", "Arial"],
+      "examples": {
+        "cover": "非对称结论封面与项目背景",
+        "body": "结论、论据、行动三段阅读路径",
+        "data": "差异矩阵与决策提示",
+        "chart": "原生图表、结论标注、来源脚注",
+        "image": "证据图片与观点并置",
+        "section": "问题重述与章节编号",
+        "closing": "建议优先级与下一步"
+      }
+    },
+    {
+      "id": "brand-launch",
+      "label": "品牌发布",
+      "officeFonts": ["Microsoft YaHei", "Arial"],
+      "examples": {
+        "cover": "品牌主视觉、艺术标题、发布信息",
+        "body": "场景图与一个核心观点",
+        "data": "产品证据带与关键指标",
+        "chart": "轻量原生图表与品牌色强调",
+        "image": "主视觉角色、焦点位置、裁切安全区",
+        "section": "全幅图像章节幕",
+        "closing": "品牌记忆点与行动入口"
+      }
+    },
+    {
+      "id": "training-narrative",
+      "label": "培训叙事",
+      "officeFonts": ["Microsoft YaHei", "Arial"],
+      "examples": {
+        "cover": "学习目标、适用对象、课程路线",
+        "body": "概念、示例、讲师提示",
+        "data": "练习进度与检查点",
+        "chart": "可编辑教学图表与解读步骤",
+        "image": "示例场景与观察问题",
+        "section": "模块目标与预计时长",
+        "closing": "练习任务、复盘问题、资料入口"
+      }
+    },
+    {
+      "id": "editorial-narrative",
+      "label": "电子杂志",
+      "officeFonts": ["Microsoft YaHei", "Arial"],
+      "examples": {
+        "cover": "暗色留白、大标题、短副题",
+        "body": "跨页图文与节奏性观点",
+        "data": "大数字与一句话解释",
+        "chart": "极简原生图表与编辑式注释",
+        "image": "主体位置、叙事角色、替代画面",
+        "section": "单句章节幕",
+        "closing": "回扣开场与记忆句"
+      }
+    },
+    {
+      "id": "swiss-information",
+      "label": "瑞士信息设计",
+      "officeFonts": ["Microsoft YaHei", "Arial"],
+      "examples": {
+        "cover": "严格网格、编号和信息标题",
+        "body": "编号模块与对齐基线",
+        "data": "KPI 塔与同比比较",
+        "chart": "高对比原生图表与明确坐标",
+        "image": "网格裁切、说明标注、替换边界",
+        "section": "编号章节与主题色块",
+        "closing": "决策清单与版本状态"
+      }
+    }
+  ]
+}

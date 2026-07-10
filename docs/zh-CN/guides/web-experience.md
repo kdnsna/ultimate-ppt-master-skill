@@ -1,6 +1,6 @@
 # Web Experience
 
-Web Experience 是终极融合 PPT 大师当前的主推广入口。它是部署到 GitHub Pages 的静态 React/Vite 四步控制台，同时承担资料导入、本地项目创建、PPTX 路线和 Web Deck 路线的融合前台。
+Web Experience 是终极融合 PPT 大师当前的主入口。v6 是部署到 GitHub Pages 的静态 React/Vite 任务型工作台；v5.4.1 控制台通过 `?classic=1` 保留一个版本周期。
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/
@@ -8,27 +8,15 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 
 ## 它做什么
 
-- 用一个状态驱动主按钮串起正常路径：准备任务、添加资料、连接本机、生成交付；
-- 资料类型、使用场景、输出形式、视觉风格、语言、AI 助手和模型偏好默认收进高级设置；
-- 接收粘贴资料、资料 URL，以及拖入的 `.md`、`.txt`、`.pdf`、`.docx`、`.pptx`、`.xlsx` 等文件；
-- 增加 Visual Brief Builder，用多样化标签选择使用场景、受众、目的、内容状态、视觉风格、排版密度、素材策略和输出偏好；
-- 增加 Swiss Deck / Asset Factory 区块，用于选择 Style A 电子杂志、Style B 瑞士国际主义、地图页意图、封面衍生图和生成配图计划；
-- 保留自由输入区，用于粘贴背景、领导要求、特殊禁忌、官方/参考链接和相关内容；
-- 文本资料在浏览器预读，Office/PDF 资料标记为等待本地 Bridge 解析；
-- 生成页纲、brief 完整度检查和 `expectationFit` 预期契合度，用于发现需求模糊或互相冲突；
-- 同屏展示 Hugo He / ppt-master 的 PPTX 路线和 op7418 / 歸藏的 Web Deck 路线；
-- 在本机连接器运行时检测本地 AI 助手命令和 provider 配置状态；
-- 生成浏览器本地的 `preview-web-deck.html`，并在页面中实时预览；
-- 生成可复制的 Agent 指令、`source.md`、`extracted-source.md`、`manifest.json` 和 `project-brief.json`；
-- 在 `project-brief.json` 写入 `briefMode`、`visualBrief`、`guidedBrief` 和 `expectationFit`，让 Codex 判断是直接制作、分步问清，还是带假设草稿；
-- 下载完整 `handoff-kit.zip`，或通过本机连接器生成项目目录；
-- handoff kit 内含 `source.md`、`extracted-source.md`、`attachments/`、`manifest.json`、`agent-prompt.md`、`project-brief.json`、`preview-web-deck.html`、`engine-plan.md`、`quality-checklist.md`、`asset-plan.md`、`asset_plan.json`、生成 prompt 文件、`visual-element-kit.md`、`codex-task.md`、`AGENTS.md`、`quality-report.json` 和 `README.md`；
-- 写入 `formal-business` 质量门禁，让 Codex 拿到验收标准、产物检查和复查命令；
-- 生成 ChatGPT 生图优先的小元素计划，覆盖章节分隔符、指标徽章、流程节点、连接线、图标点缀、低对比纹理和提示贴片；
-- Bridge 生成本地 handoff 后，显示精确的 `generate_visual_element_kit.py` 命令；
-- 没有 image backend 或 OpenAI key 时，解释 `Needs-Manual` 降级路径；
-- 打开脱敏 Agentic Developer Stack 2026 Web Deck 示例；
-- 保持 Skill 安装入口足够显眼。
+- 接收一句任务、文件、URL 或已有 PPTX，自动推断页数，不把技术设置堆在首层；
+- 最多补问三个关键问题，生成可编辑故事板；每页有稳定 `slideId`、证据状态和三种结构方案；
+- 从六套 v6 完整视觉包中推荐三个真实方向，不再只展示抽象风格标签；
+- 先生成确定性结构预览，只有进入精修阶段才创建 iframe；
+- 在同一个三栏工作区展示缩略图、预览、质量问题、页面确认和单页修订；
+- 检测本机 Bridge，通过只读 SSE 接收进度，页面不可见时停止轮询，并继续写出兼容旧版的 handoff 产物；
+- 通过 SHA-256 复用资料提取缓存，单页修订写入 `revision-requests/Pxx.json`；
+- Bridge 命令、Provider 状态、路径和生产文件收进“环境与诊断”；
+- PowerPoint 继续负责正式编辑，Skill 负责资料、品牌、ChatGPT 辅助素材、`formal-business` 门禁、可编辑对象检查和质量闭环。
 
 ## 它不做什么
 
@@ -41,7 +29,7 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 
 Brief 组装完全在浏览器本地完成。用户运行 `npm run bridge` 时，资料只发送到本机 `127.0.0.1`，用于本地解析和项目落盘。
 
-v4.1.0 保留 v4.0 混合可编辑视觉治理合同，但把控制台简化。离线时主按钮复制本机连接命令；在线后主按钮生成本地项目包；项目生成后主按钮启动或复制 AI 助手命令。命令详情和文件清单默认收进折叠区。
+v6 保留 v5.4.1 的产物合同。离线时进入聚焦的修复对话框；在线时创建本地项目并流式播报进度。组件优先的经典控制台在兼容期通过 `?classic=1` 访问。
 
 ## 本地开发
 
@@ -68,12 +56,13 @@ GITHUB_PAGES=true npm run build:web
 
 | 检查 | 期望结果 |
 |---|---|
-| 打开 Web Experience | 工作台、四步操作条、快速控制台、一个主按钮、折叠帮助和设置区正常显示。 |
-| 本机连接离线状态 | 主按钮复制启动命令：先寻找或拉取本地仓库，再运行 `npm run bridge`；更多操作中仍可下载 zip。 |
+| 打开 Web Experience | v6 任务型工作台、紧凑阶段条和一个主按钮正常显示；输入阶段不创建预览 iframe。 |
+| 本机连接离线状态 | “环境与诊断”显示一条可执行的 `npm run bridge` 修复命令。 |
 | 本机连接在线状态 | `GET /health` 填充本地 AI 助手和 provider 状态。 |
 | 拖入文本资料 | 文件显示为浏览器已预读，并进入 `extracted-source.md`。 |
 | 拖入二进制资料 | 文件显示为等待本地 Bridge 解析，并进入 `attachments/`。 |
-| 实时 Web Deck 预览 | 预览框渲染 `preview-web-deck.html`，不依赖后端或脚本。 |
+| 故事板 | “10 页”这类指令生成 P01-P10，补问不超过三个，每页有三个结构方案。 |
+| 实时 Web Deck 预览 | 只有进入精修阶段才挂载预览框，并渲染 `preview-web-deck.html`。 |
 | 复制 Agent prompt | 剪贴板获得带页纲和交付包上下文的 prompt。 |
 | 选择可视化标签 | `project-brief.json` 记录 `visualBrief.selectedTags`、标签中文名、背景文本、特殊要求和参考链接。 |
 | 选择瑞士风路线 | `project-brief.json` 记录 `webDeck.style`、`webDeck.theme`、`webDeck.layoutPolicy`、页奏和 `assetPlanRequired`；handoff 包含 `asset_plan.json`。 |
@@ -86,8 +75,7 @@ GITHUB_PAGES=true npm run build:web
 | 交付详情区 | 本地项目生成后，折叠详情中显示 `python3 scripts/generate_visual_element_kit.py <projectPath>`、AI 助手命令和 `Needs-Manual` prompt fallback。 |
 | 打开 Web Deck 示例 | 静态构建中的 `examples/agentic-developer-tools-2026/web-demo.html` 能打开。 |
 | Skill 安装说明 | 能跳到 README Skill 区域或 `docs/guides/agent-setup.md`。 |
-| 移动端 | 四步条、主按钮、设置抽屉和分组预览不溢出。 |
-| 移动端首屏 | CTA 自动换行，Skill 入口仍然明显。 |
+| 移动端 | 390px 下阶段条不溢出，首个任务输入框在初始视口可见。 |
 
 ## 场景覆盖
 

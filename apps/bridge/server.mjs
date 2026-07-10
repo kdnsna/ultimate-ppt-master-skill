@@ -4,7 +4,7 @@ import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { lstat, mkdir, readlink, symlink, writeFile } from "node:fs/promises";
-import { dirname, extname, join, resolve } from "node:path";
+import { dirname, extname, join, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import os from "node:os";
 
@@ -98,7 +98,22 @@ export function createBridgeServer(options = {}) {
   const maxBodyBytes = Number(options.maxBodyBytes || process.env.UPM_BRIDGE_MAX_MB || DEFAULT_MAX_BODY_MB) * 1024 * 1024;
   const envSnapshot = loadEnvironment(repoRoot, options.env);
 
-  return createServer(async (request, response) => {
+  const eventClients = new Set();
+  let eventSequence = 0;
+  const publishEvent = (event) => {
+    const payload = {
+      id: `bridge-${String(++eventSequence).padStart(5, "0")}`,
+      timestamp: new Date().toISOString(),
+      ...event
+    };
+    const frame = `id: ${payload.id}\ndata: ${JSON.stringify(payload)}\n\n`;
+    for (const client of eventClients) {
+      if (!client.destroyed) client.write(frame);
+    }
+    return payload;
+  };
+
+  const server = createServer(async (request, response) => {
     const origin = request.headers.origin;
     const corsHeaders = corsForOrigin(origin);
 
@@ -108,6 +123,29 @@ export function createBridgeServer(options = {}) {
     }
 
     try {
+      if (request.method === "GET" && request.url === "/events") {
+        response.writeHead(200, {
+          ...corsHeaders,
+          "Content-Type": "text/event-stream; charset=utf-8",
+          "Cache-Control": "no-cache, no-transform",
+          Connection: "keep-alive",
+          "X-Accel-Buffering": "no"
+        });
+        response.write(": Ultimate PPT Master Bridge progress stream\n\n");
+        eventClients.add(response);
+        const connected = {
+          id: `bridge-${String(++eventSequence).padStart(5, "0")}`,
+          type: "connected",
+          phase: "intake",
+          progress: 0,
+          message: "Bridge event stream connected.",
+          timestamp: new Date().toISOString()
+        };
+        response.write(`id: ${connected.id}\ndata: ${JSON.stringify(connected)}\n\n`);
+        request.on("close", () => eventClients.delete(response));
+        return;
+      }
+
       if (request.method === "GET" && request.url === "/health") {
         const health = await buildHealth({ repoRoot, homeDir, outputDir, allowLaunch, envSnapshot });
         writeJson(response, 200, health, corsHeaders);
@@ -127,8 +165,34 @@ export function createBridgeServer(options = {}) {
       }
 
       if (request.method === "POST" && request.url === "/handoff") {
+        publishEvent({ type: "phase", phase: "generating", progress: 10, message: "Receiving handoff and source material." });
         const body = await readJsonBody(request, maxBodyBytes);
+        publishEvent({ type: "artifact", phase: "generating", progress: 35, message: "Planning storyboard and project artifacts." });
         const result = await writeHandoffProject(body, { repoRoot, outputDir });
+        publishEvent({
+          type: "completed",
+          phase: "review",
+          progress: 100,
+          message: "Local project is ready for slide production and review.",
+          projectPath: result.projectPath,
+          artifacts: result.files
+        });
+        writeJson(response, 200, result, corsHeaders);
+        return;
+      }
+
+      if (request.method === "POST" && request.url === "/slides/regenerate") {
+        const body = await readJsonBody(request, maxBodyBytes);
+        const result = await writeSlideRevisionRequest(body, { outputDir });
+        publishEvent({
+          type: "finding",
+          phase: "review",
+          progress: 0,
+          slideId: result.slideId,
+          message: `Revision request saved for ${result.slideId}.`,
+          projectPath: result.projectPath,
+          recoverable: true
+        });
         writeJson(response, 200, result, corsHeaders);
         return;
       }
@@ -150,9 +214,22 @@ export function createBridgeServer(options = {}) {
       writeJson(response, 404, { ok: false, message: "Unknown bridge endpoint." }, corsHeaders);
     } catch (error) {
       const status = error?.statusCode || 500;
+      publishEvent({
+        type: "failed",
+        phase: "generating",
+        progress: 0,
+        message: error?.message || "Bridge request failed.",
+        recoverable: true
+      });
       writeJson(response, status, { ok: false, message: error?.message || "Bridge request failed." }, corsHeaders);
     }
   });
+
+  server.on("close", () => {
+    for (const client of eventClients) client.end();
+    eventClients.clear();
+  });
+  return server;
 }
 
 export function startBridge(options = {}) {
@@ -624,8 +701,10 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   const projectPath = join(outputDir, `${slug}-${timestamp}`);
   const attachmentsDir = join(projectPath, "attachments");
   const extractedDir = join(projectPath, "extracted");
+  const attachmentCacheDir = join(outputDir, ".cache", "attachments");
   await mkdir(attachmentsDir, { recursive: true });
   await mkdir(extractedDir, { recursive: true });
+  await mkdir(attachmentCacheDir, { recursive: true });
 
   const files = [];
   async function writeProjectFile(relativePath, content) {
@@ -663,7 +742,7 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
   const attachmentResults = [];
 
   for (const item of Array.isArray(payload.attachments) ? payload.attachments : []) {
-    const result = await stageAttachment(item, { attachmentsDir, extractedDir, repoRoot });
+    const result = await stageAttachment(item, { attachmentsDir, extractedDir, attachmentCacheDir, repoRoot });
     attachmentResults.push(result);
     if (result.markdown) {
       extractedSections.push("", `## ${result.name}`, "", result.markdown.trim());
@@ -691,6 +770,7 @@ async function writeHandoffProject(payload, { repoRoot, outputDir }) {
     version: BRIDGE_VERSION,
     createdAt: new Date().toISOString(),
     title,
+    deckSession: projectBrief.deckSession || payload.deckSession || null,
     projectPath,
     repoRoot,
     qualityProfile,
@@ -1056,6 +1136,7 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate }) {
     const bodyRole = ["context", "evidence", "comparison", "process", "benefit", "risk", "action"].includes(role);
     return {
       page: `P${String(index + 1).padStart(2, "0")}`,
+      slideId: `P${String(index + 1).padStart(2, "0")}`,
       role,
       title: role === "anchor" ? title : role === "closing" ? "Delivery review and next step" : String(chunk[0]?.text || title).slice(0, 44),
       intent: roleIntent(role),
@@ -1097,7 +1178,7 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate }) {
     createdAt,
     source: "extracted-source.md",
     claims,
-    slideEvidence: slides.map((slide) => ({ page: slide.page, evidenceRefs: slide.evidenceRefs }))
+    slideEvidence: slides.map((slide) => ({ slideId: slide.slideId, page: slide.page, evidenceRefs: slide.evidenceRefs }))
   };
   const planningReport = {
     version: "planning-report-v1",
@@ -1553,7 +1634,7 @@ function defaultCodexAgentGuide({ qualityGate, expectationFit, sourceConfidence,
 `;
 }
 
-async function stageAttachment(item, { attachmentsDir, extractedDir, repoRoot }) {
+async function stageAttachment(item, { attachmentsDir, extractedDir, attachmentCacheDir, repoRoot }) {
   const kind = item.kind || "file";
   const originalName = String(item.name || item.url || "source");
   const name = safeName(originalName);
@@ -1569,7 +1650,8 @@ async function stageAttachment(item, { attachmentsDir, extractedDir, repoRoot })
     attachmentPath: "",
     extractedPath: "",
     message: "",
-    markdown: ""
+    markdown: "",
+    contentHash: ""
   };
 
   if (kind === "url") {
@@ -1583,10 +1665,20 @@ async function stageAttachment(item, { attachmentsDir, extractedDir, repoRoot })
 
   const attachmentPath = join(attachmentsDir, name);
   result.attachmentPath = `attachments/${name}`;
-  if (item.dataBase64) {
-    await writeFile(attachmentPath, Buffer.from(String(item.dataBase64), "base64"));
-  } else {
-    await writeFile(attachmentPath, String(item.text || ""), "utf8");
+  const attachmentBuffer = item.dataBase64
+    ? Buffer.from(String(item.dataBase64), "base64")
+    : Buffer.from(String(item.text || ""), "utf8");
+  result.contentHash = createHash("sha256").update(attachmentBuffer).digest("hex");
+  await writeFile(attachmentPath, attachmentBuffer);
+  const cachePath = join(attachmentCacheDir, `${result.contentHash}.md`);
+  const cachedOutputPath = join(extractedDir, `${name.replace(/\.[^.]+$/, "")}.md`);
+  if (existsSync(cachePath)) {
+    result.parseStatus = "cacheHit";
+    result.markdown = readFileSync(cachePath, "utf8");
+    result.extractedPath = relativeFromProject(cachedOutputPath);
+    result.message = "Reused local extraction cache by source content hash.";
+    await writeFile(cachedOutputPath, result.markdown, "utf8");
+    return result;
   }
 
   if (item.text && isTextExtension(extension)) {
@@ -1594,12 +1686,42 @@ async function stageAttachment(item, { attachmentsDir, extractedDir, repoRoot })
     result.extractedPath = result.attachmentPath;
     result.markdown = String(item.text);
     result.message = "Text was extracted in the browser.";
+    await writeFile(cachePath, result.markdown, "utf8");
     return result;
   }
 
   const outputPath = join(extractedDir, `${name.replace(/\.[^.]+$/, "")}.md`);
   const conversion = runConverter({ repoRoot, input: attachmentPath, outputPath, extension });
+  if (conversion.markdown) await writeFile(cachePath, conversion.markdown, "utf8");
   return { ...result, ...conversion };
+}
+
+async function writeSlideRevisionRequest(payload, { outputDir }) {
+  const projectPath = resolve(String(payload?.projectPath || ""));
+  const slideId = String(payload?.slideId || "").toUpperCase();
+  const outputRoot = `${resolve(outputDir)}${sep}`;
+  if (!projectPath.startsWith(outputRoot) || !existsSync(join(projectPath, "manifest.json"))) {
+    const error = new Error("Revision project must be an existing Bridge handoff under the configured output directory.");
+    error.statusCode = 400;
+    throw error;
+  }
+  if (!/^P\d{2,3}$/.test(slideId)) {
+    const error = new Error("slideId must use the stable PNN format.");
+    error.statusCode = 400;
+    throw error;
+  }
+  const requestPath = join(projectPath, "revision-requests", `${slideId}.json`);
+  const requestPayload = {
+    schemaVersion: "slide-revision-request-v1",
+    slideId,
+    variantId: String(payload?.variantId || ""),
+    instruction: String(payload?.instruction || "Regenerate this slide while preserving its evidence and editable object contract."),
+    status: "pending",
+    createdAt: new Date().toISOString()
+  };
+  await mkdir(dirname(requestPath), { recursive: true });
+  await writeFile(requestPath, JSON.stringify(requestPayload, null, 2), "utf8");
+  return { ok: true, projectPath, slideId, requestPath, request: requestPayload };
 }
 
 function runConverter({ repoRoot, input, outputPath, extension }) {

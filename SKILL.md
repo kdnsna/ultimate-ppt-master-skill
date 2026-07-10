@@ -18,7 +18,26 @@ description: >
 
 > Ultimate Fusion PPT Master: a Codex skill that fuses editable PPTX generation with magazine-style web deck generation.
 
-**Core Pipeline**: `Request → Source Document → One Delivery Brief → Assets → Generate → Verify → Export/Preview`
+**Core Pipeline**: `Input → Storyboard → Design & Generate → Refine & Deliver`
+
+## v6 Task-First Operating Model
+
+Treat this Skill as the local quality and workflow layer around PowerPoint, not as a replacement for PowerPoint's native editor. The default user-facing sequence is:
+
+1. **Input** — accept a one-line task, files, URLs, or an existing PPTX; infer technical settings instead of exposing them first.
+2. **Storyboard** — ask at most three material questions, then show slide jobs, evidence bindings, and explicit gaps.
+3. **Design & Generate** — offer three complete visual directions with cover/body/data behavior, create a deterministic structural draft first, and refine only selected or audit-failed slides.
+4. **Refine & Deliver** — work by stable `slideId`; preserve editable PowerPoint objects and finish formal editing in PowerPoint.
+
+Bridge, providers, DeckIR, scripts, and JSON contracts remain available in professional/diagnostic mode. Preserve `project-brief.json`, `storyboard.json`, `asset_plan.json`, `quality-report.json`, and existing Bridge handoff compatibility. When a `DeckSession` is present, keep its phases (`intake / outline / generating / review / delivered`) and stable `slideId` values through every artifact.
+
+When an existing PPTX is supplied as a visual or brand reference, run:
+
+```bash
+python3 ${SKILL_DIR}/scripts/pptx_template_import.py <reference.pptx> --manifest-only --reference-style-mode style-only
+```
+
+Use the resulting `reference-style.json` to reuse master/layout rhythm, theme fonts and colors, placeholders, chart treatment, and common page roles without copying private content.
 
 **Quality Pipeline Add-on**: stakeholder-facing decks must also pass `Visual Direction → Page Role Contract → Visual Completion Audit`.
 
@@ -86,7 +105,7 @@ Before production, decide whether the request came through a visual Web brief or
 
 For direct Agent use, run the Best-Effect Brief Enhancer before guided intake. Ask staged questions only when `bestEffectBrief` cannot safely infer a production path.
 
-Guided intake covers these items in stages, one related question group at a time:
+Guided intake may inspect these items, but ask no more than three user-facing questions before presenting a storyboard. Infer non-risky technical choices and expose remaining details as editable assumptions:
 
 1. usage scenario and target audience;
 2. desired audience action or decision;
@@ -181,6 +200,7 @@ Run the formal audit when project artifacts exist:
 python3 scripts/audit_formal_delivery.py <project_path_or_artifact>
 python3 scripts/audit_design_completion.py <project_path_or_artifact>
 python3 scripts/audit_visual_recipes.py <project_path_or_artifact>
+python3 scripts/audit_pptx_native_objects.py <final.pptx> --expect text,shape
 ```
 
 If the audit fails, report the concrete issues and fix the deck before final delivery unless the user explicitly chooses to ship with known risks.

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -60,6 +61,12 @@ SOURCE_REQUIRED_FIELDS = {
 LICENSE_TIER_VALUES = {"no-attribution", "attribution-required"}
 
 IGNORED_PARTS = {".git", "node_modules", ".venv", "dist", "build", "__pycache__"}
+PUBLIC_CLAIM_PATTERN = re.compile(
+    r"(?:contains?|includes?|uses?|features?|with)\s+(?:ai[- ]generated|generated\s+(?:asset|image|visual))"
+    r"|(?:包含|使用|采用).{0,16}(?:AI\s*生成|生成素材|生成图像|AI\s*生图)"
+    r"|data-generated-asset",
+    re.IGNORECASE,
+)
 
 
 def load_json(path: Path) -> Any:
@@ -173,6 +180,31 @@ def discover_manifests(root: Path) -> list[Path]:
     return sorted(manifests)
 
 
+def discover_uncontracted_public_claims(root: Path, manifests: list[Path]) -> list[Path]:
+    """Find public examples that claim generated visuals without a local manifest."""
+    examples = root / "examples"
+    if not examples.is_dir():
+        return []
+    manifest_roots = {path.parent.resolve() for path in manifests if examples in path.parents}
+    claims: list[Path] = []
+    for path in examples.rglob("*"):
+        if not path.is_file() or path.suffix.lower() not in {".html", ".md", ".json"}:
+            continue
+        if any(part in IGNORED_PARTS for part in path.parts):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError):
+            continue
+        if not PUBLIC_CLAIM_PATTERN.search(text):
+            continue
+        sample_root = path.parent.resolve()
+        contracted = any(contract_root == sample_root or sample_root in contract_root.parents for contract_root in manifest_roots)
+        if not contracted:
+            claims.append(path)
+    return sorted(claims)
+
+
 def audit_manifest(path: Path, errors: list[str]) -> None:
     require(path.is_file(), f"manifest does not exist: {path}", errors)
     if errors and not path.is_file():
@@ -198,6 +230,9 @@ def main() -> int:
     paths = [Path(value).resolve() for value in args.manifest] if args.manifest else discover_manifests(ROOT)
     for path in paths:
         audit_manifest(path, errors)
+    if not args.manifest:
+        for claim in discover_uncontracted_public_claims(ROOT, paths):
+            errors.append(f"{claim}: public sample claims generated visuals but has no asset_plan.json or image manifest in its sample folder")
 
     if errors:
         print("Image contract audit failed:")

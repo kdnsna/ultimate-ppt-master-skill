@@ -73,6 +73,7 @@ def build_reference_style_from_manifest(manifest: dict, mode: str = "style-only"
         slide_schemas.append(
             {
                 "page": f"P{index:02d}",
+                "slideId": f"P{index:02d}",
                 "functionalType": functional_type,
                 "layoutFamily": layout_family,
                 "sourceLayout": slide.get("layoutName") or slide.get("layout") or "",

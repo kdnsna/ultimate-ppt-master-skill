@@ -18,6 +18,7 @@ export interface DesktopJob {
   stylePreset: StylePreset;
   projectDir?: string;
   providerConfig?: ProviderConfig;
+  deckSession?: DeckSession;
 }
 
 export interface ProviderConfig {
@@ -84,6 +85,7 @@ export interface WorkerResult {
   sourceName?: string;
   sourceExtraction?: SourceExtraction;
   providerConfig?: ProviderConfig;
+  deckSession?: DeckSession;
   error?: string;
 }
 
@@ -145,3 +147,4 @@ export interface RecentProject {
   thumbnail?: string;
   logsPath?: string;
 }
+import type { DeckSession } from "../../../packages/workspace-core/src";

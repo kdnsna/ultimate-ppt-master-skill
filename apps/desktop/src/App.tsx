@@ -1,29 +1,28 @@
-import {
-  Activity,
-  Archive,
-  Bot,
-  CheckCircle2,
-  ChevronRight,
-  CircleAlert,
-  Copy,
-  FileText,
-  FolderOpen,
-  Gauge,
-  Image,
-  KeyRound,
-  Layers3,
-  Mic2,
-  MonitorPlay,
-  PanelRight,
-  Play,
-  Settings,
-  ShieldCheck,
-  Sparkles,
-  Upload,
-  Volume2,
-  Wand2
-} from "lucide-react";
+import Activity from "lucide-react/dist/esm/icons/activity.js";
+import Archive from "lucide-react/dist/esm/icons/archive.js";
+import Bot from "lucide-react/dist/esm/icons/bot.js";
+import CheckCircle2 from "lucide-react/dist/esm/icons/check-circle-2.js";
+import ChevronRight from "lucide-react/dist/esm/icons/chevron-right.js";
+import CircleAlert from "lucide-react/dist/esm/icons/circle-alert.js";
+import Copy from "lucide-react/dist/esm/icons/copy.js";
+import FileText from "lucide-react/dist/esm/icons/file-text.js";
+import FolderOpen from "lucide-react/dist/esm/icons/folder-open.js";
+import Gauge from "lucide-react/dist/esm/icons/gauge.js";
+import Image from "lucide-react/dist/esm/icons/image.js";
+import KeyRound from "lucide-react/dist/esm/icons/key-round.js";
+import Layers3 from "lucide-react/dist/esm/icons/layers-3.js";
+import Mic2 from "lucide-react/dist/esm/icons/mic-2.js";
+import MonitorPlay from "lucide-react/dist/esm/icons/monitor-play.js";
+import PanelRight from "lucide-react/dist/esm/icons/panel-right.js";
+import Play from "lucide-react/dist/esm/icons/play.js";
+import Settings from "lucide-react/dist/esm/icons/settings.js";
+import ShieldCheck from "lucide-react/dist/esm/icons/shield-check.js";
+import Sparkles from "lucide-react/dist/esm/icons/sparkles.js";
+import Upload from "lucide-react/dist/esm/icons/upload.js";
+import Volume2 from "lucide-react/dist/esm/icons/volume-2.js";
+import Wand2 from "lucide-react/dist/esm/icons/wand-2.js";
 import { useEffect, useMemo, useState } from "react";
+import { createDeckSession } from "../../../packages/workspace-core/src";
 import {
   inspectEnvironment,
   listRecentProjects,
@@ -114,11 +113,11 @@ const edgeVoiceOptions = [
   { key: "en-US-GuyNeural", title: "Guy · English", titleEn: "Guy · English" }
 ];
 
-const navItems: Array<{ key: ViewKey; label: string; icon: typeof Sparkles }> = [
-  { key: "projects", label: "Projects", icon: Sparkles },
-  { key: "create", label: "Create", icon: Wand2 },
-  { key: "preview", label: "Workbench", icon: MonitorPlay },
-  { key: "settings", label: "Settings", icon: Settings }
+const navItems: Array<{ key: ViewKey; labelZh: string; labelEn: string; icon: typeof Sparkles }> = [
+  { key: "projects", labelZh: "项目", labelEn: "Projects", icon: Sparkles },
+  { key: "create", labelZh: "输入", labelEn: "Intake", icon: Wand2 },
+  { key: "preview", labelZh: "精修", labelEn: "Refine", icon: MonitorPlay },
+  { key: "settings", labelZh: "设置", labelEn: "Settings", icon: Settings }
 ];
 
 const galleryItems: Array<{
@@ -398,7 +397,14 @@ export function App() {
       outputMode,
       stylePreset,
       projectDir: projectDir || undefined,
-      providerConfig
+      providerConfig,
+      deckSession: createDeckSession({
+        phase: "generating",
+        request: sourceValue,
+        outputPurpose: outputMode === "web" ? "web-deck" : "editable-pptx",
+        selectedDirectionId: stylePreset === "business" ? "formal-finance" : stylePreset === "consulting" ? "consulting-evidence" : stylePreset === "academic" ? "training-narrative" : stylePreset === "editorial" ? "editorial-narrative" : "swiss-information",
+        sources: sourceValue.trim() ? [{ id: "S001", name: sourceName || "Desktop source", kind: sourceKind === "file" && /\.pptx?$/i.test(sourceName) ? "pptx" : sourceKind === "url" ? "url" : sourceKind === "file" ? "file" : "text", status: sourceKind === "file" ? "local-parse" : "ready" }] : []
+      })
     };
 
     const stagedSteps = progressSeed.map((step, index) => ({
@@ -509,15 +515,17 @@ export function App() {
         <nav className="nav-list" aria-label="Primary">
           {navItems.map((item) => {
             const Icon = item.icon;
+            const label = language === "en" ? item.labelEn : item.labelZh;
             return (
               <button
                 key={item.key}
                 className={view === item.key ? "nav-item active" : "nav-item"}
                 onClick={() => setView(item.key)}
-                title={item.label}
+                title={label}
+                aria-current={view === item.key ? "page" : undefined}
               >
                 <Icon size={18} />
-                <span>{item.label}</span>
+                <span>{label}</span>
               </button>
             );
           })}
@@ -690,8 +698,8 @@ function ProjectsView({
           <h1>{en ? "Drop real source material. Generate decks people can ship." : "把真实资料拖进去，生成能交付的演示文稿。"}</h1>
           <p className="hero-copy">
             {en
-              ? "A simple three-step flow for creators: import sources, choose the delivery scene, generate and export. Advanced agent power stays available without crowding the first screen."
-              : "普通创作者只需要三步：导入资料、选择场景、生成导出。专业能力藏在项目页，随时可以展开。"}
+              ? "A task-first flow: add real sources, confirm the storyboard, generate, then refine by slide. Advanced model and narration controls stay out of the first decision layer."
+              : "以任务为中心：放入真实资料、确认故事板、生成，再按页精修。模型和旁白等专业控制不再挤占首层决策。"}
           </p>
           <div className="hero-actions">
             <button className="primary-action" onClick={onCreate}>
@@ -728,9 +736,10 @@ function ProjectsView({
 
       <div className="creator-steps">
         {[
-          ["1", en ? "Import sources" : "导入资料", en ? "PDF / DOCX / URL / Markdown / pasted text" : "PDF / DOCX / URL / Markdown / 粘贴文本"],
-          ["2", en ? "Choose delivery" : "选择场景", en ? "Editable PPTX or Web Deck" : "PPTX 交付或 Web Deck 演讲"],
-          ["3", en ? "Generate and export" : "生成导出", en ? "Preview, check, open folder" : "预览、检查、打开文件夹"]
+          ["1", en ? "Intake" : "输入", en ? "Task, real sources, and delivery purpose" : "任务、真实资料和交付用途"],
+          ["2", en ? "Storyboard" : "故事板", en ? "Confirm the story and evidence gaps" : "确认故事线和证据缺口"],
+          ["3", en ? "Design & generate" : "设计与生成", en ? "Choose a direction, then generate progressively" : "确认方向后逐页生成"],
+          ["4", en ? "Refine & deliver" : "精修与交付", en ? "Review by slide and finish in PowerPoint" : "按页审阅，回到 PowerPoint 定稿"]
         ].map(([index, title, detail]) => (
           <article key={index} className="step-card">
             <span>{index}</span>
@@ -836,11 +845,11 @@ function CreateView(props: {
       <div className="section-heading">
         <div>
           <p className="eyebrow">Guided creator flow</p>
-          <h1>{en ? "Create in three steps" : "三步生成"}</h1>
+          <h1>{en ? "Start with the task and real sources" : "从任务和真实资料开始"}</h1>
         </div>
         <button className="primary-action compact" onClick={props.onGenerate} disabled={props.isGenerating || !props.sourceValue.trim()}>
           <Play size={17} />
-          {props.isGenerating ? (en ? "Generating" : "生成中") : (en ? "Generate" : "生成")}
+          {props.isGenerating ? (en ? "Generating" : "生成中") : (en ? "Build structural draft" : "生成结构稿")}
         </button>
       </div>
 
@@ -905,9 +914,11 @@ function CreateView(props: {
             </button>
           </div>
 
+          <details className="advanced-box production-options">
+            <summary>{en ? "Professional mode: direction, models, and narration" : "专业模式：视觉方向、模型与旁白"}</summary>
           <div className="panel-title spaced">
             <Image size={18} />
-            <span>{en ? "3. Choose style" : "3. 选择风格"}</span>
+            <span>{en ? "Visual direction" : "视觉方向"}</span>
           </div>
           <div className="style-grid">
             {styles.map((option) => (
@@ -921,7 +932,7 @@ function CreateView(props: {
 
           <div className="panel-title spaced">
             <Bot size={18} />
-            <span>{en ? "4. Choose models" : "4. 选择模型"}</span>
+            <span>{en ? "Models" : "模型"}</span>
           </div>
           <div className="config-card">
             <label>
@@ -950,7 +961,7 @@ function CreateView(props: {
 
           <div className="panel-title spaced">
             <Mic2 size={18} />
-            <span>{en ? "5. Choose narration voice" : "5. 选择语音"}</span>
+            <span>{en ? "Narration" : "旁白"}</span>
           </div>
           <div className="config-card">
             <label className="toggle-row">
@@ -984,6 +995,7 @@ function CreateView(props: {
             )}
             <div className="config-summary"><Volume2 size={17} /><span>{providerSummary(props.providerConfig, props.language)}</span></div>
           </div>
+          </details>
 
           <details className="advanced-box">
             <summary>{en ? "Advanced settings" : "高级设置"}</summary>
@@ -1572,9 +1584,9 @@ function humanizeError(error: unknown, language: AppLanguage = "zh") {
   return text;
 }
 
-const sampleMarkdown = `# 终极融合 PPT 大师 v2.1.0
+const sampleMarkdown = `# 终极融合 PPT 大师 v6
 
 - 把真实资料变成可编辑 PPTX 或杂志风网页 PPT
 - 支持 PDF、DOCX、XLSX、PPTX、URL、Markdown 和粘贴文本
 - 保留本地优先、多 Agent 兼容和可验证导出
-- 桌面版目标是让普通创作者三步完成`;
+- 先确认故事板，再按页精修并交付`;

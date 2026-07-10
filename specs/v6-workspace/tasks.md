@@ -1,0 +1,22 @@
+# Implementation Plan
+
+- [ ] 1. Add the shared v6 session and visual-direction core.
+  - Define phases, stable slides, readiness, progress events, and three initial direction previews.
+  - _Requirements: R2, R3, R6_
+- [ ] 2. Implement the default task-first Web workspace.
+  - Add intake, outline, generating, and review/delivery surfaces.
+  - Lazy-load the existing console as Classic mode.
+  - _Requirements: R1, R2, R3, R4_
+- [ ] 3. Add Bridge event and slide identity compatibility.
+  - Add SSE progress events without changing existing endpoints.
+  - Add `slideId` to generated storyboard and source-map records.
+  - _Requirements: R5, R6_
+- [ ] 4. Align Desktop with the shared model and visual language.
+  - Correct creator-flow copy, phase names, directions, and environment placement.
+  - _Requirements: R1, R3, R5_
+- [ ] 5. Add accessibility, responsive, and performance protections.
+  - Add focus transfer, live announcements, tab semantics, reduced motion, and active-phase mounting.
+  - _Requirements: R1, R4, R6_
+- [ ] 6. Extend tests, audits, docs, and version metadata.
+  - Run the complete gate and build sequence and visually verify desktop/mobile states.
+  - _Requirements: R1-R6_
