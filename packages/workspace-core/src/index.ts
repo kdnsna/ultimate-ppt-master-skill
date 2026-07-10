@@ -88,11 +88,11 @@ export const visualDirectionCatalog: VisualDirectionPreview[] = [
     labelEn: "Formal finance",
     fitZh: "银行、政务、国企与管理层汇报；证据先行，克制但不呆板。",
     fitEn: "Banking, government, SOE, and executive reporting with restrained evidence-first hierarchy.",
-    tone: "dark",
-    accent: "#0B5CAD",
-    coverLayout: "品牌锚点 + 结论标题",
-    bodyLayout: "证据边栏 + 可编辑正文",
-    dataLayout: "大数字 + 差异解释"
+    tone: "paper",
+    accent: "#173A63",
+    coverLayout: "克制报告封面",
+    bodyLayout: "管理结论 / 证据栏",
+    dataLayout: "原生图表 / 口径"
   },
   {
     id: "consulting-evidence",
@@ -101,10 +101,10 @@ export const visualDirectionCatalog: VisualDirectionPreview[] = [
     fitZh: "战略、经营复盘与客户方案；结论、证据和行动形成一条阅读路径。",
     fitEn: "Strategy, business review, and client proposals with a conclusion-to-evidence-to-action path.",
     tone: "paper",
-    accent: "#EF5B3F",
-    coverLayout: "非对称结论封面",
-    bodyLayout: "左结论 / 右证据",
-    dataLayout: "对比矩阵 + 决策提示"
+    accent: "#1D4ED8",
+    coverLayout: "非对称证据封面",
+    bodyLayout: "治理句 / 证据轨",
+    dataLayout: "矩阵 / 直接标注"
   },
   {
     id: "brand-launch",
@@ -113,10 +113,10 @@ export const visualDirectionCatalog: VisualDirectionPreview[] = [
     fitZh: "产品发布、文旅与活动推介；主视觉承担记忆点，正文保持可编辑。",
     fitEn: "Product launch and destination promotion with memorable visuals and editable content.",
     tone: "signal",
-    accent: "#E84E35",
-    coverLayout: "主视觉切片 + 艺术标题",
-    bodyLayout: "场景图 + 观点",
-    dataLayout: "产品证据带"
+    accent: "#DCE84B",
+    coverLayout: "全幅主视觉",
+    bodyLayout: "场景硬切 / 单观点",
+    dataLayout: "窄证据带"
   },
   {
     id: "training-narrative",
@@ -125,22 +125,22 @@ export const visualDirectionCatalog: VisualDirectionPreview[] = [
     fitZh: "课程、内训和工作坊；概念、示例、练习与检查点节奏清晰。",
     fitEn: "Training and workshops with concept, example, exercise, and checkpoint pacing.",
     tone: "warm",
-    accent: "#C36A2D",
-    coverLayout: "课程目标 + 路线",
-    bodyLayout: "概念 / 示例分栏",
-    dataLayout: "练习进度 + 检查点"
+    accent: "#356859",
+    coverLayout: "课程目录封面",
+    bodyLayout: "课程脊柱 / 示例",
+    dataLayout: "练习 / 检查点"
   },
   {
     id: "editorial-narrative",
-    labelZh: "电子杂志",
+    labelZh: "编辑叙事",
     labelEn: "Editorial narrative",
-    fitZh: "观点传播、演讲与极短指令；大留白、强节奏、图文跨页。",
-    fitEn: "Opinion-led talks and thin prompts with strong pacing and editorial spreads.",
-    tone: "dark",
-    accent: "#EF5B3F",
-    coverLayout: "暗色封面 + 大标题",
-    bodyLayout: "图文跨页",
-    dataLayout: "观点数字页"
+    fitZh: "观点传播、研究叙事与长篇演讲；用暖纸、故事网格和产品表面建立节奏。",
+    fitEn: "Opinion, research, and long-form talks with warm paper, story grids, and product surfaces.",
+    tone: "warm",
+    accent: "#CC785C",
+    coverLayout: "编辑故事封面",
+    bodyLayout: "不等宽跨栏 / 旁注",
+    dataLayout: "文章式证据"
   },
   {
     id: "swiss-information",
@@ -149,10 +149,10 @@ export const visualDirectionCatalog: VisualDirectionPreview[] = [
     fitZh: "产品、工程、KPI 与方法论；严格网格、信息秩序和高对比标记。",
     fitEn: "Product, engineering, KPI, and methodology stories with a strict information grid.",
     tone: "signal",
-    accent: "#2563EB",
-    coverLayout: "严格网格标题",
-    bodyLayout: "编号信息模块",
-    dataLayout: "KPI 塔 + 比较"
+    accent: "#1D4ED8",
+    coverLayout: "编号信息封面",
+    bodyLayout: "基线 / 越界证据",
+    dataLayout: "KPI 塔 / 直接标签"
   }
 ];
 
@@ -187,12 +187,12 @@ export function inferSlideCount(request: string, fallback = 6): number {
 
 function slideVariants(role: string, slideId: string): DeckSlideVariant[] {
   const layouts: Record<string, string[]> = {
-    anchor: ["hero-left-visual", "editorial-title-lockup", "brand-signal-cover"],
-    context: ["statement-evidence-split", "context-timeline", "source-signal-board"],
-    evidence: ["evidence-table", "metric-proof", "image-evidence-split"],
-    comparison: ["two-column-delta", "before-after-axis", "decision-matrix"],
-    action: ["owner-roadmap", "three-horizon-plan", "milestone-path"],
-    closing: ["commitment-tail", "decision-ask", "next-step-summary"]
+    anchor: ["cover.hero-left-visual", "cover.editorial-folio", "cover.image-stage"],
+    context: ["section.hero-light", "context.vertical-timeline", "story.text-image-7-5"],
+    evidence: ["evidence.native-chart", "evidence.image-proof-grid", "evidence.source-ledger"],
+    comparison: ["comparison.two-column-delta", "comparison.before-after-axis", "comparison.decision-matrix"],
+    action: ["action.owner-roadmap", "action.horizontal-timeline", "action.system-map"],
+    closing: ["closing.commitment-tail", "closing.decision-ask", "closing.editorial-colophon"]
   };
   return (layouts[role] || layouts.evidence).map((layoutFamily, index) => ({
     id: `${slideId}-V${index + 1}`,
@@ -205,11 +205,11 @@ export function createDraftSlides(request: string, sourceCount: number, count = 
   const requestTitle = request.trim() || "等待输入任务";
   const titles = [
     requestTitle.slice(0, 36),
-    "为什么现在需要关注",
-    "关键事实与证据",
-    "差异、选择与判断",
-    "下一步行动与负责人",
-    "交付结论与决策请求"
+    "背景与目标",
+    "关键事实",
+    "方案比较",
+    "行动计划",
+    "决策与交付"
   ];
   return Array.from({ length: Math.max(4, Math.min(12, count)) }, (_, index) => {
     const slideId = stableSlideId(index);

@@ -1,15 +1,18 @@
 :root {
-  --upm-font-ui: "PingFang SC", "Avenir Next", Inter, sans-serif;
-  --upm-ink: #172033;
-  --upm-muted: #647083;
-  --upm-line: #d9e0e8;
+  --upm-font-ui: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --upm-font-display: "Noto Serif SC", SimSun, serif;
+  --upm-font-evidence: "IBM Plex Sans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --upm-font-mono: "IBM Plex Mono", Consolas, monospace;
+  --upm-ink: #171714;
+  --upm-muted: #676963;
+  --upm-line: #d8d5ce;
   --upm-paper: #ffffff;
-  --upm-surface: #f3f5f7;
-  --upm-warm: #f7f3ea;
-  --upm-coral: #ef5b3f;
+  --upm-surface: #f1efea;
+  --upm-warm: #f6f3ed;
+  --upm-coral: #cc785c;
   --upm-green: #10b981;
-  --upm-blue: #2563eb;
+  --upm-blue: #1d4ed8;
   --upm-amber: #d69020;
-  --upm-radius: 10px;
-  --upm-shadow: 0 18px 45px rgba(23, 32, 51, 0.07);
+  --upm-radius: 6px;
+  --upm-shadow: 0 14px 34px rgba(23, 23, 20, 0.06);
 }

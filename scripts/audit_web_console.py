@@ -68,7 +68,7 @@ def main() -> int:
     require('import { V6Workspace } from "./V6Workspace"' in main_source, "v6 workspace is not the default entry", errors)
     require('lazy(() => import("./ClassicApp"))' in main_source, "Classic console must be lazy loaded", errors)
     require('from "./App"' not in main_source, "Default entry must not eagerly import the classic console", errors)
-    require('appVersion = "6.0.0"' in v6, "v6 workspace version marker is missing", errors)
+    require('appVersion = "6.1.0"' in v6, "v6 workspace version marker is missing", errors)
     require('new EventSource(`${bridgeUrl}/events`)' in v6, "v6 workspace must consume Bridge progress events", errors)
     require("if (!document.hidden)" in v6, "Bridge health polling must pause when the document is hidden", errors)
     require('aria-current={current ? "step" : undefined}' in v6, "Phase navigation needs aria-current", errors)

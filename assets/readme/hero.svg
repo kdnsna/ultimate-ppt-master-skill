@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-  <title id="title">Ultimate PPT Master v6.0.0 任务型演示文稿工作台</title>
+  <title id="title">Ultimate PPT Master v6.1.0 任务型演示文稿工作台</title>
   <desc id="desc">Ultimate PPT Master v6 从真实资料出发；Best-effect brief 与 sourceConfidence 先确认故事板和证据，再选择视觉方向、逐页生成和局部精修，最终交付可编辑 PPTX 或 Web Deck。</desc>
   <defs>
     <linearGradient id="pageBg" x1="0" y1="0" x2="1" y2="1">
@@ -38,7 +38,7 @@
       <circle cx="33" cy="26" r="8" fill="#2563EB"/>
       <circle cx="60" cy="26" r="8" fill="#14B8A6"/>
       <circle cx="87" cy="26" r="8" fill="#F97316"/>
-      <text x="118" y="33" fill="#516173" font-size="16" font-weight="850">Ultimate PPT Master v6.0.0</text>
+      <text x="118" y="33" fill="#516173" font-size="16" font-weight="850">Ultimate PPT Master v6.1.0</text>
 
       <text x="0" y="138" fill="#101828" font-size="68" font-weight="900">从真实资料，到一份</text>
       <text x="0" y="214" fill="#101828" font-size="68" font-weight="900">能放心交付的 PPT</text>
