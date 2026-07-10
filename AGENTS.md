@@ -8,7 +8,11 @@ Use this repository as a portable presentation-generation skill package for agen
 2. Resolve this repository root as `SKILL_DIR`.
 3. Follow `SKILL.md` before generating any presentation files.
 4. Use `assets/`, `references/`, `templates/`, `workflows/`, and `scripts/` only when the selected workflow needs them.
-5. Keep both public entry points discoverable: Web Experience / Agent Bridge for guided local handoff, Agent Skill for production workflow use.
+5. Keep both public entry points discoverable: the v6 task-first workspace / Agent Bridge for guided local handoff, and the Agent Skill for production workflow use. The v5.4.1 console remains a one-cycle Classic fallback only.
+
+## v6 Session Contract
+
+Prefer the shared `DeckSession` phases `intake / outline / generating / review / delivered`. Preserve stable `slideId` values across storyboard, source map, preview, PPTX, review findings, repair plans, and resumable handoffs. Generate a fast structural draft before expensive visual refinement, and regenerate a selected slide instead of rebuilding the full deck whenever possible.
 
 ## Invocation
 

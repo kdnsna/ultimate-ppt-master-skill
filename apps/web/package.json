@@ -1,7 +1,7 @@
 {
   "name": "ultimate-ppt-master-web",
   "private": true,
-  "version": "5.4.1",
+  "version": "6.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",

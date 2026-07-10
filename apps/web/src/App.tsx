@@ -1,29 +1,27 @@
-import {
-  Activity,
-  AlertCircle,
-  BookOpen,
-  CheckCircle2,
-  Clipboard,
-  Download,
-  ExternalLink,
-  FileArchive,
-  FileInput,
-  FileText,
-  FolderOpen,
-  Globe2,
-  KeyRound,
-  Link2,
-  MonitorPlay,
-  Play,
-  PlugZap,
-  RefreshCw,
-  Server,
-  ShieldCheck,
-  Sparkles,
-  UploadCloud,
-  Workflow,
-  XCircle
-} from "lucide-react";
+import Activity from "lucide-react/dist/esm/icons/activity.js";
+import AlertCircle from "lucide-react/dist/esm/icons/alert-circle.js";
+import BookOpen from "lucide-react/dist/esm/icons/book-open.js";
+import CheckCircle2 from "lucide-react/dist/esm/icons/check-circle-2.js";
+import Clipboard from "lucide-react/dist/esm/icons/clipboard.js";
+import Download from "lucide-react/dist/esm/icons/download.js";
+import ExternalLink from "lucide-react/dist/esm/icons/external-link.js";
+import FileArchive from "lucide-react/dist/esm/icons/file-archive.js";
+import FileInput from "lucide-react/dist/esm/icons/file-input.js";
+import FileText from "lucide-react/dist/esm/icons/file-text.js";
+import FolderOpen from "lucide-react/dist/esm/icons/folder-open.js";
+import Globe2 from "lucide-react/dist/esm/icons/globe-2.js";
+import KeyRound from "lucide-react/dist/esm/icons/key-round.js";
+import Link2 from "lucide-react/dist/esm/icons/link-2.js";
+import MonitorPlay from "lucide-react/dist/esm/icons/monitor-play.js";
+import Play from "lucide-react/dist/esm/icons/play.js";
+import PlugZap from "lucide-react/dist/esm/icons/plug-zap.js";
+import RefreshCw from "lucide-react/dist/esm/icons/refresh-cw.js";
+import Server from "lucide-react/dist/esm/icons/server.js";
+import ShieldCheck from "lucide-react/dist/esm/icons/shield-check.js";
+import Sparkles from "lucide-react/dist/esm/icons/sparkles.js";
+import UploadCloud from "lucide-react/dist/esm/icons/upload-cloud.js";
+import Workflow from "lucide-react/dist/esm/icons/workflow.js";
+import XCircle from "lucide-react/dist/esm/icons/x-circle.js";
 import type { LucideIcon } from "lucide-react";
 import JSZip from "jszip";
 import { useEffect, useMemo, useState } from "react";

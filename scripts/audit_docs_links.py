@@ -11,7 +11,7 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "5.4.1"
+VERSION = "6.0.0"
 README_BANNED_PHRASES = (
     "Best Results Prompt",
     "What v5 Changes",
@@ -93,7 +93,7 @@ def audit_version_markers(errors: list[str]) -> None:
     package = load_json("package.json")
     web_package = load_json("apps/web/package.json")
     web_lock = load_json("apps/web/package-lock.json")
-    app = read(ROOT / "apps/web/src/App.tsx")
+    app = read(ROOT / "apps/web/src/V6Workspace.tsx")
     readme = read(ROOT / "README.md")
     readme_zh = read(ROOT / "README.zh-CN.md")
     hero = read(ROOT / "assets/readme/hero.svg")
@@ -104,7 +104,7 @@ def audit_version_markers(errors: list[str]) -> None:
     require(web_lock.get("version") == VERSION, f"apps/web/package-lock.json root version is not v{VERSION}", errors)
     require(web_lock.get("packages", {}).get("", {}).get("version") == VERSION, f"apps/web package-lock package version is not v{VERSION}", errors)
     require(listing.get("version") == VERSION, f"agents/marketplace-listing.json version is not v{VERSION}", errors)
-    require(f'appVersion = "{VERSION}"' in app, f"apps/web/src/App.tsx appVersion is not v{VERSION}", errors)
+    require(f'appVersion = "{VERSION}"' in app, f"apps/web/src/V6Workspace.tsx appVersion is not v{VERSION}", errors)
 
     for label, text in (("README.md", readme), ("README.zh-CN.md", readme_zh), ("assets/readme/hero.svg", hero)):
         require(f"v{VERSION}" in text or VERSION in text, f"{label} missing v{VERSION} marker", errors)
@@ -244,6 +244,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/quality/rendered-review-loop-v4.3.md",
         "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
+        "./docs/release/release-notes-v6.0.0.md",
         "./docs/release/release-notes-v5.4.1.md",
         "./docs/release/release-notes-v5.3.0.md",
         "./docs/release/release-notes-v5.2.0.md",
@@ -259,6 +260,7 @@ def audit_canonical_public_paths(errors: list[str]) -> None:
         "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
         "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
         "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
+        "./docs/zh-CN/release/release-notes-v6.0.0.md",
         "./docs/zh-CN/release/release-notes-v5.4.1.md",
         "./docs/zh-CN/release/release-notes-v5.3.0.md",
         "./docs/zh-CN/release/release-notes-v5.2.0.md",

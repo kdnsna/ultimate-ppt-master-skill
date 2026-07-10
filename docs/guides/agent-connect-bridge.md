@@ -96,13 +96,24 @@ Bridge listens on `http://127.0.0.1:43188`.
 | Endpoint | Purpose |
 |---|---|
 | `GET /health` | Bridge version, output directory, local Agent detection, provider status. |
+| `GET /events` | Read-only SSE stream for phase, artifact, finding, failure, recovery, and completion progress. |
 | `GET /providers` | Provider status without secrets. |
 | `POST /providers/test` | Test a configured provider through Bridge. |
 | `POST /handoff` | Create a local handoff project. |
+| `POST /slides/regenerate` | Save a revision request for one stable `slideId` inside an existing Bridge handoff. |
 | `POST /agent/launch` | Return an Agent command, or launch only when explicitly allowed. |
 | `POST /skill/install` | Install or update the Skill into an allowlisted local Agent target (`codex` or `generic`). |
 
 CORS is limited to GitHub Pages and local development origins.
+
+## HTTP API Boundary and Server Deployment
+
+The v6 Bridge is an HTTP preparation and orchestration API, not yet a public multi-tenant generation service. `POST /handoff` creates the project contract; `GET /events` reports progress; `POST /slides/regenerate` records a slide-level revision. Final PPTX/Web generation still needs one of these execution layers:
+
+1. **Agent runner** - install Codex, Claude Code, Hermes, or OpenClaw on the worker and let it execute the Skill against the handoff directory.
+2. **Custom orchestrator** - call the repository scripts directly, persist `DeckSession`, schedule retries/checkpoints, run the quality gates, and publish the final artifacts yourself.
+
+There is no authenticated standalone `POST /generate` endpoint in v6.0. The current server deliberately rejects non-loopback binding, has no tenant isolation or job queue, and must not be exposed directly to the internet. A remote deployment should place an authenticated API gateway and job queue in front of isolated workers, while keeping the Bridge/Skill process private.
 
 ## Safety Defaults
 

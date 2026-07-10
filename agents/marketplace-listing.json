@@ -2,7 +2,7 @@
   "id": "ultimate-ppt-master",
   "name": "Ultimate PPT Master",
   "displayName": "终极融合PPT大师",
-  "version": "5.4.1",
+  "version": "6.0.0",
   "invocation": "$ultimate-ppt-master",
   "category": [
     "presentation generation",
@@ -10,8 +10,8 @@
     "web deck",
     "office productivity"
   ],
-  "shortDescription": "先自动扩写 best-effect brief，再生成 quality-checked PPTX and Web Decks.",
-  "positioning": "A local-first PPT delivery skill for Chinese office users who need a best-effect brief enhancer, Style A Editorial Fixed Rhythm Web Deck fallback for short prompts, editable PPTX/Web Decks, official asset boundaries, and audit-ready deliverables.",
+  "shortDescription": "先自动扩写 best-effect brief，再生成 quality-checked PPTX/Web Decks",
+  "positioning": "A local-first presentation Agent and quality operating system for Chinese formal-office delivery, with a best-effect brief, task-first intake, stable slide identities, reference-PPT learning, editable PowerPoint objects, source boundaries, and audit-ready handoff.",
   "defaultPrompt": "Use $ultimate-ppt-master with any natural-language presentation request. It will expand the request into a best-effect brief, choose PPTX or Web Deck, and run the matching quality checks.",
   "metadata": {
     "openai": "agents/openai.yaml",

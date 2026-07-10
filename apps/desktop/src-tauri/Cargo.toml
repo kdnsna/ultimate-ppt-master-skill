@@ -1,6 +1,6 @@
 [package]
 name = "ultimate-ppt-master-desktop"
-version = "2.1.0"
+version = "6.0.0"
 description = "A lightweight desktop shell for Ultimate PPT Master"
 authors = ["kdnsna"]
 license = "MIT"

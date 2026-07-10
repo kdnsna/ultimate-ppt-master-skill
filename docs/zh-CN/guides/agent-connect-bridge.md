@@ -96,13 +96,24 @@ Bridge 默认监听 `http://127.0.0.1:43188`。
 | 接口 | 作用 |
 |---|---|
 | `GET /health` | Bridge 版本、输出目录、本地 Agent 检测、provider 状态。 |
+| `GET /events` | 通过 SSE 只读推送阶段、产物、审阅发现、失败、恢复和完成进度。 |
 | `GET /providers` | 不含密钥的 provider 状态。 |
 | `POST /providers/test` | 通过 Bridge 测试已配置 provider。 |
 | `POST /handoff` | 创建本地 handoff 项目。 |
+| `POST /slides/regenerate` | 在已有 Bridge handoff 中为一个稳定 `slideId` 保存修订请求。 |
 | `POST /agent/launch` | 返回 Agent 命令；只有显式允许时才自动启动。 |
 | `POST /skill/install` | 把 Skill 安装或更新到固定白名单本地 Agent 目标（`codex` 或 `generic`）。 |
 
 CORS 只允许 GitHub Pages 和本地开发源。
+
+## HTTP API 边界与服务器部署
+
+v6 Bridge 是任务准备和编排 API，还不是可直接对公网开放的多租户生成服务。`POST /handoff` 创建项目合同，`GET /events` 返回进度，`POST /slides/regenerate` 记录单页修改；最终 PPTX/Web 生成仍需要以下执行层之一：
+
+1. **Agent Runner**：在 Worker 上安装 Codex、Claude Code、Hermes 或 OpenClaw，由它针对 handoff 目录执行 Skill。
+2. **自建编排器**：直接调用仓库脚本，持久化 `DeckSession`，负责重试/恢复点、质量门禁和最终产物发布。
+
+v6.0 暂时没有带认证的独立 `POST /generate` 接口。当前服务会拒绝非 loopback 监听，也没有租户隔离和任务队列，因此不能直接暴露到互联网。远程部署应在隔离 Worker 前增加认证 API Gateway 与任务队列，并让 Bridge/Skill 进程保持私有。
 
 ## 安全默认值
 

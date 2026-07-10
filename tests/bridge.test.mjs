@@ -40,6 +40,30 @@ test("health reports provider status without leaking keys", async () => {
   );
 });
 
+test("bridge exposes a read-only SSE progress stream", async () => {
+  await withServer({}, async (baseUrl) => {
+    const controller = new AbortController();
+    let reader;
+    try {
+      const response = await fetch(`${baseUrl}/events`, { signal: controller.signal });
+      assert.equal(response.status, 200);
+      assert.match(response.headers.get("content-type") || "", /text\/event-stream/);
+      reader = response.body.getReader();
+      let firstFrame = "";
+      while (!firstFrame.includes('"type":"connected"')) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        firstFrame += new TextDecoder().decode(value);
+      }
+      assert.match(firstFrame, /Bridge progress stream/);
+      assert.match(firstFrame, /"type":"connected"/);
+    } finally {
+      controller.abort();
+      await reader?.cancel().catch(() => {});
+    }
+  });
+});
+
 test("handoff writes project files and extracts browser text attachments", async () => {
   const outputDir = await mkdtemp(join(tmpdir(), "upm-bridge-"));
   await withServer({ outputDir }, async (baseUrl) => {
@@ -73,6 +97,49 @@ test("handoff writes project files and extracts browser text attachments", async
     const extracted = await readFile(join(payload.projectPath, "extracted-source.md"), "utf8");
     assert.ok(extracted.includes("Hello."));
     assert.equal(payload.manifest.attachments[0].parseStatus, "textExtracted");
+    const storyboard = JSON.parse(await readFile(join(payload.projectPath, "storyboard.json"), "utf8"));
+    assert.equal(storyboard.slides[0].slideId, "P01");
+    const sourceMap = JSON.parse(await readFile(join(payload.projectPath, "source-map.json"), "utf8"));
+    assert.equal(sourceMap.slideEvidence[0].slideId, "P01");
+  });
+  await rm(outputDir, { recursive: true, force: true });
+});
+
+test("handoff reuses attachment extraction by content hash", async () => {
+  const outputDir = await mkdtemp(join(tmpdir(), "upm-bridge-cache-"));
+  await withServer({ outputDir }, async (baseUrl) => {
+    const requestBody = {
+      form: { title: "Cache Test Deck" },
+      projectBrief: { title: "Cache Test Deck" },
+      attachments: [{ id: "cache-source", kind: "file", name: "source.md", type: "text/markdown", text: "# Stable source\n\nSame content." }]
+    };
+    const first = await fetch(`${baseUrl}/handoff`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(requestBody) });
+    const firstPayload = await first.json();
+    const second = await fetch(`${baseUrl}/handoff`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(requestBody) });
+    const secondPayload = await second.json();
+    assert.equal(firstPayload.manifest.attachments[0].parseStatus, "textExtracted");
+    assert.equal(secondPayload.manifest.attachments[0].parseStatus, "cacheHit");
+    assert.equal(firstPayload.manifest.attachments[0].contentHash, secondPayload.manifest.attachments[0].contentHash);
+  });
+  await rm(outputDir, { recursive: true, force: true });
+});
+
+test("slide regeneration writes a stable slide revision request", async () => {
+  const outputDir = await mkdtemp(join(tmpdir(), "upm-bridge-slide-"));
+  await withServer({ outputDir }, async (baseUrl) => {
+    const handoff = await fetch(`${baseUrl}/handoff`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ form: { title: "Slide Revision Deck" }, projectBrief: { title: "Slide Revision Deck" } }) });
+    const handoffPayload = await handoff.json();
+    const revision = await fetch(`${baseUrl}/slides/regenerate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ projectPath: handoffPayload.projectPath, slideId: "P02", variantId: "P02-v2", instruction: "Use the comparison variant." })
+    });
+    assert.equal(revision.status, 200);
+    const revisionPayload = await revision.json();
+    assert.equal(revisionPayload.slideId, "P02");
+    const saved = JSON.parse(await readFile(revisionPayload.requestPath, "utf8"));
+    assert.equal(saved.variantId, "P02-v2");
+    assert.equal(saved.status, "pending");
   });
   await rm(outputDir, { recursive: true, force: true });
 });
