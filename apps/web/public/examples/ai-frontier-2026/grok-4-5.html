@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Grok 4.5 engineering efficiency briefing, built as a finished Ultimate PPT Master Web Deck.">
+  <title>Grok 4.5 · 工程智能的效率曲线</title>
+  <link rel="stylesheet" href="./deck.css">
+</head>
+<body class="theme-grok">
+  <div class="progress" aria-hidden="true"></div>
+  <main class="deck" aria-label="Grok 4.5 finished presentation">
+    <section class="slide dark">
+      <div class="chrome"><span>Engineering Intelligence · Field Note</span><span>08.07.2026</span></div>
+      <div class="content bottom">
+        <p class="eyebrow">GROK 4.5 · CODING / AGENTS / KNOWLEDGE</p>
+        <h1 class="display">工程智能<br>效率曲线</h1>
+        <p class="lead">当模型不只追求“答对”，而是同时压缩延迟、token 与工具调用成本，工程能力才开始进入可规模化区间。</p>
+        <div style="margin-top:4vh"><span class="fact-pill">Official release · 8 July 2026</span></div>
+      </div>
+      <span class="index-mark" aria-hidden="true">4.5</span>
+      <div class="foot"><span>Ultimate PPT Master · Finished Deck 02</span><span>01 / 09</span></div>
+    </section>
+
+    <section class="slide signal">
+      <div class="chrome"><span>00 · Fact Check</span><span>Requested topic corrected</span></div>
+      <div class="content split reverse">
+        <div>
+          <p class="eyebrow">先把版本号说清楚</p>
+          <h2 class="statement">未找到 Grok 4.6<br>官方发布。</h2>
+        </div>
+        <div>
+          <h3 style="margin:0;font-family:var(--display);font-size:clamp(38px,5vw,84px);line-height:.92">最新可核验版本<br>是 Grok 4.5。</h3>
+          <p class="lead">x.ai 官方于 2026 年 7 月 8 日发布 Grok 4.5。本案例按官方最新信息制作，并保留核验日期；后续若 4.6 发布，应更新内容而不是沿用旧结论。</p>
+        </div>
+      </div>
+      <div class="foot"><span>Verification date · 10 Jul 2026</span><span>02 / 09</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="chrome"><span>01 · Product Thesis</span><span>Beyond benchmark score</span></div>
+      <div class="content top">
+        <p class="eyebrow">模型价值的三维坐标</p>
+        <h2 class="title">更聪明，不够。<br>还要更快、更省。</h2>
+        <div class="grid-3" style="margin-top:6vh">
+          <article class="metric"><strong>01 · QUALITY</strong><b>任务完成</b><p>复杂编码、代理任务与知识工作必须在真实工具链中闭环。</p></article>
+          <article class="metric"><strong>02 · LATENCY</strong><b>80 TPS</b><p>xAI 公布的服务速度，定位在 fast-model 级别。</p></article>
+          <article class="metric"><strong>03 · EFFICIENCY</strong><b>4.2×</b><p>xAI 称在 SWE Bench Pro 已解决任务上，输出 token 较 Opus 4.8 更少。</p></article>
+        </div>
+      </div>
+      <div class="foot"><span>Vendor-published figures · see source page</span><span>03 / 09</span></div>
+    </section>
+
+    <section class="slide dark">
+      <div class="chrome"><span>02 · Engineering Benchmarks</span><span>Results reported by xAI</span></div>
+      <div class="content split reverse">
+        <div>
+          <p class="eyebrow">三种工程压力测试</p>
+          <h2 class="title">不是答题，<br>是完成工程。</h2>
+          <p class="lead">官方发布页强调代码库理解、终端操作和真实软件问题。下列数字为 xAI 公布结果，不等同于独立复现。</p>
+        </div>
+        <div class="signal-bars">
+          <div class="bar"><span>DeepSWE 1.0</span><div class="bar-track"><div class="bar-fill" style="--value:62%"></div></div><b>62.0%</b></div>
+          <div class="bar"><span>Terminal Bench 2.1</span><div class="bar-track"><div class="bar-fill" style="--value:83.3%"></div></div><b>83.3%</b></div>
+          <div class="bar"><span>SWE Bench Pro</span><div class="bar-track"><div class="bar-fill" style="--value:64.7%"></div></div><b>64.7%</b></div>
+        </div>
+      </div>
+      <div class="foot"><span>Source · Introducing Grok 4.5</span><span>04 / 09</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="chrome"><span>03 · Token Economics</span><span>Less output, less waiting</span></div>
+      <div class="content split">
+        <div>
+          <p class="eyebrow">效率不是小优化</p>
+          <h2 class="statement">15,954<br><span style="color:var(--accent)">tokens</span></h2>
+          <p class="lead">xAI 报告 Grok 4.5 在 SWE Bench Pro 已解决任务上的平均输出 token。</p>
+        </div>
+        <div class="stack">
+          <div class="folio"><strong>更短路径</strong><p>减少无效推理和重复工具调用，长任务的总时长更可控。</p></div>
+          <div class="folio"><strong>更低成本</strong><p>输出 token 是代理系统里持续累积的可变成本。</p></div>
+          <div class="folio"><strong>更易审阅</strong><p>中间轨迹更短，工程师更容易定位决策点和失败点。</p></div>
+        </div>
+      </div>
+      <div class="foot"><span>Comparison baseline · Opus 4.8 max, reported by xAI</span><span>05 / 09</span></div>
+    </section>
+
+    <section class="slide signal">
+      <div class="chrome"><span>04 · Office Work</span><span>Native deliverables matter</span></div>
+      <div class="content split reverse">
+        <div>
+          <p class="eyebrow">工程模型开始进入办公交付</p>
+          <h2 class="title" style="font-size:clamp(38px,4.8vw,78px)">PowerPoint 不是一张图，<br>而是一组可编辑对象。</h2>
+        </div>
+        <div class="grid-4" style="gap:1.4vh 1.2vw">
+          <article class="metric" style="min-height:18vh"><strong>POWERPOINT</strong><b style="font-size:clamp(28px,2.7vw,46px)">原生形状</b><p>用 PowerPoint 形状构建复杂图示。</p></article>
+          <article class="metric" style="min-height:18vh"><strong>EXCEL</strong><b style="font-size:clamp(28px,2.7vw,46px)">公式模型</b><p>研究、多表公式与说明一起交付。</p></article>
+          <article class="metric" style="min-height:18vh"><strong>WORD</strong><b style="font-size:clamp(28px,2.7vw,46px)">清晰长文</b><p>输出结构化、可继续编辑的正式文稿。</p></article>
+          <article class="metric" style="min-height:18vh"><strong>BUILD</strong><b style="font-size:clamp(28px,2.7vw,46px)">默认模型</b><p>Grok 4.5 已成为 Grok Build 的默认模型。</p></article>
+        </div>
+      </div>
+      <div class="foot"><span>Product surface · Grok Build and Office plugins</span><span>06 / 09</span></div>
+    </section>
+
+    <section class="slide dark">
+      <div class="chrome"><span>05 · Training System</span><span>Scale is an operating model</span></div>
+      <div class="content top">
+        <p class="eyebrow">能力背后是一条异步训练流水线</p>
+        <h2 class="title">大量并行 rollout，<br>持续学习真实工程。</h2>
+        <div class="rail">
+          <article class="rail-step"><span>01 / DATA</span><b>筛选</b><p>去重、质量评分、领域聚焦，保持高信号数据混合。</p></article>
+          <article class="rail-step"><span>02 / TASKS</span><b>覆盖</b><p>编码、科学、工程与数学任务形成训练面。</p></article>
+          <article class="rail-step"><span>03 / RL</span><b>强化</b><p>围绕数十万任务扩展多步骤软件工程训练。</p></article>
+          <article class="rail-step"><span>04 / ROLLOUT</span><b>异步</b><p>长时间代理轨迹并行执行，同时继续学习。</p></article>
+          <article class="rail-step"><span>05 / SERVE</span><b>交付</b><p>把每 token 智能与 80 TPS 服务速度一起优化。</p></article>
+        </div>
+      </div>
+      <div class="foot"><span>Training description · xAI official release</span><span>07 / 09</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="chrome"><span>06 · Adoption Decision</span><span>What to validate first</span></div>
+      <div class="content">
+        <p class="eyebrow">对团队真正有用的验收方式</p>
+        <div class="compare" style="margin-top:2vh">
+          <div><h3>值得优先试</h3><ul><li>终端密集、工具调用多的代码任务。</li><li>需要快速生成并继续编辑的 Office 工作。</li><li>对延迟和输出 token 都敏感的代理系统。</li><li>可用内部基准集做独立复现的团队。</li></ul></div>
+          <div><h3>不要直接假设</h3><ul><li>供应商 benchmark 排名会等比迁移到你的代码库。</li><li>更少 token 自动意味着更高正确率。</li><li>“Grok 4.6”已经存在或具有这些能力。</li><li>发布时的地域可用性和产品入口不会变化。</li></ul></div>
+        </div>
+      </div>
+      <div class="foot"><span>Recommendation · test completion, latency, cost together</span><span>08 / 09</span></div>
+    </section>
+
+    <section class="slide dark">
+      <div class="chrome"><span>07 · Sources</span><span>Primary reference</span></div>
+      <div class="content top">
+        <p class="eyebrow">来源与更新机制</p>
+        <h2 class="title">热点会变，<br>案例必须能更新。</h2>
+        <div class="source-links" style="margin-top:5vh">
+          <a href="https://x.ai/news/grok-4-5" target="_blank" rel="noreferrer"><b>Introducing Grok 4.5</b><span>x.ai · 8 Jul 2026 · capabilities, benchmarks, efficiency, Office examples, access</span></a>
+          <a href="https://x.ai/news" target="_blank" rel="noreferrer"><b>x.ai News Index</b><span>Used to verify that Grok 4.6 had not been officially published by 10 Jul 2026</span></a>
+        </div>
+        <p class="lead" style="margin-top:5vh">结论：Grok 4.5 的故事不是“又一个更高分模型”，而是工程智能开始同时优化完成率、延迟和 token 经济性。</p>
+      </div>
+      <div class="foot"><span>Verified · 10 Jul 2026</span><span>09 / 09</span></div>
+    </section>
+  </main>
+  <div class="nav-shell" aria-label="Slide navigation"><nav class="nav"></nav><span class="counter" aria-live="polite"></span></div>
+  <script src="./deck.js"></script>
+</body>
+</html>

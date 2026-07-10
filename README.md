@@ -17,7 +17,7 @@
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-2563EB?style=flat-square">
 </p>
 
-![Ultimate PPT Master v6](assets/readme/hero.svg)
+![Ultimate PPT Master v6 finished presentation cases](assets/readme/v6-finished-decks.png)
 
 Most AI presentation tools optimize for the first preview. Ultimate PPT Master optimizes for the moment the deck is opened in a real meeting, revised in PowerPoint, challenged on its sources, and handed to someone else.
 
@@ -93,22 +93,19 @@ You do not need a special prompt. v6 infers low-risk settings and asks only when
 - Local-first source handling, provider-secret isolation and explicit official/IP asset rules.
 - Web and Desktop surfaces sharing the same `DeckSession` stages and design tokens.
 
-## Real Proof Packs — proof, not just claims
+## Finished presentations · Real Proof Packs
 
-The public [Proof Packs gallery](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) exposes sanitized input, preset, output and review evidence. Scores are self-assessed by Design Doctor and linked to the rubric; they are not presented as an external benchmark.
+Start with the public [presentation gallery](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/): three complete nine-slide editorial decks sit above the stable Proof Packs. GPT-5.6 and Claude Fable 5 use official release material; the requested “Grok 4.6” was corrected to the latest verified official release, Grok 4.5, as of 10 July 2026. Proof Pack scores remain self-assessed by Design Doctor, not external benchmarks.
 
-| Proof pack | Inspectable output |
+| Case | Inspectable output |
 |---|---|
-| Executive Business Review | [Open web demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) |
-| Consulting Proposal | [Open web demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/consulting-proposal-starter/web-demo.html) |
-| Product Pitch | [Open web demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/product-pitch-starter/web-demo.html) |
-| Tech Trend Web Deck | [Open web demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/tech-trend-web-deck-starter/web-demo.html) |
-
-<p align="center">
-  <img alt="Executive review proof" src="examples/executive-business-review-starter/cover.svg" width="31%">
-  <img alt="Consulting proposal proof" src="examples/consulting-proposal-starter/cover.svg" width="31%">
-  <img alt="Product pitch proof" src="examples/product-pitch-starter/cover.svg" width="31%">
-</p>
+| GPT-5.6 · Three Orbits | [Open 9-slide deck](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/ai-frontier-2026/gpt-5-6.html) |
+| Grok 4.5 · Engineering Efficiency | [Open 9-slide deck](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/ai-frontier-2026/grok-4-5.html) |
+| Claude Fable 5 · Long Horizon | [Open 9-slide deck](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/ai-frontier-2026/claude-fable-5.html) |
+| Executive Business Review | [Open stable proof](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) |
+| Consulting Proposal | [Open stable proof](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/consulting-proposal-starter/web-demo.html) |
+| Product Pitch | [Open stable proof](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/product-pitch-starter/web-demo.html) |
+| Tech Trend Web Deck | [Open stable proof](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/tech-trend-web-deck-starter/web-demo.html) |
 
 ## HTTP API and server deployment
 
@@ -154,6 +151,7 @@ npm run audit:v6-workspace
 npm run audit:web-console
 npm run audit:docs
 npm run audit:image-contracts
+npm run audit:featured-decks
 ```
 
 Formal PPTX projects also support:

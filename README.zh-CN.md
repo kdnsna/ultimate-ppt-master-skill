@@ -17,7 +17,7 @@
   <img alt="editable PPTX" src="https://img.shields.io/badge/输出-可编辑_PPTX-2563EB?style=flat-square">
 </p>
 
-![Ultimate PPT Master v6](assets/readme/hero.svg)
+![Ultimate PPT Master v6 完整演示案例](assets/readme/v6-finished-decks.png)
 
 多数 AI PPT 产品优化的是“第一眼看起来像成品”。Ultimate PPT Master 更在意另一刻：这份文件被带进真实会议、在 PowerPoint 里继续修改、被追问数据来源，并最终交给另一个人使用。
 
@@ -93,22 +93,19 @@ npm run bridge
 - 本地优先的资料处理、Provider 密钥隔离和明确的官方/IP 素材规则。
 - Web 与 Desktop 共用 `DeckSession` 阶段和设计令牌。
 
-## 真实 Proof Packs：不是口号，而是可检查的 Proof
+## 完整演示与真实 Proof Packs
 
-公开的 [Proof Packs 案例库](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) 展示脱敏输入、preset、输出和审阅证据。分数来自 Design Doctor 自评并链接评分规则，不包装成第三方权威评测。
+先打开 [演示成品库](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/)：上层是三套各 9 页、视觉方向完全不同的完整 Deck，下层保留稳定 Proof Packs 的证明链。GPT-5.6 和 Claude Fable 5 使用官方发布资料；用户提到的“Grok 4.6”截至 2026-07-10 未找到官方发布，案例因此改为官方最新可核验版本 Grok 4.5。Proof Pack 分数仍是 Design Doctor 自评，不包装成第三方 benchmark。
 
-| Proof Pack | 可检查输出 |
+| 案例 | 可检查产物 |
 |---|---|
-| Executive Business Review | [打开 Web Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) |
-| Consulting Proposal | [打开 Web Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/consulting-proposal-starter/web-demo.html) |
-| Product Pitch | [打开 Web Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/product-pitch-starter/web-demo.html) |
-| Tech Trend Web Deck | [打开 Web Demo](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/tech-trend-web-deck-starter/web-demo.html) |
-
-<p align="center">
-  <img alt="经营复盘 Proof" src="examples/executive-business-review-starter/cover.svg" width="31%">
-  <img alt="咨询方案 Proof" src="examples/consulting-proposal-starter/cover.svg" width="31%">
-  <img alt="产品发布 Proof" src="examples/product-pitch-starter/cover.svg" width="31%">
-</p>
+| GPT-5.6 · 三种轨道 | [打开 9 页成品](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/ai-frontier-2026/gpt-5-6.html) |
+| Grok 4.5 · 工程效率曲线 | [打开 9 页成品](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/ai-frontier-2026/grok-4-5.html) |
+| Claude Fable 5 · 长周期工作 | [打开 9 页成品](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/ai-frontier-2026/claude-fable-5.html) |
+| 经营复盘 | [打开稳定 Proof](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) |
+| 咨询方案 | [打开稳定 Proof](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/consulting-proposal-starter/web-demo.html) |
+| 产品发布 | [打开稳定 Proof](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/product-pitch-starter/web-demo.html) |
+| 科技趋势 Web Deck | [打开稳定 Proof](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/tech-trend-web-deck-starter/web-demo.html) |
 
 ## HTTP API 与服务器部署
 
@@ -154,6 +151,7 @@ npm run audit:v6-workspace
 npm run audit:web-console
 npm run audit:docs
 npm run audit:image-contracts
+npm run audit:featured-decks
 ```
 
 正式 PPTX 项目还可以运行：

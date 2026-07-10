@@ -386,6 +386,31 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("Design Doctor scorecard", page)
         self.assertIn("report-only repair policy", page)
 
+    def test_v6_featured_gallery_contains_three_finished_source_grounded_decks(self):
+        benchmark = (ROOT / "apps/web/public/benchmark/index.html").read_text(encoding="utf-8")
+        cases = {
+            "gpt-5-6.html": ("GPT-5.6", "openai.com/index/previewing-gpt-5-6-sol"),
+            "grok-4-5.html": ("Grok 4.5", "x.ai/news/grok-4-5"),
+            "claude-fable-5.html": ("Claude Fable 5", "anthropic.com/claude/fable"),
+        }
+        case_root = ROOT / "apps/web/public/examples/ai-frontier-2026"
+
+        for filename, (title, source_host) in cases.items():
+            path = case_root / filename
+            self.assertTrue(path.is_file(), filename)
+            text = path.read_text(encoding="utf-8")
+            self.assertEqual(text.count('<section class="slide'), 9, filename)
+            self.assertIn(title, text)
+            self.assertIn(source_host, text)
+            self.assertIn("deck.js", text)
+            self.assertIn(f"examples/ai-frontier-2026/{filename}", benchmark)
+
+        grok = (case_root / "grok-4-5.html").read_text(encoding="utf-8")
+        self.assertIn("\u672a\u627e\u5230 Grok 4.6", grok)
+        self.assertNotIn("<title>Grok 4.6", grok)
+        self.assertTrue((ROOT / "apps/web/public/benchmark/showcase.html").is_file())
+        self.assertTrue((ROOT / "assets/readme/v6-finished-decks.png").is_file())
+
     def test_release_docs_include_v3_and_v4_generation_loops(self):
         release_maintenance = (ROOT / "docs/release/release-maintenance.md").read_text(encoding="utf-8")
         growth_playbook = (ROOT / "docs/strategy/public-growth-playbook.md").read_text(encoding="utf-8")

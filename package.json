@@ -27,6 +27,7 @@
     "audit:image-contracts": "python3 scripts/audit_image_contracts.py",
     "audit:magazine-deck": "node scripts/validate-magazine-deck.mjs examples/magazine-v54-demo/index.html",
     "audit:swiss-deck": "node scripts/validate-swiss-deck.mjs examples/swiss-v54-demo/index.html",
+    "audit:featured-decks": "node scripts/validate-featured-decks.mjs",
     "audit:presets": "python3 scripts/audit_preset_packs.py",
     "audit:quality": "python3 scripts/audit_quality_proofs.py",
     "audit:market": "python3 scripts/audit_skill_market.py",
