@@ -159,12 +159,12 @@ npm run audit:featured-decks
 ```
 
 正式 PPTX 项目还可以运行：
-
 ```bash
 python3 scripts/audit_formal_delivery.py <project>
 python3 scripts/audit_design_completion.py <project>
 python3 scripts/audit_visual_recipes.py <project>
 python3 scripts/audit_pptx_native_objects.py <final.pptx> --expect text,shape
+uvx --from https://github.com/kdnsna/decklint/releases/download/v0.2.0/decklint-0.2.0-py3-none-any.whl decklint audit <final.pptx> --profile ai-generated --fail-on high # 案例：https://kdnsna.github.io/decklint/
 ```
 
 ## 架构一眼看懂
