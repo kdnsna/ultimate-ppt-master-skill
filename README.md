@@ -1,7 +1,7 @@
 # Ultimate PPT Master v6
 
-> Turn real source material into editable, reviewable presentation deliverables — locally, with evidence and quality gates.
-
+> Turn real source material into editable, reviewable presentation deliverables — locally, with clear sources and checks before delivery.
+<p align="center"><strong>Already have a PowerPoint to improve or check?</strong> Use <a href="https://github.com/kdnsna/pptlint"><strong>PPTLint</strong></a> to see whether it is ready to send and which slides to fix first.</p>
 <p align="center">
   <a href="./README.zh-CN.md"><strong>中文</strong></a> ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Live Workspace</strong></a> ·
