@@ -7,6 +7,7 @@
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Proof Packs</strong></a> ·
   <a href="./docs/release/release-notes-v6.1.0.md"><strong>v6.1 Release Notes</strong></a>
 </p>
+
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square"></a>
   <a href="./LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-172033?style=flat-square"></a>
@@ -14,9 +15,13 @@
   <img alt="local first" src="https://img.shields.io/badge/local--first-yes-10B981?style=flat-square">
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-2563EB?style=flat-square">
 </p>
+
 ![Ultimate PPT Master v6 design systems and finished presentation cases](assets/readme/v6-finished-decks.png)
+
 [![A real editable PowerPoint improved from 49 to 100 with Ultimate PPT Master and PPTLint](assets/readme/pptlint-before-after-hero.png)](https://kdnsna.github.io/pptlint/proof-loop/comparison.html)
+
 Already have a PowerPoint to improve or check? Ultimate PPT Master repairs the editable deck; [PPTLint](https://kdnsna.github.io/pptlint/) independently checks the finished PPTX on your computer. In the published nine-slide Proof Loop, **103 reported issues were resolved with 0 new high-confidence problems**. [Open the complete before/after evidence →](https://kdnsna.github.io/pptlint/proof-loop/comparison.html)
+
 Most AI presentation tools optimize for the first preview. Ultimate PPT Master optimizes for the moment the deck is opened in a real meeting, revised in PowerPoint, challenged on its sources, and handed to someone else.
 
 It is not another free-form slide editor. It is a local presentation Agent and quality operating system for formal reports, consulting work, training, finance/government material, branded communication, and high-stakes handoff.

@@ -7,6 +7,7 @@
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>查看 Proof Packs</strong></a> ·
   <a href="./docs/zh-CN/release/release-notes-v6.1.0.md"><strong>v6.1 发布说明</strong></a>
 </p>
+
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square"></a>
   <a href="./LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-172033?style=flat-square"></a>
@@ -14,9 +15,13 @@
   <img alt="local first" src="https://img.shields.io/badge/本地优先-是-10B981?style=flat-square">
   <img alt="editable PPTX" src="https://img.shields.io/badge/输出-可编辑_PPTX-2563EB?style=flat-square">
 </p>
+
 ![Ultimate PPT Master v6 设计系统与完整演示案例](assets/readme/v6-finished-decks.png)
+
 [![Ultimate PPT Master 与 PPTLint 将一份真实可编辑 PPT 从 49 分修到 100 分](assets/readme/pptlint-before-after-hero.png)](https://kdnsna.github.io/pptlint/proof-loop/comparison.html)
+
 已有 PPT，想先检查或继续修改？Ultimate PPT Master 负责定向修复可编辑 PPT，[PPTLint](https://kdnsna.github.io/pptlint/) 在你的电脑上独立检查最终文件。公开的九页 Proof Loop 中，**解决了 103 项报告问题，且没有新增高置信问题**。[打开完整前后证据 →](https://kdnsna.github.io/pptlint/proof-loop/comparison.html)
+
 多数 AI PPT 产品优化的是“第一眼看起来像成品”。Ultimate PPT Master 更在意另一刻：这份文件被带进真实会议、在 PowerPoint 里继续修改、被追问数据来源，并最终交给另一个人使用。
 
 它不是另一个自由画布编辑器，而是一套面向中文正式办公、企业资料和高要求交付的本地演示文稿 Agent 与质量操作系统。适合正式汇报、咨询方案、培训课件、政务金融材料、品牌发布和需要审阅留痕的工作。

@@ -182,8 +182,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
             self.assertNotIn(banned, readme)
             self.assertNotIn(banned, readme_zh)
 
-        self.assertLessEqual(len(readme.splitlines()), 230)
-        self.assertLessEqual(len(readme_zh.splitlines()), 230)
+        self.assertLessEqual(len(readme.splitlines()), 240)
+        self.assertLessEqual(len(readme_zh.splitlines()), 240)
+
+        for content in (readme, readme_zh):
+            self.assertIn("</p>\n\n![", content)
+            self.assertIn(".png)\n\n[![", content)
+            self.assertIn("comparison.html)\n\n", content)
 
     def test_readme_top_routes_existing_powerpoints_to_pptlint(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
