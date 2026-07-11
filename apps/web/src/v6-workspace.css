@@ -105,6 +105,21 @@ button:disabled { cursor: not-allowed; }
 .v6-brand small { color: var(--v6-muted); font-size: 11px; letter-spacing: .04em; }
 
 .v6-top-actions { display: flex; align-items: center; gap: 8px; }
+.pptlint-top-link {
+  min-height: 38px;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid rgba(204, 120, 92, .44);
+  border-radius: 7px;
+  color: #8f3f2d;
+  background: rgba(204, 120, 92, .09);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 900;
+}
+.pptlint-top-link:hover { color: #fff; border-color: var(--v6-coral); background: var(--v6-coral); }
 .bridge-indicator, .language-switch, .quiet-link {
   min-height: 38px;
   padding: 0 12px;
@@ -179,6 +194,32 @@ button:disabled { cursor: not-allowed; }
 .v6-readiness-track { height: 6px; margin: 12px 0; overflow: hidden; background: #dfe5ec; }
 .v6-readiness-track span { display: block; height: 100%; background: var(--v6-blue); transition: width 200ms ease; }
 .v6-hero-status small { display: block; color: var(--v6-muted); font-size: 11px; line-height: 1.5; }
+
+.pptlint-proof-banner {
+  min-height: 248px;
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: minmax(320px, .84fr) minmax(460px, 1.16fr);
+  overflow: hidden;
+  border: 1px solid #172033;
+  border-radius: var(--v6-radius);
+  color: #f7f4ed;
+  background: #172033;
+  box-shadow: var(--v6-shadow);
+}
+.pptlint-proof-copy { padding: clamp(24px, 3vw, 38px); align-self: center; }
+.pptlint-proof-copy > p { margin: 0; color: #ee8b6c; font: 700 11px/1.3 var(--upm-font-mono); letter-spacing: .11em; }
+.pptlint-proof-copy h2 { max-width: 600px; margin: 12px 0 10px; font-family: var(--upm-font-display); font-size: clamp(27px, 2.6vw, 40px); font-weight: 500; line-height: 1.05; letter-spacing: -.035em; }
+.pptlint-proof-copy > span { max-width: 640px; display: block; color: #c7ced7; font-size: 14px; line-height: 1.65; }
+.pptlint-proof-actions { margin-top: 20px; display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap; }
+.pptlint-proof-actions a { display: inline-flex; align-items: center; gap: 7px; color: #f7f4ed; text-decoration: none; font-size: 12px; font-weight: 900; }
+.pptlint-proof-actions a:not(.pptlint-primary) { border-bottom: 1px solid rgba(247, 244, 237, .48); }
+.pptlint-proof-actions .pptlint-primary { min-height: 40px; padding: 0 14px; color: #172033; background: #f7f4ed; }
+.pptlint-proof-visual { min-height: 248px; position: relative; overflow: hidden; border-left: 1px solid rgba(255,255,255,.2); background: #f7f4ed; }
+.pptlint-proof-visual img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.pptlint-proof-visual strong { position: absolute; top: 16px; padding: 7px 9px; border: 1px solid currentColor; background: rgba(247,244,237,.94); font: 800 10px/1 var(--upm-font-mono); letter-spacing: .08em; }
+.pptlint-before { left: 16px; color: #b42318; }
+.pptlint-after { right: 16px; color: #087a55; }
 
 .phase-rail {
   margin-top: 14px;
@@ -523,6 +564,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 @media (max-width: 1120px) {
   .v6-hero { grid-template-columns: 1fr; align-items: start; }
   .v6-hero-status { max-width: 520px; }
+  .pptlint-proof-banner { grid-template-columns: 1fr; }
+  .pptlint-proof-visual { min-height: 310px; border-left: 0; border-top: 1px solid rgba(255,255,255,.2); }
   .intake-layout, .outline-layout, .direction-stage { grid-template-columns: 1fr; }
   .intake-primary, .question-rail { border-right: 0; border-bottom: 1px solid var(--v6-line); }
   .direction-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -533,12 +576,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 
 @media (max-width: 760px) {
   .v6-topbar { position: static; align-items: flex-start; }
-  .v6-brand small, .bridge-indicator span, .quiet-link { display: none; }
+  .v6-brand small, .bridge-indicator span, .quiet-link, .pptlint-top-link { display: none; }
   .v6-workspace { padding-top: 14px; }
   .v6-hero { min-height: 0; padding: 20px; gap: 0; }
   .v6-hero::after { width: 180px; height: 58px; }
   .v6-hero h1 { font-size: 28px; }
   .v6-hero-copy > p:last-child, .v6-hero-status { display: none; }
+  .pptlint-proof-copy { padding: 22px 20px; }
+  .pptlint-proof-copy h2 { font-size: 28px; }
+  .pptlint-proof-visual { min-height: 205px; }
   .phase-rail { grid-template-columns: repeat(5, minmax(58px, 1fr)); overflow-x: auto; }
   .phase-rail button { min-height: 52px; padding: 7px; display: grid; justify-items: center; gap: 4px; border-right: 0; text-align: center; }
   .phase-rail button > span { width: 23px; height: 23px; }

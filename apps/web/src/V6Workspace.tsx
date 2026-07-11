@@ -50,6 +50,7 @@ const bridgeUrl = "http://127.0.0.1:43188";
 const storageKey = "ultimate-ppt-master-deck-session-v6";
 const appVersion = "6.1.0";
 const brandAssetUrl = `${import.meta.env.BASE_URL}brand.svg`;
+const pptlintProofAssetUrl = `${import.meta.env.BASE_URL}pptlint-before-after-hero.png`;
 
 type Language = "zh" | "en";
 
@@ -91,6 +92,14 @@ const copy = {
     diagnostics: "环境与诊断",
     connected: "本机已连接",
     disconnected: "需要连接本机",
+    checkExistingPpt: "检查已有 PPT",
+    pptlintKicker: "真实交付闭环 · ULTIMATE × PPTLINT",
+    pptlintTitle: "一份可编辑 PPT，从 49 分修到 100 分。",
+    pptlintText: "Ultimate PPT Master 负责生成与定向修复，PPTLint 在本机独立检查。真实九页案例解决 103 项问题，未新增高置信风险。",
+    pptlintOpen: "用 PPTLint 检查 PPT",
+    pptlintProof: "查看完整前后证据",
+    pptlintBefore: "修改前 · 49",
+    pptlintAfter: "修改后 · 100",
     intakeTitle: "先把任务和真实资料放进来",
     intakeLead: "一句话也可以开始。首层只保留任务、资料和交付用途，其余由 Agent 推断后再确认。",
     requestLabel: "这份演示要完成什么？",
@@ -150,6 +159,14 @@ const copy = {
     diagnostics: "Environment & diagnostics",
     connected: "Local bridge connected",
     disconnected: "Local connection needed",
+    checkExistingPpt: "Check an existing PPT",
+    pptlintKicker: "REAL DELIVERY LOOP · ULTIMATE × PPTLINT",
+    pptlintTitle: "One editable PowerPoint, improved from 49 to 100.",
+    pptlintText: "Ultimate PPT Master creates and repairs the deck; PPTLint independently checks it on your computer. The real nine-slide case resolved 103 reported issues with no new high-confidence problems.",
+    pptlintOpen: "Check a PPT with PPTLint",
+    pptlintProof: "Open the complete evidence",
+    pptlintBefore: "Before · 49",
+    pptlintAfter: "After · 100",
     intakeTitle: "Start with the task and real sources",
     intakeLead: "A single sentence is enough. The first layer keeps only the task, sources, and delivery purpose.",
     requestLabel: "What should this presentation accomplish?",
@@ -451,6 +468,7 @@ export function V6Workspace({ classicHref = "?classic=1" }: V6WorkspaceProps) {
           <span><strong>{t.product}</strong><small>{t.promise}</small></span>
         </a>
         <div className="v6-top-actions">
+          <a className="pptlint-top-link" href="https://kdnsna.github.io/pptlint/" target="_blank" rel="noreferrer"><ShieldCheck size={16} />{t.checkExistingPpt}</a>
           <button className={`bridge-indicator ${bridge ? "online" : "offline"}`} onClick={() => setDiagnosticsOpen(true)} aria-haspopup="dialog" aria-label={bridge ? t.connected : t.disconnected}>
             {bridge ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
             <span>{bridge ? t.connected : t.disconnected}</span>
@@ -477,6 +495,23 @@ export function V6Workspace({ classicHref = "?classic=1" }: V6WorkspaceProps) {
             <div className="v6-readiness-track" aria-hidden="true"><span style={{ width: `${readiness}%` }} /></div>
             <small>{sources.length ? `${sources.length} ${t.sourceTitle}` : t.realSourceRequired}</small>
           </div>
+        </section>
+
+        <section className="pptlint-proof-banner" aria-labelledby="pptlint-proof-title">
+          <div className="pptlint-proof-copy">
+            <p>{t.pptlintKicker}</p>
+            <h2 id="pptlint-proof-title">{t.pptlintTitle}</h2>
+            <span>{t.pptlintText}</span>
+            <div className="pptlint-proof-actions">
+              <a className="pptlint-primary" href="https://kdnsna.github.io/pptlint/" target="_blank" rel="noreferrer"><ShieldCheck size={17} />{t.pptlintOpen}</a>
+              <a href="https://kdnsna.github.io/pptlint/proof-loop/comparison.html" target="_blank" rel="noreferrer">{t.pptlintProof}<ExternalLink size={15} /></a>
+            </div>
+          </div>
+          <a className="pptlint-proof-visual" href="https://kdnsna.github.io/pptlint/proof-loop/comparison.html" target="_blank" rel="noreferrer" aria-label={t.pptlintProof}>
+            <img src={pptlintProofAssetUrl} alt="" />
+            <strong className="pptlint-before">{t.pptlintBefore}</strong>
+            <strong className="pptlint-after">{t.pptlintAfter}</strong>
+          </a>
         </section>
 
         <nav className="phase-rail" aria-label={language === "zh" ? "任务阶段" : "Task phases"}>

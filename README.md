@@ -1,14 +1,12 @@
 # Ultimate PPT Master v6
 
-> Turn real source material into editable, reviewable presentation deliverables — locally, with clear sources and checks before delivery.
-<p align="center"><strong>Already have a PowerPoint to improve or check?</strong> Use <a href="https://github.com/kdnsna/pptlint"><strong>PPTLint</strong></a> to see whether it is ready to send and which slides to fix first.</p>
+> Turn real source material into editable, reviewable presentation deliverables — locally, with clear sources and checks before delivery. Already have a PowerPoint? Check it with [PPTLint](https://github.com/kdnsna/pptlint).
 <p align="center">
   <a href="./README.zh-CN.md"><strong>中文</strong></a> ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Live Workspace</strong></a> ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Proof Packs</strong></a> ·
   <a href="./docs/release/release-notes-v6.1.0.md"><strong>v6.1 Release Notes</strong></a>
 </p>
-
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square"></a>
   <a href="./LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-172033?style=flat-square"></a>
@@ -16,9 +14,9 @@
   <img alt="local first" src="https://img.shields.io/badge/local--first-yes-10B981?style=flat-square">
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-2563EB?style=flat-square">
 </p>
-
 ![Ultimate PPT Master v6 design systems and finished presentation cases](assets/readme/v6-finished-decks.png)
-
+[![A real editable PowerPoint improved from 49 to 100 with Ultimate PPT Master and PPTLint](assets/readme/pptlint-before-after-hero.png)](https://kdnsna.github.io/pptlint/proof-loop/comparison.html)
+Already have a PowerPoint to improve or check? Ultimate PPT Master repairs the editable deck; [PPTLint](https://kdnsna.github.io/pptlint/) independently checks the finished PPTX on your computer. In the published nine-slide Proof Loop, **103 reported issues were resolved with 0 new high-confidence problems**. [Open the complete before/after evidence →](https://kdnsna.github.io/pptlint/proof-loop/comparison.html)
 Most AI presentation tools optimize for the first preview. Ultimate PPT Master optimizes for the moment the deck is opened in a real meeting, revised in PowerPoint, challenged on its sources, and handed to someone else.
 
 It is not another free-form slide editor. It is a local presentation Agent and quality operating system for formal reports, consulting work, training, finance/government material, branded communication, and high-stakes handoff.
@@ -164,8 +162,10 @@ python3 scripts/audit_formal_delivery.py <project>
 python3 scripts/audit_design_completion.py <project>
 python3 scripts/audit_visual_recipes.py <project>
 python3 scripts/audit_pptx_native_objects.py <final.pptx> --expect text,shape
-uvx --from https://github.com/kdnsna/decklint/releases/download/v0.2.0/decklint-0.2.0-py3-none-any.whl decklint audit <final.pptx> --profile ai-generated --fail-on high # Proof: https://kdnsna.github.io/decklint/
+uvx pptlint check <final.pptx> --profile ai-generated # Proof: https://kdnsna.github.io/pptlint/
 ```
+
+Legacy `decklint` remains available through PPTLint v0.4; new integrations should use `pptlint`.
 
 ## Architecture at a glance
 
