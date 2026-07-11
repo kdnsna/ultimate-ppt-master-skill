@@ -15,6 +15,8 @@ from pathlib import Path
 from typing import Any
 
 from pptx import Presentation
+from pptx.opc.oxml import serialize_part_xml
+from pptx.oxml.slide import CT_NotesMaster
 from pptx.util import Emu
 
 from .drawingml_converter import convert_svg_to_slide_shapes
@@ -83,6 +85,62 @@ def _append_relationship(
         f.write(rels_content)
 
     return next_rid
+
+
+def _ensure_notes_master_parts(extract_dir: Path) -> None:
+    """Create the singleton notes master and its package relationships.
+
+    Notes slides are invalid when they point at a missing notes master.  The
+    base PowerPoint template has no notes master, so manual notes injection
+    must add the master, a notes theme, and a presentation-level relationship.
+    The operation is idempotent to support repeated export passes.
+    """
+    ppt_dir = extract_dir / 'ppt'
+    notes_master_dir = ppt_dir / 'notesMasters'
+    notes_master_rels_dir = notes_master_dir / '_rels'
+    theme_dir = ppt_dir / 'theme'
+    notes_master_dir.mkdir(parents=True, exist_ok=True)
+    notes_master_rels_dir.mkdir(parents=True, exist_ok=True)
+    theme_dir.mkdir(parents=True, exist_ok=True)
+
+    notes_master_path = notes_master_dir / 'notesMaster1.xml'
+    if not notes_master_path.exists():
+        notes_master_path.write_bytes(serialize_part_xml(CT_NotesMaster.new_default()))
+
+    theme1_path = theme_dir / 'theme1.xml'
+    theme2_path = theme_dir / 'theme2.xml'
+    if not theme2_path.exists():
+        if not theme1_path.exists():
+            raise FileNotFoundError('Cannot create notes theme: ppt/theme/theme1.xml is missing')
+        shutil.copy2(theme1_path, theme2_path)
+
+    notes_master_rels_path = notes_master_rels_dir / 'notesMaster1.xml.rels'
+    if not notes_master_rels_path.exists():
+        notes_master_rels_path.write_text(
+            '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="../theme/theme2.xml"/>
+</Relationships>''',
+            encoding='utf-8',
+        )
+
+    presentation_rels_path = ppt_dir / '_rels' / 'presentation.xml.rels'
+    presentation_rels = presentation_rels_path.read_text(encoding='utf-8')
+    notes_master_type = (
+        'http://schemas.openxmlformats.org/officeDocument/2006/relationships/notesMaster'
+    )
+    if notes_master_type not in presentation_rels:
+        _append_relationship(
+            presentation_rels_path,
+            notes_master_type,
+            'notesMasters/notesMaster1.xml',
+        )
+
+
+def _clear_personal_core_properties(presentation: Any) -> None:
+    """Remove template author/editor identities from a generated PPTX."""
+    presentation.core_properties.author = ''
+    presentation.core_properties.last_modified_by = ''
 
 
 def _add_default_content_type(content_types: str, extension: str, content_type: str) -> str:
@@ -406,6 +464,7 @@ def create_pptx_with_native_svg(
     try:
         # Create base PPTX with python-pptx
         prs = Presentation()
+        _clear_personal_core_properties(prs)
         prs.slide_width = width_emu
         prs.slide_height = height_emu
 
@@ -754,6 +813,9 @@ def create_pptx_with_native_svg(
                 if use_native_shapes:
                     raise
 
+        if enable_notes and notes_slides_created:
+            _ensure_notes_master_parts(extract_dir)
+
         # Update [Content_Types].xml
         content_types_path = extract_dir / '[Content_Types].xml'
         with open(content_types_path, 'r', encoding='utf-8') as f:
@@ -788,6 +850,22 @@ def create_pptx_with_native_svg(
 
         # Add notesSlides content types
         if enable_notes and notes_slides_created:
+            notes_master_override = (
+                '  <Override PartName="/ppt/notesMasters/notesMaster1.xml" '
+                'ContentType="application/vnd.openxmlformats-officedocument.presentationml.notesMaster+xml"/>'
+            )
+            if notes_master_override not in content_types:
+                content_types = content_types.replace(
+                    '</Types>', notes_master_override + '\n</Types>',
+                )
+            notes_theme_override = (
+                '  <Override PartName="/ppt/theme/theme2.xml" '
+                'ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>'
+            )
+            if notes_theme_override not in content_types:
+                content_types = content_types.replace(
+                    '</Types>', notes_theme_override + '\n</Types>',
+                )
             for i in sorted(notes_slides_created):
                 override = (
                     f'  <Override PartName="/ppt/notesSlides/notesSlide{i}.xml" '
