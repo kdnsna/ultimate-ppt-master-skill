@@ -185,6 +185,19 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertLessEqual(len(readme.splitlines()), 230)
         self.assertLessEqual(len(readme_zh.splitlines()), 230)
 
+    def test_readme_top_routes_existing_powerpoints_to_pptlint(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        english_top = "\n".join(readme.splitlines()[:10])
+        chinese_top = "\n".join(readme_zh.splitlines()[:10])
+
+        self.assertIn("Already have a PowerPoint", english_top)
+        self.assertIn("已有 PPT", chinese_top)
+        self.assertIn("https://github.com/kdnsna/pptlint", english_top)
+        self.assertIn("https://github.com/kdnsna/pptlint", chinese_top)
+        for jargon in ("quality gate", "regression gate", "质量门禁", "回归门禁"):
+            self.assertNotIn(jargon, english_top + chinese_top)
+
     def test_maintainer_guardrails_live_outside_readme(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")

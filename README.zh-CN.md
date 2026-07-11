@@ -1,7 +1,7 @@
 # Ultimate PPT Master v6 · 终极融合 PPT 大师
 
 > 从真实资料出发，在本地完成一份可编辑、可审阅、能放心交付的演示文稿。
-
+<p align="center"><strong>已有 PPT，想先检查或继续修改？</strong>使用 <a href="https://github.com/kdnsna/pptlint"><strong>PPTLint</strong></a>，先看它是否适合发出去，以及最应该修改哪几页。</p>
 <p align="center">
   <a href="./README.md"><strong>English</strong></a> ·
   <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>在线体验工作台</strong></a> ·
