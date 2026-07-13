@@ -377,6 +377,18 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         self.assertIn("audit:magazine-deck", package["scripts"])
 
+    def test_existing_pptx_repair_refuses_full_deck_reexport(self):
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        bridge = (ROOT / "apps/bridge/server.mjs").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+
+        self.assertIn("never import and re-export the whole source deck", skill)
+        self.assertIn("native, package-preserving object edit path", skill)
+        self.assertIn("do not generate a repaired PPTX", skill)
+        self.assertIn("do not import/re-export the whole deck", bridge)
+        self.assertIn("PowerPoint/WPS/LibreOffice", bridge)
+        self.assertIn("不再通过整份导入/重导出", readme_zh)
+
     def test_public_proof_packs_page_lists_all_quality_proofs(self):
         benchmark = ROOT / "apps/web/public/benchmark/index.html"
         self.assertTrue(benchmark.is_file())

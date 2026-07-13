@@ -43,14 +43,18 @@ Use the resulting `reference-style.json` to reuse master/layout rhythm, theme fo
 
 When a handoff includes `attachments/pptlint-repair-plan.json`, treat the source PPTX as the deliverable being repaired, not merely as source material for a new deck:
 
+- use a fast, manual-first repair path; skip storyboard generation, visual-direction exploration, image acquisition, element-kit generation, and full-deck production steps that do not directly change the named objects;
 - read the selected repair tasks before planning and touch only their named slides;
 - keep every visible character, number, datum, conclusion, slide count, slide order, and unselected slide unchanged unless the user explicitly unlocks one of them;
-- use the source deck in `style-only` reference mode so the repair remains recognizably part of the same presentation;
+- never import and re-export the whole source deck through Artifact Tool, SVG, or another reconstruction pipeline for a local repair; these routes can reinterpret masters, transparency, placeholders, grouped objects, links, and untouched slides;
+- use only a native, package-preserving object edit path that can change the named PowerPoint objects without rebuilding the rest of the presentation;
 - improve hierarchy, alignment, spacing, contrast, font consistency, and visual completion with native editable PowerPoint objects;
+- if no native package-preserving editor is available, do not generate a repaired PPTX; return the short PowerPoint/WPS steps immediately instead of starting the normal deck-production pipeline;
 - if a selected problem cannot be improved without breaking a lock, preserve the original page and report the exact decision the user must make;
-- write a separate repaired PPTX, run the visual completion audits, then run `pptlint proof` against the original before claiming improvement.
+- after an actual native edit, render the changed slides through PowerPoint, WPS, or LibreOffice and inspect the before/after at full size; missing visible objects, black/changed backgrounds, broken logos, changed links, or unintended movement are hard failures;
+- write a separate repaired PPTX, run `pptlint proof`, and treat its score/rule result as supporting evidence only. Never issue a success claim or Verified credential from text/rule checks without the rendered visual review.
 
-This mode is a targeted revision path. It must not silently turn a repair request into a new storyboard, change the narrative, or regenerate unaffected pages.
+This mode is a targeted revision path. It must not silently turn a repair request into a new storyboard, change the narrative, regenerate unaffected pages, or spend full-generation time on a small local fix.
 
 **Quality Pipeline Add-on**: stakeholder-facing decks must also pass `Visual Direction → Page Role Contract → Visual Completion Audit`.
 
