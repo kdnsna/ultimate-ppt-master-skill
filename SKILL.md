@@ -39,6 +39,19 @@ python3 ${SKILL_DIR}/scripts/pptx_template_import.py <reference.pptx> --manifest
 
 Use the resulting `reference-style.json` to reuse master/layout rhythm, theme fonts and colors, placeholders, chart treatment, and common page roles without copying private content.
 
+### Existing PPTX Repair Mode
+
+When a handoff includes `attachments/pptlint-repair-plan.json`, treat the source PPTX as the deliverable being repaired, not merely as source material for a new deck:
+
+- read the selected repair tasks before planning and touch only their named slides;
+- keep every visible character, number, datum, conclusion, slide count, slide order, and unselected slide unchanged unless the user explicitly unlocks one of them;
+- use the source deck in `style-only` reference mode so the repair remains recognizably part of the same presentation;
+- improve hierarchy, alignment, spacing, contrast, font consistency, and visual completion with native editable PowerPoint objects;
+- if a selected problem cannot be improved without breaking a lock, preserve the original page and report the exact decision the user must make;
+- write a separate repaired PPTX, run the visual completion audits, then run `pptlint proof` against the original before claiming improvement.
+
+This mode is a targeted revision path. It must not silently turn a repair request into a new storyboard, change the narrative, or regenerate unaffected pages.
+
 **Quality Pipeline Add-on**: stakeholder-facing decks must also pass `Visual Direction → Page Role Contract → Visual Completion Audit`.
 
 ## Best-Effect Brief Enhancer

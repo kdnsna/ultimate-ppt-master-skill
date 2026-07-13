@@ -22,6 +22,8 @@
 
 已有 PPT，想先检查或继续修改？Ultimate PPT Master 负责定向修复可编辑 PPT，[PPTLint](https://kdnsna.github.io/pptlint/) 在你的电脑上独立检查最终文件。公开的九页 Proof Loop 中，**解决了 103 项报告问题，且没有新增高置信问题**。[打开完整前后证据 →](https://kdnsna.github.io/pptlint/proof-loop/comparison.html)
 
+如果 PPTLint 已经找到难改页，可以只把选中问题页交给本机 Ultimate Bridge。这条修复路径默认锁定原文、数字、数据、结论、页数、顺序和未选页，只调整层级、对齐、间距、对比度与字体一致性；无法在锁定条件下安全改好时，保留原内容并显式提醒人工决策。
+
 多数 AI PPT 产品优化的是“第一眼看起来像成品”。Ultimate PPT Master 更在意另一刻：这份文件被带进真实会议、在 PowerPoint 里继续修改、被追问数据来源，并最终交给另一个人使用。
 
 它不是另一个自由画布编辑器，而是一套面向中文正式办公、企业资料和高要求交付的本地演示文稿 Agent 与质量操作系统。适合正式汇报、咨询方案、培训课件、政务金融材料、品牌发布和需要审阅留痕的工作。

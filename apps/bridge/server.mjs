@@ -19,7 +19,7 @@ const AGENT_COMMANDS = {
   codex: {
     label: "Codex",
     binary: "codex",
-    prompt: "Read AGENTS.md, codex-task.md, project-brief.json, asset_plan.json, asset-plan.md, and visual-element-kit.md first, including sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop. If expectationFit.readyForProduction is false, run guided intake before final production. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image key is configured, use the Needs-Manual prompts. Execute the ChatGPT-generation-first formal-business workflow, update asset_plan.json, asset-plan.md, and quality-report.json, then list final files."
+    prompt: "Read AGENTS.md, agent-prompt.md, codex-task.md, project-brief.json, asset_plan.json, asset-plan.md, and visual-element-kit.md first, including sourceConfidence, deliveryScorecard, referenceStyle, confirmationBrief, and feedbackLoop. If attachments/pptlint-repair-plan.json exists, use Existing PPTX Repair Mode: repair only selected slides, lock exact text, numbers, slide count, order, and all unselected slides, then run PPTLint proof. If expectationFit.readyForProduction is false, run guided intake before final production. Run or handle scripts/generate_visual_element_kit.py before deck production; if no image key is configured, use the Needs-Manual prompts. Execute the ChatGPT-generation-first formal-business workflow, update asset_plan.json, asset-plan.md, and quality-report.json, then list final files."
   },
   claude: {
     label: "Claude Code",
