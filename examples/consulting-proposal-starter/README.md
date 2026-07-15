@@ -1,16 +1,21 @@
-# Consulting Proposal Starter Proof
+# 咨询方案：次级公开样例
 
-This is a sanitized proof output for the `consulting_proposal` preset starter pack.
+这是一份使用脱敏合成资料制作的次级公开案例，用来验证“决策定义 → 方案比较 → 明确推荐 → 实施路线”的稳定叙事骨架。
 
-## Input
+## 输入
 
-- Source skeleton: [source.sanitized.md](./source.sanitized.md)
-- Preset contract: [templates/presets/consulting_proposal/preset.json](../../templates/presets/consulting_proposal/preset.json)
+- [脱敏合成 source](./source.sanitized.md)
+- 场景预设：[`consulting_proposal`](../../templates/presets/consulting_proposal/preset.json)
+- 数据边界：不含客户资料、个人信息或真实业务数据
 
-## Output
+## 输出与复核
 
-- Preview Web Deck: [web-demo.html](./web-demo.html)
-- Cover proof: [cover.svg](./cover.svg)
+- [打开 3 页 Web Deck](./web-demo.html)
+- [查看封面预览](./cover.svg)
+- [查看质量报告](./quality-report.json)
 
-The pack is designed for editable PPTX production first, with a Swiss-style Web Deck as an optional steering readout.
+## 状态说明
 
+- 当前公开样例以中文为主，并已检查 1440px 与 390px 首屏。
+- `quality-report.json.version = 2.5.0` 是 stable proof 报告 schema，不是当前产品版本；候选版本另见 `releaseVersion`。
+- Design Doctor 分数属于仓库内部质量合同，不是第三方 benchmark 或审美评分。

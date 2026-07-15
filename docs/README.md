@@ -2,6 +2,8 @@
 
 Ultimate PPT Master v6 uses a categorized documentation structure. Start with the route that matches the work you are doing.
 
+The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`README.en.md`](../README.en.md) for the complete English product overview.
+
 ## Guides
 
 | Need | Read |
@@ -30,7 +32,12 @@ Ultimate PPT Master v6 uses a categorized documentation structure. Start with th
 
 | Need | Read |
 |---|---|
-| See the latest release | [Release Notes - v6.1.0](./release/release-notes-v6.1.0.md) |
+| Review the current unreleased candidate | [Candidate Notes - v6.3.6](./release/release-notes-v6.3.6.md) |
+| Review the v6.3.5 refinement and runtime slice | [Candidate Notes - v6.3.5](./release/release-notes-v6.3.5.md) |
+| Review the v6.3.4 session and delivery slice | [Candidate Notes - v6.3.4](./release/release-notes-v6.3.4.md) |
+| Review the v6.3.3 source and evidence slice | [Candidate Notes - v6.3.3](./release/release-notes-v6.3.3.md) |
+| Review the v6.3.2 visual and security slice | [Candidate Notes - v6.3.2](./release/release-notes-v6.3.2.md) |
+| Review the v6.3.1 Chinese-first boundary | [Draft Notes - v6.3.1](./release/release-notes-v6.3.1.md) |
 | Review the v5.4 Swiss Deck and Asset Factory release | [Release Notes - v5.4.1](./release/release-notes-v5.4.1.md) |
 | Review the v5.3 best-effect brief enhancer | [Release Notes - v5.3.0](./release/release-notes-v5.3.0.md) |
 | Review the v5.2 expectation-fit contract | [Release Notes - v5.2.0](./release/release-notes-v5.2.0.md) |
@@ -51,8 +58,8 @@ Ultimate PPT Master v6 uses a categorized documentation structure. Start with th
 | Review the v5.2 deep optimization PRD | [v5.2 Deep Optimization Guide / PRD](./zh-CN/strategy/prd-v5.2-deep-optimization-guide.md) |
 | Improve public GitHub exposure | [Public Growth Playbook](./strategy/public-growth-playbook.md) |
 | Prepare marketplace or agent-directory distribution | [Skill Market Distribution](./strategy/skill-market-distribution.md) |
-| Review content and template direction | [Next Roadmap - Content and Template Presets](./strategy/next-roadmap.md) |
-| Review optimization backlog | [Next Optimization Directions](./strategy/next-optimization-directions.md) |
+| Review the archived v2.5–v5.5 content/template roadmap | [Historical Roadmap - Content and Template Presets](./strategy/next-roadmap.md) |
+| Review the archived v2.5 optimization backlog | [Historical Optimization Directions](./strategy/next-optimization-directions.md) |
 
 ## Trace Map
 
@@ -64,4 +71,4 @@ Ultimate PPT Master v6 uses a categorized documentation structure. Start with th
 | Is marketplace readiness still true? | `npm run audit:market` | `agents/openai.yaml`, `agents/marketplace-listing.json`, benchmark page. |
 | Is CI healthy? | `.github/workflows/ci.yml` | Web build, desktop build, worker tests, Node tests, audits, whitespace check. |
 
-中文用户请从 [中文文档索引](./zh-CN/README.md) 开始。
+中文用户请从 [中文主 README](../README.md) 或 [中文文档索引](./zh-CN/README.md) 开始。

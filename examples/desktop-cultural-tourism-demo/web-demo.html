@@ -3,30 +3,35 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ultimate PPT Master Web Deck Demo - 文旅消费活动</title>
+  <meta name="description" content="脱敏的文旅消费活动 Web Deck 兼容样例，不含原始办公文件或真实业务数据。">
+  <title>文旅消费活动 · 脱敏 Web Deck 样例</title>
   <style>
-    :root { --ink: #172033; --muted: #667085; --orange: #f97316; --blue: #2563eb; --green: #10b981; }
+    :root { --paper: #f6f3ed; --surface: #fffdf8; --ink: #171714; --muted: #67675f; --line: #d9d4c9; --orange: #d9573b; --blue: #1d4ed8; --green: #73866c; }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: Avenir Next, PingFang SC, Microsoft YaHei, sans-serif; color: var(--ink); background: #fff8ec; }
-    main { height: 100vh; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; }
-    section { min-width: 100vw; min-height: 100vh; padding: 8vh 9vw; scroll-snap-align: start; display: grid; align-content: center; background: linear-gradient(135deg, #fff8ec 0%, #f4f8ff 58%, #fff3e8 100%); }
-    section:nth-child(even) { background: linear-gradient(135deg, #f8fbff 0%, #fff8ec 100%); }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { font-family: "Noto Sans SC", PingFang SC, Microsoft YaHei, sans-serif; color: var(--ink); background: var(--paper); }
+    main { height: 100dvh; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; }
+    main::-webkit-scrollbar { display: none; }
+    section { position: relative; min-width: 100vw; min-height: 100dvh; padding: 8vh 9vw; overflow-y: auto; scroll-snap-align: start; scroll-snap-stop: always; display: grid; align-content: center; background: var(--paper); }
+    section::after { position: absolute; inset: 16px; border: 1px solid rgba(23,23,20,.1); border-radius: 24px; pointer-events: none; content: ""; }
+    section:nth-child(even) { background: #eef2f8; }
     .eyebrow { margin: 0 0 24px; color: var(--orange); font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-    h1 { max-width: 980px; margin: 0 0 34px; font-size: 78px; line-height: .98; letter-spacing: 0; }
+    h1 { max-width: 980px; margin: 0 0 34px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: 78px; font-weight: 600; line-height: 1.04; letter-spacing: -.04em; }
     ul { max-width: 860px; margin: 0; padding: 0; display: grid; gap: 16px; list-style: none; }
     li { color: var(--muted); font-size: 28px; line-height: 1.42; }
-    li::before { content: ""; display: inline-block; width: 14px; height: 14px; margin-right: 14px; border-radius: 999px; background: linear-gradient(135deg, var(--orange), var(--blue)); }
+    li::before { content: ""; display: inline-block; width: 14px; height: 14px; margin-right: 14px; border-radius: 999px; background: var(--blue); box-shadow: 7px 0 0 -3px var(--orange); }
     @media (max-width: 720px) {
-      section { padding: 7vh 7vw; }
-      h1 { font-size: 44px; }
-      li { font-size: 21px; }
+      section { padding: 7vh 7vw 64px; }
+      section::after { inset: 10px; border-radius: 20px; }
+      h1 { font-size: 42px; }
+      li { font-size: 19px; }
     }
   </style>
 </head>
 <body>
   <main>
     <section>
-      <p class="eyebrow">Sanitized Web Deck Demo</p>
+      <p class="eyebrow">脱敏 Web Deck 兼容样例</p>
       <h1>文旅消费活动行办会材料</h1>
       <ul>
         <li>从真实办公材料结构脱敏而来</li>

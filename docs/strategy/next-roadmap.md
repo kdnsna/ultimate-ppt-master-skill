@@ -1,5 +1,7 @@
 # Next Roadmap - Content and Template Presets
 
+> **Archived historical roadmap:** this document records the v2.5-v5.5 planning stage and is not the current v6.3.6 candidate plan. See the [v6.3.6 unreleased candidate notes](../release/release-notes-v6.3.6.md) and the [current documentation index](../README.md).
+
 v2.5 makes the first mile clearer and more checkable: visible input, preset proof, local Agent handoff, and Design Doctor review.
 
 The next product priority is output stability. Ultimate PPT Master should become richer in content patterns and template presets, so users do not start from a blank prompt every time and Agents have stronger defaults before they generate slides.

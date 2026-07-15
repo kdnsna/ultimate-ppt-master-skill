@@ -18,8 +18,8 @@
 | 结构化上架合同 | `agents/marketplace-listing.json` |
 | 小图标 | `assets/skill-market/ultimate-ppt-master-icon.svg` |
 | 列表卡片 | `assets/skill-market/ultimate-ppt-master-card.svg` |
-| 首次上手路径 | `README.zh-CN.md#60-秒开箱即用` |
-| 证明案例 | `README.zh-CN.md#真实-proof-packs`、`apps/web/public/benchmark/index.html` 和 `docs/zh-CN/quality/quality-workbench-v2.5.md` |
+| 首次上手路径 | `README.md#一分钟安装` |
+| 证明案例 | `README.md#公开-proof-怎么看`、`apps/web/public/benchmark/index.html` 和 `docs/zh-CN/quality/quality-workbench-v2.5.md` |
 | v4 工作流 | `docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md` |
 | 安装说明 | `docs/guides/agent-setup.md` |
 

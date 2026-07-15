@@ -1,92 +1,176 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ultimate PPT Master Proof Packs</title>
-  <meta name="description" content="Finished presentation cases and inspectable proof packs for Ultimate PPT Master v6.">
+  <title>公开案例与交付证据｜Ultimate PPT Master</title>
+  <meta name="description" content="查看 Ultimate PPT Master 的中文公开案例：可下载、可继续编辑的脱敏经营复盘 PPTX，以及完整的 GPT-5.6 AI Web Deck。">
+  <meta name="keywords" content="可编辑 PPTX, AI presentation, Web Deck, PowerPoint 生成, 中文办公 PPT, Ultimate PPT Master">
+  <link rel="canonical" href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Ultimate PPT Master">
+  <meta property="og:title" content="先看成品，再看交付证据｜Ultimate PPT Master">
+  <meta property="og:description" content="可编辑 PPTX 与 AI Web Deck 两条路线，都提供可检查的输入、输出与质量证据。">
+  <meta property="og:url" content="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/">
+  <meta property="og:image" content="https://kdnsna.github.io/ultimate-ppt-master-skill/social-preview.png">
+  <meta property="og:image:alt" content="Ultimate PPT Master 把真实资料变成可编辑 PowerPoint 与 Web Deck">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="先看成品，再看交付证据｜Ultimate PPT Master">
+  <meta name="twitter:description" content="可编辑 PPTX 与 AI Web Deck 的中文公开案例和质量证据。">
+  <meta name="twitter:image" content="https://kdnsna.github.io/ultimate-ppt-master-skill/social-preview.png">
+  <meta name="twitter:image:alt" content="Ultimate PPT Master 把真实资料变成可编辑 PowerPoint 与 Web Deck">
   <link rel="icon" href="../brand.svg" type="image/svg+xml">
-  <style>
-    :root { --ink:#111318; --paper:#f4f0e7; --muted:#687078; --line:rgba(17,19,24,.18); --orange:#ef6a3c; --blue:#275fd0; --green:#173d34; --red:#e52237; color:var(--ink); background:var(--paper); font-family:"Avenir Next","PingFang SC",sans-serif; }
-    * { box-sizing:border-box; }
-    html { scroll-behavior:smooth; }
-    body { margin:0; background:var(--paper); }
-    a { color:inherit; }
-    .shell { max-width:1500px; margin:0 auto; padding:0 32px 70px; }
-    .topbar { min-height:78px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--ink); font-family:Menlo,monospace; font-size:12px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
-    .topbar nav { display:flex; gap:20px; }
-    .topbar a { text-decoration:none; }
-    .hero { min-height:430px; display:grid; grid-template-columns:8fr 4fr; gap:7vw; align-items:end; padding:72px 0 48px; border-bottom:1px solid var(--ink); position:relative; overflow:hidden; }
-    .hero::after { content:"06"; position:absolute; right:-.02em; bottom:-.18em; z-index:-1; font-size:390px; font-weight:800; line-height:1; letter-spacing:-.1em; opacity:.045; }
-    .eyebrow { margin:0 0 22px; color:var(--orange); font-family:Menlo,monospace; font-size:12px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
-    h1,h2,h3,p { margin-top:0; }
-    h1 { margin-bottom:26px; max-width:12ch; font-size:clamp(56px,7.5vw,118px); line-height:.88; letter-spacing:-.055em; }
-    .hero p:not(.eyebrow) { max-width:38em; margin-bottom:0; color:var(--muted); font-size:clamp(17px,1.35vw,22px); line-height:1.6; }
-    .manifesto { display:grid; gap:0; border-top:1px solid var(--ink); }
-    .manifesto span { display:grid; grid-template-columns:42px 1fr; gap:12px; padding:16px 0; border-bottom:1px solid var(--ink); font-size:14px; line-height:1.4; }
-    .manifesto b { color:var(--orange); font-family:Menlo,monospace; }
-    .section-head { display:grid; grid-template-columns:4fr 8fr; gap:3vw; align-items:end; padding:70px 0 28px; }
-    .section-head h2 { margin:0; font-size:clamp(38px,4.8vw,72px); line-height:.96; letter-spacing:-.04em; }
-    .section-head p { max-width:42em; margin:0; color:var(--muted); font-size:17px; line-height:1.6; }
-    .featured { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
-    .case { border-top:5px solid var(--case); background:#fff; }
-    .preview { position:relative; width:100%; aspect-ratio:16/9; overflow:hidden; background:#111; border-bottom:1px solid var(--line); }
-    .preview img { width:100%; height:100%; display:block; object-fit:cover; }
-    .preview a { position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:flex-end; padding:16px; color:#fff; background:linear-gradient(transparent 62%,rgba(0,0,0,.62)); text-decoration:none; font-family:Menlo,monospace; font-size:11px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; }
-    .case-copy { padding:22px; }
-    .case-copy small { color:var(--case); font-family:Menlo,monospace; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
-    .case-copy h3 { margin:10px 0 12px; font-size:28px; line-height:1.05; }
-    .case-copy p { min-height:72px; margin-bottom:20px; color:var(--muted); line-height:1.55; }
-    .case-copy a { display:inline-flex; min-height:40px; align-items:center; padding:0 14px; border:1px solid var(--ink); text-decoration:none; font-weight:800; }
-    .proof-grid { display:grid; grid-template-columns:repeat(2,1fr); border-top:1px solid var(--ink); border-left:1px solid var(--ink); }
-    .proof { padding:26px; border-right:1px solid var(--ink); border-bottom:1px solid var(--ink); background:rgba(255,255,255,.48); }
-    .proof h3 { margin-bottom:10px; font-size:25px; }
-    .proof > p { color:var(--muted); line-height:1.55; }
-    dl { margin:22px 0 0; display:grid; gap:10px; }
-    .row { display:grid; grid-template-columns:112px 1fr; gap:12px; padding-top:10px; border-top:1px solid var(--line); }
-    dt { color:var(--blue); font-family:Menlo,monospace; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
-    dd { margin:0; line-height:1.45; overflow-wrap:anywhere; }
-    dd a { font-weight:750; }
-    .scorecard { margin-top:20px; display:flex; flex-wrap:wrap; gap:8px; }
-    .scorecard span { padding:7px 10px; color:#fff; background:var(--green); font-family:Menlo,monospace; font-size:11px; font-weight:800; }
-    .note { margin-top:34px; display:grid; grid-template-columns:4fr 8fr; gap:3vw; padding:30px 0; border-top:5px solid var(--orange); border-bottom:1px solid var(--ink); }
-    .note h2 { margin:0; font-size:34px; }.note p { color:var(--muted); line-height:1.6; }
-    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; }
-    .actions a { min-height:42px; padding:0 15px; display:inline-flex; align-items:center; border:1px solid var(--ink); text-decoration:none; font-weight:800; }
-    .actions .primary { color:#fff; background:var(--ink); }
-    a:focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
-    @media (max-width:900px) { .shell{padding-inline:18px}.topbar nav a:nth-child(2){display:none}.hero{grid-template-columns:1fr;min-height:auto;padding:54px 0 34px}.manifesto{margin-top:12px}.section-head{grid-template-columns:1fr;padding-top:48px}.featured{grid-template-columns:1fr}.case-copy p{min-height:auto}.proof-grid{grid-template-columns:1fr}.note{grid-template-columns:1fr}.row{grid-template-columns:1fr} }
-  </style>
   <link rel="stylesheet" href="./benchmark.css">
 </head>
 <body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
   <div class="shell">
-    <div class="topbar"><span>Ultimate PPT Master · v6.1.0</span><nav><a href="#finished">Finished decks</a><a href="#proof">Proof packs</a><a href="../">Workspace →</a></nav></div>
-    <header class="hero">
-      <div><p class="eyebrow">Presentation cases · proof before promise</p><h1>先看成品，<br>再相信流程。</h1><p>Three current AI topics, three complete visual systems, 27 source-grounded slides. Below them, every stable pack keeps the same inspectable chain: input -> preset -> output -> review.</p><div class="actions"><a class="primary" href="#finished">Open finished decks</a><a href="https://github.com/kdnsna/ultimate-ppt-master-skill/blob/main/README.md">README</a><a href="https://github.com/kdnsna/ultimate-ppt-master-skill/blob/main/docs/quality/quality-workbench-v2.5.md">Rubric</a></div></div>
-      <div class="manifesto"><span><b>01</b>Not three recolored templates.</span><span><b>02</b>Primary sources separated from interpretation.</span><span><b>03</b>Keyboard, wheel and touch navigation.</span><span><b>04</b>Built to demonstrate a finished delivery bar.</span></div>
+    <header class="topbar">
+      <a class="brand" href="../" aria-label="返回 Ultimate PPT Master 工作台">Ultimate PPT Master <span>· v6.3.6 未发布候选</span></a>
+      <nav aria-label="案例页导航">
+        <a href="#featured">代表案例</a>
+        <a href="#proof">质量证据</a>
+        <a href="#library">更多案例</a>
+        <a class="workspace-link" href="../">打开工作台&nbsp;→</a>
+      </nav>
     </header>
 
-    <section id="finished">
-      <div class="section-head"><div><p class="eyebrow">Featured · July 2026</p><h2>Three finished decks</h2></div><p>Each case is nine slides long, has its own art direction, and ends with primary sources. Grok uses the latest verified release, 4.5; no official Grok 4.6 release was found as of 10 July 2026.</p></div>
-      <div class="featured">
-        <article class="case" style="--case:#ef6a3c"><div class="preview"><img src="./previews/gpt-5-6.png" alt="GPT-5.6 finished deck cover"><a href="../examples/ai-frontier-2026/gpt-5-6.html">Open 9-slide deck →</a></div><div class="case-copy"><small>Orbit technology annual</small><h3>GPT-5.6 · Three Orbits</h3><p>Sol, Terra and Luna as a task-routing architecture: capability, preview pricing, workflow and boundaries.</p><a href="../examples/ai-frontier-2026/gpt-5-6.html">View presentation</a></div></article>
-        <article class="case" style="--case:#e52237"><div class="preview"><img src="./previews/grok-4-5.png" alt="Grok 4.5 finished deck cover"><a href="../examples/ai-frontier-2026/grok-4-5.html">Open 9-slide deck →</a></div><div class="case-copy"><small>Industrial signal log</small><h3>Grok 4.5 · Efficiency Curve</h3><p>A fact-checked engineering brief on task completion, 80 TPS, token efficiency and native Office work.</p><a href="../examples/ai-frontier-2026/grok-4-5.html">View presentation</a></div></article>
-        <article class="case" style="--case:#b94832"><div class="preview"><img src="./previews/claude-fable-5.png" alt="Claude Fable 5 finished deck cover"><a href="../examples/ai-frontier-2026/claude-fable-5.html">Open 9-slide deck →</a></div><div class="case-copy"><small>Long-form research folio</small><h3>Claude Fable 5 · Long Horizon</h3><p>A warm editorial story about long-running work, project coherence, economics, safeguards and adoption.</p><a href="../examples/ai-frontier-2026/claude-fable-5.html">View presentation</a></div></article>
-      </div>
-    </section>
+    <main id="main">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">公开案例 · 先看效果，再看流程</p>
+          <h1 id="hero-title">先看成品，<br><em>再看交付证据。</em></h1>
+          <p class="hero-lead">一个是可下载、可继续修改的脱敏经营复盘 PPTX；一个是可完整浏览的 GPT-5.6 Web Deck。两条路线都把输入、策划、输出与质量复核放在台面上。</p>
+          <div class="actions">
+            <a class="button button-primary" href="../examples/executive-business-review-starter/executive-business-review-editable.pptx" download>下载可编辑 PPTX</a>
+            <a class="button" href="../examples/ai-frontier-2026/gpt-5-6.html">打开 GPT-5.6 Web Deck</a>
+          </div>
+        </div>
+        <aside class="hero-ledger" aria-label="公开案例的四项承诺">
+          <div><span>01</span><strong>原生可编辑</strong><p>文字、形状与图表保留为 PowerPoint 对象，不把整页压成图片。</p></div>
+          <div><span>02</span><strong>来源可追溯</strong><p>公开输入、资料来源和边界说明，事实与判断分开表达。</p></div>
+          <div><span>03</span><strong>中文办公可用</strong><p>面向经营复盘、咨询方案和正式汇报，而不是只做展示动效。</p></div>
+          <div><span>04</span><strong>质量可复核</strong><p>原生对象、PPTLint 与质量报告独立留痕，明确已知限制。</p></div>
+        </aside>
+      </section>
 
-    <section id="proof">
-      <div class="section-head"><div><p class="eyebrow">Stable preset evidence</p><h2>Inspectable Proof Packs</h2></div><p>The following packs remain the contract tests for public presets. Scores are self-assessed by Design Doctor; they are not external benchmark claims.</p></div>
-      <div class="proof-grid" aria-label="Proof pack cases">
-        <article class="proof"><h3>Executive Business Review / 经营复盘</h3><p>KPI reality, management conclusion, owner-led next actions.</p><dl><div class="row"><dt>Input</dt><dd><a href="../examples/executive-business-review-starter/source.sanitized.md">source.sanitized.md</a>, 159 words.</dd></div><div class="row"><dt>Input excerpt</dt><dd>Executive Business Review Starter Source. Topic: quarterly operating review.</dd></div><div class="row"><dt>Preset</dt><dd>executive_business_review stable pack</dd></div><div class="row"><dt>Output</dt><dd><a href="../examples/executive-business-review-starter/web-demo.html">examples/executive-business-review-starter/web-demo.html</a></dd></div><div class="row"><dt>Review</dt><dd><a href="../examples/executive-business-review-starter/quality-report.json">examples/executive-business-review-starter/quality-report.json</a></dd></div></dl><div class="scorecard"><span>Layout 92</span><span>Evidence 90</span><span>Editability 86</span></div></article>
-        <article class="proof"><h3>Consulting Proposal / 咨询方案</h3><p>Decision question, option comparison, recommendation, roadmap.</p><dl><div class="row"><dt>Input</dt><dd><a href="../examples/consulting-proposal-starter/source.sanitized.md">source.sanitized.md</a>, 120 words.</dd></div><div class="row"><dt>Input excerpt</dt><dd>Consulting Proposal Starter Source. Topic: operating model transformation.</dd></div><div class="row"><dt>Preset</dt><dd>consulting_proposal stable pack</dd></div><div class="row"><dt>Output</dt><dd><a href="../examples/consulting-proposal-starter/web-demo.html">examples/consulting-proposal-starter/web-demo.html</a></dd></div><div class="row"><dt>Review</dt><dd><a href="../examples/consulting-proposal-starter/quality-report.json">examples/consulting-proposal-starter/quality-report.json</a></dd></div></dl><div class="scorecard"><span>Layout 91</span><span>Evidence 88</span><span>Editability 87</span></div></article>
-        <article class="proof"><h3>Product Pitch / 产品路演</h3><p>Product wedge, workflow proof, adoption ask.</p><dl><div class="row"><dt>Input</dt><dd><a href="../examples/product-pitch-starter/source.sanitized.md">source.sanitized.md</a>, 127 words.</dd></div><div class="row"><dt>Input excerpt</dt><dd>Product Pitch Starter Source. Topic: product workflow and adoption ask.</dd></div><div class="row"><dt>Preset</dt><dd>product_pitch stable pack</dd></div><div class="row"><dt>Output</dt><dd><a href="../examples/product-pitch-starter/web-demo.html">examples/product-pitch-starter/web-demo.html</a></dd></div><div class="row"><dt>Review</dt><dd><a href="../examples/product-pitch-starter/quality-report.json">examples/product-pitch-starter/quality-report.json</a></dd></div></dl><div class="scorecard"><span>Layout 90</span><span>Evidence 86</span><span>Editability 85</span></div></article>
-        <article class="proof"><h3>Tech Trend Web Deck / 科技趋势</h3><p>Public signals, interpretation, implications, Web Deck rhythm.</p><dl><div class="row"><dt>Input</dt><dd><a href="../examples/tech-trend-web-deck-starter/source.sanitized.md">source.sanitized.md</a>, 128 words.</dd></div><div class="row"><dt>Input excerpt</dt><dd>Tech Trend Web Deck Starter Source. Topic: public trend briefing.</dd></div><div class="row"><dt>Preset</dt><dd>tech_trend_web_deck stable pack</dd></div><div class="row"><dt>Output</dt><dd><a href="../examples/tech-trend-web-deck-starter/web-demo.html">examples/tech-trend-web-deck-starter/web-demo.html</a></dd></div><div class="row"><dt>Review</dt><dd><a href="../examples/tech-trend-web-deck-starter/quality-report.json">examples/tech-trend-web-deck-starter/quality-report.json</a></dd></div></dl><div class="scorecard"><span>Layout 93</span><span>Evidence 89</span><span>Editability 82</span></div></article>
-      </div>
-    </section>
+      <section id="featured" class="section-block" aria-labelledby="featured-title">
+        <header class="section-intro">
+          <p class="section-index">01 / 代表案例</p>
+          <div>
+            <h2 id="featured-title">两条路线，两份完整成品。</h2>
+            <p>正式办公优先交付原生可编辑 PPTX；需要浏览器演示与叙事表现时，交付独立 Web Deck。这里先展示各自最能代表当前完成度的一份。</p>
+          </div>
+        </header>
 
-    <section class="note"><h2>Design Doctor scorecard</h2><div><p>The scorecard is a self-assessed by Design Doctor proof contract, not a claim of automatic repair or external comparison. The default is a <strong>report-only repair policy</strong>: generate <code>quality-report.json</code>, name risks in plain language, and only repair SVG files when the user explicitly asks for it.</p><p>Rubric fields include layout structure, source evidence, editability, public-demo safety, and whether the proof chain keeps input, preset, output, and review inspectable.</p></div></section>
+        <div class="showcase">
+          <article class="feature feature-office">
+            <div class="feature-media">
+              <a href="../examples/executive-business-review-starter/web-demo.html" aria-label="查看脱敏经营复盘关键页">
+                <img src="../examples/executive-business-review-starter/cover.svg" alt="脱敏经营复盘可编辑 PPTX 封面与指标页预览">
+              </a>
+              <span class="media-label">Editable PPTX · 正式办公</span>
+            </div>
+            <div class="feature-body">
+              <p class="eyebrow">主案例 A · 原生 PowerPoint</p>
+              <h3>脱敏经营复盘</h3>
+              <p class="feature-summary">从 KPI 事实、驱动分析到责任人行动计划。公开文件使用合成数据，保留可编辑文字、形状、图表与备注，适合下载后继续修改。</p>
+              <ul class="object-list" aria-label="可编辑对象类型">
+                <li>原生文字</li><li>原生形状</li><li>原生图表</li><li>演讲备注</li>
+              </ul>
+              <div class="feature-actions">
+                <a class="button button-primary" href="../examples/executive-business-review-starter/executive-business-review-editable.pptx" download>下载可编辑 PPTX</a>
+                <a class="text-link" href="../examples/executive-business-review-starter/web-demo.html">查看关键页</a>
+              </div>
+              <ol class="delivery-chain" aria-label="脱敏经营复盘交付链">
+                <li><span>输入</span><a href="../examples/executive-business-review-starter/source.sanitized.md">脱敏 source</a></li>
+                <li><span>策划</span><b>经营复盘叙事骨架</b></li>
+                <li><span>输出</span><b>Editable PPTX</b></li>
+                <li><span>质量复核</span><div class="report-links"><a href="../examples/executive-business-review-starter/native-object-report.json">原生对象</a><a href="../examples/executive-business-review-starter/pptlint-report.md">PPTLint</a><a href="../examples/executive-business-review-starter/quality-report.json">质量报告</a></div></li>
+              </ol>
+            </div>
+          </article>
+
+          <article class="feature feature-web">
+            <div class="feature-media">
+              <a href="../examples/ai-frontier-2026/gpt-5-6.html" aria-label="打开 GPT-5.6 三轨道 Web Deck">
+                <img src="./previews/gpt-5-6.png" alt="GPT-5.6 三轨道 Web Deck 封面预览">
+              </a>
+              <span class="media-label">AI Web Deck · 浏览器演示</span>
+            </div>
+            <div class="feature-body">
+              <p class="eyebrow">主案例 B · Editorial Web Deck</p>
+              <h3>GPT-5.6 · 三轨道</h3>
+              <p class="feature-summary">用 Sol、Terra、Luna 三条轨道解释任务路由、能力边界与工作流。九页完整演示，支持键盘、滚轮和触控浏览。</p>
+              <div class="feature-actions">
+                <a class="button button-primary" href="../examples/ai-frontier-2026/gpt-5-6.html">打开完整演示</a>
+                <a class="text-link" href="../examples/ai-frontier-2026/gpt-5-6-mobile.png" target="_blank">查看移动端效果</a>
+                <a class="text-link" href="https://openai.com/index/gpt-5-6/" target="_blank" rel="noreferrer">查看资料来源</a>
+              </div>
+              <ol class="delivery-chain" aria-label="GPT-5.6 Web Deck 交付链">
+                <li><span>输入</span><b>官方公开资料</b></li>
+                <li><span>策划</span><b>Three Orbits 叙事</b></li>
+                <li><span>输出</span><b>9 页 Web Deck</b></li>
+                <li><span>质量复核</span><b>来源页、边界声明、桌面与 390px 触控检查</b></li>
+              </ol>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="proof" class="section-block proof-section" aria-labelledby="proof-title">
+        <header class="section-intro">
+          <p class="section-index">02 / 质量证据</p>
+          <div>
+            <h2 id="proof-title">不是只给一张好看的截图。</h2>
+            <p>主案例保留可下载成品及其旁证。你可以打开源材料、检查原生对象、查看 PPTLint 规则结果，再读取质量报告中的限制与待复核项。</p>
+          </div>
+        </header>
+        <div class="proof-contract">
+          <p class="proof-statement">Proof Pack 分数为<strong>内部质量合同</strong>，不是第三方 benchmark，也不等同于自动修复成功率。</p>
+          <dl>
+            <div><dt>输入</dt><dd>使用脱敏或公开 source，明确资料边界。</dd></div>
+            <div><dt>输出</dt><dd>提供真实 PPTX 或完整 Web Deck，而非概念图。</dd></div>
+            <div><dt>检查</dt><dd>原生对象、PPTLint、渲染与交付状态分别记录。</dd></div>
+            <div><dt>边界</dt><dd>Design Doctor 默认只报告问题；未经明确授权不自动改写内容。</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section id="library" class="section-block" aria-labelledby="library-title">
+        <header class="section-intro">
+          <p class="section-index">03 / 次级案例库</p>
+          <div>
+            <h2 id="library-title">更多方向，退到第二层。</h2>
+            <p>这些案例继续保留，用来检查不同叙事和稳定预设；它们不再与两个代表案例争夺首屏注意力。</p>
+          </div>
+        </header>
+        <div class="case-index" aria-label="更多公开案例">
+          <article>
+            <span class="case-number">01</span><div><p>AI Web Deck</p><h3>Grok 4.5 · 效率曲线</h3></div><p>任务完成、吞吐、token 效率与原生 Office 工作的事实核查。</p><a href="../examples/ai-frontier-2026/grok-4-5.html">查看演示&nbsp;→</a>
+          </article>
+          <article>
+            <span class="case-number">02</span><div><p>AI Web Deck</p><h3>Claude Fable 5 · 长周期</h3></div><p>关于长任务、项目一致性、经济性、安全边界与采用路径的编辑叙事。</p><a href="../examples/ai-frontier-2026/claude-fable-5.html">查看演示&nbsp;→</a>
+          </article>
+          <article>
+            <span class="case-number">03</span><div><p>Stable Proof Pack</p><h3>咨询方案</h3></div><p>决策问题、方案比较、明确推荐与实施路线图。</p><div class="index-links"><a href="../examples/consulting-proposal-starter/source.sanitized.md">输入</a><a href="../examples/consulting-proposal-starter/web-demo.html">输出</a><a href="../examples/consulting-proposal-starter/quality-report.json">复核</a></div>
+          </article>
+          <article>
+            <span class="case-number">04</span><div><p>Stable Proof Pack</p><h3>产品路演</h3></div><p>产品切入点、工作流证明与采用请求。</p><div class="index-links"><a href="../examples/product-pitch-starter/source.sanitized.md">输入</a><a href="../examples/product-pitch-starter/web-demo.html">输出</a><a href="../examples/product-pitch-starter/quality-report.json">复核</a></div>
+          </article>
+          <article>
+            <span class="case-number">05</span><div><p>Stable Proof Pack</p><h3>科技趋势 Web Deck</h3></div><p>公开信号、解释边界、业务影响与杂志式页面节奏。</p><div class="index-links"><a href="../examples/tech-trend-web-deck-starter/source.sanitized.md">输入</a><a href="../examples/tech-trend-web-deck-starter/web-demo.html">输出</a><a href="../examples/tech-trend-web-deck-starter/quality-report.json">复核</a></div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>本地生成，不托管用户资料。正式交付前仍应在 PowerPoint、WPS 或 LibreOffice 中完成最终渲染复核。</p>
+      <div><a href="https://github.com/kdnsna/ultimate-ppt-master-skill">GitHub</a><a href="../">打开工作台</a></div>
+    </footer>
   </div>
 </body>
 </html>

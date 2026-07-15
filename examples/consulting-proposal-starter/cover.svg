@@ -1,22 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
-  <title id="title">Consulting Proposal starter proof</title>
-  <desc id="desc">A consulting proposal preview with decision question, option matrix, and roadmap.</desc>
-  <rect width="1200" height="675" fill="#172033"/>
-  <rect x="70" y="70" width="1060" height="535" rx="18" fill="#ffffff"/>
-  <text x="112" y="132" fill="#2563eb" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850">CONSULTING PROPOSAL</text>
-  <text x="112" y="198" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="920">Choose one operating route.</text>
-  <text x="112" y="254" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="920">Make the evidence visible.</text>
-  <g font-family="Inter, Arial, sans-serif">
-    <rect x="112" y="344" width="250" height="120" rx="12" fill="#eff6ff"/>
-    <text x="138" y="388" fill="#1d4ed8" font-size="20" font-weight="850">Diagnose</text>
-    <text x="138" y="426" fill="#475569" font-size="18">Problem and root cause</text>
-    <rect x="390" y="344" width="250" height="120" rx="12" fill="#ecfdf5"/>
-    <text x="416" y="388" fill="#047857" font-size="20" font-weight="850">Compare</text>
-    <text x="416" y="426" fill="#475569" font-size="18">Options and criteria</text>
-    <rect x="668" y="344" width="250" height="120" rx="12" fill="#fff7ed"/>
-    <text x="694" y="388" fill="#c2410c" font-size="20" font-weight="850">Recommend</text>
-    <text x="694" y="426" fill="#475569" font-size="18">Route and roadmap</text>
+  <title id="title">咨询方案次级公开样例封面</title>
+  <desc id="desc">先定义决策，再展开分析；展示三个方案的同尺比较。</desc>
+  <rect width="1200" height="675" fill="#F6F3ED"/>
+  <rect x="44" y="40" width="1112" height="595" rx="28" fill="#FFFDF8" stroke="#D9D4C9"/>
+  <rect x="44" y="40" width="9" height="595" rx="4.5" fill="#1D4ED8"/>
+  <g font-family="Noto Sans SC, Microsoft YaHei, sans-serif">
+    <text x="92" y="104" fill="#1D4ED8" font-size="18" font-weight="700">咨询方案 · 次级公开样例</text>
+    <g font-family="Noto Serif SC, SimSun, serif" fill="#171714" font-weight="600">
+      <text x="92" y="208" font-size="66">先定义决策，</text>
+      <text x="92" y="286" font-size="66">再展开分析。</text>
+    </g>
+    <text x="94" y="346" fill="#67675F" font-size="22">决策定义 → 同尺比较 → 明确推荐 → 实施路线</text>
+    <g transform="translate(94 414)">
+      <rect width="285" height="132" rx="20" fill="#F6F3ED" stroke="#D9D4C9"/>
+      <text x="22" y="40" fill="#67675F" font-size="15">方案 A</text><text x="22" y="82" fill="#171714" font-size="27" font-weight="700">快速改善</text>
+      <rect x="309" width="285" height="132" rx="20" fill="#E8EEF9" stroke="#9EB4EA"/>
+      <text x="331" y="40" fill="#1D4ED8" font-size="15">推荐 · 方案 B</text><text x="331" y="82" fill="#171714" font-size="27" font-weight="700">增长专项</text>
+      <rect x="618" width="285" height="132" rx="20" fill="#F6F3ED" stroke="#D9D4C9"/>
+      <text x="640" y="40" fill="#67675F" font-size="15">方案 C</text><text x="640" y="82" fill="#171714" font-size="27" font-weight="700">旅程重构</text>
+    </g>
   </g>
-  <text x="112" y="542" fill="#617085" font-family="Inter, Arial, sans-serif" font-size="22">Starter proof: decision question -> option matrix -> implementation roadmap.</text>
 </svg>
-

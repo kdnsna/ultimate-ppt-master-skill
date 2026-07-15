@@ -3,22 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ultimate PPT Master · Design Systems, Not Recolored Templates</title>
+  <meta name="description" content="Ultimate PPT Master 的三套独立演示设计系统：证据精密、影像产品与编辑叙事。">
+  <title>三套独立设计系统｜Ultimate PPT Master</title>
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500&display=swap");
-    :root{--paper:#f6f3ed;--ink:#171714;--blue:#1d4ed8;--coral:#cc785c;--acid:#dce84b;--muted:#676963}
+    :root{--paper:#f6f3ed;--ink:#171714;--blue:#1d4ed8;--coral:#cc785c;--acid:#dce84b;--muted:#676963;--radius:18px}
     *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}body{background:var(--paper);color:var(--ink);font-family:"Noto Sans SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
     .page{height:100%;display:grid;grid-template-columns:5fr 7fr;grid-template-rows:auto 1fr auto;column-gap:4vw;padding:40px 54px 34px;position:relative}
     .top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--ink);font-size:12px;font-weight:500;letter-spacing:.035em}.top span:last-child{font-family:"IBM Plex Sans",sans-serif}
     .copy{align-self:center;padding:28px 0 46px}.kicker{margin:0 0 24px;color:var(--blue);font-family:"IBM Plex Sans",sans-serif;font-size:13px;font-weight:500}.copy h1{max-width:9.5ch;margin:0;font-family:"Noto Serif SC",SimSun,serif;font-size:64px;font-weight:400;line-height:1.08;letter-spacing:-.035em}.copy p{max-width:30em;margin:28px 0 0;color:var(--muted);font-size:18px;line-height:1.65}
     .proof{align-self:end;display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--ink)}.proof span{padding:15px 14px 0 0;font-size:12px;color:var(--muted)}.proof b{display:block;margin-bottom:4px;color:var(--ink);font-family:"IBM Plex Sans",sans-serif;font-size:21px;font-weight:400}
-    .stage{align-self:center;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:2fr 1fr;gap:12px;height:min(590px,68vh);padding:28px 0;position:relative}.frame{position:relative;overflow:hidden;background:#0a0a0a}.frame img{width:100%;height:100%;display:block;object-fit:cover}.main{grid-column:1/-1;grid-row:1}.side img{transform:scale(1.012)}.label{position:absolute;left:0;bottom:0;display:flex;align-items:baseline;gap:10px;padding:10px 14px;background:rgba(246,243,237,.94);color:var(--ink)}.label b{font-family:"IBM Plex Sans",sans-serif;font-size:16px;font-weight:500}.label span{font-size:10px;color:var(--muted)}.main .label{border-left:4px solid var(--blue)}.grok .label{border-left:4px solid var(--acid)}.fable .label{border-left:4px solid var(--coral)}
+    .stage{align-self:center;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:2fr 1fr;gap:12px;height:min(590px,68vh);padding:28px 0;position:relative}.frame{position:relative;overflow:hidden;border:1px solid rgba(23,23,20,.14);border-radius:var(--radius);background:#efede7}.frame img{width:100%;height:100%;display:block;object-fit:cover}.main{grid-column:1/-1;grid-row:1}.side img{transform:scale(1.012)}.label{position:absolute;left:8px;bottom:8px;display:flex;align-items:baseline;gap:10px;padding:10px 14px;border:1px solid rgba(23,23,20,.12);border-radius:12px;background:rgba(246,243,237,.94);color:var(--ink)}.label b{font-family:"IBM Plex Sans",sans-serif;font-size:16px;font-weight:500}.label span{font-size:10px;color:var(--muted)}.main .label{border-left:4px solid var(--blue)}.grok .label{border-left:4px solid var(--acid)}.fable .label{border-left:4px solid var(--coral)}
     .footer{grid-column:1/-1;display:grid;grid-template-columns:5fr 7fr;gap:4vw;padding-top:14px;border-top:1px solid var(--ink);font-size:12px;color:var(--muted)}.footer strong{color:var(--ink);font-weight:500}.footer span:last-child{text-align:right}
+    @media(max-width:720px){html,body{height:auto;min-height:100%;overflow:auto}.page{min-height:100dvh;height:auto;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto;gap:0;padding:22px 20px 28px}.top{grid-column:1;align-items:flex-start;gap:8px;flex-direction:column}.copy{padding:46px 0 24px}.copy h1{max-width:8.5ch;font-size:48px}.copy p{margin-top:22px;font-size:16px}.proof{grid-template-columns:repeat(3,minmax(0,1fr))}.proof span{padding-right:8px}.proof b{font-size:18px}.stage{height:auto;grid-template-columns:1fr;grid-template-rows:auto;gap:12px;padding:18px 0 34px}.frame,.main{grid-column:1;grid-row:auto;aspect-ratio:16/9}.label{left:6px;bottom:6px;padding:8px 10px}.footer{grid-column:1;grid-template-columns:1fr;gap:8px}.footer span:last-child{text-align:left}}
   </style>
 </head>
 <body>
   <main class="page">
-    <header class="top"><span>Ultimate PPT Master · v6 Design System</span><span>Source-grounded · editable · reviewable</span></header>
+    <header class="top"><span>Ultimate PPT Master · v6 设计系统</span><span>来源可追溯 · 产物可编辑 · 质量可复核</span></header>
     <section class="copy">
       <p class="kicker">不是把同一套模板换三种颜色</p>
       <h1>让内容拥有<br>自己的版式语言。</h1>
@@ -26,11 +27,11 @@
       <div class="proof"><span><b>03</b>独立设计系统</span><span><b>27</b>完整页面</span><span><b>06</b>可执行方向包</span></div>
     </section>
     <section class="stage" aria-label="三套完整演示案例">
-      <article class="frame main"><img src="./previews/gpt-5-6.png" alt="GPT-5.6 证据精密方向"><div class="label"><b>GPT-5.6</b><span>Precision evidence</span></div></article>
-      <article class="frame side grok"><img src="./previews/grok-4-5.png" alt="Grok 4.5 影像产品方向"><div class="label"><b>Grok 4.5</b><span>Cinematic product</span></div></article>
-      <article class="frame side fable"><img src="./previews/claude-fable-5.png" alt="Claude Fable 5 编辑叙事方向"><div class="label"><b>Fable 5</b><span>Editorial intelligence</span></div></article>
+      <article class="frame main"><img src="./previews/gpt-5-6.png" alt="GPT-5.6 证据精密方向"><div class="label"><b>GPT-5.6</b><span>证据精密</span></div></article>
+      <article class="frame side grok"><img src="./previews/grok-4-5.png" alt="Grok 4.5 影像产品方向"><div class="label"><b>Grok 4.5</b><span>影像产品</span></div></article>
+      <article class="frame side fable"><img src="./previews/claude-fable-5.png" alt="Claude Fable 5 编辑叙事方向"><div class="label"><b>Fable 5</b><span>编辑叙事</span></div></article>
     </section>
-    <footer class="footer"><span><strong>DESIGN.md</strong> controls atmosphere, type, layout, depth and anti-patterns.</span><span>Patterns informed by awesome-design-md · original Ultimate PPT Master directions</span></footer>
+    <footer class="footer"><span><strong>DESIGN.md</strong> 约束氛围、字体、版式、层次与反模式。</span><span>方法参考 awesome-design-md · 方向与组件为 Ultimate PPT Master 原创实现</span></footer>
   </main>
 </body>
 </html>

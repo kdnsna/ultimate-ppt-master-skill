@@ -8,18 +8,44 @@
   let locked = false;
 
   slides.forEach((slide, index) => {
-    slide.setAttribute('aria-label', `Slide ${index + 1} of ${slides.length}`);
+    slide.setAttribute('aria-label', `第 ${index + 1} 页，共 ${slides.length} 页`);
     const button = document.createElement('button');
     button.type = 'button';
-    button.setAttribute('aria-label', `Go to slide ${index + 1}`);
+    button.setAttribute('aria-label', `前往第 ${index + 1} 页`);
     button.addEventListener('click', () => go(index));
+    button.addEventListener('keydown', event => {
+      let target = index;
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') target = Math.min(slides.length - 1, index + 1);
+      else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') target = Math.max(0, index - 1);
+      else if (event.key === 'Home') target = 0;
+      else if (event.key === 'End') target = slides.length - 1;
+      else if (event.key === ' ' || event.key === 'Enter') {
+        event.stopPropagation();
+        return;
+      } else {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      go(target);
+      nav.children[target].focus();
+    });
     nav.appendChild(button);
   });
 
   function go(index, updateHash = true) {
     current = Math.max(0, Math.min(slides.length - 1, index));
     deck.style.transform = `translate3d(${-current * 100}vw, 0, 0)`;
-    [...nav.children].forEach((button, i) => button.setAttribute('aria-current', i === current ? 'true' : 'false'));
+    slides.forEach((slide, i) => {
+      const active = i === current;
+      slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+      slide.inert = !active;
+    });
+    [...nav.children].forEach((button, i) => {
+      const active = i === current;
+      button.setAttribute('aria-current', active ? 'true' : 'false');
+      button.tabIndex = active ? 0 : -1;
+    });
     counter.textContent = `${String(current + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
     progress.style.setProperty('--progress', `${((current + 1) / slides.length) * 100}%`);
     document.body.dataset.slideTheme = slides[current].classList.contains('dark') ? 'dark' : 'light';

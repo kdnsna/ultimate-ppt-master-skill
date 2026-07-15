@@ -1,27 +1,28 @@
-# Tech Trend Web Deck Starter Source
+# 科技趋势 Web Deck 公开案例 · 脱敏合成资料
 
-## Topic
+## 主题
 
-Local-first AI presentation workflows for builders and AI tool users.
+面向开发者、产品构建者和 AI 工具用户的本地优先演示工作流。
 
-## Audience
+## 受众
 
-Developers, product builders, AI tool users, and technical decision makers.
+开发者、产品构建者、AI 工具用户与技术决策者。
 
-## Trend Thesis
+## 趋势判断
 
-The next useful AI presentation workflow is not a single black-box generator. It is a local-first chain: source material, Markdown handoff, local agent tools, editable outputs, and visible quality gates.
+下一代有用的 AI 演示工作流不是单一黑箱生成器，而是一条本地优先链路：真实资料、可检查文本、本地 Agent 工具、可编辑输出与可见质量门禁。
 
-## Public Signals
+## 公开方向性信号
 
-- Markdown conversion tools are becoming common agent input adapters.
-- MCP-style tool discovery is moving local capabilities closer to agents.
-- Markdown-first slide tools remain popular with developer audiences.
-- Editable PPTX generation is still important for business handoff.
+- Markdown 转换工具正在成为常见的 Agent 输入适配层。
+- 工具发现协议让本地能力更容易被 Agent 使用。
+- Markdown-first 的演示工具仍受到开发者群体关注。
+- 正式商务交付仍需要可编辑 PPTX。
 
-## Required Output
+以上信号只用于公开合成案例的叙事演示，不构成市场规模、占有率或增长结论。
 
-- Magazine-style HTML Web Deck.
-- Source trail and caveats visible near claims.
-- Optional editable PPTX appendix.
+## 预期输出
 
+- 杂志风 HTML Web Deck。
+- 在主张附近保留来源线索和解释边界。
+- 可选的可编辑 PPTX 附录。

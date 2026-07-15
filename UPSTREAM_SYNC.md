@@ -13,6 +13,7 @@ work across Codex, Claude Code, OpenClaw, Hermes, and generic agent tools.
 | Guizang PPT Skill | `op7418/guizang-ppt-skill` | `82fe5ae129e8c2a12e1155fcabed6703342749d6` | `6bfa520b86ed5a3dffdac0a3323155e2b6f516b6` | `upstream-ppt-benchmark/upstreams/guizang-ppt-skill` plus installed `~/.agents/skills/guizang-ppt-skill` at `e09f931` | AGPL-3.0 on current `main` after 2026-05-28 | Do not copy post-AGPL Guizang code directly; absorb behavior requirements and reimplement locally | 2026-07-05 |
 | Baoyu Skills | `JimLiu/baoyu-skills` | `main` skill versions around `1.117.x` / `2.x` | Hermes ports: infographic/comic `1.56.1`, article illustrator `1.57.0` | `~/.hermes/skills/creative/*` | MIT upstream with Hermes-local adaptations | Absorb workflow discipline first; do not import the full raster skill matrix into the PPTX/Web Deck core | 2026-07-05 |
 | Baoyu Design | `baoyu/design` | `v1.1.1` notes | research only | external reference | MIT-compatible design workflow reference at review time | Use as research input; do not add an HTML-to-PPTX exporter to v5.4 | 2026-07-05 |
+| gzh-design-skill | `isjiamu/gzh-design-skill` | `ba1f4175519b481cb3566616c9e5178705067904` | research only | temporary clean-room audit | AGPL-3.0 | Do not copy code, templates, components, or prompts; only restate high-level composition and QA principles in original local rules | 2026-07-15 |
 
 ## Absorbed Capabilities
 
@@ -50,9 +51,18 @@ absorbed_capabilities:
 - Baoyu Design v1.1.1 reinforces the rule that HTML/CSS stays the default structure layer for Web Decks, and images supplement the deck instead of replacing editable text.
 - HTML Deck to editable PPTX research is tracked for v5.5+; it is intentionally not shipped in v5.4.
 
+### gzh-design-skill
+
+absorbed_capabilities:
+- Treat white or near-white space as the default canvas and reserve strong color for evidence, emphasis, and navigation anchors.
+- Define a small reusable composition grammar before production instead of styling every page ad hoc.
+- Keep editorial hierarchy, reading rhythm, and deterministic rendered QA as explicit production contracts.
+- Reimplement these method-level ideas locally for PPTX/Web Deck use; the upstream skill itself explicitly targets WeChat article layouts rather than presentation or landing-page production.
+
 ## Deferred Capabilities
 
 deferred_capabilities:
+- No AGPL-licensed code, template, component markup, prompt text, or asset from `gzh-design-skill` is imported into this repository.
 - Guizang code committed after the AGPL-3.0 switch is not directly copied into this MIT fusion repository.
 - `baoyu-slide-deck` remains a separate raster slide-image workflow. It is not the default because this repository's core promise is editable PPTX plus Magazine Web Deck.
 - `baoyu-cover-image`, `baoyu-xhs-images`, `baoyu-diagram`, and `baoyu-image-gen` are candidates for optional future modules, not production-critical dependencies for v5.4.x.
@@ -67,6 +77,7 @@ deferred_capabilities:
 - Preserve the local `web_to_md.cjs` fallback even though current `ppt-master` prefers the Python `web_to_md.py` path.
 - Keep `--trace-conversion` as an optional diagnostics path; it should not become part of the default export unless a failure or QA investigation needs it.
 - Prefer syncing upstream implementation assets mechanically, then manually adapting the fusion entry files.
+- For `gzh-design-skill`, use clean-room behavioral review only; never mechanically sync its AGPL implementation assets.
 - Run `python3 -m unittest discover -s tests` after every sync to verify the expected upstream capability surface remains wired into the fusion package.
 
 ## Future Sync Checklist
@@ -75,6 +86,7 @@ deferred_capabilities:
 2. Compare `hugohe3/ppt-master/skills/ppt-master` against this repository.
 3. Compare `op7418/guizang-ppt-skill` against `assets/magazine-web/`, `references/magazine-web/`, and `scripts/validate-swiss-deck.mjs`.
 4. Review `JimLiu/baoyu-skills` for workflow-level changes to prompt files, backend selection, batching, and text repair policy.
-5. Sync implementation files only when the license and adaptation policy allow it.
-6. Manually merge `SKILL.md` and docs according to the adaptation policy above.
-7. Run unit tests and at least one CLI smoke test.
+5. Review `isjiamu/gzh-design-skill` only for high-level editorial/QA principles and re-check its license before any discussion of reuse.
+6. Sync implementation files only when the license and adaptation policy allow it.
+7. Manually merge `SKILL.md` and docs according to the adaptation policy above.
+8. Run unit tests and at least one CLI smoke test.

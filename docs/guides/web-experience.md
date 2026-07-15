@@ -1,6 +1,6 @@
 # Web Experience
 
-The Web Experience is the primary public entry point for Ultimate PPT Master. v6 is a static React/Vite task-first workspace deployed to GitHub Pages; the v5.4.1 console remains available through `?classic=1` for one release cycle.
+The Web Experience is the primary public entry point for Ultimate PPT Master. The v6.3.6 source metadata marks this Chinese-first, static React/Vite task workspace as an **unreleased candidate**. Pages may receive a matching `main` commit only after CI, but source or Pages visibility does not imply a tag, GitHub Release, or marketplace publication. The Classic console is frozen and remains available only through `?classic=1` during the v6.3 compatibility window.
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/
@@ -13,7 +13,13 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 - recommends three complete directions from six v6 visual packs instead of presenting abstract style tags;
 - creates a deterministic structural preview first and mounts its iframe only in review;
 - shows slide thumbnails, preview, quality findings, slide approval, and slide-level revision in one three-column workspace;
-- detects the local Bridge, consumes read-only SSE progress, pauses polling while hidden, and writes backward-compatible handoff artifacts;
+- detects the local Bridge, consumes read-only SSE progress, and creates a backward-compatible local handoff;
+- launches Codex only when Bridge explicitly allows it; otherwise it provides a copyable local command;
+- polls both real artifacts and Agent status every three seconds during generation and review, pauses while the page is hidden, and resumes from the saved `session.projectPath` after refresh; a delivered session performs one restoration check instead of continuing to poll;
+- downloads only real PPTX, Web Deck, PDF, archive, or quality-report files returned by the Bridge artifact API;
+- lets pending and warning files be downloaded for review, but marks a task delivered only after every artifact kind required by the chosen output mode is `passed` and every slide is approved;
+- accepts at most 24 sources, with a 32 MB per-file and 40 MB aggregate browser boundary; over-limit files are rejected before their content is read;
+- reconciles successful Bridge parsing into source and slide-evidence state without replacing the user's slide order, title, takeaway, role, `slideId`, or selected variant;
 - reuses source extraction by SHA-256 content hash and records slide-level requests under `revision-requests/Pxx.json`;
 - keeps Bridge commands, provider status, paths, and production files in the Environment & Diagnostics dialog;
 - keeps PowerPoint as the formal editor while the Skill handles sources, brand rules, ChatGPT-assisted assets, the `formal-business` gate, editable-object checks, and quality review.
@@ -29,7 +35,12 @@ https://kdnsna.github.io/ultimate-ppt-master-skill/
 
 Brief assembly is handled in the browser. If users run `npm run bridge`, source files are sent only to `127.0.0.1` for local parsing and project staging.
 
-v6 keeps the v5.4.1 artifact contracts. Offline mode opens a focused repair dialog; online mode creates a local project and streams progress. The classic component-first console is available at `?classic=1` during the compatibility cycle.
+The page is a local workflow controller, not a hosted generator. Offline mode exposes the Bridge startup command. Online mode creates a project and starts Codex only with explicit local permission. A structural preview is labeled as a draft; it is not a substitute for the downloadable final artifact. The Classic component-first console is not shown in primary navigation.
+
+For a production handoff that needs small visual assets, the local Agent may run
+`python3 scripts/generate_visual_element_kit.py <projectPath>`. The script keeps
+ChatGPT-assisted elements behind the `formal-business` quality contract and
+records unresolved items as `Needs-Manual`; the browser never calls it directly.
 
 ## Local Development
 
@@ -64,7 +75,7 @@ Use these checks before promoting a release:
 | Drop text source | The file appears as browser pre-read and is included in `extracted-source.md`. |
 | Drop binary source | The file appears as pending local Bridge parsing and is included in `attachments/`. |
 | Storyboard | A request such as “10 slides” produces P01-P10, no more than three questions, and three variants per slide. |
-| Live Web Deck preview | The preview frame mounts only in review and renders `preview-web-deck.html` without script dependencies. |
+| Structural preview | The frame is visibly labeled as a structural draft and is never described as the final PPTX. |
 | Copy Agent prompt | Clipboard receives the generated prompt with outline and kit context. |
 | Select visual tags | `project-brief.json` records `visualBrief.selectedTags`, selected tag labels, background text, special requirements, and reference links. |
 | Select Swiss route | `project-brief.json` records `webDeck.style`, `webDeck.theme`, `webDeck.layoutPolicy`, page rhythm, and `assetPlanRequired`; the handoff includes `asset_plan.json`. |
@@ -72,9 +83,11 @@ Use these checks before promoting a release:
 | Copy `source.md` | Clipboard receives the generated source markdown. |
 | Download `source.md` | Browser downloads a Markdown brief with current form values and outline. |
 | Download `preview-web-deck.html` | Browser downloads a standalone HTML preview with the current brief and storyboard. |
-| Download `handoff-kit.zip` | Browser downloads a zip containing source files, manifest, attachments, prompt, preview, engine plan, checklist, asset plan markdown, `asset_plan.json`, prompt files, visual element kit, Codex task, AGENTS guide, quality report, and README. |
-| Create local project | The local connector writes a project folder and returns suggested AI-helper commands. |
-| Delivery details | After the local project is created, the collapsed detail panel shows `python3 scripts/generate_visual_element_kit.py <projectPath>`, the AI-helper command, and the `Needs-Manual` prompt fallback. |
+| Create local project | The local connector writes a project folder; with `--allow-launch` it starts Codex, otherwise it returns a copyable command. |
+| Artifact and Agent discovery | During generation/review, `GET /projects/artifacts` and `GET /agent/status` run every three seconds; both pause while hidden and recover from `session.projectPath` after refresh. Delivered state checks once and then stops. |
+| Real download | PPTX/Web/PDF/archive buttons call `GET /projects/artifacts/file`; the structural preview download is labeled separately. |
+| Pending artifact | The file can be downloaded, but the task cannot be marked delivered. |
+| Delivery gate | **Mark delivered** appears only when every artifact kind required by the output mode is `passed` and all storyboard pages are approved. |
 | Install Skill via local connector | `POST /skill/install` links or updates an allowlisted local Skill target without accepting arbitrary paths. |
 | Open Web Deck demo | `examples/agentic-developer-tools-2026/web-demo.html` opens from the static build. |
 | Skill setup link | Opens the README Skill section or `docs/guides/agent-setup.md`. |
@@ -95,4 +108,4 @@ The page should also keep both engine paths visible. The web route is for onboar
 
 - App source: [apps/web](../../apps/web)
 - Pages workflow: [.github/workflows/pages.yml](../../.github/workflows/pages.yml)
-- Shared public demo source: [examples/agentic-developer-tools-2026](../../examples/agentic-developer-tools-2026)
+- Public proof gallery: [apps/web/public/benchmark](../../apps/web/public/benchmark)

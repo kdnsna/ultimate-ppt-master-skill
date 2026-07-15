@@ -2,17 +2,19 @@
 
 Ultimate PPT Master v6 采用分类文档结构。先按你当前要做的事情选择入口。
 
+GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像保留在 [`README.en.md`](../../README.en.md)。
+
 ## 使用指南
 
 | 需求 | 阅读 |
 |---|---|
 | 理解网页入口 | [Web Experience](./guides/web-experience.md) |
 | 连接网页、本地资料和 Agent | [Agent Connect Bridge](./guides/agent-connect-bridge.md) |
-| 安装和调用 Skill | [Agent Setup](../guides/agent-setup.md) |
-| 选择 PPTX、Web Deck、双版本或桌面预览 | [Choosing a Workflow](../guides/choosing-a-workflow.md) |
-| 本地配置 provider key | [Model and Provider Setup](../guides/model-provider-setup.md) |
-| 使用桌面预览路径 | [Quickstart Desktop](../guides/quickstart-desktop.md) |
-| 排查安装、解析、输出、provider 或 Agent 问题 | [Troubleshooting](../guides/troubleshooting.md) |
+| 安装和调用 Skill | [安装与启动](./guides/agent-setup.md) |
+| 选择 PPTX、Web Deck、双版本或已有 PPTX 修复 | [选择交付路线](./guides/choosing-a-workflow.md) |
+| 本地配置 Provider key | [模型与 Provider 配置](./guides/model-provider-setup.md) |
+| 使用桌面预览路径 | [选择交付路线](./guides/choosing-a-workflow.md) |
+| 排查安装、解析、输出、Provider 或 Agent 问题 | [故障排查](./guides/troubleshooting.md) |
 
 ## 质量与审计
 
@@ -30,7 +32,12 @@ Ultimate PPT Master v6 采用分类文档结构。先按你当前要做的事情
 
 | 需求 | 阅读 |
 |---|---|
-| 查看最新发布 | [发布说明 - v6.1.0](./release/release-notes-v6.1.0.md) |
+| 查看当前未发布候选 | [候选说明 - v6.3.6](./release/release-notes-v6.3.6.md) |
+| 查看 v6.3.5 精修与运行切片 | [候选说明 - v6.3.5](./release/release-notes-v6.3.5.md) |
+| 查看 v6.3.4 会话与交付切片 | [候选说明 - v6.3.4](./release/release-notes-v6.3.4.md) |
+| 查看 v6.3.3 资料与证据切片 | [候选说明 - v6.3.3](./release/release-notes-v6.3.3.md) |
+| 查看 v6.3.2 视觉与安全切片 | [候选说明 - v6.3.2](./release/release-notes-v6.3.2.md) |
+| 查看 v6.3.1 中文主入口边界 | [草案说明 - v6.3.1](./release/release-notes-v6.3.1.md) |
 | 查看 v5.4 瑞士风 Deck 与资产工厂 | [发布说明 - v5.4.1](./release/release-notes-v5.4.1.md) |
 | 查看 v5.3 最佳效果提示增强器 | [发布说明 - v5.3.0](./release/release-notes-v5.3.0.md) |
 | 查看 v5.2 预期契合合同 | [发布说明 - v5.2.0](./release/release-notes-v5.2.0.md) |
@@ -51,13 +58,13 @@ Ultimate PPT Master v6 采用分类文档结构。先按你当前要做的事情
 | 深度优化 PRD | [v5.2 深度优化指南 / PRD](./strategy/prd-v5.2-deep-optimization-guide.md) |
 | 改善 GitHub 公开曝光 | [Public Growth Playbook](../strategy/public-growth-playbook.md) |
 | 准备 Skill 市场分发 | [Skill 市场分发](./strategy/skill-market-distribution.md) |
-| 查看内容和模板方向 | [下一步路线 - 内容与模板预设](./strategy/next-roadmap.md) |
-| 查看优化 backlog | [Next Optimization Directions](../strategy/next-optimization-directions.md) |
+| 回看 v2.5–v5.5 内容与模板历史路线 | [历史路线 - 内容与模板预设](./strategy/next-roadmap.md) |
+| 回看 v2.5 历史优化 backlog | [历史优化方向](../strategy/next-optimization-directions.md) |
 
 ## 推荐路线
 
 ```text
-打开 Web Experience -> 拖入资料或粘贴摘要 -> 启动 npm run bridge -> 发送到本地 Bridge -> 把 handoff 项目交给 Codex / Claude Code / Hermes / OpenClaw 深加工
+打开 Web Experience -> 加入真实资料 -> 确认故事板和视觉方向 -> 创建本地项目 -> 启动或复制 Codex 命令 -> 发现并下载真实产物 -> 通过质量门禁后交付
 ```
 
-v5.1 的新增重点是：Web 可视化标签、Codex 分步访谈、统一 `project-brief.json`、预期契合风险和制作前关键问题澄清；v5.0 的默认可编辑 PPTX、官方/IP 素材边界、Codex-first 生成视觉、微软雅黑版式规范和 formal-business 审计继续作为主线。
+v6.3.6 当前标记为未发布候选；该标记允许源码进入 `main` 或由 Pages 展示，但不代表已打 tag、已创建 GitHub Release 或已发布到 marketplace。主线继续保持中文任务入口、稳定故事板合同、本地 Agent 和真实产物下载。HTTP 字段、Provider 与兼容细节保留在专业指南中，不占据普通用户首屏。

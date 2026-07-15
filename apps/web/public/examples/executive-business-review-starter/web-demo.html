@@ -1,36 +1,441 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Executive Business Review Starter Proof</title>
-  <link rel="icon" href="../../brand.svg" type="image/svg+xml">
+  <meta name="description" content="脱敏合成的经营复盘公开案例，展示从 KPI 现状到负责人行动的正式办公表达。">
+  <title>经营复盘 · 公开样例</title>
   <style>
-    :root{--ink:#172033;--muted:#617085;--line:#d8e0ea;--blue:#2563eb;--green:#10b981;--paper:#f7f9fc;font-family:Inter,Avenir Next,Arial,sans-serif;color:var(--ink);background:var(--paper)}
-    *{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}.deck{height:100vh;display:flex;overflow-x:auto;scroll-snap-type:x mandatory}.slide{min-width:100vw;height:100vh;padding:56px;display:grid;align-content:space-between;scroll-snap-align:start;background:#fff;border-right:1px solid var(--line)}.dark{background:var(--ink);color:#fff}.kicker{margin:0 0 18px;color:var(--blue);font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.dark .kicker{color:#93c5fd}h1,h2,p{margin:0;letter-spacing:0}h1{max-width:960px;font-size:68px;line-height:1.02}h2{max-width:880px;font-size:52px;line-height:1.08}.lead{max-width:760px;color:var(--muted);font-size:23px;line-height:1.5}.dark .lead{color:rgba(255,255,255,.75)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{padding:22px;border:1px solid var(--line);border-radius:8px;background:#f8fafc;min-height:160px}.metric{font-size:54px;font-weight:950}.label{color:var(--muted);font-weight:800}.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.step{padding:22px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(255,255,255,.06)}.step b{color:#6ee7b7}.foot{color:var(--muted);font-size:14px}.dark .foot{color:rgba(255,255,255,.55)}
+    :root {
+      --paper: #f6f3ed;
+      --surface: #fbfaf7;
+      --white: #ffffff;
+      --ink: #171714;
+      --muted: #68675f;
+      --faint: #8b887f;
+      --line: #ddd8ce;
+      --blue: #1d4ed8;
+      --blue-soft: #e8eef9;
+      --orange: #d9573b;
+      --orange-soft: #f4e9e4;
+      --green: #73866c;
+      --green-soft: #e8ece5;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-hero: 32px;
+      --radius-pill: 999px;
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    html,
+    body { margin: 0; height: 100%; overflow: hidden; }
+    body { background: var(--paper); }
+    a { color: inherit; }
+
+    .deck {
+      display: flex;
+      width: 100%;
+      height: 100dvh;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+    }
+    .deck::-webkit-scrollbar { display: none; }
+
+    .slide {
+      position: relative;
+      display: grid;
+      flex: 0 0 100vw;
+      min-inline-size: 0;
+      min-width: 100vw;
+      height: 100dvh;
+      padding: clamp(28px, 4vw, 58px);
+      overflow-y: auto;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      background: var(--paper);
+    }
+    .slide::after {
+      position: absolute;
+      inset: 18px;
+      border: 1px solid rgba(23, 23, 20, 0.08);
+      border-radius: var(--radius-hero);
+      pointer-events: none;
+      content: "";
+    }
+    .slide--paper { background: #faf8f3; }
+    .slide--sage { background: #eff1eb; }
+
+    .kicker-row,
+    .slide-foot,
+    .cover-grid,
+    .section-head,
+    .score-layout,
+    .action-panel { position: relative; z-index: 1; }
+
+    .kicker-row,
+    .slide-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+    .kicker::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+    .page-no,
+    .footnote {
+      margin: 0;
+      color: var(--faint);
+      font-size: 13px;
+    }
+
+    h1,
+    h2,
+    p { margin: 0; }
+    h1,
+    h2 {
+      font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      overflow-wrap: anywhere;
+    }
+    h1 {
+      max-width: 620px;
+      font-size: clamp(44px, 4.2vw, 62px);
+      line-height: 1.1;
+    }
+    h2 {
+      max-width: 850px;
+      font-size: clamp(36px, 4vw, 58px);
+      line-height: 1.12;
+    }
+    .lead {
+      max-width: 690px;
+      color: var(--muted);
+      font-size: clamp(17px, 1.5vw, 22px);
+      line-height: 1.65;
+    }
+
+    .cover {
+      grid-template-rows: auto 1fr auto;
+      gap: clamp(24px, 3vw, 42px);
+      align-items: stretch;
+    }
+    .cover-grid {
+      display: grid;
+      min-width: 0;
+      grid-template-columns: minmax(0, 1fr) minmax(430px, 1fr);
+      gap: clamp(36px, 5vw, 84px);
+      align-items: center;
+    }
+    .cover-grid > *,
+    .section-head > *,
+    .score-layout > * { min-width: 0; }
+    .cover-copy { display: grid; gap: 30px; align-content: center; }
+    .signal-rule {
+      width: 76px;
+      height: 5px;
+      border: 0;
+      border-radius: var(--radius-pill);
+      margin: 0;
+      background: var(--orange);
+    }
+    .evidence-panel {
+      display: grid;
+      gap: 0;
+      min-width: 0;
+      min-height: min(64vh, 560px);
+      padding: clamp(26px, 3vw, 42px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-hero);
+      background: var(--white);
+      box-shadow: 0 24px 60px rgba(40, 37, 30, 0.08);
+    }
+    .panel-head {
+      display: grid;
+      grid-template-columns: 5px 1fr;
+      gap: 18px;
+      align-items: center;
+      padding-bottom: 18px;
+    }
+    .panel-head::before {
+      width: 5px;
+      height: 44px;
+      border-radius: var(--radius-pill);
+      background: var(--blue);
+      content: "";
+    }
+    .panel-title { font-size: 16px; font-weight: 900; }
+    .panel-subtitle { margin-top: 5px; color: var(--faint); font-size: 13px; }
+    .evidence-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 24px;
+      align-items: end;
+      padding: clamp(16px, 2vh, 24px) 10px;
+      border-top: 1px solid #e7e3db;
+    }
+    .evidence-label { color: var(--muted); font-size: 15px; font-weight: 800; }
+    .evidence-value { font-size: clamp(31px, 3.2vw, 48px); font-weight: 900; line-height: 1; }
+    .evidence-note { grid-column: 1 / -1; color: var(--green); font-size: 14px; }
+    .evidence-note--risk,
+    .evidence-value--risk { color: var(--orange); }
+    .next-step {
+      align-self: end;
+      margin-top: 18px;
+      padding: 18px 20px;
+      border-radius: var(--radius-md);
+      background: var(--orange-soft);
+      color: #74372b;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .next-step b { display: block; margin-bottom: 3px; color: var(--orange); }
+
+    .content-slide {
+      grid-template-rows: auto auto 1fr auto;
+      gap: clamp(24px, 3vw, 40px);
+      align-content: stretch;
+    }
+    .section-head { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr); gap: 48px; align-items: end; }
+    .section-head .lead { justify-self: end; max-width: 520px; }
+    .score-layout { display: grid; grid-template-columns: minmax(260px, 0.72fr) minmax(0, 1.28fr); gap: 22px; align-items: stretch; }
+    .decision {
+      display: grid;
+      align-content: space-between;
+      min-height: 300px;
+      padding: clamp(26px, 3vw, 40px);
+      border-radius: var(--radius-lg);
+      background: var(--orange-soft);
+    }
+    .decision-mark { color: var(--orange); font-size: 15px; font-weight: 900; }
+    .decision strong { max-width: 430px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(28px, 3vw, 44px); line-height: 1.25; }
+    .decision p { color: #74463d; font-size: 15px; line-height: 1.6; }
+    .score-ledger {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--white);
+    }
+    .metric-row {
+      display: grid;
+      grid-template-columns: minmax(140px, 1fr) minmax(110px, 0.7fr) minmax(180px, 1.2fr);
+      gap: 18px;
+      align-items: center;
+      min-height: 72px;
+      padding: 14px clamp(20px, 2.4vw, 34px);
+      border-top: 1px solid #e7e3db;
+    }
+    .metric-row:first-child { border-top: 0; }
+    .metric-label { color: var(--muted); font-weight: 800; }
+    .metric-value { font-size: clamp(25px, 2.5vw, 38px); font-weight: 900; }
+    .metric-note { color: var(--faint); font-size: 14px; line-height: 1.45; }
+    .metric-row--risk .metric-value,
+    .metric-row--risk .metric-note { color: var(--orange); }
+
+    .action-panel {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      overflow: hidden;
+      border: 1px solid #d5dace;
+      border-radius: var(--radius-hero);
+      background: rgba(255, 255, 255, 0.78);
+      box-shadow: 0 20px 50px rgba(50, 58, 45, 0.07);
+    }
+    .action-step {
+      display: grid;
+      align-content: space-between;
+      min-height: 310px;
+      padding: clamp(24px, 2.6vw, 38px);
+      border-left: 1px solid #dce0d7;
+    }
+    .action-step:first-child { border-left: 0; }
+    .step-no { color: var(--green); font-size: 14px; font-weight: 900; letter-spacing: 0.08em; }
+    .action-step h3 { margin: 24px 0 12px; font-size: clamp(21px, 2vw, 30px); line-height: 1.25; }
+    .action-step p { color: var(--muted); font-size: 15px; line-height: 1.6; }
+    .owner {
+      display: inline-flex;
+      justify-self: start;
+      margin-top: 30px;
+      padding: 8px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--green-soft);
+      color: #50634a;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .pager {
+      position: fixed;
+      z-index: 20;
+      right: 34px;
+      bottom: 30px;
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid rgba(23, 23, 20, 0.1);
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.86);
+      box-shadow: 0 10px 30px rgba(23, 23, 20, 0.08);
+      backdrop-filter: blur(12px);
+    }
+    .pager a {
+      display: grid;
+      width: 30px;
+      height: 30px;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .pager a:hover,
+    .pager a:focus-visible { color: #fff; background: var(--blue); outline: none; }
+
+    @media (max-width: 820px) {
+      .slide { padding: 28px; }
+      .slide::after { inset: 10px; border-radius: var(--radius-lg); }
+      .cover-grid,
+      .section-head,
+      .score-layout { grid-template-columns: 1fr; }
+      .cover-grid { gap: 30px; align-items: start; }
+      .cover-copy { gap: 20px; }
+      h1 { font-size: clamp(39px, 12vw, 58px); }
+      h2 { font-size: clamp(34px, 10vw, 50px); }
+      .evidence-panel { min-height: 0; padding: 24px; border-radius: var(--radius-lg); }
+      .evidence-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px 14px; padding-inline: 0; }
+      .evidence-value { font-size: 32px; }
+      .section-head { gap: 16px; }
+      .section-head .lead { justify-self: start; }
+      .metric-row { grid-template-columns: 1fr auto; }
+      .metric-note { grid-column: 1 / -1; }
+      .action-panel { grid-template-columns: 1fr; border-radius: var(--radius-lg); }
+      .action-step { min-height: 210px; border-top: 1px solid #dce0d7; border-left: 0; }
+      .action-step:first-child { border-top: 0; }
+      .pager { right: 18px; bottom: 18px; }
+      .slide-foot { padding-right: 116px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   </style>
 </head>
 <body>
-  <main class="deck">
-    <section class="slide dark">
-      <div><p class="kicker">Executive Business Review / Starter proof</p><h1>Growth is positive. Retention decides the next quarter.</h1><p class="lead">A reusable pack for KPI reality, driver diagnosis, risk/opportunity mapping, and owner-led actions.</p></div>
-      <p class="foot">Synthetic public demo. No private business data.</p>
-    </section>
-    <section class="slide">
-      <div><p class="kicker">KPI reality first</p><h2>Show the scorecard before interpretation.</h2></div>
-      <div class="grid">
-        <div class="card"><div class="label">Revenue growth</div><div class="metric">12%</div><p class="lead">Below stretch target.</p></div>
-        <div class="card"><div class="label">Retention</div><div class="metric">82%</div><p class="lead">Main risk to quality.</p></div>
-        <div class="card"><div class="label">Gross margin</div><div class="metric">38%</div><p class="lead">Channel mix pressure.</p></div>
-        <div class="card"><div class="label">Pipeline</div><div class="metric">2.7x</div><p class="lead">Demand exists.</p></div>
+  <main class="deck" aria-label="经营复盘公开案例">
+    <section class="slide cover" id="page-1" aria-labelledby="title-1">
+      <header class="kicker-row">
+        <p class="kicker">经营复盘 · 公开样例</p>
+        <p class="page-no">01 / 03</p>
+      </header>
+      <div class="cover-grid">
+        <div class="cover-copy">
+          <h1 id="title-1">增长已经发生，<br>下一季度取决于留存。</h1>
+          <hr class="signal-rule">
+          <p class="lead">把 KPI 现状、驱动因素与负责人行动，放进同一份可继续修改的 PowerPoint。</p>
+        </div>
+        <aside class="evidence-panel" aria-label="本期经营判断">
+          <div class="panel-head">
+            <div>
+              <p class="panel-title">本期经营判断</p>
+              <p class="panel-subtitle">KPI 现状 → 风险焦点 → 下期动作</p>
+            </div>
+          </div>
+          <div class="evidence-row">
+            <span class="evidence-label">收入增长</span><strong class="evidence-value">+12%</strong>
+            <span class="evidence-note">增长延续，但仍低于挑战目标</span>
+          </div>
+          <div class="evidence-row">
+            <span class="evidence-label">客户留存</span><strong class="evidence-value evidence-value--risk">82%</strong>
+            <span class="evidence-note evidence-note--risk">影响增长质量的首要风险</span>
+          </div>
+          <div class="evidence-row">
+            <span class="evidence-label">销售管线</span><strong class="evidence-value">2.7x</strong>
+            <span class="evidence-note">需求仍在，需要优先修复转化与留存</span>
+          </div>
+          <p class="next-step"><b>下一步</b>按客户分层拆解留存，明确负责人与截止日期。</p>
+        </aside>
       </div>
-      <p class="foot">Preset checks require period, unit, and source for every KPI.</p>
+      <footer class="slide-foot">
+        <p class="footnote">脱敏合成数据 · 不含真实业务材料</p>
+        <p class="footnote">横向滑动继续</p>
+      </footer>
     </section>
-    <section class="slide dark">
-      <div><p class="kicker">From findings to action</p><h2>Do not stop at diagnosis. Convert each risk into an owned next step.</h2></div>
-      <div class="flow"><div class="step"><b>01</b><p>Segment retention risk.</p></div><div class="step"><b>02</b><p>Prioritize margin fixes.</p></div><div class="step"><b>03</b><p>Assign owner and deadline.</p></div><div class="step"><b>04</b><p>Track one metric per action.</p></div></div>
-      <p class="foot">Primary route: editable PPTX. Optional route: Swiss Web Deck.</p>
+
+    <section class="slide slide--paper content-slide" id="page-2" aria-labelledby="title-2">
+      <header class="kicker-row">
+        <p class="kicker">KPI 现状</p>
+        <p class="page-no">02 / 03</p>
+      </header>
+      <div class="section-head">
+        <h2 id="title-2">先说清结果，再解释原因。</h2>
+        <p class="lead">每项 KPI 同时保留期间、口径与来源，让结论能被追溯，也能被继续编辑。</p>
+      </div>
+      <div class="score-layout">
+        <article class="decision">
+          <span class="decision-mark">核心判断</span>
+          <strong>增长动能仍在，留存与渠道结构是下一阶段的优先级。</strong>
+          <p>证据不足的结论保持待核验，不把占位数据包装成已验证事实。</p>
+        </article>
+        <div class="score-ledger" role="table" aria-label="经营指标总览">
+          <div class="metric-row" role="row"><span class="metric-label" role="cell">收入增长</span><strong class="metric-value" role="cell">+12%</strong><span class="metric-note" role="cell">低于挑战目标</span></div>
+          <div class="metric-row metric-row--risk" role="row"><span class="metric-label" role="cell">客户留存</span><strong class="metric-value" role="cell">82%</strong><span class="metric-note" role="cell">增长质量的主要风险</span></div>
+          <div class="metric-row" role="row"><span class="metric-label" role="cell">毛利率</span><strong class="metric-value" role="cell">38%</strong><span class="metric-note" role="cell">受渠道组合影响</span></div>
+          <div class="metric-row" role="row"><span class="metric-label" role="cell">销售管线</span><strong class="metric-value" role="cell">2.7x</strong><span class="metric-note" role="cell">需求基础仍在</span></div>
+        </div>
+      </div>
+      <footer class="slide-foot">
+        <p class="footnote">公开样例使用脱敏合成口径</p>
+        <p class="footnote">核心交付：可编辑 PPTX</p>
+      </footer>
+    </section>
+
+    <section class="slide slide--sage content-slide" id="page-3" aria-labelledby="title-3">
+      <header class="kicker-row">
+        <p class="kicker">从结论到行动</p>
+        <p class="page-no">03 / 03</p>
+      </header>
+      <div class="section-head">
+        <h2 id="title-3">复盘不止于诊断，每个风险都要有负责人。</h2>
+        <p class="lead">用一个清晰的行动链把结论收口：分层定位、排序取舍、明确主责，最后用单一指标回看。</p>
+      </div>
+      <div class="action-panel">
+        <article class="action-step"><div><span class="step-no">01</span><h3>分层定位</h3><p>按客户类型拆解留存风险，找到主要流失区间。</p></div><span class="owner">客户成功</span></article>
+        <article class="action-step"><div><span class="step-no">02</span><h3>排序取舍</h3><p>结合收益与执行成本，优先处理毛利影响最大的项目。</p></div><span class="owner">财务 + 销售</span></article>
+        <article class="action-step"><div><span class="step-no">03</span><h3>明确主责</h3><p>每个动作只有一位主责人，同时写清截止日期。</p></div><span class="owner">项目负责人</span></article>
+        <article class="action-step"><div><span class="step-no">04</span><h3>指标回看</h3><p>每个动作绑定一项可核验指标，在下次复盘中跟踪。</p></div><span class="owner">经营会议</span></article>
+      </div>
+      <footer class="slide-foot">
+        <p class="footnote">质量合同：证据、口径、负责人、截止日期</p>
+        <p class="footnote">Web Deck 仅作视觉预览</p>
+      </footer>
     </section>
   </main>
+
+  <nav class="pager" aria-label="页码导航">
+    <a href="#page-1" aria-label="前往第 1 页">1</a>
+    <a href="#page-2" aria-label="前往第 2 页">2</a>
+    <a href="#page-3" aria-label="前往第 3 页">3</a>
+  </nav>
 </body>
 </html>

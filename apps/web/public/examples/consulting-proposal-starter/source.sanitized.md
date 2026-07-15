@@ -1,31 +1,30 @@
-# Consulting Proposal Starter Source
+# 咨询方案公开案例 · 脱敏合成资料
 
-## Topic
+## 主题
 
-Client growth diagnosis and implementation recommendation.
+客户增长诊断与实施建议。
 
-## Audience
+## 受众
 
-Client executives, project sponsor, and steering committee.
+客户管理层、项目发起人与决策委员会。
 
-## Decision Question
+## 决策问题
 
-Which operating route should the client choose for the next two quarters?
+未来两个季度应选择哪一条经营改善路线？
 
-## Public Demo Situation
+## 公开合成情境
 
-- Growth ideas exist, but the organization lacks shared prioritization criteria.
-- Current process improvements are too scattered to become a funded plan.
-- Leadership needs one recommended route, a phased roadmap, and risk controls.
+- 团队提出了多个增长想法，但缺少统一的优先级标准。
+- 现有流程改善过于分散，尚不能形成可获批的投入计划。
+- 管理层需要一条明确推荐、分阶段路线和风险治理机制。
 
-## Option Set
+## 备选方案
 
-1. Optimize current process with targeted quick wins.
-2. Rebuild the customer journey around high-value segments.
-3. Launch a dedicated cross-functional growth program.
+1. 通过定向快速措施优化现有流程。
+2. 围绕高价值客群重构客户旅程。
+3. 启动跨部门增长专项。
 
-## Required Output
+## 预期输出
 
-- Editable PPTX for client review.
-- Option matrix, recommendation, implementation roadmap, and governance page.
-
+- 面向客户评审的可编辑 PPTX。
+- 方案比较、明确推荐、实施路线图与治理页面。

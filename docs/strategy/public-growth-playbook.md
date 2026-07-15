@@ -4,7 +4,8 @@ Use this checklist when improving GitHub exposure for Ultimate PPT Master.
 
 ## GitHub Discovery Surface
 
-- Keep the repository description English-first and keyword-rich.
+- Keep the repository description Chinese-first while retaining the English
+  discovery terms `editable PPTX`, `AI presentation`, and `Web Deck`.
 - Keep the homepage pointed at the GitHub Pages Web Experience.
 - Use the full 20-topic budget for high-intent discovery pools:
   `ai-presentation`, `presentation-generator`, `powerpoint-generation`,
@@ -60,6 +61,8 @@ Prioritize focused pull requests over drive-by promotion:
 
 Suggested one-line listing:
 
-> Ultimate PPT Master - Local-first AI presentation hub for Codex/Claude Code; turns PDFs, docs, PPTX, URLs, and notes into agent-ready projects, editable PowerPoint decks, and magazine-style Web Decks.
+> 把真实资料变成可编辑 PPTX 与 Web Deck 的本地优先 AI presentation Agent，面向 Codex / Claude Code。
 
-Include the GitHub Pages demo, v5.4.0 release link, and the public benchmark wall when the target list format allows it.
+Include the GitHub Pages demo, the latest actually published release link, and
+the public proof wall when the target list format allows it. Never present an
+unreleased candidate as a tagged release, GitHub Release, or marketplace publication merely because its source or Pages build is public.

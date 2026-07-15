@@ -1,21 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
-  <title id="title">Tech Trend Web Deck starter proof</title>
-  <desc id="desc">A magazine-style trend deck preview with source signals and local-first workflow.</desc>
-  <rect width="1200" height="675" fill="#fbfaf7"/>
-  <rect x="70" y="70" width="1060" height="535" rx="20" fill="#172033"/>
-  <text x="112" y="138" fill="#f97316" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850">TECH TREND WEB DECK</text>
-  <text x="112" y="212" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="930">The deck is becoming</text>
-  <text x="112" y="276" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="930">a local agent workflow.</text>
-  <g font-family="Inter, Arial, sans-serif" font-size="18" font-weight="800">
-    <rect x="116" y="370" width="180" height="70" rx="12" fill="#2563eb"/>
-    <text x="154" y="413" fill="#ffffff">Source</text>
-    <rect x="328" y="370" width="180" height="70" rx="12" fill="#10b981"/>
-    <text x="366" y="413" fill="#ffffff">Markdown</text>
-    <rect x="540" y="370" width="180" height="70" rx="12" fill="#f97316"/>
-    <text x="588" y="413" fill="#ffffff">Handoff</text>
-    <rect x="752" y="370" width="180" height="70" rx="12" fill="#ffffff"/>
-    <text x="798" y="413" fill="#172033">Agent QA</text>
+  <title id="title">科技趋势 Web Deck 次级公开样例封面</title>
+  <desc id="desc">有用的生成是一条可检查链路，而不是黑箱。</desc>
+  <rect width="1200" height="675" fill="#F6F3ED"/>
+  <rect x="44" y="40" width="1112" height="595" rx="28" fill="#FFFDF8" stroke="#D9D4C9"/>
+  <rect x="44" y="40" width="9" height="595" rx="4.5" fill="#73866C"/>
+  <g font-family="Noto Sans SC, Microsoft YaHei, sans-serif">
+    <text x="92" y="104" fill="#D9573B" font-size="18" font-weight="700">科技趋势 Web Deck · 次级公开样例</text>
+    <g font-family="Noto Serif SC, SimSun, serif" fill="#171714" font-weight="600">
+      <text x="92" y="208" font-size="62">有用的生成，</text>
+      <text x="92" y="282" font-size="62">是一条链而不是黑箱。</text>
+    </g>
+    <text x="94" y="342" fill="#67675F" font-size="22">观察事实、解释边界与工作流建议分开表达</text>
+    <g transform="translate(94 414)" font-size="18" font-weight="700">
+      <rect width="166" height="108" rx="18" fill="#E8EEF9"/><text x="24" y="63" fill="#1D4ED8">真实资料</text>
+      <path d="M176 54H202" stroke="#73866C"/>
+      <rect x="212" width="166" height="108" rx="18" fill="#F6F3ED" stroke="#D9D4C9"/><text x="236" y="63" fill="#171714">结构文本</text>
+      <path d="M388 54H414" stroke="#73866C"/>
+      <rect x="424" width="166" height="108" rx="18" fill="#E8ECE5"/><text x="448" y="63" fill="#73866C">本地交接</text>
+      <path d="M600 54H626" stroke="#73866C"/>
+      <rect x="636" width="166" height="108" rx="18" fill="#F7E8E2"/><text x="660" y="63" fill="#D9573B">质量门禁</text>
+    </g>
   </g>
-  <text x="112" y="536" fill="#b9c6d6" font-family="Inter, Arial, sans-serif" font-size="22">Starter proof: public signals -> stack shift -> builder takeaway.</text>
 </svg>
-

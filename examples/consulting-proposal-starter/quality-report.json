@@ -1,9 +1,11 @@
 {
   "version": "2.5.0",
+  "releaseVersion": "6.3.6",
+  "releaseStatus": "unreleased-candidate",
   "presetId": "consulting_proposal",
   "status": "passed",
   "publicDemoSafe": true,
-  "checkedAt": "2026-05-27",
+  "checkedAt": "2026-07-15",
   "summary": {
     "zh": "合成咨询方案样例已具备 source、Web Deck、封面截图和交付检查清单；重点证明问题定义、选项比较和路线图结构可复用。",
     "en": "Synthetic consulting proposal proof includes source, Web Deck, cover screenshot, and delivery checklist."
@@ -12,17 +14,17 @@
     {
       "id": "source-contract",
       "status": "passed",
-      "summary": "Source brief includes decision context, evidence, options, and roadmap inputs."
+      "summary": "公开 source 包含决策情境、备选方案、评估标准与实施路线输入。"
     },
     {
       "id": "visual-review",
       "status": "passed",
-      "summary": "Starter proof keeps client-facing structure visible without private data."
+      "summary": "当前中文浅色圆角 Web Deck 明确展示决策定义、同尺比较和分阶段路线，不含私有数据。"
     },
     {
       "id": "handoff-contract",
       "status": "passed",
-      "summary": "Preset declares expected artifacts, review commands, and acceptance criteria."
+      "summary": "预设声明预期产物、复核命令与验收标准。"
     }
   ],
   "designDoctor": {

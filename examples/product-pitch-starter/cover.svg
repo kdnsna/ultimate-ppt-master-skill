@@ -1,22 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
-  <title id="title">Product Pitch starter proof</title>
-  <desc id="desc">A product pitch preview showing Web Experience, Bridge, Agent Skill, and outputs.</desc>
-  <rect width="1200" height="675" fill="#fbfaf7"/>
-  <rect x="70" y="70" width="1060" height="535" rx="20" fill="#ffffff" stroke="#d8e0ea"/>
-  <text x="112" y="138" fill="#ef5b3f" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="850">PRODUCT PITCH</text>
-  <text x="112" y="212" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="930">AI decks need</text>
-  <text x="112" y="276" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="930">a production handoff.</text>
-  <g font-family="Inter, Arial, sans-serif">
-    <rect x="116" y="368" width="210" height="92" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
-    <text x="142" y="405" fill="#2563eb" font-size="18" font-weight="850">Web Experience</text>
-    <text x="142" y="435" fill="#475569" font-size="16">Prepare the brief</text>
-    <rect x="364" y="368" width="210" height="92" rx="14" fill="#ecfdf5" stroke="#a7f3d0"/>
-    <text x="390" y="405" fill="#047857" font-size="18" font-weight="850">Bridge</text>
-    <text x="390" y="435" fill="#475569" font-size="16">Write local files</text>
-    <rect x="612" y="368" width="210" height="92" rx="14" fill="#fff7ed" stroke="#fed7aa"/>
-    <text x="638" y="405" fill="#c2410c" font-size="18" font-weight="850">Agent Skill</text>
-    <text x="638" y="435" fill="#475569" font-size="16">Produce and QA</text>
+  <title id="title">产品路演次级公开样例封面</title>
+  <desc id="desc">AI 演示文稿需要一条生产交接链。</desc>
+  <rect width="1200" height="675" fill="#F6F3ED"/>
+  <rect x="44" y="40" width="1112" height="595" rx="28" fill="#FFFDF8" stroke="#D9D4C9"/>
+  <path d="M44 562 Q44 635 116 635 H1156 V520 Z" fill="#F7E8E2"/>
+  <g font-family="Noto Sans SC, Microsoft YaHei, sans-serif">
+    <text x="92" y="104" fill="#D9573B" font-size="18" font-weight="700">产品路演 · 次级公开样例</text>
+    <g font-family="Noto Serif SC, SimSun, serif" fill="#171714" font-weight="600">
+      <text x="92" y="208" font-size="64">AI 演示文稿需要</text>
+      <text x="92" y="284" font-size="64">一条生产交接链。</text>
+    </g>
+    <text x="94" y="344" fill="#67675F" font-size="22">真实资料、本地交接、Agent 生产与可检查成品</text>
+    <g transform="translate(94 414)">
+      <rect width="258" height="126" rx="20" fill="#E8EEF9" stroke="#CBD8F2"/>
+      <text x="22" y="39" fill="#1D4ED8" font-size="15">01 / WEB</text><text x="22" y="80" fill="#171714" font-size="25" font-weight="700">说清任务</text>
+      <rect x="282" width="258" height="126" rx="20" fill="#E8ECE5" stroke="#CAD5C5"/>
+      <text x="304" y="39" fill="#73866C" font-size="15">02 / BRIDGE</text><text x="304" y="80" fill="#171714" font-size="25" font-weight="700">本地交接</text>
+      <rect x="564" width="258" height="126" rx="20" fill="#F7E8E2" stroke="#EFC9BA"/>
+      <text x="586" y="39" fill="#D9573B" font-size="15">03 / AGENT</text><text x="586" y="80" fill="#171714" font-size="25" font-weight="700">生产复核</text>
+    </g>
   </g>
-  <text x="112" y="542" fill="#617085" font-family="Inter, Arial, sans-serif" font-size="22">Starter proof: pain -> product workflow -> visible proof -> ask.</text>
 </svg>
-

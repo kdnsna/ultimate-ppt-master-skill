@@ -1,5 +1,7 @@
 # Quality Workbench v2.5
 
+> **Historical record (v2.5, 2026-05-27).** This document preserves the v2.5 product and proof contract. Its routes, proof matrix, and release language are not a statement of current v6 release readiness.
+
 v2.5 positions Ultimate PPT Master as a quality workbench for Chinese office users, not a black-box cloud deck generator. The Web Experience collects the brief, the Bridge writes a local handoff contract, and the Skill/Agent route performs the final production, review, and repair.
 
 ## Stable Proof Matrix

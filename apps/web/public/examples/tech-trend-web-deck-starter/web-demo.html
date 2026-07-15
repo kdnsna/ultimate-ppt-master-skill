@@ -1,19 +1,50 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tech Trend Web Deck Starter Proof</title>
+  <meta name="description" content="脱敏合成的科技趋势 Web Deck 次级案例，把公开信号、解读和建议分开表达。">
+  <title>科技趋势 Web Deck · 次级公开样例</title>
   <link rel="icon" href="../../brand.svg" type="image/svg+xml">
   <style>
-    :root{--ink:#172033;--muted:#66758c;--paper:#fbfaf7;--line:#d8e0ea;--blue:#2563eb;--green:#10b981;--orange:#f97316;font-family:Inter,Avenir Next,Arial,sans-serif;color:var(--ink);background:var(--paper)}*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}.deck{height:100vh;display:flex;overflow-x:auto;scroll-snap-type:x mandatory}.slide{min-width:100vw;height:100vh;padding:56px;display:grid;align-content:space-between;scroll-snap-align:start;background:var(--paper);border-right:1px solid var(--line)}.dark{background:var(--ink);color:#fff}.kicker{margin:0 0 18px;color:var(--orange);font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}h1,h2,p{margin:0;letter-spacing:0}h1{max-width:980px;font-size:68px;line-height:1.02}h2{max-width:900px;font-size:52px;line-height:1.08}.lead{max-width:790px;color:var(--muted);font-size:23px;line-height:1.5}.dark .lead{color:rgba(255,255,255,.75)}.signals{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.signal{padding:22px;border:1px solid var(--line);border-radius:8px;background:#fff;min-height:190px}.signal b{color:var(--blue)}.chain{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.node{padding:20px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}.node b{color:#6ee7b7}.foot{color:var(--muted);font-size:14px}.dark .foot{color:rgba(255,255,255,.55)}
+    :root{--paper:#f6f3ed;--surface:#fffdf8;--ink:#171714;--muted:#67675f;--line:#d9d4c9;--blue:#1d4ed8;--blue-soft:#e8eef9;--coral:#d9573b;--sage:#73866c;--sage-soft:#e8ece5;font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--paper)}
+    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}body{background:var(--paper)}h1,h2,h3,p{margin:0}.deck{display:flex;width:100%;height:100dvh;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}.deck::-webkit-scrollbar{display:none}
+    .slide{position:relative;flex:0 0 100vw;min-width:0;height:100dvh;padding:clamp(28px,4vw,58px);display:grid;grid-template-rows:auto 1fr auto;gap:clamp(22px,3vw,40px);overflow-y:auto;scroll-snap-align:start;scroll-snap-stop:always;background:var(--paper)}.slide::after{position:absolute;inset:16px;border:1px solid rgba(23,23,20,.1);border-radius:24px;pointer-events:none;content:""}.slide--sage{background:#eff1eb}
+    .chrome,.foot,.content{position:relative;z-index:1}.chrome,.foot{display:flex;justify-content:space-between;gap:18px;color:var(--muted);font-family:"IBM Plex Mono","Noto Sans SC",monospace;font-size:clamp(10px,.8vw,13px);letter-spacing:.03em}.chrome{padding-bottom:14px;border-bottom:1px solid var(--line)}.foot{align-self:end}.content{align-self:center;display:grid;gap:clamp(18px,2.6vw,32px)}
+    .eyebrow{color:var(--coral);font-size:13px;font-weight:800;letter-spacing:.06em}.title{max-width:14ch;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(43px,5.4vw,76px);font-weight:600;line-height:1.08;letter-spacing:-.04em}.subtitle{max-width:42em;color:var(--muted);font-size:clamp(17px,1.5vw,23px);line-height:1.65}
+    .signals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.signal{min-width:0;min-height:220px;padding:clamp(18px,2.2vw,30px);display:grid;align-content:space-between;gap:20px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}.signal b{color:var(--blue);font-family:"IBM Plex Mono",monospace;font-size:13px}.signal h3{font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(22px,1.9vw,30px)}.signal p{color:var(--muted);line-height:1.6}
+    .chain{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.node{position:relative;min-width:0;min-height:185px;padding:clamp(17px,2vw,26px);border:1px solid rgba(115,134,108,.35);border-radius:18px;background:rgba(255,253,248,.82)}.node:not(:last-child)::after{position:absolute;right:-9px;top:50%;z-index:2;width:16px;height:1px;background:var(--sage);content:""}.node b{display:block;margin-bottom:24px;color:var(--blue);font-family:"IBM Plex Mono",monospace}.node h3{margin-bottom:10px;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(21px,1.8vw,28px)}.node p{color:var(--muted);line-height:1.55}
+    @media(max-width:720px){.slide{padding:26px 24px 66px;gap:18px}.slide::after{inset:10px;border-radius:20px}.chrome span:first-child{max-width:62vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chrome span:last-child{white-space:nowrap}.title{max-width:none;font-size:clamp(39px,12vw,52px)}.subtitle{font-size:16px}.signals{grid-template-columns:1fr 1fr;gap:10px}.signal{min-height:0;padding:15px;gap:7px}.signal h3{font-size:19px}.signal p{font-size:12px}.chain{grid-template-columns:1fr 1fr;gap:10px}.node{min-height:0;padding:14px}.node:last-child{grid-column:1/-1}.node:not(:last-child)::after{display:none}.node b{margin-bottom:8px}.node h3{font-size:19px}.node p{font-size:12px}.foot span:first-child{display:none}}
   </style>
 </head>
 <body>
-  <main class="deck">
-    <section class="slide dark"><div><p class="kicker">Tech Trend / Starter proof</p><h1>The deck is becoming a local agent workflow.</h1><p class="lead">A reusable Web Deck pack for public signals, stack shifts, builder implications, and source-cited takeaways.</p></div><p class="foot">Synthetic public demo. Star counts and trend signals should be treated as directional evidence.</p></section>
-    <section class="slide"><div><p class="kicker">Public signals</p><h2>Separate observed facts from interpretation.</h2></div><div class="signals"><div class="signal"><b>Markdown adapters</b><p class="lead">Source material moves into inspectable text.</p></div><div class="signal"><b>MCP tools</b><p class="lead">Agents discover local capabilities.</p></div><div class="signal"><b>Slides-as-code</b><p class="lead">Decks stay reviewable and versioned.</p></div><div class="signal"><b>Editable PPTX</b><p class="lead">Business handoff still matters.</p></div></div><p class="foot">Preset checks require source URLs or citation notes near claims.</p></section>
-    <section class="slide dark"><div><p class="kicker">New workflow</p><h2>Useful generation is a chain, not a black box.</h2></div><div class="chain"><div class="node"><b>01</b><p>Source</p></div><div class="node"><b>02</b><p>Markdown</p></div><div class="node"><b>03</b><p>Handoff</p></div><div class="node"><b>04</b><p>Agent production</p></div><div class="node"><b>05</b><p>QA gates</p></div></div><p class="foot">Primary route: magazine Web Deck. Optional route: editable PPTX appendix.</p></section>
+  <main class="deck" aria-label="科技趋势 Web Deck 次级公开样例">
+    <section class="slide">
+      <div class="chrome"><span>科技趋势 · 脱敏合成 Proof</span><span>01 / 03</span></div>
+      <div class="content"><p class="eyebrow">当演示文稿进入 Agent 工作流</p><h1 class="title">有用的生成，<br>是一条链而不是黑箱。</h1><p class="subtitle">资料进入、可检查文本、本地工具、可编辑输出与可见质量门禁，共同决定交付是否可靠。</p></div>
+      <div class="foot"><span>公开合成案例 · 趋势信号仅作方向性证据</span><span>滑动 / 方向键</span></div>
+    </section>
+    <section class="slide">
+      <div class="chrome"><span>01 · 公开信号</span><span>02 / 03</span></div>
+      <div class="content"><p class="eyebrow">观察与解读分开</p><h2 class="title">先写发生了什么，<br>再写这意味着什么。</h2><div class="signals">
+        <article class="signal"><b>MARKDOWN</b><h3>可检查适配层</h3><p>资料先进入可读、可版本化的文本。</p></article>
+        <article class="signal"><b>TOOLS</b><h3>本地能力发现</h3><p>Agent 能确认当前环境实际可用的工具。</p></article>
+        <article class="signal"><b>SLIDES AS CODE</b><h3>过程可回放</h3><p>结构、样式和修订记录不再是一次性结果。</p></article>
+        <article class="signal"><b>EDITABLE PPTX</b><h3>交付仍可修改</h3><p>商务汇报仍需要可编辑、可归档的 PowerPoint。</p></article>
+      </div></div>
+      <div class="foot"><span>预设检查：公开 URL、引用备注与解释边界</span><span>02 / 03</span></div>
+    </section>
+    <section class="slide slide--sage">
+      <div class="chrome"><span>02 · 新工作流</span><span>03 / 03</span></div>
+      <div class="content"><p class="eyebrow">把链路做成可检查中间产物</p><h2 class="title">每一步都能确认，<br>失败才不必从头来过。</h2><div class="chain">
+        <article class="node"><b>01</b><h3>真实资料</h3><p>文件、URL 与任务边界。</p></article>
+        <article class="node"><b>02</b><h3>结构化文本</h3><p>source、brief 与证据缺口。</p></article>
+        <article class="node"><b>03</b><h3>本地交接</h3><p>manifest、storyboard 与恢复状态。</p></article>
+        <article class="node"><b>04</b><h3>Agent 生产</h3><p>生成、渲染和按页精修。</p></article>
+        <article class="node"><b>05</b><h3>质量门禁</h3><p>真实产物、哈希绑定和人工复核。</p></article>
+      </div></div>
+      <div class="foot"><span>主路线：杂志风 Web Deck · 可选：可编辑 PPTX 附录</span><span>03 / 03</span></div>
+    </section>
   </main>
 </body>
 </html>

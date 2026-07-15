@@ -1,12 +1,14 @@
 # Completion Audit - v2.5 Quality Workbench and Skill Market Distribution
 
-This audit records the current completion evidence for the requested direction: make Ultimate PPT Master easier for non-technical Chinese office users, raise output quality, prove the quality with public cases, and prepare the skill for marketplace distribution.
+> **Historical record (v2.5, 2026-05-27).** This snapshot preserves the evidence and terminology used for the v2.5 milestone. References to "current" or "complete" describe that milestone only and must not be used as evidence that a later v6 release has shipped.
+
+This audit records the v2.5 completion evidence for the requested direction: make Ultimate PPT Master easier for non-technical Chinese office users, raise output quality, prove the quality with public cases, and prepare the skill for marketplace distribution.
 
 ## Requirement Audit
 
 | Requirement | Evidence | Status |
 |---|---|---|
-| First-time users can understand the shortest path quickly | `README.md#60-second-quickstart`, `README.zh-CN.md#60-秒开箱即用`, Web `OneClickRunbookPanel` | Complete |
+| First-time users can understand the shortest path quickly | `README.md#一分钟安装`, `README.en.md#one-minute-install`, Web `OneClickRunbookPanel` | Complete |
 | The Web Experience avoids a blank first screen and exposes the current task, next step, and quality state | `apps/web/src/App.tsx` quality workbench panels, `apps/web/src/styles.css` responsive rules, browser smoke at desktop and mobile widths | Complete |
 | Chinese office scenarios are the default path | Preset ordering and copy in `apps/web/src/App.tsx`; stable packs for Executive Business Review and Consulting Proposal; README first-choice table | Complete |
 | Stable packs are quality presets, not vague examples | `templates/presets/*/preset.json` includes `userLevel`, `qualityProfile`, `proofArtifacts`, and `notFor`; guarded by `npm run audit:quality` | Complete |

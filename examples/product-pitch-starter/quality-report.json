@@ -1,9 +1,11 @@
 {
   "version": "2.5.0",
+  "releaseVersion": "6.3.6",
+  "releaseStatus": "unreleased-candidate",
   "presetId": "product_pitch",
   "status": "passed",
   "publicDemoSafe": true,
-  "checkedAt": "2026-05-27",
+  "checkedAt": "2026-07-15",
   "summary": {
     "zh": "合成产品路演样例已具备 source、Web Deck、封面截图和交付检查清单；重点证明首屏叙事、产品流程和公开展示路径。",
     "en": "Synthetic product pitch proof includes source, Web Deck, cover screenshot, and delivery checklist."
@@ -12,17 +14,17 @@
     {
       "id": "source-contract",
       "status": "passed",
-      "summary": "Source brief includes product one-liner, user pain, proof, roadmap, and ask."
+      "summary": "公开 source 包含产品一句话、用户痛点、工作流证明、交付物与采用请求。"
     },
     {
       "id": "visual-review",
       "status": "passed",
-      "summary": "Web Deck starter is designed for public demo rhythm and mobile readability."
+      "summary": "当前中文浅色圆角 Web Deck 展示真实输入、本地交接与 Agent 生产链路，并适配移动端。"
     },
     {
       "id": "handoff-contract",
       "status": "passed",
-      "summary": "Preset declares expected artifacts, review commands, and acceptance criteria."
+      "summary": "预设声明预期产物、复核命令与验收标准。"
     }
   ],
   "designDoctor": {

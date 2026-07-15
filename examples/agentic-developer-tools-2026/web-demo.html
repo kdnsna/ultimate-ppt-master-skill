@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Agentic Developer Stack 2026 · Ultimate PPT Master Demo</title>
+  <meta name="description" content="Ultimate PPT Master v2.5 时期的已归档历史案例，记录 Agentic Developer Stack 2026 的公开叙事。">
+  <title>Agentic Developer Stack 2026 · 历史样例</title>
   <style>
     :root{
       --ink:#172033;
@@ -16,15 +17,15 @@
       --gold:#f2c94c;
       --cyan:#06b6d4;
       --shadow:0 16px 46px rgba(23,32,51,.12);
-      font-family:"Avenir Next","SF Pro Display","PingFang SC","Microsoft YaHei",Arial,sans-serif;
+      font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
       color:var(--ink);
       background:var(--paper);
     }
     *{box-sizing:border-box}
     html,body{margin:0;width:100%;height:100%;overflow:hidden}
     body{background:var(--paper)}
-    .deck{height:100vh;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth}
-    .slide{position:relative;min-width:100vw;height:100vh;scroll-snap-align:start;padding:52px 58px;display:grid;grid-template-rows:auto 1fr auto;gap:24px;background:var(--paper);border-right:1px solid var(--line)}
+    .deck{height:100dvh;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth}
+    .slide{position:relative;min-width:100vw;height:100dvh;overflow-y:auto;scroll-snap-align:start;padding:52px 58px;display:grid;grid-template-rows:auto 1fr auto;gap:24px;background:var(--paper);border-right:1px solid var(--line)}
     .slide.dark{background:var(--ink);color:#fff}
     .slide.blue{background:#eef5ff}
     .slide.warm{background:#fff7ed}
@@ -47,20 +48,20 @@
     .pill{min-height:34px;padding:0 12px;border:1px solid currentColor;border-radius:8px;display:inline-flex;align-items:center;color:var(--muted);font-size:13px;font-weight:850}
     .dark .pill{color:rgba(255,255,255,.76)}
     .hero-grid{grid-template-columns:minmax(0,1fr) 420px;align-items:center}
-    .agent-map{position:relative;width:420px;height:420px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);overflow:hidden}
+    .agent-map{position:relative;width:420px;height:420px;border:1px solid rgba(255,255,255,.18);border-radius:18px;background:rgba(255,255,255,.05);overflow:hidden}
     .agent-map::before{content:"";position:absolute;inset:36px;border:1px solid rgba(255,255,255,.16)}
     .agent-map::after{content:"";position:absolute;left:50%;top:50%;width:160px;height:160px;transform:translate(-50%,-50%);border:2px solid var(--green)}
     .node{position:absolute;width:108px;height:54px;padding:8px;border:1px solid rgba(255,255,255,.22);display:grid;align-content:center;background:rgba(255,255,255,.08);font-size:12px;font-weight:900}
     .n1{left:34px;top:42px}.n2{right:34px;top:42px}.n3{left:34px;bottom:42px}.n4{right:34px;bottom:42px}.n5{left:156px;top:180px;background:var(--blue);border-color:var(--blue);color:#fff}
     .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
     .grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-    .panel{min-height:210px;padding:20px;border:1px solid var(--line);border-radius:8px;background:#fff;display:grid;align-content:space-between;gap:14px;box-shadow:var(--shadow)}
+    .panel{min-height:210px;padding:20px;border:1px solid var(--line);border-radius:18px;background:#fff;display:grid;align-content:space-between;gap:14px;box-shadow:var(--shadow)}
     .panel strong{display:block;font-size:15px;color:var(--coral);font-family:"SFMono-Regular",Consolas,monospace;letter-spacing:.08em;text-transform:uppercase}
     .panel p,.compact{color:var(--muted);font-size:16px;line-height:1.5}
     .metric{font-size:62px;line-height:.9;font-weight:950;letter-spacing:0;color:var(--ink)}
     .metric small{font-size:18px;color:var(--muted)}
     .pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;align-items:stretch}
-    .step{min-height:170px;padding:16px;border:1px solid var(--line);background:#fff;border-radius:8px;display:grid;align-content:space-between}
+    .step{min-height:170px;padding:16px;border:1px solid var(--line);background:#fff;border-radius:16px;display:grid;align-content:space-between}
     .step b{color:var(--blue);font-family:"SFMono-Regular",Consolas,monospace}
     .step span{display:block;color:var(--muted);font-size:14px;line-height:1.45}
     .matrix{display:grid;grid-template-columns:220px repeat(3,minmax(0,1fr));border:1px solid var(--line);background:#fff}
@@ -75,19 +76,22 @@
     .half.ink{background:var(--ink);color:#fff}
     .half.ink p{color:rgba(255,255,255,.74)}
     .trace{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-    .trace .item{padding:18px;border-radius:8px;border:1px solid var(--line);background:#fff;min-height:150px}
+    .trace .item{padding:18px;border-radius:16px;border:1px solid var(--line);background:#fff;min-height:150px}
     .trace .item:nth-child(2){border-color:rgba(37,99,235,.3);background:#eff6ff}
     .trace .item:nth-child(3){border-color:rgba(16,185,129,.35);background:#ecfdf5}
     .trace .item:nth-child(4){border-color:rgba(239,91,63,.3);background:#fff1ee}
     .proof-grid{display:grid;grid-template-columns:1.05fr .82fr 1.05fr;gap:16px;align-items:stretch}
-    .proof-card{min-height:360px;padding:24px;border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:var(--shadow);display:grid;align-content:space-between;gap:20px}
+    .proof-card{min-height:360px;padding:24px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:var(--shadow);display:grid;align-content:space-between;gap:20px}
     .proof-card strong{color:var(--coral);font-family:"SFMono-Regular",Consolas,monospace;font-size:13px;text-transform:uppercase}
     .proof-card h3{font-size:30px}
     .proof-card ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
     .proof-card li{padding:12px 14px;border-left:4px solid var(--blue);background:#f8fafc;color:var(--muted);font-size:15px;line-height:1.4}
     .handoff-rail{display:grid;place-items:center;gap:14px;color:#fff;background:var(--ink)}
     .handoff-rail .arrow{width:68px;height:68px;border:1px solid rgba(255,255,255,.26);display:grid;place-items:center;font-size:28px;color:var(--green)}
-    .product-frame{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);padding:18px;display:grid;gap:12px}
+    .product-frame{border:1px solid rgba(255,255,255,.18);border-radius:18px;background:rgba(255,255,255,.06);padding:18px;display:grid;gap:12px;overflow:hidden}
+    .warm .product-frame{border-color:var(--line);background:rgba(255,255,255,.76)}
+    .warm .product-bar,.warm .product-body div{border-color:var(--line);background:#fff;color:var(--ink)}
+    .warm .product-body b{color:var(--ink)}.warm .product-body span{color:var(--muted)}
     .product-bar{height:34px;border:1px solid rgba(255,255,255,.18);display:flex;align-items:center;gap:8px;padding:0 10px;color:rgba(255,255,255,.72);font-size:12px;font-weight:850}
     .product-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
     .product-body{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -98,17 +102,20 @@
     .source-list li{padding:14px 16px;border-left:4px solid var(--blue);background:#fff;color:var(--muted);line-height:1.45}
     .bigline{font-size:44px;line-height:1.18;font-weight:930;max-width:960px}
     #nav{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:flex;gap:8px;z-index:5}
-    #nav button{width:8px;height:8px;border:0;border-radius:0;background:rgba(23,32,51,.28);padding:0;cursor:pointer}
+    #nav button{width:8px;height:8px;border:0;border-radius:999px;background:rgba(23,32,51,.28);padding:0;cursor:pointer}
     #nav button.active{width:28px;background:var(--coral)}
     body.dark-bg #nav button{background:rgba(255,255,255,.32)}
     body.dark-bg #nav button.active{background:var(--green)}
     @media (max-width:900px){
-      .slide{padding:28px 24px;gap:18px}
-      h1{font-size:42px}
+      .slide{padding:24px 24px 96px;gap:16px}
+      .stage{align-self:start;padding-top:8px}
+      .chrome{font-size:10px}.chrome>span:last-child{max-width:44vw;text-align:right}
+      .foot{display:none}
+      h1{font-size:38px;line-height:1.04}
       h2{font-size:34px}
       .lead{font-size:18px}
       .hero-grid,.grid-3,.grid-2,.pipeline,.trace,.proof-grid,.product-body{grid-template-columns:1fr}
-      .agent-map{width:100%;height:320px}
+      .agent-map{width:100%;height:300px}
       .matrix{grid-template-columns:1fr}
       .cell,.cell:nth-child(4n){border-right:0}
       .split{grid-template-columns:1fr}
@@ -117,18 +124,20 @@
       .metric{font-size:44px}
       .bigline{font-size:30px}
       .proof-card{min-height:260px}
+      .product-frame{margin-bottom:24px}
+      #nav{bottom:10px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:rgba(251,250,247,.94);box-shadow:0 8px 24px rgba(23,32,51,.12)}
     }
   </style>
 </head>
 <body>
-  <main class="deck" id="deck" aria-label="Agentic Developer Stack 2026">
-    <section class="slide dark">
-      <div class="chrome"><span class="brand"><span class="brand-mark"><i><b></b><b></b><b></b></i></span>Ultimate PPT Master</span><span>v2.5 Quality Workbench · 2026.05</span></div>
+  <main class="deck" id="deck" aria-label="Agentic Developer Stack 2026 历史样例">
+    <section class="slide warm">
+      <div class="chrome"><span class="brand"><span class="brand-mark"><i><b></b><b></b><b></b></i></span>Ultimate PPT Master</span><span>v2.5 历史样例 · 2026.05</span></div>
       <div class="stage hero-grid">
         <div>
-          <p class="kicker">Input visible · Output proven</p>
+          <p class="kicker">已归档历史案例 · 不代表当前版本</p>
           <h1>Agentic Developer Stack 2026</h1>
-          <p class="lead">从“模型回答问题”到“Agent 执行工作”：开发工具正在变成可计划、可运行、可检查的生产工作台。</p>
+          <p class="lead">这份历史样例记录 v2.5 时期对 Agent 工作台的判断：开发工具正从“回答问题”走向可计划、可运行、可检查的执行链。</p>
           <div class="meta-row">
             <span class="pill">Google I/O 2026</span>
             <span class="pill">Gemini 3.5 Flash</span>
@@ -145,11 +154,11 @@
           </div>
         </div>
       </div>
-      <div class="foot"><span>Web Deck sample</span><span>Use arrow keys / scroll</span></div>
+      <div class="foot"><span>历史 Web Deck 样例</span><span>方向键 / 滑动查看</span></div>
     </section>
 
     <section class="slide warm">
-      <div class="chrome"><span>00 / v2.5 Proof</span><span>Input → preset → output → review</span></div>
+      <div class="chrome"><span>00 / v2.5 历史 Proof</span><span>输入 → 预设 → 输出 → 复核</span></div>
       <div class="stage">
         <p class="kicker">Release focus</p>
         <h2>用户不需要猜：给什么、怎么交、产出长什么样。</h2>
@@ -177,9 +186,8 @@
               <li>带质量清单，不把结果当黑盒</li>
             </ul>
           </article>
-        </div>
       </div>
-      <div class="foot"><span>v2.5 quality proof</span><span>Visible workflow</span></div>
+      <div class="foot"><span>v2.5 历史质量 Proof</span><span>当前版本见 README</span></div>
     </section>
 
     <section class="slide">

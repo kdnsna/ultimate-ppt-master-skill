@@ -1,29 +1,58 @@
-# Executive Business Review Starter Source
+# 经营复盘公开案例·脱敏合成资料
 
-## Topic
+> 本案例的公司、数据、责任人与时间均为合成内容，仅用于验证中文正式办公 PPTX 的策划、可编辑性和质量门禁，不对应任何真实企业。
 
-Quarterly business review and next growth actions.
+## 任务
 
-## Audience
+- 场景：季度经营复盘与下季度资源决策。
+- 受众：管理层、业务负责人与项目负责人。
+- 核心结论：增长仍在继续，但下季度必须同时改善留存、保护毛利，并把高风险行动锁定到责任人、时限和指标。
+- 交付：9 页、16:9、中文为主、可编辑 PPTX；所有图表、表格、文字和形状保留为 PowerPoint 原生对象。
 
-Executive team, business owners, and project leads.
+## 公开合成数据
 
-## Core Message
-
-The business is still growing, but the next quarter depends on improving retention, protecting margin, and assigning owners to the highest-risk actions.
-
-## Public Demo Data
-
-| KPI | Current | Target | Prior | Note |
+| 指标 | 本期 | 目标 | 上期 | 判断 |
 |---|---:|---:|---:|---|
-| Revenue growth | 12% | 15% | 9% | Growth is positive but below stretch target. |
-| Gross margin | 38% | 40% | 39% | Margin pressure comes from channel mix. |
-| Retention | 82% | 88% | 84% | Retention is the main risk. |
-| Pipeline coverage | 2.7x | 3.0x | 2.4x | Demand exists but conversion quality varies. |
+| 收入增速 | 12% | 15% | 9% | 增长改善，但仍低于挑战目标 3 个百分点 |
+| 毛利率 | 38% | 40% | 39% | 渠道结构变化导致毛利承压 |
+| 客户留存率 | 82% | 88% | 84% | 较上期下降 2 个百分点，是首要风险 |
+| 商机管道覆盖 | 2.7× | 3.0× | 2.4× | 需求充足，但转化质量分化 |
 
-## Required Output
+## 驱动因素
 
-- Editable PPTX as the primary output.
-- Optional Swiss-style Web Deck for internal readout.
-- Keep actions tied to owner, deadline, and metric.
+| 因素 | 影响 | 证据边界 |
+|---|---|---|
+| 新客获取 | 正向 | 新客贡献约 +5 个百分点的增长拉动 |
+| 客户留存 | 负向 | 留存下降抵消约 -2 个百分点 |
+| 渠道结构 | 负向 | 低毛利渠道占比提高，影响毛利率约 -1 个百分点 |
+| 管道扩容 | 正向 | 覆盖倍数提升 0.3×，但需筛选高质量商机 |
 
+## 风险与机会
+
+- 高风险：留存持续下降，可能抵消新客增量。
+- 中风险：渠道结构若不调整，毛利目标缺口将扩大。
+- 主要机会：管道覆盖上升，可以通过分层与销售资格管理提高转化质量。
+
+## 下季度行动合同
+
+| 优先级 | 行动 | 责任人 | 时限 | 验收指标 |
+|---|---|---|---|---|
+| P0 | 对高风险客户建立 30 天留存战情机制 | 客户成功负责人 | 第 2 周 | 留存率恢复至 ≥85% |
+| P0 | 重新设定渠道组合与折扣边界 | 商务负责人 | 第 4 周 | 毛利率回升至 ≥39% |
+| P1 | 将商机分层与销售资格检查纳入周会 | 销售运营负责人 | 第 3 周 | 高质量管道覆盖 ≥3.0× |
+
+## Agent 合成管理门槛（待业务确认）
+
+> 以下数值是为公开合成案例设定的管理门槛假设，不是企业历史事实或已批准目标。正式使用前必须由业务负责人确认或替换。
+
+| 假设复核节点 | 留存 | 毛利 | 高质量管道 |
+|---|---:|---:|---:|
+| 月末 1 | ≥85% | ≥39% | ≥2.8× |
+| 月末 2 | ≥86% | ≥39.5% | ≥3.0× |
+| 季末 | 趋近 88% | 趋近 40% | 保持 ≥3.0× |
+
+## 需要管理层确认
+
+1. 是否同意将留存恢复设为下季度第一优先级。
+2. 是否授权商务负责人调整渠道折扣边界。
+3. 是否按月复核留存、毛利与高质量管道三个指标。

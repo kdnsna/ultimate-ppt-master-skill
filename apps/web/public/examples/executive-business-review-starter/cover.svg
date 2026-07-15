@@ -1,25 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
-  <title id="title">Executive Business Review starter proof</title>
-  <desc id="desc">A clean executive review preview with KPI cards and action plan.</desc>
-  <rect width="1200" height="675" fill="#f7f9fc"/>
-  <rect x="56" y="56" width="1088" height="563" rx="22" fill="#ffffff" stroke="#d8e0ea"/>
-  <text x="96" y="126" fill="#2563eb" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="800">EXECUTIVE BUSINESS REVIEW</text>
-  <text x="96" y="190" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="900">Growth is positive.</text>
-  <text x="96" y="248" fill="#172033" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="900">Retention decides the next quarter.</text>
-  <g font-family="Inter, Arial, sans-serif">
-    <rect x="96" y="330" width="224" height="150" rx="14" fill="#eff6ff" stroke="#bfdbfe"/>
-    <text x="124" y="380" fill="#2563eb" font-size="18" font-weight="800">Revenue</text>
-    <text x="124" y="440" fill="#172033" font-size="48" font-weight="900">12%</text>
-    <rect x="352" y="330" width="224" height="150" rx="14" fill="#ecfdf5" stroke="#a7f3d0"/>
-    <text x="380" y="380" fill="#0f766e" font-size="18" font-weight="800">Retention</text>
-    <text x="380" y="440" fill="#172033" font-size="48" font-weight="900">82%</text>
-    <rect x="608" y="330" width="224" height="150" rx="14" fill="#fff7ed" stroke="#fed7aa"/>
-    <text x="636" y="380" fill="#c2410c" font-size="18" font-weight="800">Margin</text>
-    <text x="636" y="440" fill="#172033" font-size="48" font-weight="900">38%</text>
-    <rect x="864" y="330" width="224" height="150" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
-    <text x="892" y="380" fill="#475569" font-size="18" font-weight="800">Pipeline</text>
-    <text x="892" y="440" fill="#172033" font-size="48" font-weight="900">2.7x</text>
-  </g>
-  <text x="96" y="560" fill="#617085" font-family="Inter, Arial, sans-serif" font-size="22">Starter proof: KPI reality -> driver analysis -> owner-led action plan.</text>
-</svg>
+  <title id="title">经营复盘公开案例封面</title>
+  <desc id="desc">暖纸底的正式办公演示封面，左侧为经营结论，右侧为大圆角证据面板。</desc>
 
+  <rect width="1200" height="675" fill="#F6F3ED"/>
+  <rect x="54" y="52" width="1092" height="571" rx="30" fill="#FBFAF7" stroke="#DED9CF"/>
+
+  <g font-family="Noto Sans SC, PingFang SC, Microsoft YaHei, sans-serif">
+    <rect x="92" y="88" width="164" height="32" rx="16" fill="#E8EEF9"/>
+    <circle cx="112" cy="104" r="4" fill="#1D4ED8"/>
+    <text x="126" y="110" fill="#1D4ED8" font-size="14" font-weight="700" letter-spacing="1.2">经营复盘 · 公开样例</text>
+
+    <text x="92" y="204" fill="#171714" font-family="Noto Serif SC, Source Han Serif SC, Songti SC, serif" font-size="48" font-weight="700">增长已经发生，</text>
+    <text x="92" y="270" fill="#171714" font-family="Noto Serif SC, Source Han Serif SC, Songti SC, serif" font-size="48" font-weight="700">下一季度</text>
+    <text x="92" y="336" fill="#171714" font-family="Noto Serif SC, Source Han Serif SC, Songti SC, serif" font-size="48" font-weight="700">取决于留存。</text>
+    <rect x="92" y="393" width="74" height="5" rx="2.5" fill="#D9573B"/>
+    <text x="92" y="442" fill="#5D5D56" font-size="20">把 KPI 现状、驱动因素与负责人行动</text>
+    <text x="92" y="473" fill="#5D5D56" font-size="20">放进同一份可继续修改的 PowerPoint。</text>
+    <text x="92" y="574" fill="#87847C" font-size="14">脱敏合成数据 · 不含真实业务材料</text>
+
+    <rect x="688" y="82" width="414" height="513" rx="32" fill="#FFFFFF" stroke="#D8D3C9"/>
+    <rect x="716" y="112" width="5" height="48" rx="2.5" fill="#1D4ED8"/>
+    <text x="742" y="132" fill="#171714" font-size="15" font-weight="800">本期经营判断</text>
+    <text x="742" y="157" fill="#77746C" font-size="14">KPI 现状 → 风险焦点 → 下期动作</text>
+
+    <text x="726" y="224" fill="#77746C" font-size="15" font-weight="700">收入增长</text>
+    <text x="1040" y="224" fill="#171714" font-size="36" font-weight="800" text-anchor="end">+12%</text>
+    <text x="726" y="253" fill="#73866C" font-size="14">增长延续，但仍低于挑战目标</text>
+    <line x1="726" y1="280" x2="1064" y2="280" stroke="#E4E0D8"/>
+
+    <text x="726" y="330" fill="#77746C" font-size="15" font-weight="700">客户留存</text>
+    <text x="1040" y="330" fill="#D9573B" font-size="36" font-weight="800" text-anchor="end">82%</text>
+    <text x="726" y="359" fill="#D9573B" font-size="14">影响增长质量的首要风险</text>
+    <line x1="726" y1="386" x2="1064" y2="386" stroke="#E4E0D8"/>
+
+    <text x="726" y="436" fill="#77746C" font-size="15" font-weight="700">销售管线</text>
+    <text x="1040" y="436" fill="#171714" font-size="36" font-weight="800" text-anchor="end">2.7x</text>
+    <text x="726" y="465" fill="#73866C" font-size="14">需求仍在，需要优先修复转化与留存</text>
+
+    <rect x="716" y="508" width="358" height="56" rx="16" fill="#F4E9E4"/>
+    <text x="738" y="533" fill="#8C3C2D" font-size="13" font-weight="800">下一步</text>
+    <text x="738" y="552" fill="#171714" font-size="14">按客户分层拆解留存，明确负责人与截止日期</text>
+  </g>
+</svg>

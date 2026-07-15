@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "pptx-native-object-audit-v1",
+  "artifact": {
+    "name": "executive-business-review-editable.pptx",
+    "relativePath": "./executive-business-review-editable.pptx",
+    "sha256": "0afdc71d4414e3be527e4d90e3a6bc355bb01160ae28adf97c25925c0b136dc3",
+    "size": 81460
+  },
+  "totals": {
+    "slides": 9,
+    "textRuns": 209,
+    "shapes": 222,
+    "pictures": 0,
+    "graphicFrames": 4,
+    "tables": 2,
+    "charts": 2,
+    "notesSlides": 9,
+    "noteTextRuns": 9,
+    "nativeVectorObjects": 226
+  },
+  "slides": [
+    {
+      "slideId": "P01",
+      "textRuns": 19,
+      "shapes": 24,
+      "pictures": 0,
+      "graphicFrames": 0,
+      "tables": 0
+    },
+    {
+      "slideId": "P02",
+      "textRuns": 20,
+      "shapes": 31,
+      "pictures": 0,
+      "graphicFrames": 0,
+      "tables": 0
+    },
+    {
+      "slideId": "P03",
+      "textRuns": 47,
+      "shapes": 31,
+      "pictures": 0,
+      "graphicFrames": 1,
+      "tables": 1
+    },
+    {
+      "slideId": "P04",
+      "textRuns": 12,
+      "shapes": 13,
+      "pictures": 0,
+      "graphicFrames": 1,
+      "tables": 0
+    },
+    {
+      "slideId": "P05",
+      "textRuns": 11,
+      "shapes": 13,
+      "pictures": 0,
+      "graphicFrames": 1,
+      "tables": 0
+    },
+    {
+      "slideId": "P06",
+      "textRuns": 18,
+      "shapes": 25,
+      "pictures": 0,
+      "graphicFrames": 0,
+      "tables": 0
+    },
+    {
+      "slideId": "P07",
+      "textRuns": 29,
+      "shapes": 39,
+      "pictures": 0,
+      "graphicFrames": 0,
+      "tables": 0
+    },
+    {
+      "slideId": "P08",
+      "textRuns": 37,
+      "shapes": 22,
+      "pictures": 0,
+      "graphicFrames": 1,
+      "tables": 1
+    },
+    {
+      "slideId": "P09",
+      "textRuns": 16,
+      "shapes": 24,
+      "pictures": 0,
+      "graphicFrames": 0,
+      "tables": 0
+    }
+  ]
+}

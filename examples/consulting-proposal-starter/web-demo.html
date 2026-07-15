@@ -1,19 +1,50 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Consulting Proposal Starter Proof</title>
+  <meta name="description" content="脱敏合成的咨询方案次级公开案例，展示决策定义、方案比较与实施路线。">
+  <title>咨询方案 · 次级公开样例</title>
   <link rel="icon" href="../../apps/web/public/brand.svg" type="image/svg+xml">
   <style>
-    :root{--ink:#172033;--muted:#617085;--line:#d8e0ea;--blue:#2563eb;--green:#10b981;--orange:#f97316;font-family:Inter,Avenir Next,Arial,sans-serif;color:var(--ink);background:#f8fafc}*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden}.deck{height:100vh;display:flex;overflow-x:auto;scroll-snap-type:x mandatory}.slide{min-width:100vw;height:100vh;padding:56px;display:grid;align-content:space-between;scroll-snap-align:start;background:#fff;border-right:1px solid var(--line)}.dark{background:var(--ink);color:#fff}.kicker{margin:0 0 18px;color:var(--blue);font-size:14px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.dark .kicker{color:#93c5fd}h1,h2,p{margin:0;letter-spacing:0}h1{max-width:980px;font-size:68px;line-height:1.02}h2{max-width:880px;font-size:52px;line-height:1.08}.lead{max-width:780px;color:var(--muted);font-size:23px;line-height:1.5}.dark .lead{color:rgba(255,255,255,.75)}.matrix{display:grid;grid-template-columns:220px repeat(3,1fr);border:1px solid var(--line)}.cell{min-height:110px;padding:18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);background:#fff}.cell:nth-child(4n){border-right:0}.head{background:#f1f5f9;font-weight:900}.win{background:#ecfdf5}.road{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.phase{padding:22px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(255,255,255,.07)}.phase b{color:#6ee7b7}.foot{color:var(--muted);font-size:14px}.dark .foot{color:rgba(255,255,255,.55)}
+    :root{--paper:#f6f3ed;--surface:#fffdf8;--ink:#171714;--muted:#67675f;--line:#d9d4c9;--blue:#1d4ed8;--blue-soft:#e8eef9;--sage:#73866c;--sage-soft:#e8ece5;--coral:#d9573b;font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--paper)}
+    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}body{background:var(--paper)}h1,h2,h3,p,dl,dd{margin:0}a{color:inherit}
+    .deck{display:flex;width:100%;height:100dvh;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}.deck::-webkit-scrollbar{display:none}
+    .slide{position:relative;flex:0 0 100vw;min-width:0;height:100dvh;padding:clamp(28px,4vw,58px);display:grid;grid-template-rows:auto 1fr auto;gap:clamp(22px,3vw,40px);overflow-y:auto;scroll-snap-align:start;scroll-snap-stop:always;background:var(--paper)}
+    .slide::after{position:absolute;inset:16px;border:1px solid rgba(23,23,20,.1);border-radius:24px;pointer-events:none;content:""}.slide--sage{background:#eff1eb}
+    .chrome,.foot,.content{position:relative;z-index:1}.chrome,.foot{display:flex;justify-content:space-between;gap:18px;color:var(--muted);font-family:"IBM Plex Mono","Noto Sans SC",monospace;font-size:clamp(10px,.8vw,13px);letter-spacing:.03em}.chrome{padding-bottom:14px;border-bottom:1px solid var(--line)}.foot{align-self:end}.content{align-self:center;display:grid;gap:clamp(18px,2.6vw,32px)}
+    .eyebrow{color:var(--blue);font-size:13px;font-weight:800;letter-spacing:.06em}.title{max-width:14ch;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(43px,5.4vw,76px);font-weight:600;line-height:1.08;letter-spacing:-.04em}.subtitle{max-width:42em;color:var(--muted);font-size:clamp(17px,1.5vw,23px);line-height:1.65}
+    .option-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.option{min-width:0;padding:clamp(20px,2.4vw,32px);border:1px solid var(--line);border-radius:18px;background:var(--surface)}.option--recommended{border-color:rgba(29,78,216,.42);background:var(--blue-soft);box-shadow:0 16px 36px rgba(29,78,216,.09)}.option small{color:var(--blue);font-weight:800}.option h3{margin:12px 0 22px;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(24px,2.2vw,34px);font-weight:600}.option dl{display:grid;gap:10px}.option dl div{display:flex;justify-content:space-between;gap:14px;padding-top:10px;border-top:1px solid rgba(23,23,20,.12)}.option dt{color:var(--muted)}.option dd{font-weight:800}
+    .road{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.phase{min-width:0;padding:clamp(18px,2vw,28px);border:1px solid rgba(115,134,108,.34);border-radius:18px;background:rgba(255,253,248,.78)}.phase b{display:block;margin-bottom:18px;color:var(--blue);font-family:"IBM Plex Mono",monospace;font-size:13px}.phase h3{margin-bottom:10px;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(20px,1.8vw,28px)}.phase p{color:var(--muted);line-height:1.6}
+    @media(max-width:720px){.slide{padding:26px 24px 66px;gap:18px}.slide::after{inset:10px;border-radius:20px}.chrome span:first-child{max-width:62vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chrome span:last-child{white-space:nowrap}.title{max-width:none;font-size:clamp(39px,12vw,52px)}.subtitle{font-size:16px}.option-grid{grid-template-columns:1fr}.option{padding:18px}.option h3{margin:8px 0 14px;font-size:25px}.option dl{gap:5px}.option dl div{padding-top:7px;font-size:13px}.road{grid-template-columns:1fr 1fr;gap:10px}.phase{padding:16px}.phase b{margin-bottom:8px}.phase h3{font-size:20px}.phase p{font-size:13px}.foot span:first-child{display:none}}
   </style>
 </head>
 <body>
-  <main class="deck">
-    <section class="slide dark"><div><p class="kicker">Consulting Proposal / Starter proof</p><h1>Define the decision before showing analysis.</h1><p class="lead">A reusable pack for problem framing, option comparison, recommendation, roadmap, and governance.</p></div><p class="foot">Synthetic public demo. Built for editable PPTX production.</p></section>
-    <section class="slide"><div><p class="kicker">Option comparison</p><h2>Use named criteria, not vague pros and cons.</h2></div><div class="matrix"><div class="cell head">Criteria</div><div class="cell head">Quick wins</div><div class="cell head win">Growth program</div><div class="cell head">Journey rebuild</div><div class="cell">Impact</div><div class="cell">Medium</div><div class="cell win">High</div><div class="cell">High</div><div class="cell">Speed</div><div class="cell">Fast</div><div class="cell win">Medium</div><div class="cell">Slow</div><div class="cell">Governance</div><div class="cell">Weak</div><div class="cell win">Clear</div><div class="cell">Complex</div></div><p class="foot">Preset checks require evidence and criteria before recommendation.</p></section>
-    <section class="slide dark"><div><p class="kicker">Implementation route</p><h2>Recommendation becomes credible only when the roadmap is operational.</h2></div><div class="road"><div class="phase"><b>Phase 1</b><p>Confirm scope and metric owner.</p></div><div class="phase"><b>Phase 2</b><p>Run focused journey experiments.</p></div><div class="phase"><b>Phase 3</b><p>Scale cross-functional program.</p></div><div class="phase"><b>Phase 4</b><p>Review governance and risks.</p></div></div><p class="foot">Primary route: editable PPTX. Optional route: Swiss Web Deck.</p></section>
+  <main class="deck" aria-label="咨询方案次级公开样例">
+    <section class="slide">
+      <div class="chrome"><span>咨询方案 · 脱敏合成 Proof</span><span>01 / 03</span></div>
+      <div class="content"><p class="eyebrow">先把问题说清楚</p><h1 class="title">先定义决策，<br>再展开分析。</h1><p class="subtitle">这是一份用于问题定义、方案比较、明确推荐、实施路线与治理机制的可复用结构。</p></div>
+      <div class="foot"><span>公开合成案例 · 不含客户资料</span><span>滑动 / 方向键</span></div>
+    </section>
+    <section class="slide">
+      <div class="chrome"><span>01 · 方案比较</span><span>02 / 03</span></div>
+      <div class="content"><p class="eyebrow">用明确标准，不用模糊的利弊</p><h2 class="title">推荐必须经得起<br>同一尺度的比较。</h2><div class="option-grid">
+        <article class="option"><small>方案 A</small><h3>快速改善</h3><dl><div><dt>影响</dt><dd>中</dd></div><div><dt>速度</dt><dd>快</dd></div><div><dt>治理</dt><dd>较弱</dd></div></dl></article>
+        <article class="option option--recommended"><small>推荐 · 方案 B</small><h3>跨部门增长专项</h3><dl><div><dt>影响</dt><dd>高</dd></div><div><dt>速度</dt><dd>中</dd></div><div><dt>治理</dt><dd>清晰</dd></div></dl></article>
+        <article class="option"><small>方案 C</small><h3>客户旅程重构</h3><dl><div><dt>影响</dt><dd>高</dd></div><div><dt>速度</dt><dd>慢</dd></div><div><dt>治理</dt><dd>复杂</dd></div></dl></article>
+      </div></div>
+      <div class="foot"><span>预设检查：证据、评估标准与推荐逻辑</span><span>02 / 03</span></div>
+    </section>
+    <section class="slide slide--sage">
+      <div class="chrome"><span>02 · 实施路线</span><span>03 / 03</span></div>
+      <div class="content"><p class="eyebrow">把推荐变成可执行合同</p><h2 class="title">有责任人和复盘点，<br>路线才算成立。</h2><div class="road">
+        <article class="phase"><b>01 / 范围</b><h3>确认目标</h3><p>锁定问题边界、指标口径和负责人。</p></article>
+        <article class="phase"><b>02 / 试验</b><h3>聚焦验证</h3><p>针对高价值旅程运行小范围实验。</p></article>
+        <article class="phase"><b>03 / 扩展</b><h3>跨部门推进</h3><p>在证据成立后扩展项目与资源。</p></article>
+        <article class="phase"><b>04 / 治理</b><h3>复盘风险</h3><p>按程序检查结果、偏差与下一轮决策。</p></article>
+      </div></div>
+      <div class="foot"><span>主路线：可编辑 PPTX · 可选：Web Deck</span><span>03 / 03</span></div>
+    </section>
   </main>
 </body>
 </html>

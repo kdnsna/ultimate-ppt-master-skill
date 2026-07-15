@@ -1,16 +1,21 @@
-# Tech Trend Web Deck Starter Proof
+# 科技趋势 Web Deck：次级公开样例
 
-This is a sanitized proof output for the `tech_trend_web_deck` preset starter pack.
+这是一份使用公开方向性信号制作的次级案例，用来验证“观察事实、解释边界和业务建议分开表达”的趋势叙事。
 
-## Input
+## 输入
 
-- Source skeleton: [source.sanitized.md](./source.sanitized.md)
-- Preset contract: [templates/presets/tech_trend_web_deck/preset.json](../../templates/presets/tech_trend_web_deck/preset.json)
+- [脱敏合成 source](./source.sanitized.md)
+- 场景预设：`tech_trend_web_deck`
+- 数据边界：不含客户资料、个人信息或真实业务数据
 
-## Output
+## 输出与复核
 
-- Preview Web Deck: [web-demo.html](./web-demo.html)
-- Cover proof: [cover.svg](./cover.svg)
+- [打开 3 页 Web Deck](./web-demo.html)
+- [查看封面预览](./cover.svg)
+- [查看质量报告](./quality-report.json)
 
-The pack is meant for public, source-cited trend storytelling. It keeps facts, interpretation, and recommendations visually separate.
+## 状态说明
 
+- 当前公开样例以中文为主，并已检查 1440px 与 390px 首屏。
+- `quality-report.json.version = 2.5.0` 是 stable proof 报告 schema，不是当前产品版本；候选版本另见 `releaseVersion`。
+- Design Doctor 分数属于仓库内部质量合同，不是第三方 benchmark 或审美评分。
