@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { EventEmitter } from "node:events";
+import { constants as fsConstants } from "node:fs";
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
@@ -50,7 +51,7 @@ async function freePort() {
 async function firstExisting(paths) {
   for (const path of paths) {
     try {
-      await access(path);
+      await access(path, fsConstants.X_OK);
       return path;
     } catch {
       // Try the next known Chrome location.
@@ -62,6 +63,7 @@ async function firstExisting(paths) {
 async function waitForHttp(url, child, label, timeoutMs = 10_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
+    if (child.spawnError) throw new Error(`${label} could not start: ${child.spawnError.message}`);
     if (child.exitCode !== null) throw new Error(`${label} exited with code ${child.exitCode}: ${child.capturedOutput || "no child output"}`);
     try {
       const response = await fetch(url);
@@ -76,9 +78,14 @@ async function waitForHttp(url, child, label, timeoutMs = 10_000) {
 
 function captureChildOutput(child) {
   child.capturedOutput = "";
+  child.spawnError = null;
   const append = (chunk) => {
     child.capturedOutput = `${child.capturedOutput}${String(chunk)}`.slice(-8_000);
   };
+  child.once("error", (error) => {
+    child.spawnError = error;
+    append(error.stack || error.message);
+  });
   child.stdout?.on("data", append);
   child.stderr?.on("data", append);
   return child;
@@ -1297,6 +1304,7 @@ async function main() {
     "--disable-sync",
     "--no-first-run",
     "--no-default-browser-check",
+    "--remote-debugging-address=127.0.0.1",
     `--remote-debugging-port=${chromePort}`,
     `--user-data-dir=${userDataDir}`,
     "about:blank"
@@ -1305,7 +1313,8 @@ async function main() {
   let client;
   try {
     await waitForHttp(baseUrl, vite, "Vite");
-    const versionResponse = await waitForHttp(`http://127.0.0.1:${chromePort}/json/version`, chrome, "Chrome");
+    console.log(`Browser regression using Chrome: ${chromePath}`);
+    const versionResponse = await waitForHttp(`http://127.0.0.1:${chromePort}/json/version`, chrome, "Chrome", 30_000);
     const version = await versionResponse.json();
     client = await CdpClient.connect(version.webSocketDebuggerUrl);
     await testKeyboardDialogAndReducedMotion(client, baseUrl);
