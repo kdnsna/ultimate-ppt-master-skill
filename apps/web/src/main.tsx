@@ -13,12 +13,12 @@ function RootApp() {
     return (
       <Suspense fallback={<div className="route-loading" role="status">正在载入经典控制台…</div>}>
         <ClassicApp />
-        <a className="classic-return" href="/" aria-label="返回 v6 工作台">返回 v6 工作台</a>
+        <a className="classic-return" href={import.meta.env.BASE_URL} aria-label="返回 v6 工作台">返回 v6 工作台</a>
       </Suspense>
     );
   }
 
-  return <V6Workspace classicHref="?classic=1" />;
+  return <V6Workspace />;
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

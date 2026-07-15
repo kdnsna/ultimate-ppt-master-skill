@@ -5,14 +5,14 @@
   --upm-font-mono: "IBM Plex Mono", Consolas, monospace;
   --upm-ink: #171714;
   --upm-muted: #676963;
-  --upm-line: #d8d5ce;
-  --upm-paper: #ffffff;
-  --upm-surface: #f1efea;
+  --upm-line: #ded9cf;
+  --upm-paper: #fffdf8;
+  --upm-surface: #f4f1ea;
   --upm-warm: #f6f3ed;
-  --upm-coral: #cc785c;
-  --upm-green: #10b981;
+  --upm-coral: #d9573b;
+  --upm-green: #73866c;
   --upm-blue: #1d4ed8;
   --upm-amber: #d69020;
-  --upm-radius: 6px;
-  --upm-shadow: 0 14px 34px rgba(23, 23, 20, 0.06);
+  --upm-radius: 14px;
+  --upm-shadow: 0 18px 48px rgba(23, 23, 20, 0.055);
 }

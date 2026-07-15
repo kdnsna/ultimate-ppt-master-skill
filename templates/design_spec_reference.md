@@ -281,7 +281,7 @@ Two views on the same font decisions — fill both, keep them consistent:
 | ------- | ---------------- | --------------- |
 | Card gap | 20-32px | [fill in] |
 | Card padding | 20-32px | [fill in] |
-| Card border radius | 8-16px | [fill in] |
+| Card border radius | 12-20px Web / 8-14pt editable PPTX | [choose one restrained radius family; a single hero panel may reach 24-32px / 18-24pt; avoid both hard-corner walls and excessive pills] |
 | Single-row card height | 530-600px | [fill in] |
 | Double-row card height | 265-295px each | [fill in] |
 | Three-column card width | 360-380px each | [fill in] |
@@ -301,7 +301,7 @@ Two views on the same font decisions — fill both, keep them consistent:
 | Whitespace strategy | [Where the quiet/empty zone lives; avoid filling every corner] |
 | Card count bound | [Prefer 3-5 peer cards; max 6 on 16:9 unless table/matrix] |
 | Card padding bound | [24-36px normal; never below 20px formal] |
-| Corner radius | [Usually 6-12px; avoid overly pill-shaped cards unless brand requires] |
+| Corner radius | [Usually 12-20px Web / 8-14pt editable PPTX; a single cover hero may use 24-32px / 18-24pt; use on functional containers, keep charts/rules/table internals straight, avoid overly pill-shaped cards unless brand requires] |
 | Shadow/depth | [0-2 focal shadows per page; peer grids remain flat] |
 | Logo placement | [Reserved zone; official marks do not compete with title] |
 | Contrast | [Secondary text remains readable; no low-contrast gray body copy] |

@@ -16,6 +16,24 @@ from apps.desktop.worker.desktop_worker import (
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def deck_session_fixture(count: int = 4) -> dict:
+    return {
+        "schemaVersion": "deck-session-v6",
+        "sessionId": "desktop-contract-test",
+        "phase": "outline",
+        "slides": [
+            {
+                "slideId": f"P{index:02d}",
+                "title": f"Title {index}",
+                "takeaway": f"Takeaway {index}",
+                "selectedVariantId": f"P{index:02d}-v2",
+            }
+            for index in range(1, count + 1)
+        ],
+        "extensionField": {"preserve": ["unknown", "fields"]},
+    }
+
+
 class DesktopWorkerTest(unittest.TestCase):
     def test_validate_job_accepts_minimal_markdown_pptx_job(self):
         job = validate_job(
@@ -31,6 +49,59 @@ class DesktopWorkerTest(unittest.TestCase):
         self.assertEqual(job["source"]["kind"], "markdown")
         self.assertEqual(job["providerConfig"]["modelProvider"], "auto")
         self.assertEqual(job["providerConfig"]["voiceProvider"], "none")
+        self.assertIsNone(job["deckSession"])
+
+    def test_validate_job_preserves_valid_deck_session_without_rewriting(self):
+        deck_session = deck_session_fixture()
+        job = validate_job(
+            {
+                "source": {"kind": "markdown", "value": "# Demo", "name": "demo.md"},
+                "outputMode": "pptx",
+                "stylePreset": "business",
+                "deck_session": deck_session,
+            }
+        )
+
+        self.assertIs(job["deckSession"], deck_session)
+        self.assertEqual(job["deckSession"], deck_session)
+
+    def test_validate_job_rejects_invalid_deck_session_contracts(self):
+        invalid_sessions = [
+            [],
+            {**deck_session_fixture(), "schemaVersion": "deck-session-v5"},
+            deck_session_fixture(3),
+            deck_session_fixture(25),
+            {
+                **deck_session_fixture(),
+                "slides": [
+                    {"slideId": "P01"},
+                    {"slideId": "P02"},
+                    {"slideId": "P02"},
+                    {"slideId": "P04"},
+                ],
+            },
+            {
+                **deck_session_fixture(),
+                "slides": [
+                    {"slideId": "P01"},
+                    {"slideId": "P02"},
+                    {"slideId": "   "},
+                    {"slideId": "P04"},
+                ],
+            },
+        ]
+
+        for deck_session in invalid_sessions:
+            with self.subTest(deck_session=deck_session):
+                with self.assertRaises(ValueError):
+                    validate_job(
+                        {
+                            "source": {"kind": "markdown", "value": "# Demo"},
+                            "outputMode": "pptx",
+                            "stylePreset": "business",
+                            "deckSession": deck_session,
+                        }
+                    )
 
     def test_validate_job_normalizes_provider_and_voice_config(self):
         job = validate_job(
@@ -158,6 +229,44 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertIn("Needs-Manual", codex_task)
             self.assertRegex(codex_task, r"ChatGPT|generated asset|生成素材")
             self.assertRegex(codex_task, r"micro-assets|small element|小元素|元素素材")
+
+    def test_run_job_persists_deck_session_across_desktop_contract_files(self):
+        deck_session = deck_session_fixture()
+        with tempfile.TemporaryDirectory() as tmp:
+            result = run_job(
+                {
+                    "source": {
+                        "kind": "markdown",
+                        "value": "# DeckSession Contract\n\n- Preserve the storyboard contract",
+                        "name": "deck-session.md",
+                    },
+                    "outputMode": "web",
+                    "stylePreset": "swiss",
+                    "projectDir": tmp,
+                    "deckSession": deck_session,
+                },
+                ROOT,
+            )
+
+            project_path = Path(result["projectPath"])
+            contract_files = [
+                project_path / "desktop-manifest.json",
+                project_path / "manifest.json",
+                project_path / "project-brief.json",
+                project_path / "quality-report.json",
+            ]
+            for contract_path in contract_files:
+                with self.subTest(contract_path=contract_path.name):
+                    payload = json.loads(contract_path.read_text(encoding="utf-8"))
+                    self.assertEqual(payload["deckSession"], deck_session)
+
+            deck_session_path = project_path / "deck-session.json"
+            self.assertEqual(json.loads(deck_session_path.read_text(encoding="utf-8")), deck_session)
+            self.assertEqual(result["deckSession"], deck_session)
+            self.assertTrue(any(path.endswith("deck-session.json") for path in result["generatedFiles"]))
+
+            formal_manifest = json.loads((project_path / "manifest.json").read_text(encoding="utf-8"))
+            self.assertTrue(any(path.endswith("deck-session.json") for path in formal_manifest["generatedFiles"]))
 
     def test_run_job_creates_pptx_preview_manifest(self):
         with tempfile.TemporaryDirectory() as tmp:

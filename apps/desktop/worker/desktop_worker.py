@@ -152,6 +152,32 @@ def normalize_provider_config(raw: Any) -> dict[str, Any]:
     return config
 
 
+def validate_deck_session(raw: Any) -> dict[str, Any] | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError("deckSession must be an object when provided.")
+    if raw.get("schemaVersion") != "deck-session-v6":
+        raise ValueError("deckSession.schemaVersion must be deck-session-v6.")
+
+    slides = raw.get("slides")
+    if not isinstance(slides, list) or not 4 <= len(slides) <= 24:
+        raise ValueError("deckSession.slides must contain between 4 and 24 slides.")
+
+    slide_ids: set[str] = set()
+    for index, slide in enumerate(slides):
+        if not isinstance(slide, dict):
+            raise ValueError(f"deckSession.slides[{index}] must be an object.")
+        slide_id = slide.get("slideId")
+        if not isinstance(slide_id, str) or not slide_id.strip():
+            raise ValueError(f"deckSession.slides[{index}].slideId must be a non-empty string.")
+        if slide_id in slide_ids:
+            raise ValueError(f"deckSession slideId must be unique: {slide_id}")
+        slide_ids.add(slide_id)
+
+    return raw
+
+
 def validate_job(job: dict[str, Any]) -> dict[str, Any]:
     source = job.get("source")
     if not isinstance(source, dict):
@@ -176,6 +202,9 @@ def validate_job(job: dict[str, Any]) -> dict[str, Any]:
     if project_dir is not None and not isinstance(project_dir, str):
         raise ValueError("projectDir must be a string when provided.")
 
+    raw_deck_session = job["deckSession"] if "deckSession" in job else job.get("deck_session")
+    deck_session = validate_deck_session(raw_deck_session)
+
     return {
         "source": {
             "kind": source_kind,
@@ -186,6 +215,7 @@ def validate_job(job: dict[str, Any]) -> dict[str, Any]:
         "stylePreset": style_preset,
         "projectDir": project_dir,
         "providerConfig": normalize_provider_config(job.get("providerConfig", job.get("provider_config"))),
+        "deckSession": deck_session,
     }
 
 
@@ -2480,6 +2510,7 @@ def write_formal_delivery_files(
     now: str,
     source_text: str = "",
 ) -> list[Path]:
+    deck_session = job.get("deckSession")
     quality_gate = formal_quality_gate()
     quality_profile = formal_quality_profile(job["outputMode"])
     workflow_state = {
@@ -2516,6 +2547,7 @@ def write_formal_delivery_files(
     page_visual_prompt_json_path = project_path / "images" / "page_visual_prompts.json"
     page_visual_prompt_md_path = project_path / "images" / "page_visual_prompts.md"
     image_prompt_fallback_path = project_path / "images" / "image_prompts.md"
+    deck_session_path = project_path / "deck-session.json"
     formal_file_paths = [
         design_spec_path,
         spec_lock_path,
@@ -2531,6 +2563,7 @@ def write_formal_delivery_files(
         page_visual_prompt_json_path,
         page_visual_prompt_md_path,
         image_prompt_fallback_path,
+        *([deck_session_path] if deck_session is not None else []),
     ]
     brief = {
         "version": "desktop-worker-formal-v1",
@@ -2712,11 +2745,17 @@ def write_formal_delivery_files(
             }
         ],
     }
+    if deck_session is not None:
+        brief["deckSession"] = deck_session
+        manifest["deckSession"] = deck_session
+        report["deckSession"] = deck_session
     files = [
         (manifest_path, manifest),
         (brief_path, brief),
         (report_path, report),
     ]
+    if deck_session is not None:
+        files.append((deck_session_path, deck_session))
     written: list[Path] = []
     for path, payload in files:
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -2895,6 +2934,8 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
         "sourceExtraction": source_extraction,
         "providerConfig": valid["providerConfig"],
     }
+    if valid["deckSession"] is not None:
+        manifest["deckSession"] = valid["deckSession"]
     (project_path / "desktop-manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2),
         encoding="utf-8",

@@ -93,7 +93,7 @@ Apply these guardrails on every formal PPTX page unless `spec_lock.md` or the te
 - **Text density**: formal body text normally sits at 18-24px; chart labels/captions at 12-16px; page titles at 30-40px. If content cannot fit without shrinking below the ramp, split the slide or convert text to a table/process visual.
 - **Aesthetic scale**: for formal business decks, prefer 20-22px body on ordinary report pages, 18px only for dense pages. Titles must be visibly dominant; avoid "everything is small but fits" layouts.
 - **Alignment**: align major edges and baselines to the declared grid or to a deliberate asymmetric split. Avoid accidental 5-10px misalignments between peer cards, charts, and text blocks.
-- **Containers**: use cards only for grouped peer items. Avoid wrapping every paragraph in a rounded rectangle; use whitespace, dividers, accent rules, and typography when grouping is enough.
+- **Containers**: use cards only for grouped peer items. Avoid wrapping every paragraph in a rounded rectangle; use whitespace, dividers, accent rules, and typography when grouping is enough. When a container is justified, prefer one restrained `8-14 pt` radius family over repeated hard 90-degree boxes; the single cover hero/evidence surface may use `18-24 pt`. Reserve pills for compact status labels, and keep charts, rules, and table internals straight.
 - **Visual layers**: generated images support the editable slide. Do not place full-page raster behind body content unless `raster_policy` explicitly allows it for cover/section/poster/showcase pages.
 
 ### 2.1 Per-page spec_lock re-read (Mandatory)

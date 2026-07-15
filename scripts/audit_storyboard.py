@@ -25,6 +25,32 @@ def read_json(path: Path) -> Any:
         return {}
 
 
+def consecutive_repetition_failures(slides: list[Any], field: str) -> list[str]:
+    failures: list[str] = []
+    run_start = 0
+    while run_start < len(slides):
+        first = slides[run_start] if isinstance(slides[run_start], dict) else {}
+        value = str(first.get(field) or "")
+        run_end = run_start + 1
+        while run_end < len(slides):
+            candidate = slides[run_end] if isinstance(slides[run_end], dict) else {}
+            if str(candidate.get(field) or "") != value:
+                break
+            run_end += 1
+        if value and run_end - run_start >= 3:
+            pages = [
+                str(slide.get("page") or slide.get("slideId") or f"slide {index + 1}")
+                if isinstance(slide, dict)
+                else f"slide {index + 1}"
+                for index, slide in enumerate(slides[run_start:run_end], start=run_start)
+            ]
+            failures.append(
+                f"{'-'.join(pages)} repeat {field} `{value}` {len(pages)} times; maximum is two consecutive pages"
+            )
+        run_start = run_end
+    return failures
+
+
 def audit_project(project: Path) -> dict[str, Any]:
     storyboard_path = project / "storyboard.json"
     source_map_path = project / "source-map.json"
@@ -45,6 +71,9 @@ def audit_project(project: Path) -> dict[str, Any]:
     if not isinstance(slides, list) or not slides:
         failures.append("storyboard.json slides must be a non-empty array")
         return {"path": str(project), "status": "fail", "failures": failures, "warnings": warnings}
+
+    failures.extend(consecutive_repetition_failures(slides, "layoutFamily"))
+    failures.extend(consecutive_repetition_failures(slides, "recipeId"))
 
     claim_ids = {
         item.get("id")

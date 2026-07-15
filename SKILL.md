@@ -98,18 +98,18 @@ If the user provides only a topic, a one-line request, or almost no source mater
 - Style: `Style A · 电子杂志 × 电子墨水`;
 - Length: 8 pages unless the user gives another count;
 - Page rhythm:
-  1. dark cover with one strong title and minimal subtitle;
+  1. light or warm-paper cover with one strong title, minimal subtitle, and one soft-edged visual/evidence panel;
   2. light context page for problem, trend, or setting;
-  3. dark image/text spread for tension or opportunity;
+  3. image/text or restrained signal spread for tension or opportunity;
   4. light structure page with a three-part framework, path, or method;
   5. large-statement section divider;
   6. evidence / scene / case page;
-  7. dark point-of-view page with final judgment or question;
+  7. point-of-view page with final judgment or question; use dark only when the user, reference, or chosen direction calls for it;
   8. light closing page with action, takeaway, or ending line.
 
 This fallback is the "stable high-quality output" path. The Agent may ask one focused question only when missing facts, brand/IP permission, compliance boundaries, or source authority would materially change the deck. Ordinary style gaps are filled by the fixed style.
 
-If the user explicitly asks for a formal editable deck, government/finance/training/report material, or `.pptx`, switch to `formal-editable-pptx`: create a 8-12 page editable PPTX brief with Microsoft YaHei, formal-business quality gate, source confidence, official/IP asset plan, and the same `bestEffectBrief` record.
+If the user explicitly asks for a formal editable deck, government/finance/training/report material, or `.pptx`, switch to `formal-editable-pptx`: create a 8-12 page editable PPTX brief with Microsoft YaHei, a light/near-white default cover, one large soft-edged hero panel, formal-business quality gate, source confidence, official/IP asset plan, and the same `bestEffectBrief` record. Do not use a full-page black cover unless the user or brand direction explicitly asks for it.
 
 ## Brief Clarity Gate
 
@@ -209,7 +209,7 @@ Use these defaults unless the user, brand guide, or selected template explicitly
 - **Layout variety**: alternate page families across body pages: chart + takeaway, image/text split, process flow, evidence table, negative-space statement, matrix, timeline, FAQ/risk stack. Avoid repeated title + three cards as the default.
 - **Element discipline**: use flat shapes, crisp dividers, subtle fills, and restrained shadows. Cards are for grouped items, not for every paragraph. Icons support scanning; they do not replace content.
 - **Image discipline**: generated visuals are no-text support layers unless the page is a cover, section divider, poster/showcase, or intentionally image-led Web Deck page. Formal body PPTX remains editable.
-- **Polish discipline**: avoid tiny gutters, over-rounded cards, equal-weight boxes everywhere, weak title hierarchy, low-contrast gray text, orphan labels, crowded logos, random decorative lines, and unlicensed official-looking marks. Use whitespace, scale, alignment, and one clear dominant element before adding decoration.
+- **Polish discipline**: avoid tiny gutters, walls of hard-corner boxes, over-rounded cards, equal-weight boxes everywhere, weak title hierarchy, low-contrast gray text, orphan labels, crowded logos, random decorative lines, and unlicensed official-looking marks. When a container is needed, default to one restrained `8-14 pt` radius family for editable PPTX (`12-20 px` for Web); a single cover hero/evidence panel may use `18-24 pt` / `24-32 px`. Keep charts, rules, and table internals straight. Use whitespace, scale, alignment, and one clear dominant element before adding decoration.
 
 Run the formal audit when project artifacts exist:
 

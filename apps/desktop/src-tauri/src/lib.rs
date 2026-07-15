@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use tauri::path::BaseDirectory;
 use tauri::{AppHandle, Manager};
@@ -13,6 +13,7 @@ struct DesktopJob {
     style_preset: String,
     project_dir: Option<String>,
     provider_config: Option<serde_json::Value>,
+    deck_session: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -68,7 +69,7 @@ fn repo_root(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(root)
 }
 
-fn python_executable(root: &PathBuf) -> String {
+fn python_executable(root: &Path) -> String {
     let unix_venv = root.join(".venv").join("bin").join("python");
     let windows_venv = root.join(".venv").join("Scripts").join("python.exe");
     if unix_venv.exists() {
@@ -87,7 +88,7 @@ fn resource_path(app: &AppHandle, value: &str) -> Option<PathBuf> {
         .filter(|path| path.exists())
 }
 
-fn worker_path(app: &AppHandle, root: &PathBuf) -> Result<PathBuf, String> {
+fn worker_path(app: &AppHandle, root: &Path) -> Result<PathBuf, String> {
     if let Ok(value) = std::env::var("UPM_WORKER_PATH") {
         let path = PathBuf::from(value);
         if path.exists() {
@@ -226,4 +227,41 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running Ultimate PPT Master desktop app");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::DesktopJob;
+    use serde_json::json;
+
+    #[test]
+    fn desktop_job_round_trips_deck_session_as_camel_case() {
+        let payload = json!({
+            "source": {
+                "kind": "markdown",
+                "value": "# Demo",
+                "name": "demo.md"
+            },
+            "outputMode": "pptx",
+            "stylePreset": "business",
+            "projectDir": "/tmp/projects",
+            "providerConfig": {"modelProvider": "auto"},
+            "deckSession": {
+                "schemaVersion": "deck-session-v6",
+                "phase": "outline",
+                "slides": [
+                    {"slideId": "P01", "title": "Cover"},
+                    {"slideId": "P02", "title": "Context"},
+                    {"slideId": "P03", "title": "Evidence"},
+                    {"slideId": "P04", "title": "Action"}
+                ]
+            }
+        });
+
+        let job: DesktopJob = serde_json::from_value(payload.clone()).expect("deserialize job");
+        let encoded = serde_json::to_value(job).expect("serialize job");
+
+        assert_eq!(encoded["deckSession"], payload["deckSession"]);
+        assert!(encoded.get("deck_session").is_none());
+    }
 }

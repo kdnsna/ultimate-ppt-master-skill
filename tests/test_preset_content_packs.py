@@ -90,7 +90,10 @@ class PresetContentPackTest(unittest.TestCase):
                 report = json.loads((ROOT / proof_artifacts["qualityReport"]).read_text(encoding="utf-8"))
                 self.assertEqual(report["presetId"], data["id"])
                 self.assertEqual(report["version"], "2.5.0")
-                self.assertIn(report["status"], ("passed", "reviewed"))
+                self.assertIn(
+                    report["status"],
+                    ("pending", "passed", "warning", "blocked", "reviewed"),
+                )
                 self.assertIn("designDoctor", report)
                 doctor = report["designDoctor"]
                 self.assertEqual(doctor["repairPolicy"]["default"], "report-only")

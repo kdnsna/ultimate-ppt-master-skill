@@ -4232,23 +4232,23 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
       ? webDeck.pageRhythm.map((page) => `${String(page.page).padStart(2, "0")} ${page.layout}: ${page.role}${page.imageSlot ? ` (${page.imageSlot})` : ""}`)
       : zh
       ? [
-        "01 深色封面：一句强标题 + 极简副标题",
+        "01 浅色或暖纸封面：一句强标题 + 一个圆润证据 / 视觉面板",
         "02 浅色背景：问题背景 / 趋势 / 现场语境",
-        "03 深色图文页：关键冲突或机会",
+        "03 图文或克制信号页：关键冲突或机会",
         "04 浅色结构页：三段式框架 / 路径 / 方法",
         "05 章节分隔：大字短句，制造翻页节奏",
         "06 证据或场景页：图片 / 数据 / 案例块",
-        "07 深色观点页：最终判断或反问",
+        "07 观点页：最终判断或反问；只有明确视觉方向才使用深色",
         "08 浅色收束页：行动建议 / 结束语"
       ]
       : [
-        "01 dark cover: one strong title plus minimal subtitle",
+        "01 light or warm-paper cover: one strong title plus one soft evidence / visual panel",
         "02 light context: problem, trend, or setting",
-        "03 dark image/text spread: key tension or opportunity",
+        "03 image/text or restrained signal spread: key tension or opportunity",
         "04 light structure: three-part framework, path, or method",
         "05 section divider: large short statement with page-turn rhythm",
         "06 evidence or scene page: image, data, or case block",
-        "07 dark point-of-view page: final judgment or question",
+        "07 point-of-view page: final judgment or question; dark only when the direction calls for it",
         "08 light closing: action, takeaway, or ending line"
       ],
     qualityBar: zh
