@@ -49,14 +49,14 @@
 - [x] Classic 返回链接使用 `BASE_URL`；Desktop 保持合同兼容。
 - [x] 手动 Agent 命令始终可见、可选中，剪贴板失败时不再静默。
 
-## 5. v6.3.6 · 验证与发布候选
+## 5. v6.3.6 · 验证与 GitHub 发布
 
 - [x] 补 1440/390 真实浏览器回归与视觉截图。
   - 工作台与 `/benchmark/` 均覆盖 1440×900 / 390×844 的横向溢出和主操作可达性；案例库移动端两个代表成品操作收为单列。
 - [x] 补双标签页、刷新恢复、六种运行状态与键盘回归。
   - `npm run test:web-browser` 真实驱动 Chrome，覆盖 1440×900 / 390×844、legacy 会话迁移、双标签页隔离、刷新恢复、六状态唯一主操作、radio Home/End/方向键、dialog 焦点环、hidden polling 与 reduced-motion。
 - [x] 补完整攻击矩阵、并发矩阵和 allowLaunch 测试。
-- [x] 对齐 6.3.2–6.3.6 中英文未发布候选说明、回滚边界和全部公开版本号。
+- [x] 对齐 6.3.2–6.3.5 中英文未发布候选切片、v6.3.6 发布说明、回滚边界和全部公开版本号。
 - [x] 校准 README、案例库、Proof、OG、sitemap 与文档链接。
 - [x] 运行 Web/Desktop build、Node/Python/Rust、质量、文档、console 与安全审计。
 - [x] 验证 Web 主入口小于 80KB gzip。
@@ -67,4 +67,5 @@
 
 - [ ] 每个版本可独立提交、打标签与回滚。
 - [x] 只有 CI 通过的 `main` 才允许 Pages 部署。
-- [x] 用户已授权本轮完成后推送 `main`；该授权不包含 tag、GitHub Release 或 marketplace 发布。
+- [x] 用户已授权本轮完成后推送 `main`，并创建 `v6.3.6` tag 与 GitHub Release；marketplace 发布仍不在本次授权范围内。
+- [x] v6.3.6 源码发布合同使用 `github-released`，且明确只以 tag/GitHub Release 页面为权威证据。

@@ -2,6 +2,8 @@
 
 Use this checklist when preparing Ultimate PPT Master for a skill marketplace, agent directory, or curated skill list.
 
+The v6.3.6 GitHub release and marketplace distribution are separate states. Verify the GitHub version from the [`v6.3.6` tag and GitHub Release page](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6). `marketplaceStatus: independent-not-attested` means that release neither uploads nor proves a marketplace listing; verify the target marketplace record independently.
+
 ## Listing Positioning
 
 - Name: Ultimate PPT Master / 终极融合PPT大师
@@ -48,6 +50,7 @@ Use $ultimate-ppt-master with any natural-language presentation request. It will
 - Public proof packs include source, generated output, screenshot/cover, and `quality-report.json`.
 - Release checklist runs `npm run audit:docs`, `npm run audit:presets`, `npm run audit:quality`, `npm run audit:market`, `npm run test:node`, `npm run test:worker`, and `npm run build:web`.
 - Marketplace readiness is machine-checked with `npm run audit:market` before public promotion.
+- `releaseStatus: github-released` and `marketplaceStatus: independent-not-attested` remain separate machine fields; never infer the second from the first.
 
 ## Distribution Notes
 

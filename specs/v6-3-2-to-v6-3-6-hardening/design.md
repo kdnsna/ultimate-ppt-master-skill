@@ -149,7 +149,7 @@ type SourceState = {
 - 单飞轮询、错误回显、键盘 radio、dialog 焦点与 reduced motion。
 - Classic BASE_URL 与 Desktop 合同兼容。
 
-### v6.3.6 · 验证与发布候选
+### v6.3.6 · 验证与 GitHub 发布
 
 - 1440/390 浏览器回归、双标签页、攻击矩阵和并发矩阵。
 - 版本、README、案例库、Proof、发布说明和 CI 一致性。

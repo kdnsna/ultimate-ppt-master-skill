@@ -10,7 +10,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-CANDIDATE_STATUS = "unreleased-candidate"
+RELEASE_STATUS = "github-released"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6"
+MARKETPLACE_STATUS = "independent-not-attested"
 
 PROOF_CASES = (
     "executive-business-review-starter",
@@ -83,7 +85,9 @@ def audit_marketplace_listing(errors: list[str]) -> None:
     require(listing.get("id") == "ultimate-ppt-master", "marketplace listing id must be ultimate-ppt-master", errors)
     require(listing.get("invocation") == "$ultimate-ppt-master", "marketplace listing invocation must be $ultimate-ppt-master", errors)
     require(listing.get("version") == json.loads(read_text(ROOT / "package.json")).get("version"), "marketplace listing version must match package.json", errors)
-    require(listing.get("releaseStatus") == CANDIDATE_STATUS, "marketplace listing must disclose unreleased candidate status", errors)
+    require(listing.get("releaseStatus") == RELEASE_STATUS, "marketplace listing must use the GitHub release status", errors)
+    require(listing.get("releaseEvidence") == RELEASE_EVIDENCE, "marketplace listing must link the authoritative GitHub Release", errors)
+    require(listing.get("marketplaceStatus") == MARKETPLACE_STATUS, "marketplace listing must not infer marketplace publication from GitHub Release", errors)
     require(listing.get("defaultPrompt") == interface.get("default_prompt"), "marketplace listing defaultPrompt must match agents/openai.yaml", errors)
     require(listing.get("displayName") == "Ultimate PPT Master", "marketplace displayName must stay English for international discovery", errors)
     require(listing_short == openai_short, "marketplace shortDescription must match agents/openai.yaml", errors)
@@ -191,6 +195,7 @@ def audit_benchmark_wall(errors: list[str]) -> None:
     require('<html lang="zh-CN">' in text, "proof page must default to Chinese", errors)
     require("先看成品" in text and "再看交付证据" in text, "proof page missing Chinese-first title", errors)
     require("输入、策划、输出与质量复核" in text, "proof page missing delivery chain", errors)
+    require("v6.3.6 正式版本" in text and RELEASE_EVIDENCE in text, "proof page missing formal-version or release-evidence marker", errors)
     require("Proof Pack 分数为<strong>内部质量合同</strong>" in text, "proof page missing internal-contract disclosure", errors)
     require("不是第三方 benchmark" in text, "proof page must reject third-party benchmark framing", errors)
     require("脱敏 source" in text, "proof page missing sanitized input link", errors)
@@ -236,6 +241,8 @@ def audit_distribution_docs(errors: list[str]) -> None:
     for text, label in ((market, "English market doc"), (market_zh, "Chinese market doc")):
         for needle in ("agents/openai.yaml", "agents/marketplace-listing.json", "assets/skill-market", "npm run audit:market", "benchmark"):
             require(needle in text, f"{label} missing {needle}", errors)
+        for needle in ("releaseStatus: github-released", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE):
+            require(needle in text, f"{label} missing independent release/marketplace marker: {needle}", errors)
 
     require("npm run audit:docs" in release, "release maintenance missing audit:docs", errors)
     require("npm run audit:market" in release, "release maintenance missing audit:market", errors)

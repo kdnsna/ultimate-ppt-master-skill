@@ -1,6 +1,6 @@
 # Next Roadmap - Content and Template Presets
 
-> **Archived historical roadmap:** this document records the v2.5-v5.5 planning stage and is not the current v6.3.6 candidate plan. See the [v6.3.6 unreleased candidate notes](../release/release-notes-v6.3.6.md) and the [current documentation index](../README.md).
+> **Archived historical roadmap:** this document records the v2.5-v5.5 planning stage and is not the current v6.3.6 plan. See the [v6.3.6 release notes](../release/release-notes-v6.3.6.md) and the [current documentation index](../README.md).
 
 v2.5 makes the first mile clearer and more checkable: visible input, preset proof, local Agent handoff, and Design Doctor review.
 

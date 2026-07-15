@@ -1,6 +1,6 @@
 # Agent Connect Bridge
 
-Agent Connect Bridge 是 v6.3.6 工作台的本地伴侣。它让 GitHub Pages 页面只连接本机 `127.0.0.1`，把真实资料落盘，将用户确认的 `DeckSession` 原样并入生产故事板，再把项目交给 Codex。Bridge 只发现和下载通过本地路径边界的真实成品，不承担云端托管。v6.3.6 源码标记为 **未发布候选**：它可以存在于 `main` 或由 Pages 展示，但该标记不证明已有 tag、GitHub Release、marketplace 发布或某次 Pages 部署。
+Agent Connect Bridge 是 v6.3.6 工作台的本地伴侣。它让 GitHub Pages 页面只连接本机 `127.0.0.1`，把真实资料落盘，将用户确认的 `DeckSession` 原样并入生产故事板，再把项目交给 Codex。Bridge 只发现和下载通过本地路径边界的真实成品，不承担云端托管。v6.3.6 源码的机器状态为 `github-released`；是否真正发布，只以 [`v6.3.6` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6) 为准。marketplace 发布与 Pages 当前部署 SHA 都是独立状态。
 
 ## 快速开始
 
@@ -132,7 +132,7 @@ CORS 只允许 GitHub Pages 和本地开发源。
 
 ## HTTP API 边界与服务器部署
 
-v6.3.6 候选版 Bridge 是任务准备和编排 API，不是可直接对公网开放的多租户生成服务。`POST /handoff` 创建项目合同，`GET /events` 返回进度，`POST /slides/regenerate` 记录单页修改；两个 artifact 接口只发现和下载本地 Agent 已经生成的文件。最终 PPTX/Web 生成仍需要以下执行层之一：
+v6.3.6 Bridge 是任务准备和编排 API，不是可直接对公网开放的多租户生成服务。`POST /handoff` 创建项目合同，`GET /events` 返回进度，`POST /slides/regenerate` 记录单页修改；两个 artifact 接口只发现和下载本地 Agent 已经生成的文件。最终 PPTX/Web 生成仍需要以下执行层之一：
 
 1. **Agent Runner**：在 Worker 上安装 Codex、Claude Code、Hermes 或 OpenClaw，由它针对 handoff 目录执行 Skill。
 2. **自建编排器**：直接调用仓库脚本，持久化 `DeckSession`，负责重试/恢复点、质量门禁和最终产物发布。

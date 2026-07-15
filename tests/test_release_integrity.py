@@ -8,8 +8,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "6.3.6"
-CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 7))
-CANDIDATE_STATUS = "unreleased-candidate"
+CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
+RELEASE_STATUS = "github-released"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6"
+MARKETPLACE_STATUS = "independent-not-attested"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -38,19 +40,29 @@ class ReleaseIntegrityTest(unittest.TestCase):
             rf'(?s)\[\[package\]\]\s+name = "ultimate-ppt-master-desktop"\s+version = "{re.escape(version)}"',
         )
         self.assertEqual(listing["version"], version)
-        self.assertEqual(listing["releaseStatus"], CANDIDATE_STATUS)
+        self.assertEqual(listing["releaseStatus"], RELEASE_STATUS)
+        self.assertEqual(listing["releaseEvidence"], RELEASE_EVIDENCE)
+        self.assertEqual(listing["marketplaceStatus"], MARKETPLACE_STATUS)
         for path in ("README.md", "README.en.md", "README.zh-CN.md"):
             self.assertIn(f"v{version}", (ROOT / path).read_text(encoding="utf-8"), path)
         self.assertIn(f'appVersion = "{version}"', (ROOT / "apps/web/src/V6Workspace.tsx").read_text(encoding="utf-8"))
-        self.assertIn(f"v{version} 未发布候选", (ROOT / "apps/web/public/benchmark/index.html").read_text(encoding="utf-8"))
+        self.assertIn(f"v{version} 正式版本", (ROOT / "apps/web/public/benchmark/index.html").read_text(encoding="utf-8"))
         self.assertIn(f"v{version}", (ROOT / "assets/readme/hero.svg").read_text(encoding="utf-8"))
         for report_path in (
             "examples/executive-business-review-starter/quality-report.json",
+            "examples/consulting-proposal-starter/quality-report.json",
+            "examples/product-pitch-starter/quality-report.json",
+            "examples/tech-trend-web-deck-starter/quality-report.json",
             "apps/web/public/examples/executive-business-review-starter/quality-report.json",
+            "apps/web/public/examples/consulting-proposal-starter/quality-report.json",
+            "apps/web/public/examples/product-pitch-starter/quality-report.json",
+            "apps/web/public/examples/tech-trend-web-deck-starter/quality-report.json",
         ):
             report = json.loads((ROOT / report_path).read_text(encoding="utf-8"))
             self.assertEqual(report["releaseVersion"], version, report_path)
-            self.assertEqual(report["releaseStatus"], CANDIDATE_STATUS, report_path)
+            self.assertEqual(report["releaseStatus"], RELEASE_STATUS, report_path)
+            self.assertEqual(report["releaseEvidence"], RELEASE_EVIDENCE, report_path)
+            self.assertEqual(report["marketplaceStatus"], MARKETPLACE_STATUS, report_path)
         self.assertTrue((ROOT / f"docs/release/release-notes-v{version}.md").is_file())
         self.assertTrue((ROOT / f"docs/zh-CN/release/release-notes-v{version}.md").is_file())
         self.assertIn(
@@ -64,7 +76,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn(f"release/release-notes-v{version}.md", (ROOT / "docs/README.md").read_text(encoding="utf-8"))
         self.assertIn(f"release/release-notes-v{version}.md", (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8"))
 
-    def test_v632_to_v636_candidate_notes_are_truthful_and_rollbackable(self):
+    def test_v632_to_v635_candidate_notes_and_v636_release_contract_are_truthful(self):
         docs_en = (ROOT / "docs/README.md").read_text(encoding="utf-8")
         docs_zh = (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8")
 
@@ -90,6 +102,29 @@ class ReleaseIntegrityTest(unittest.TestCase):
                 self.assertIn(f"release-notes-v{version}.md", docs_zh)
                 self.assertIn(f"../zh-CN/release/release-notes-v{version}.md", en)
                 self.assertIn(f"../../release/release-notes-v{version}.md", zh)
+
+        release_en = (ROOT / f"docs/release/release-notes-v{VERSION}.md").read_text(encoding="utf-8")
+        release_zh = (ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md").read_text(encoding="utf-8")
+        for marker in (
+            "GitHub release contract",
+            "releaseStatus: github-released",
+            "marketplaceStatus: independent-not-attested",
+            RELEASE_EVIDENCE,
+            "Plain-Language Update Notes",
+            "Independent Rollback Boundary",
+        ):
+            self.assertIn(marker, release_en)
+        for marker in (
+            "GitHub 发布合同",
+            "releaseStatus: github-released",
+            "marketplaceStatus: independent-not-attested",
+            RELEASE_EVIDENCE,
+            "白话更新栏",
+            "独立回滚边界",
+        ):
+            self.assertIn(marker, release_zh)
+        self.assertIn("../zh-CN/release/release-notes-v6.3.6.md", release_en)
+        self.assertIn("../../release/release-notes-v6.3.6.md", release_zh)
 
     def test_core_entry_scripts_exist(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
@@ -355,6 +390,9 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("Skill 市场分发", docs_index_zh)
         self.assertEqual(listing["metadata"]["distributionGuide"], "docs/strategy/skill-market-distribution.md")
         self.assertEqual(listing["metadata"]["distributionGuideZh"], "docs/zh-CN/strategy/skill-market-distribution.md")
+        self.assertEqual(listing["releaseStatus"], RELEASE_STATUS)
+        self.assertEqual(listing["releaseEvidence"], RELEASE_EVIDENCE)
+        self.assertEqual(listing["marketplaceStatus"], MARKETPLACE_STATUS)
         self.assertEqual(listing["links"]["agentSetup"], "docs/guides/agent-setup.md")
         self.assertEqual(listing["proof"]["qualityWorkbench"], "docs/quality/quality-workbench-v2.5.md")
         self.assertIn("npm run audit:docs", listing["acceptanceGates"])
@@ -521,7 +559,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertEqual(finished_png_bytes[:8], b"\x89PNG\r\n\x1a\n")
         self.assertEqual((int.from_bytes(finished_png_bytes[16:20]), int.from_bytes(finished_png_bytes[20:24])), (1440, 810))
         source_text = finished_decks_source.read_text(encoding="utf-8")
-        for marker in ("V6.3.6 未发布候选", "226 个原生矢量对象", "AI Web Deck"):
+        for marker in ("V6.3.6 正式版本", "226 个原生矢量对象", "AI Web Deck"):
             self.assertIn(marker, source_text)
 
         design_system = (ROOT / "DESIGN.md").read_text(encoding="utf-8")

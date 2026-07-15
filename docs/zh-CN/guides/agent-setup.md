@@ -1,6 +1,6 @@
 # 安装与启动
 
-v6.3.6 未发布候选保留两条安装路径。该标记只区分源码候选与 tag、GitHub Release、marketplace 发布，不表达当前分支或 Pages 部署状态。只想让 Codex 或其他兼容 Agent 使用 Skill，优先走一分钟安装；需要可视化工作台、真实资料解析和本地产物下载，再安装完整仓库。
+v6.3.6 正式版本保留两条安装路径。是否真正发布，只以 [`v6.3.6` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6) 为准；源码元数据本身不能代替该证据。GitHub 安装不会自动发布或证明 marketplace 已上架。只想让 Codex 或其他兼容 Agent 使用 Skill，优先走一分钟安装；需要可视化工作台、真实资料解析和本地产物下载，再安装完整仓库。
 
 ## 一分钟安装 Skill
 

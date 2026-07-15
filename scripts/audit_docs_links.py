@@ -12,8 +12,10 @@ from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "6.3.6"
-CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 7))
-CANDIDATE_STATUS = "unreleased-candidate"
+CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
+RELEASE_STATUS = "github-released"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6"
+MARKETPLACE_STATUS = "independent-not-attested"
 README_BANNED_PHRASES = (
     "Best Results Prompt",
     "What v5 Changes",
@@ -107,9 +109,15 @@ def audit_version_markers(errors: list[str]) -> None:
     cargo_toml = read(ROOT / "apps/desktop/src-tauri/Cargo.toml")
     cargo_lock = read(ROOT / "apps/desktop/src-tauri/Cargo.lock")
     benchmark = read(ROOT / "apps/web/public/benchmark/index.html")
-    proof_reports = (
-        load_json("examples/executive-business-review-starter/quality-report.json"),
-        load_json("apps/web/public/examples/executive-business-review-starter/quality-report.json"),
+    proof_reports = tuple(
+        load_json(f"{prefix}/{case}/quality-report.json")
+        for prefix in ("examples", "apps/web/public/examples")
+        for case in (
+            "executive-business-review-starter",
+            "consulting-proposal-starter",
+            "product-pitch-starter",
+            "tech-trend-web-deck-starter",
+        )
     )
 
     require(package.get("version") == VERSION, f"package.json version is not v{VERSION}", errors)
@@ -127,22 +135,34 @@ def audit_version_markers(errors: list[str]) -> None:
         errors,
     )
     require(listing.get("version") == VERSION, f"agents/marketplace-listing.json version is not v{VERSION}", errors)
-    require(listing.get("releaseStatus") == CANDIDATE_STATUS, "marketplace listing must disclose unreleased candidate status", errors)
+    require(listing.get("releaseStatus") == RELEASE_STATUS, "marketplace listing must use the GitHub release status", errors)
+    require(listing.get("releaseEvidence") == RELEASE_EVIDENCE, "marketplace listing must link the authoritative GitHub Release", errors)
+    require(listing.get("marketplaceStatus") == MARKETPLACE_STATUS, "marketplace listing must keep marketplace publication independent", errors)
     require(f'appVersion = "{VERSION}"' in app, f"apps/web/src/V6Workspace.tsx appVersion is not v{VERSION}", errors)
-    require(f"v{VERSION} 未发布候选" in benchmark, f"benchmark page is missing the v{VERSION} unreleased-candidate marker", errors)
+    require(f"v{VERSION} 正式版本" in benchmark, f"benchmark page is missing the v{VERSION} formal-release marker", errors)
 
     for report in proof_reports:
         require(report.get("releaseVersion") == VERSION, f"public proof releaseVersion is not v{VERSION}", errors)
-        require(report.get("releaseStatus") == CANDIDATE_STATUS, "public proof must disclose unreleased candidate status", errors)
+        require(report.get("releaseStatus") == RELEASE_STATUS, "public proof must use the GitHub release status", errors)
+        require(report.get("releaseEvidence") == RELEASE_EVIDENCE, "public proof must link the authoritative GitHub Release", errors)
+        require(report.get("marketplaceStatus") == MARKETPLACE_STATUS, "public proof must keep marketplace publication independent", errors)
 
     for label, text in (("README.md", readme_zh), ("README.en.md", readme_en), ("README.zh-CN.md", compatibility), ("assets/readme/hero.svg", hero)):
         require(f"v{VERSION}" in text or VERSION in text, f"{label} missing v{VERSION} marker", errors)
 
     require((ROOT / f"docs/release/release-notes-v{VERSION}.md").is_file(), "missing English current release notes", errors)
     require((ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md").is_file(), "missing Chinese current release notes", errors)
+    release_en = read(ROOT / f"docs/release/release-notes-v{VERSION}.md")
+    release_zh = read(ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md")
+    for marker in ("GitHub release contract", "releaseStatus: github-released", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE, "Plain-Language Update Notes", "Independent Rollback Boundary"):
+        require(marker in release_en, f"v{VERSION} English release notes missing release-contract marker: {marker}", errors)
+    for marker in ("GitHub 发布合同", "releaseStatus: github-released", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE, "白话更新栏", "独立回滚边界"):
+        require(marker in release_zh, f"v{VERSION} Chinese release notes missing release-contract marker: {marker}", errors)
     require("把真实资料变成可继续修改的原生 PowerPoint" in readme_zh, "README.md is not the Chinese canonical homepage", errors)
     require("Turn real source material into a native PowerPoint" in readme_en, "README.en.md is not the English mirror", errors)
     require("中文 README 已迁移" in compatibility and "./README.md" in compatibility, "README.zh-CN.md is not a compatibility entry", errors)
+    require("GitHub_Release" in readme_zh and "GitHub_Release" in readme_en, "README release badges are missing", errors)
+    require("GITHUB RELEASE" in hero, "README hero is missing the GitHub release marker", errors)
 
     docs_en = read(ROOT / "docs/README.md")
     docs_zh = read(ROOT / "docs/zh-CN/README.md")

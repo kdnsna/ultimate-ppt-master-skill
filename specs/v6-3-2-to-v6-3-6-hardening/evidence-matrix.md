@@ -2,7 +2,7 @@
 
 > 审计日期：2026-07-15
 > 审计范围：用户原 v6.2–v6.3.1 升级计划、[`v6-2-3-chinese-artifact-loop`](../v6-2-3-chinese-artifact-loop/requirements.md) 与本目录的 v6.3.2–v6.3.6 规格。
-> 状态说明：本矩阵记录 2026-07-15 的源码与本机证据；v6.3.6 的持久标记为“未发布候选”，该标记不表达分支、推送或 Pages 当前部署状态。
+> 状态说明：本矩阵记录 2026-07-15 的源码与本机证据；v6.3.6 的发布合同机器状态为 `github-released`。该源码字段本身不是发布证据，真实发布只以 `v6.3.6` tag 与 GitHub Release 页面为准；marketplace 仍是独立状态。
 
 ## 状态口径
 
@@ -18,7 +18,7 @@
 | 本地 Agent 到真实下载 | **通过** | 真实 Chrome 连接真实 Bridge，验证 command-only、Agent running/completed/failed、产物发现、path+SHA-256 质量绑定、PPTX 下载与交付撤销；Bridge 合同额外实际下载 `ppt/index.html` Web Deck。 |
 | Bridge 安全和并发 | **通过** | Origin/Content-Type/413、路径越界、外部符号链接、伪造/篡改 manifest、源文件下载、120 并发、同名附件、SSE 隔离和 Agent 幂等均有运行测试。 |
 | 中文 README 与公开 Proof 源码 | **源码通过** | 中文 `README.md` 189 行，英文镜像 182 行，GitHub Markdown API 渲染通过；两个主案例及证据链在构建产物中完整。 |
-| 公开发布 | **本矩阵不声明** | “未发布候选”明确区分源码/Pages 可见与 tag、GitHub Release、marketplace 发布；Pages 运行态应按 Actions 的精确 SHA 另行查验。 |
+| 公开发布 | **发布合同通过 / 外部记录核验** | 源码统一 `github-released`，但只有 [`v6.3.6` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6) 能证明真实发布；Pages 按 Actions 精确 SHA 核验，marketplace 独立核验。 |
 | Office 人工兼容性 | **部分通过** | 质量报告记录 WPS 9/9 页通过；PowerPoint 未安装/未复核，LibreOffice 本机中文渲染有缺字，总状态正确保持 `warning`。 |
 | 独立回滚与发版图 | **逻辑边界通过 / 发布图外部核验** | v6.3.2–v6.3.6 说明定义独立回滚边界；实际 commit/tag/Release 状态必须从 Git 与 GitHub 实时记录核验，不由本静态矩阵断言。 |
 
@@ -44,8 +44,8 @@
 | Web 主包 < 80KB gzip，Classic 异步分包 | `build:web` 通过；当前 v6 主 JS+CSS 为 **78.71KB gzip**；`ClassicApp` 保持 lazy chunk，主导航无 Classic，`?classic=1` 与 `BASE_URL` 返回链接保留。 | **通过** | 只剩 1.29KB 名义空间，发布前必须重跑 bundle gate。 |
 | Desktop 只保持合同兼容 | Desktop TypeScript/Vite build 通过；Python worker 原样保留 DeckSession 到 `deck-session.json` 及 4 个合同文件；Rust serde camelCase round-trip 通过；`cargo fmt/clippy/test` 通过。 | **通过** | 未增加 Desktop 产品功能，符合范围。 |
 | Pages 只从 CI 通过的 `main` 部署 | `.github/workflows/pages.yml` 只响应 CI `workflow_run` 的 `push`+`success`+`main`+同仓库，checkout 精确 `head_sha`，部署后执行 `smoke-pages.mjs`。发布完整性测试也检查这些条件。 | **流程通过 / 运行态外部核验** | 工作流源码不证明某个 SHA 已部署；必须查看 Actions 并对实际 URL 运行 smoke。 |
-| v6.3.2–v6.3.6 版本与中英文说明 | root/Web/Desktop/Cargo/Tauri/lock/marketplace 都对齐 6.3.6；5 个版本均有中文主说明、英文镜像与回滚边界；发布完整性测试通过。 | **源码通过** | 文档均明确写「未发布候选」，不能代替 tag、GitHub Release 或 marketplace 发布记录。 |
-| 三里程碑独立发布/回滚与原始基线提交 | 候选说明与 tasks 定义逻辑回滚边界；实际 commit/tag/Release 需查看 Git 与 GitHub 实时记录。 | **逻辑边界通过 / 版本发布未声明** | 推送 `main` 不等于获授权打 tag、创建 GitHub Release 或发布 marketplace；这些步骤必须单独授权。 |
+| v6.3.2–v6.3.6 版本与中英文说明 | root/Web/Desktop/Cargo/Tauri/lock/marketplace 都对齐 6.3.6；v6.3.2–v6.3.5 保留中英文未发布候选切片与回滚边界；v6.3.6 为中文主发布说明和英文镜像。 | **源码通过** | v6.3.6 的权威证据是 tag/Release 页面，不是源码文案；marketplace 记录不从 GitHub Release 推断。 |
+| 三里程碑独立发布/回滚与原始基线提交 | v6.3.2–v6.3.5 候选说明与 tasks 定义逻辑回滚边界；v6.3.6 发布语义可单独回退，实际 commit/tag/Release 从 Git 与 GitHub 记录核验。 | **逻辑边界通过 / 发布记录外部核验** | 用户已授权推送并发布 v6.3.6 GitHub Release；该授权不包含 marketplace 上架。 |
 | PowerPoint/WPS/LibreOffice 人工复核 | `quality-report.json` 和 PPTLint 报告记录 2026-07-15 WPS 9/9 逐页通过；PowerPoint 未安装；LibreOffice 可打开/导出但中文缺字；字体便携性和阅读顺序仍是 warning。 | **部分通过** | 不得将 WPS 结论复制为 PowerPoint/LibreOffice `passed`；项目总质量状态应保持 `warning`。 |
 
 ## Bridge 攻击与并发矩阵
@@ -79,7 +79,7 @@
 | `https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/` | 200 | `<title>Ultimate PPT Master Proof Packs`，仍为旧案例页。 |
 | `.../executive-business-review-editable.pptx` | 404 | 返回 HTML 404 页，不是 PPTX。 |
 
-这组观察是推送前快照，不用于断言后续 Pages 状态。中文 README、新工作台、双主案例和公开 PPTX 的持久语义是**未发布候选**；即使它们进入 `main` 或 Pages，也不代表已打 tag、已创建 GitHub Release 或已发布到 marketplace。
+这组观察是推送前快照，不用于断言后续 Pages 状态。当时中文 README、新工作台、双主案例和公开 PPTX 仍处于未发布候选阶段；该历史状态现已被 v6.3.6 发布合同取代。是否完成 GitHub 发布只查验 `v6.3.6` tag 与 Release 页面；marketplace 不因 GitHub Release 而自动上架。
 
 ## 本次审计的可执行结果
 
@@ -103,6 +103,6 @@
 
 1. **保留提交与回滚边界**：保留用户原改动，将 v6.2.0、v6.3.0、v6.3.1 及后续 hardening 切片整理成可审阅/可回滚提交，或明确记录 squash + revert map。
 2. **在精确推送 SHA 上跑全部 CI**：本机 checkout 的通过不能替代 GitHub CI。
-3. **分开推送与版本发布授权**：推送 `main` 不自动授权打 tag、创建 GitHub Release 或发布 marketplace；后三者需要单独明确授权。
+3. **分开 GitHub 发布与 marketplace 授权**：用户已单独授权创建 `v6.3.6` tag 与 GitHub Release；这不自动授权发布 marketplace。
 4. **每次部署后跑 smoke**：中文根页、benchmark、GPT-5.6 Web Deck、移动图、PPTX OOXML、quality report、OG 图与 sitemap 都必须从真实 Pages URL 验证。
 5. **PowerPoint 原生复核**：在安装 PowerPoint 的目标环境完成 9/9 页逐页检查；LibreOffice CJK 缺字在未解决前继续 warning，不得通过改报告文案消除。

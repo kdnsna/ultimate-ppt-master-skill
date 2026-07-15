@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square"></a>
   <a href="./LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-172033?style=flat-square"></a>
-  <img alt="unreleased candidate 6.3.6" src="https://img.shields.io/badge/unreleased_candidate-6.3.6-CC785C?style=flat-square">
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6"><img alt="GitHub Release v6.3.6" src="https://img.shields.io/badge/GitHub_Release-v6.3.6-1D4ED8?style=flat-square"></a>
   <img alt="local first" src="https://img.shields.io/badge/local--first-yes-10B981?style=flat-square">
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-2563EB?style=flat-square">
 </p>
@@ -171,7 +171,7 @@ After a real edit, render and compare the changed slides in PowerPoint, WPS, or 
 | Choose PPTX, Web Deck, or Desktop | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md) |
 | Configure models and providers | [Model and Provider Setup](./docs/guides/model-provider-setup.md) |
 | Troubleshoot | [Troubleshooting](./docs/guides/troubleshooting.md) |
-| Review the current unreleased candidate | [v6.3.6 Unreleased Candidate Notes](./docs/release/release-notes-v6.3.6.md) |
+| Review the current release | [v6.3.6 Release Notes](./docs/release/release-notes-v6.3.6.md) |
 
 Detailed HTTP interfaces, artifact tables, contributor gates, and compatibility notes live in [`docs/`](./docs/README.md), outside the first-run path.
 

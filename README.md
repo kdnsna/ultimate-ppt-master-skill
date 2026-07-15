@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square"></a>
   <a href="./LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-172033?style=flat-square"></a>
-  <img alt="unreleased candidate 6.3.6" src="https://img.shields.io/badge/unreleased_candidate-6.3.6-CC785C?style=flat-square">
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6"><img alt="GitHub Release v6.3.6" src="https://img.shields.io/badge/GitHub_Release-v6.3.6-1D4ED8?style=flat-square"></a>
   <img alt="本地优先" src="https://img.shields.io/badge/本地优先-是-10B981?style=flat-square">
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-2563EB?style=flat-square">
 </p>
@@ -171,7 +171,7 @@ npm run bridge
 | 选择 PPTX、Web Deck 或 Desktop | [选择交付路线](./docs/zh-CN/guides/choosing-a-workflow.md) |
 | 配置模型与 Provider | [模型与 Provider 配置](./docs/zh-CN/guides/model-provider-setup.md) |
 | 排查问题 | [故障排查](./docs/zh-CN/guides/troubleshooting.md) |
-| 查看当前未发布候选 | [v6.3.6 未发布候选说明](./docs/zh-CN/release/release-notes-v6.3.6.md) |
+| 查看当前正式版本 | [v6.3.6 发布说明](./docs/zh-CN/release/release-notes-v6.3.6.md) |
 
 维护者的完整 API、产物表、发布门禁和兼容策略在 [`docs/`](./docs/zh-CN/README.md) 中，不占用第一次上手路径。
 
@@ -179,7 +179,7 @@ npm run bridge
 
 ## Documentation Map
 
-[Agent Connect Bridge](./docs/guides/agent-connect-bridge.md) · [Agent Setup](./docs/guides/agent-setup.md) · [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) · [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md) · [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md) · [v4.3 Rendered Review Loop](./docs/quality/rendered-review-loop-v4.3.md) · [v5.0](./docs/release/release-notes-v5.0.0.md) · [v5.1](./docs/release/release-notes-v5.1.0.md) · [v5.2](./docs/release/release-notes-v5.2.0.md) · [v5.3](./docs/release/release-notes-v5.3.0.md) · [v5.4.1](./docs/release/release-notes-v5.4.1.md) · [v6.3.6 未发布候选](./docs/release/release-notes-v6.3.6.md)
+[Agent Connect Bridge](./docs/guides/agent-connect-bridge.md) · [Agent Setup](./docs/guides/agent-setup.md) · [Hybrid-Editable Visual Workflow v4.0](./docs/quality/hybrid-editable-visual-workflow-v4.0.md) · [Simplified Web Console v4.1](./docs/release/release-notes-v4.1.0.md) · [DeckIR AI Planning Workflow v4.2](./docs/quality/deckir-ai-planning-workflow-v4.2.md) · [v4.3 Rendered Review Loop](./docs/quality/rendered-review-loop-v4.3.md) · [v5.0](./docs/release/release-notes-v5.0.0.md) · [v5.1](./docs/release/release-notes-v5.1.0.md) · [v5.2](./docs/release/release-notes-v5.2.0.md) · [v5.3](./docs/release/release-notes-v5.3.0.md) · [v5.4.1](./docs/release/release-notes-v5.4.1.md) · [v6.3.6 发布说明](./docs/release/release-notes-v6.3.6.md)
 </details>
 
 ## 许可与致谢

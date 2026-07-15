@@ -1,6 +1,6 @@
 # Web Experience
 
-Web Experience 是 Ultimate PPT Master 当前的中文主入口。v6.3.6 源码元数据将这个静态 React/Vite 任务型工作台标记为 **未发布候选**；对应 `main` 提交只有通过 CI 后才能进入 GitHub Pages，但源码或 Pages 可见不等于已打 tag、已创建 GitHub Release 或已发布到 marketplace。Classic 控制台已经冻结，只在 v6.3 兼容期通过 `?classic=1` 保留，不进入主导航。
+Web Experience 是 Ultimate PPT Master 当前的中文主入口。v6.3.6 源码元数据将这个静态 React/Vite 任务型工作台标记为 `github-released`。是否真正发布，只以 [`v6.3.6` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6) 为准，源码或 Pages 可见本身不是证据。对应 `main` 提交只有通过 CI 后才能进入 GitHub Pages，marketplace 发布仍是独立操作。Classic 控制台已经冻结，只在 v6.3 兼容期通过 `?classic=1` 保留，不进入主导航。
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/

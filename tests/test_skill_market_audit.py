@@ -50,6 +50,12 @@ class SkillMarketAuditTest(unittest.TestCase):
 
         self.assertEqual(listing["id"], "ultimate-ppt-master")
         self.assertEqual(listing["invocation"], "$ultimate-ppt-master")
+        self.assertEqual(listing["releaseStatus"], "github-released")
+        self.assertEqual(
+            listing["releaseEvidence"],
+            "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6",
+        )
+        self.assertEqual(listing["marketplaceStatus"], "independent-not-attested")
         self.assertIn("quality-checked", listing["shortDescription"])
         self.assertIn("local-first", listing["positioning"].lower())
         self.assertIn("agents/openai.yaml", listing["metadata"]["openai"])

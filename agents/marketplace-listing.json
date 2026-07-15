@@ -3,7 +3,9 @@
   "name": "Ultimate PPT Master",
   "displayName": "Ultimate PPT Master",
   "version": "6.3.6",
-  "releaseStatus": "unreleased-candidate",
+  "releaseStatus": "github-released",
+  "releaseEvidence": "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6",
+  "marketplaceStatus": "independent-not-attested",
   "invocation": "$ultimate-ppt-master",
   "category": [
     "presentation generation",

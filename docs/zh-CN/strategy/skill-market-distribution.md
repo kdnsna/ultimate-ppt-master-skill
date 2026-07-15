@@ -2,6 +2,8 @@
 
 当你准备把 Ultimate PPT Master 放到 Skill 市场、Agent 目录或精选技能列表时，用这份清单检查。
 
+v6.3.6 GitHub 发布与 marketplace 分发是两个独立状态。GitHub 版本只从 [`v6.3.6` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6) 核验。`marketplaceStatus: independent-not-attested` 表示该 Release 既不上传、也不证明市场列表已发布；必须到目标 marketplace 独立查验。
+
 ## 上架定位
 
 - 名称：Ultimate PPT Master / 终极融合PPT大师
@@ -48,6 +50,7 @@ Use $ultimate-ppt-master with any natural-language presentation request. It will
 - 每个 public proof pack 都有 source、生成输出、截图/封面和 `quality-report.json`。
 - 发布检查继续运行 `npm run audit:docs`、`npm run audit:presets`、`npm run audit:quality`、`npm run audit:market`、`npm run test:node`、`npm run test:worker`、`npm run build:web`。
 - 正式推广前用 `npm run audit:market` 机器检查市场元数据、公开案例墙和上架资产。
+- `releaseStatus: github-released` 与 `marketplaceStatus: independent-not-attested` 是两个独立机器字段，不得用前者推断后者。
 
 ## 分发注意事项
 
