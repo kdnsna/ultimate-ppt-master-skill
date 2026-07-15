@@ -11,7 +11,9 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "6.1.0"
+VERSION = "6.3.6"
+CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 7))
+CANDIDATE_STATUS = "unreleased-candidate"
 README_BANNED_PHRASES = (
     "Best Results Prompt",
     "What v5 Changes",
@@ -93,32 +95,75 @@ def audit_version_markers(errors: list[str]) -> None:
     package = load_json("package.json")
     web_package = load_json("apps/web/package.json")
     web_lock = load_json("apps/web/package-lock.json")
+    desktop_package = load_json("apps/desktop/package.json")
+    desktop_lock = load_json("apps/desktop/package-lock.json")
+    tauri_config = load_json("apps/desktop/src-tauri/tauri.conf.json")
     app = read(ROOT / "apps/web/src/V6Workspace.tsx")
-    readme = read(ROOT / "README.md")
-    readme_zh = read(ROOT / "README.zh-CN.md")
+    readme_zh = read(ROOT / "README.md")
+    readme_en = read(ROOT / "README.en.md")
+    compatibility = read(ROOT / "README.zh-CN.md")
     hero = read(ROOT / "assets/readme/hero.svg")
     listing = load_json("agents/marketplace-listing.json")
+    cargo_toml = read(ROOT / "apps/desktop/src-tauri/Cargo.toml")
+    cargo_lock = read(ROOT / "apps/desktop/src-tauri/Cargo.lock")
+    benchmark = read(ROOT / "apps/web/public/benchmark/index.html")
+    proof_reports = (
+        load_json("examples/executive-business-review-starter/quality-report.json"),
+        load_json("apps/web/public/examples/executive-business-review-starter/quality-report.json"),
+    )
 
     require(package.get("version") == VERSION, f"package.json version is not v{VERSION}", errors)
     require(web_package.get("version") == VERSION, f"apps/web/package.json version is not v{VERSION}", errors)
     require(web_lock.get("version") == VERSION, f"apps/web/package-lock.json root version is not v{VERSION}", errors)
     require(web_lock.get("packages", {}).get("", {}).get("version") == VERSION, f"apps/web package-lock package version is not v{VERSION}", errors)
+    require(desktop_package.get("version") == VERSION, f"apps/desktop/package.json version is not v{VERSION}", errors)
+    require(desktop_lock.get("version") == VERSION, f"apps/desktop/package-lock.json root version is not v{VERSION}", errors)
+    require(desktop_lock.get("packages", {}).get("", {}).get("version") == VERSION, f"apps/desktop package-lock package version is not v{VERSION}", errors)
+    require(tauri_config.get("version") == VERSION, f"apps/desktop/src-tauri/tauri.conf.json version is not v{VERSION}", errors)
+    require(f'version = "{VERSION}"' in cargo_toml, f"apps/desktop/src-tauri/Cargo.toml version is not v{VERSION}", errors)
+    require(
+        re.search(r'\[\[package\]\]\s+name = "ultimate-ppt-master-desktop"\s+version = "' + re.escape(VERSION) + r'"', cargo_lock) is not None,
+        f"apps/desktop/src-tauri/Cargo.lock package version is not v{VERSION}",
+        errors,
+    )
     require(listing.get("version") == VERSION, f"agents/marketplace-listing.json version is not v{VERSION}", errors)
+    require(listing.get("releaseStatus") == CANDIDATE_STATUS, "marketplace listing must disclose unreleased candidate status", errors)
     require(f'appVersion = "{VERSION}"' in app, f"apps/web/src/V6Workspace.tsx appVersion is not v{VERSION}", errors)
+    require(f"v{VERSION} 未发布候选" in benchmark, f"benchmark page is missing the v{VERSION} unreleased-candidate marker", errors)
 
-    for label, text in (("README.md", readme), ("README.zh-CN.md", readme_zh), ("assets/readme/hero.svg", hero)):
+    for report in proof_reports:
+        require(report.get("releaseVersion") == VERSION, f"public proof releaseVersion is not v{VERSION}", errors)
+        require(report.get("releaseStatus") == CANDIDATE_STATUS, "public proof must disclose unreleased candidate status", errors)
+
+    for label, text in (("README.md", readme_zh), ("README.en.md", readme_en), ("README.zh-CN.md", compatibility), ("assets/readme/hero.svg", hero)):
         require(f"v{VERSION}" in text or VERSION in text, f"{label} missing v{VERSION} marker", errors)
 
     require((ROOT / f"docs/release/release-notes-v{VERSION}.md").is_file(), "missing English current release notes", errors)
     require((ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md").is_file(), "missing Chinese current release notes", errors)
-    require("Hybrid-Editable Visual Workflow v4.0" in readme, "README missing v4 hybrid workflow entry", errors)
-    require("v4.0 混合可编辑视觉工作流" in readme_zh, "Chinese README missing v4 hybrid workflow entry", errors)
-    require("Simplified Web Console v4.1" in readme, "README missing v4.1 console entry", errors)
-    require("v4.1 精简网页控制台" in readme_zh, "Chinese README missing v4.1 console entry", errors)
-    require("DeckIR AI Planning Workflow v4.2" in readme, "README missing v4.2 AI planning entry", errors)
-    require("v4.2 DeckIR AI 策划工作流" in readme_zh, "Chinese README missing v4.2 AI planning entry", errors)
-    require("v4.3 Rendered Review Loop" in readme, "README missing v4.3 rendered review entry", errors)
-    require("v4.3 渲染审阅闭环" in readme_zh, "Chinese README missing v4.3 rendered review entry", errors)
+    require("把真实资料变成可继续修改的原生 PowerPoint" in readme_zh, "README.md is not the Chinese canonical homepage", errors)
+    require("Turn real source material into a native PowerPoint" in readme_en, "README.en.md is not the English mirror", errors)
+    require("中文 README 已迁移" in compatibility and "./README.md" in compatibility, "README.zh-CN.md is not a compatibility entry", errors)
+
+    docs_en = read(ROOT / "docs/README.md")
+    docs_zh = read(ROOT / "docs/zh-CN/README.md")
+    for candidate in CANDIDATE_VERSIONS:
+        release_en_path = ROOT / f"docs/release/release-notes-v{candidate}.md"
+        release_zh_path = ROOT / f"docs/zh-CN/release/release-notes-v{candidate}.md"
+        require(release_en_path.is_file(), f"missing English v{candidate} candidate notes", errors)
+        require(release_zh_path.is_file(), f"missing Chinese v{candidate} candidate notes", errors)
+        if release_en_path.is_file():
+            release_en = read(release_en_path)
+            require("Unreleased candidate" in release_en, f"v{candidate} English notes do not disclose unreleased candidate status", errors)
+            require("Plain-Language Update Notes" in release_en, f"v{candidate} English notes missing plain-language section", errors)
+            require("Independent Rollback Boundary" in release_en, f"v{candidate} English notes missing rollback boundary", errors)
+        if release_zh_path.is_file():
+            release_zh = read(release_zh_path)
+            require("未发布候选" in release_zh, f"v{candidate} Chinese notes do not disclose unreleased candidate status", errors)
+            require("白话更新栏" in release_zh, f"v{candidate} Chinese notes missing plain-language section", errors)
+            require("独立回滚边界" in release_zh, f"v{candidate} Chinese notes missing rollback boundary", errors)
+        release_link = f"release/release-notes-v{candidate}.md"
+        require(release_link in docs_en, f"English docs index missing v{candidate}", errors)
+        require(release_link in docs_zh, f"Chinese docs index missing v{candidate}", errors)
 
 
 def audit_moved_stubs(errors: list[str]) -> None:
@@ -139,6 +184,7 @@ LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)|href=[\"']([^\"']+)[\"']|src=
 def iter_text_files() -> list[Path]:
     roots = [
         ROOT / "README.md",
+        ROOT / "README.en.md",
         ROOT / "README.zh-CN.md",
         ROOT / "AGENTS.md",
         ROOT / "CLAUDE.md",
@@ -214,8 +260,9 @@ def count_doc_map_rows(text: str, heading: str) -> int:
 def audit_readme_truthfulness(errors: list[str]) -> None:
     readmes = {
         "README.md": read(ROOT / "README.md"),
-        "README.zh-CN.md": read(ROOT / "README.zh-CN.md"),
+        "README.en.md": read(ROOT / "README.en.md"),
     }
+    compatibility = read(ROOT / "README.zh-CN.md")
     corpus = support_corpus()
 
     for label, text in readmes.items():
@@ -226,50 +273,47 @@ def audit_readme_truthfulness(errors: list[str]) -> None:
             if f"`{artifact}`" in text or artifact in text:
                 require(artifact in corpus, f"{label} claims {artifact} but no SKILL/scripts/tests anchor exists", errors)
 
-    require(count_doc_map_rows(readmes["README.md"], "## Documentation Map") <= 8, "README documentation map must stay capped at 8 rows", errors)
-    require(count_doc_map_rows(readmes["README.md"], "## Documentation Map") >= 0, "README missing Documentation Map", errors)
-    require(count_doc_map_rows(readmes["README.zh-CN.md"], "## 文档地图") <= 8, "Chinese README documentation map must stay capped at 8 rows", errors)
-    require(count_doc_map_rows(readmes["README.zh-CN.md"], "## 文档地图") >= 0, "Chinese README missing 文档地图", errors)
+    for label, text in readmes.items():
+        require(180 <= len(text.splitlines()) <= 220, f"{label} must stay between 180 and 220 lines", errors)
+    require("## 文档入口" in readmes["README.md"], "README.md missing Chinese documentation entry", errors)
+    require("## Documentation" in readmes["README.en.md"], "README.en.md missing documentation entry", errors)
+    require(len(compatibility.splitlines()) <= 20, "README.zh-CN.md compatibility entry is too long", errors)
+    require("中文 README 已迁移" in compatibility, "README.zh-CN.md missing migration notice", errors)
 
 
 def audit_canonical_public_paths(errors: list[str]) -> None:
-    readme = read(ROOT / "README.md")
-    readme_zh = read(ROOT / "README.zh-CN.md")
+    readme_zh = read(ROOT / "README.md")
+    readme_en = read(ROOT / "README.en.md")
+    compatibility = read(ROOT / "README.zh-CN.md")
     app = read(ROOT / "apps/web/src/App.tsx")
     listing = load_json("agents/marketplace-listing.json")
 
-    required = [
+    required_en = [
         "./docs/guides/agent-connect-bridge.md",
         "./docs/guides/agent-setup.md",
-        "./docs/quality/hybrid-editable-visual-workflow-v4.0.md",
-        "./docs/quality/rendered-review-loop-v4.3.md",
-        "./docs/quality/deckir-ai-planning-workflow-v4.2.md",
-        "./docs/release/release-notes-v6.1.0.md",
-        "./docs/release/release-notes-v5.4.1.md",
-        "./docs/release/release-notes-v5.3.0.md",
-        "./docs/release/release-notes-v5.2.0.md",
-        "./docs/release/release-notes-v5.1.0.md",
-        "./docs/release/release-notes-v5.0.0.md",
-        "./docs/release/release-notes-v4.1.0.md",
+        f"./docs/release/release-notes-v{VERSION}.md",
+        "./docs/README.md",
     ]
-    for link in required:
-        require(link in readme, f"README missing canonical link {link}", errors)
+    for link in required_en:
+        require(link in readme_en, f"README.en.md missing canonical link {link}", errors)
 
     required_zh = [
         "./docs/zh-CN/guides/agent-connect-bridge.md",
-        "./docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
-        "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
-        "./docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
-        "./docs/zh-CN/release/release-notes-v6.1.0.md",
-        "./docs/zh-CN/release/release-notes-v5.4.1.md",
-        "./docs/zh-CN/release/release-notes-v5.3.0.md",
-        "./docs/zh-CN/release/release-notes-v5.2.0.md",
-        "./docs/zh-CN/release/release-notes-v5.1.0.md",
-        "./docs/zh-CN/release/release-notes-v5.0.0.md",
-        "./docs/zh-CN/release/release-notes-v4.1.0.md",
+        f"./docs/zh-CN/release/release-notes-v{VERSION}.md",
+        "./docs/zh-CN/README.md",
+        "./README.en.md",
     ]
     for link in required_zh:
-        require(link in readme_zh, f"Chinese README missing canonical link {link}", errors)
+        require(link in readme_zh, f"README.md missing canonical link {link}", errors)
+
+    require("[./README.md]" not in compatibility, "README.zh-CN.md contains malformed README link", errors)
+    require("(./README.md)" in compatibility and "(./README.en.md)" in compatibility, "README.zh-CN.md missing compatibility links", errors)
+
+    docs_en = read(ROOT / "docs/README.md")
+    docs_zh = read(ROOT / "docs/zh-CN/README.md")
+    release_link = f"release/release-notes-v{VERSION}.md"
+    require(release_link in docs_en, "English docs index missing current release", errors)
+    require(release_link in docs_zh, "Chinese docs index missing current release", errors)
 
     require("docs/guides/agent-connect-bridge.md" in app, "Web app still points to old bridge docs path", errors)
     require("docs/strategy/skill-market-distribution.md" in app, "Web app still points to old skill market docs path", errors)

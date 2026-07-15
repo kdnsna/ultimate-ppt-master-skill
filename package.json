@@ -1,7 +1,11 @@
 {
   "name": "ultimate-ppt-master",
   "private": true,
-  "version": "6.1.0",
+  "version": "6.3.6",
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "description": "AI PPT delivery system that clarifies the brief first, then turns local source material into editable PPTX/Web Decks with visual review and audit trails.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
@@ -18,7 +22,9 @@
     "package:desktop:dmg": "npm --prefix apps/desktop run tauri:build:dmg",
     "package:desktop:homebrew": "bash scripts/package-homebrew-release.sh",
     "audit:docs": "python3 scripts/audit_docs_links.py",
+    "audit:readme-render": "node scripts/audit-readme-render.mjs",
     "audit:web-console": "python3 scripts/audit_web_console.py",
+    "audit:web-bundle": "node scripts/audit-web-bundle.mjs",
     "audit:v6-workspace": "python3 scripts/audit_v6_workspace.py",
     "audit:brief": "python3 scripts/audit_brief_contract.py",
     "audit:visual-intent": "python3 scripts/audit_visual_intent.py",
@@ -31,8 +37,10 @@
     "audit:presets": "python3 scripts/audit_preset_packs.py",
     "audit:quality": "python3 scripts/audit_quality_proofs.py",
     "audit:market": "python3 scripts/audit_skill_market.py",
+    "smoke:pages": "node scripts/smoke-pages.mjs",
     "test:worker": "bash -lc 'if [ -x .venv/bin/python ]; then .venv/bin/python -m unittest discover -s tests; else python3 -m unittest discover -s tests; fi'",
     "test:node": "node --test tests/*.test.mjs",
-    "test:bridge": "node --test tests/bridge.test.mjs"
+    "test:bridge": "node --test tests/bridge.test.mjs",
+    "test:web-browser": "node scripts/browser-v6-regression.mjs"
   }
 }

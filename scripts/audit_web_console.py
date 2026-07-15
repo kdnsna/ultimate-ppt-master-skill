@@ -16,6 +16,7 @@ V6 = ROOT / "apps/web/src/V6Workspace.tsx"
 V6_CSS = ROOT / "apps/web/src/v6-workspace.css"
 CORE = ROOT / "packages/workspace-core/src/index.ts"
 CLASSIC_VERSION = "5.4.1"
+V6_VERSION = "6.3.6"
 
 
 def read(path: Path) -> str:
@@ -68,8 +69,8 @@ def main() -> int:
     require('import { V6Workspace } from "./V6Workspace"' in main_source, "v6 workspace is not the default entry", errors)
     require('lazy(() => import("./ClassicApp"))' in main_source, "Classic console must be lazy loaded", errors)
     require('from "./App"' not in main_source, "Default entry must not eagerly import the classic console", errors)
-    require('appVersion = "6.1.0"' in v6, "v6 workspace version marker is missing", errors)
-    require('new EventSource(`${bridgeUrl}/events`)' in v6, "v6 workspace must consume Bridge progress events", errors)
+    require(f'appVersion = "{V6_VERSION}"' in v6, f"v6 workspace version marker is not v{V6_VERSION}", errors)
+    require("new URLSearchParams({ sessionId: session.sessionId })" in v6 and 'new EventSource(`${bridgeUrl}/events?${query}`)' in v6, "v6 workspace must consume session-scoped Bridge progress events", errors)
     require("if (!document.hidden)" in v6, "Bridge health polling must pause when the document is hidden", errors)
     require('aria-current={current ? "step" : undefined}' in v6, "Phase navigation needs aria-current", errors)
     require('@media (prefers-reduced-motion: reduce)' in v6_css, "v6 workspace must respect reduced motion", errors)

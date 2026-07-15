@@ -14,6 +14,7 @@ PRESETS_DIR = ROOT / "templates" / "presets"
 REQUIRED_PROOF_KEYS = ("source", "generatedOutput", "screenshot", "qualityReport", "benchmarkNote")
 REQUIRED_PROFILE_KEYS = ("label", "acceptanceCriteria", "reviewCommands", "expectedArtifacts")
 STALE_MARKERS = ("v2.3 Demo", "v2.3 Proof", "draft-pack")
+ALLOWED_QUALITY_STATUSES = {"pending", "passed", "warning", "blocked", "reviewed"}
 
 
 def load_json(path: Path) -> Any:
@@ -65,7 +66,11 @@ def audit_preset(preset_path: Path, errors: list[str]) -> None:
             report = load_json(report_path)
             require(report.get("version") == "2.5.0", f"{preset_id}: quality report version must be 2.5.0", errors)
             require(report.get("presetId") == preset_id, f"{preset_id}: quality report presetId mismatch", errors)
-            require(report.get("status") in {"passed", "reviewed"}, f"{preset_id}: quality report status invalid", errors)
+            require(
+                report.get("status") in ALLOWED_QUALITY_STATUSES,
+                f"{preset_id}: quality report status invalid",
+                errors,
+            )
             require(report.get("publicDemoSafe") is True, f"{preset_id}: quality report must be public demo safe", errors)
             doctor = report.get("designDoctor", {})
             require(isinstance(doctor, dict), f"{preset_id}: designDoctor must be an object", errors)

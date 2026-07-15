@@ -33,14 +33,22 @@ def main() -> int:
     require('from "./App"' not in main_source, "Classic App is still eagerly imported")
     require("useDeferredValue" in workspace, "Preview derivation is not deferred")
     require("document.hidden" in workspace, "Hidden-page polling is not paused")
-    require("new EventSource" in workspace and 'request.url === "/events"' in bridge, "SSE progress path is incomplete")
+    require("new EventSource" in workspace and 'requestUrl.pathname === "/events"' in bridge and "sessionId" in bridge, "Session-scoped SSE progress path is incomplete")
     require('data-slide-id="${escapeHtml(slide.slideId)}"' in workspace, "Preview lacks stable slideId")
+    require("activeSlideId?: string" in workspace and "!activeSlideId || slide.slideId === activeSlideId" in workspace, "Review preview is not scoped to the active slide")
+    require("sourceHasVerifiedText" in workspace and "sourceMarkdown = verifiedSources" in workspace and "taskContext" in workspace, "Task context and verified evidence are not separated")
+    require("requiredArtifactsPassed" in workspace and 'artifact.kind === kind && artifact.verification === "passed"' in workspace, "Delivery can be satisfied without the required final artifact kind")
+    require("agent-command-panel" in workspace and "<textarea readOnly value={agentLaunch.command}" in workspace and 'commandCopyState === "failed"' in workspace, "Manual Agent command is not visibly recoverable when clipboard access fails")
     require("slideId: `P${String(index + 1).padStart(2, \"0\")}`" in bridge, "Bridge DeckIR lacks stable slideId")
+    require("complete-manifest-excluding-integrity" in bridge and "manifestSignature" in bridge, "Bridge manifest authenticity does not cover the complete immutable handoff contract")
+    require("Conflicting selectedDirectionId values" in bridge, "Bridge does not reject conflicting visual-direction contracts")
     require('session.phase === "review" || session.phase === "delivered"' in workspace, "Preview must mount only in review/delivered")
     require("window.scrollTo({ top: 0" in workspace and "workspaceHeadingRef.current?.focus" in workspace, "Phase changes must reset scroll and focus")
     require('aria-live="polite"' in workspace, "Progress changes need a live region")
     require('role="radiogroup"' in workspace and 'aria-checked=' in workspace, "Selection controls need radio semantics")
     require(":focus-visible" in css, "Visible keyboard focus styles are missing")
+    require("--v6-radius-sm: 12px" in css and "--v6-radius-md: 18px" in css and "--v6-radius: 24px" in css, "Warm Paper rounded geometry contract is missing")
+    require("fonts.googleapis.com" not in css and "fonts.googleapis.com" not in workspace, "Local-first workspace must not depend on Google Fonts")
     require("prefers-reduced-motion: reduce" in css, "Reduced-motion support is missing")
     require("@media (max-width: 760px)" in css, "390px/mobile layout contract is missing")
     require("DeckSession" in core and "deck-session-v6" in core, "Shared DeckSession model is missing")
@@ -51,7 +59,7 @@ def main() -> int:
     require(len(page_recipes) >= 18, "Registered page recipe library is too small for layout diversity")
     require(len(directions.get("directions", [])) >= 6, "At least six complete visual directions are required")
     generation_guardrails = directions.get("generationGuardrails", {})
-    for field in ("titleSequence", "visualProtagonist", "layoutRegistry", "layoutDiversity", "surfaceRhythm", "imageGeometry", "browserReview"):
+    for field in ("titleSequence", "visualProtagonist", "layoutRegistry", "layoutDiversity", "surfaceRhythm", "coverDefault", "semanticRadii", "imageGeometry", "browserReview"):
         require(bool(generation_guardrails.get(field)), f"Missing generation guardrail: {field}")
     required_roles = {"cover", "body", "data", "chart", "image", "section", "closing"}
     required_design_fields = {

@@ -10,6 +10,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CANDIDATE_STATUS = "unreleased-candidate"
 
 PROOF_CASES = (
     "executive-business-review-starter",
@@ -53,6 +54,8 @@ def audit_openai_metadata(errors: list[str]) -> None:
     require("policy:" in text, "agents/openai.yaml missing policy block", errors)
     require("$ultimate-ppt-master" in interface.get("default_prompt", ""), "default prompt must mention $ultimate-ppt-master", errors)
     require("quality checks" in interface.get("default_prompt", "") or "quality-checked" in interface.get("default_prompt", ""), "default prompt must promise quality checks", errors)
+    require(interface.get("display_name") == "Ultimate PPT Master", "agents/openai.yaml display_name must stay English for international discovery", errors)
+    require(not re.search(r"[\u3400-\u9fff]", interface.get("short_description", "")), "agents/openai.yaml short_description must stay English for international discovery", errors)
     require(bool(re.fullmatch(r"#[0-9A-Fa-f]{6}", interface.get("brand_color", ""))), "brand_color must be a hex color", errors)
     require(len(interface.get("short_description", "")) <= 80, "short_description should stay marketplace-chip friendly", errors)
 
@@ -80,7 +83,10 @@ def audit_marketplace_listing(errors: list[str]) -> None:
     require(listing.get("id") == "ultimate-ppt-master", "marketplace listing id must be ultimate-ppt-master", errors)
     require(listing.get("invocation") == "$ultimate-ppt-master", "marketplace listing invocation must be $ultimate-ppt-master", errors)
     require(listing.get("version") == json.loads(read_text(ROOT / "package.json")).get("version"), "marketplace listing version must match package.json", errors)
+    require(listing.get("releaseStatus") == CANDIDATE_STATUS, "marketplace listing must disclose unreleased candidate status", errors)
     require(listing.get("defaultPrompt") == interface.get("default_prompt"), "marketplace listing defaultPrompt must match agents/openai.yaml", errors)
+    require(listing.get("displayName") == "Ultimate PPT Master", "marketplace displayName must stay English for international discovery", errors)
+    require(listing_short == openai_short, "marketplace shortDescription must match agents/openai.yaml", errors)
     require("quality-checked" in listing_short, "marketplace listing shortDescription must promise quality-checked output", errors)
     require("PPTX" in listing_short and "Web Deck" in listing_short, "marketplace listing shortDescription must name PPTX and Web Deck", errors)
     require(openai_short.split("PPTX", 1)[0].strip() in listing_short, "marketplace listing shortDescription must align with agents/openai.yaml", errors)
@@ -121,6 +127,11 @@ def audit_marketplace_listing(errors: list[str]) -> None:
             require(isinstance(value, str) and (ROOT / value).is_file(), f"marketplace listing proof case path missing: {case.get('id')}.{key}", errors)
         require(bool(case.get("bestFor")), f"marketplace listing proof case missing bestFor: {case.get('id')}", errors)
 
+    office_case = next((case for case in cases if isinstance(case, dict) and case.get("id") == "executive-business-review-starter"), {})
+    for key in ("editablePptx", "nativeObjectReport", "pptlintReport"):
+        value = office_case.get(key, "")
+        require(isinstance(value, str) and (ROOT / value).is_file(), f"marketplace listing office proof path missing: {key}", errors)
+
     gates = listing.get("acceptanceGates", [])
     for command in ("npm run audit:docs", "npm run audit:web-console", "npm run audit:presets", "npm run audit:quality", "npm run audit:market", "npm run test:node", "npm run test:worker", "npm run build:web"):
         require(command in gates, f"marketplace listing acceptance gate missing: {command}", errors)
@@ -140,30 +151,34 @@ def audit_skill_entrypoint(errors: list[str]) -> None:
 
 
 def audit_readme_surfaces(errors: list[str]) -> None:
-    readme = read_text(ROOT / "README.md")
-    readme_zh = read_text(ROOT / "README.zh-CN.md")
+    readme_zh = read_text(ROOT / "README.md")
+    readme_en = read_text(ROOT / "README.en.md")
+    compatibility = read_text(ROOT / "README.zh-CN.md")
 
     for needle in (
-        "60-second quickstart",
-        "Hybrid-Editable Visual Workflow v4.0",
-        "Proof Packs",
+        "One-minute install",
+        "Formal editable PPTX",
+        "AI Web Deck",
+        "Finished Work & Proof",
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
-        "Known Limits",
-        "./docs/release/release-notes-v5.1.0.md",
-        "./docs/quality/rendered-review-loop-v4.3.md",
+        "Known limits",
+        "./docs/release/release-notes-v6.3.6.md",
     ):
-        require(needle in readme, f"README.md missing marketplace surface: {needle}", errors)
+        require(needle in readme_en, f"README.en.md missing marketplace surface: {needle}", errors)
 
     for needle in (
-        "60 秒开箱即用",
-        "v4.0 混合可编辑视觉工作流",
-        "Proof Packs",
+        "一分钟安装",
+        "正式办公 PPTX",
+        "AI Web Deck",
+        "成品与 Proof",
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
         "已知限制",
-        "./docs/zh-CN/release/release-notes-v5.1.0.md",
-        "./docs/zh-CN/quality/rendered-review-loop-v4.3.md",
+        "./docs/zh-CN/release/release-notes-v6.3.6.md",
     ):
-        require(needle in readme_zh, f"README.zh-CN.md missing marketplace surface: {needle}", errors)
+        require(needle in readme_zh, f"README.md missing Chinese marketplace surface: {needle}", errors)
+
+    require("中文 README 已迁移" in compatibility, "README.zh-CN.md must remain a compatibility entry", errors)
+    require("./README.md" in compatibility and "./README.en.md" in compatibility, "README compatibility entry is missing language links", errors)
 
 
 def audit_benchmark_wall(errors: list[str]) -> None:
@@ -173,16 +188,26 @@ def audit_benchmark_wall(errors: list[str]) -> None:
         return
 
     text = read_text(benchmark)
-    require("Ultimate PPT Master Proof Packs" in text, "proof packs page missing title", errors)
-    require("input -> preset -> output -> review" in text, "proof packs page missing proof chain", errors)
-    require("self-assessed by Design Doctor" in text, "proof packs page missing self-assessment disclosure", errors)
-    require("Input excerpt" in text, "proof packs page missing input excerpts", errors)
-    require("Rubric" in text, "proof packs page missing rubric link", errors)
+    require('<html lang="zh-CN">' in text, "proof page must default to Chinese", errors)
+    require("先看成品" in text and "再看交付证据" in text, "proof page missing Chinese-first title", errors)
+    require("输入、策划、输出与质量复核" in text, "proof page missing delivery chain", errors)
+    require("Proof Pack 分数为<strong>内部质量合同</strong>" in text, "proof page missing internal-contract disclosure", errors)
+    require("不是第三方 benchmark" in text, "proof page must reject third-party benchmark framing", errors)
+    require("脱敏 source" in text, "proof page missing sanitized input link", errors)
+    require("原生对象" in text and "PPTLint" in text and "质量报告" in text, "proof page missing office quality evidence", errors)
     require("Skill Market Distribution" not in text, "proof packs page should not link marketplace strategy", errors)
     old_branding = "Benchmark" + " Wall"
     require(old_branding not in text, "proof packs page should not use old branding", errors)
-    require("Design Doctor scorecard" in text, "benchmark page missing Design Doctor scorecard", errors)
-    require("report-only repair policy" in text, "benchmark page missing report-only repair policy", errors)
+    require("Design Doctor 默认只报告问题" in text, "proof page missing Design Doctor report-only boundary", errors)
+
+    for filename in (
+        "executive-business-review-editable.pptx",
+        "native-object-report.json",
+        "pptlint-report.md",
+    ):
+        public_artifact = ROOT / "apps" / "web" / "public" / "examples" / "executive-business-review-starter" / filename
+        require(public_artifact.is_file(), f"public office proof artifact missing: {filename}", errors)
+        require(f"examples/executive-business-review-starter/{filename}" in text, f"proof page missing office artifact link: {filename}", errors)
 
     for case in PROOF_CASES:
         public_dir = ROOT / "apps" / "web" / "public" / "examples" / case

@@ -1,8 +1,9 @@
 {
   "id": "ultimate-ppt-master",
   "name": "Ultimate PPT Master",
-  "displayName": "终极融合PPT大师",
-  "version": "6.1.0",
+  "displayName": "Ultimate PPT Master",
+  "version": "6.3.6",
+  "releaseStatus": "unreleased-candidate",
   "invocation": "$ultimate-ppt-master",
   "category": [
     "presentation generation",
@@ -10,7 +11,7 @@
     "web deck",
     "office productivity"
   ],
-  "shortDescription": "先自动扩写 best-effect brief，再生成 quality-checked PPTX/Web Decks",
+  "shortDescription": "Expand any brief into quality-checked PPTX and Web Decks",
   "positioning": "A local-first presentation Agent and quality operating system for Chinese formal-office delivery, with a best-effect brief, task-first intake, stable slide identities, reference-PPT learning, editable PowerPoint objects, source boundaries, and audit-ready handoff.",
   "defaultPrompt": "Use $ultimate-ppt-master with any natural-language presentation request. It will expand the request into a best-effect brief, choose PPTX or Web Deck, and run the matching quality checks.",
   "metadata": {
@@ -28,7 +29,7 @@
     "repository": "https://github.com/kdnsna/ultimate-ppt-master-skill",
     "webExperience": "https://kdnsna.github.io/ultimate-ppt-master-skill/",
     "benchmarkWall": "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
-    "quickstart": "README.md#60-second-quickstart",
+    "quickstart": "README.md#一分钟安装",
     "agentSetup": "docs/guides/agent-setup.md"
   },
   "proof": {
@@ -42,7 +43,10 @@
         "bestFor": "Operations reviews, CEO or department updates, KPI storylines.",
         "source": "examples/executive-business-review-starter/source.sanitized.md",
         "demo": "apps/web/public/examples/executive-business-review-starter/web-demo.html",
-        "qualityReport": "examples/executive-business-review-starter/quality-report.json"
+        "qualityReport": "examples/executive-business-review-starter/quality-report.json",
+        "editablePptx": "apps/web/public/examples/executive-business-review-starter/executive-business-review-editable.pptx",
+        "nativeObjectReport": "apps/web/public/examples/executive-business-review-starter/native-object-report.json",
+        "pptlintReport": "apps/web/public/examples/executive-business-review-starter/pptlint-report.md"
       },
       {
         "id": "consulting-proposal-starter",

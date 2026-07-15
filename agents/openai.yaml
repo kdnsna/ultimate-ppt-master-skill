@@ -1,6 +1,6 @@
 interface:
-  display_name: "终极融合PPT大师"
-  short_description: "先自动扩写 best-effect brief，再生成 quality-checked PPTX/Web Decks"
+  display_name: "Ultimate PPT Master"
+  short_description: "Expand any brief into quality-checked PPTX and Web Decks"
   icon_small: "./assets/skill-market/ultimate-ppt-master-icon.svg"
   icon_large: "./assets/skill-market/ultimate-ppt-master-card.svg"
   brand_color: "#0F766E"

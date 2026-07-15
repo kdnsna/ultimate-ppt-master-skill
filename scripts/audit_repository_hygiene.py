@@ -17,6 +17,7 @@ IGNORED_DIRS = {
     "node_modules",
     "dist",
     "build",
+    "target",
     ".turbo",
     "__pycache__",
 }

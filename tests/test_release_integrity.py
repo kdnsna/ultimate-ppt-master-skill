@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 import sys
 import unittest
@@ -6,7 +7,9 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "6.1.0"
+VERSION = "6.3.6"
+CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 7))
+CANDIDATE_STATUS = "unreleased-candidate"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
@@ -14,16 +17,40 @@ class ReleaseIntegrityTest(unittest.TestCase):
         version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
         web_version = json.loads((ROOT / "apps/web/package.json").read_text(encoding="utf-8"))["version"]
         web_lock = json.loads((ROOT / "apps/web/package-lock.json").read_text(encoding="utf-8"))
+        desktop = json.loads((ROOT / "apps/desktop/package.json").read_text(encoding="utf-8"))
+        desktop_lock = json.loads((ROOT / "apps/desktop/package-lock.json").read_text(encoding="utf-8"))
+        tauri = json.loads((ROOT / "apps/desktop/src-tauri/tauri.conf.json").read_text(encoding="utf-8"))
+        cargo_toml = (ROOT / "apps/desktop/src-tauri/Cargo.toml").read_text(encoding="utf-8")
+        cargo_lock = (ROOT / "apps/desktop/src-tauri/Cargo.lock").read_text(encoding="utf-8")
         listing = json.loads((ROOT / "agents/marketplace-listing.json").read_text(encoding="utf-8"))
 
         self.assertEqual(version, VERSION)
         self.assertEqual(web_version, version)
         self.assertEqual(web_lock["version"], version)
         self.assertEqual(web_lock["packages"][""]["version"], version)
+        self.assertEqual(desktop["version"], version)
+        self.assertEqual(desktop_lock["version"], version)
+        self.assertEqual(desktop_lock["packages"][""]["version"], version)
+        self.assertEqual(tauri["version"], version)
+        self.assertIn(f'version = "{version}"', cargo_toml)
+        self.assertRegex(
+            cargo_lock,
+            rf'(?s)\[\[package\]\]\s+name = "ultimate-ppt-master-desktop"\s+version = "{re.escape(version)}"',
+        )
         self.assertEqual(listing["version"], version)
-        self.assertIn(f"v{version}", (ROOT / "README.md").read_text(encoding="utf-8"))
-        self.assertIn(f"v{version}", (ROOT / "README.zh-CN.md").read_text(encoding="utf-8"))
+        self.assertEqual(listing["releaseStatus"], CANDIDATE_STATUS)
+        for path in ("README.md", "README.en.md", "README.zh-CN.md"):
+            self.assertIn(f"v{version}", (ROOT / path).read_text(encoding="utf-8"), path)
         self.assertIn(f'appVersion = "{version}"', (ROOT / "apps/web/src/V6Workspace.tsx").read_text(encoding="utf-8"))
+        self.assertIn(f"v{version} 未发布候选", (ROOT / "apps/web/public/benchmark/index.html").read_text(encoding="utf-8"))
+        self.assertIn(f"v{version}", (ROOT / "assets/readme/hero.svg").read_text(encoding="utf-8"))
+        for report_path in (
+            "examples/executive-business-review-starter/quality-report.json",
+            "apps/web/public/examples/executive-business-review-starter/quality-report.json",
+        ):
+            report = json.loads((ROOT / report_path).read_text(encoding="utf-8"))
+            self.assertEqual(report["releaseVersion"], version, report_path)
+            self.assertEqual(report["releaseStatus"], CANDIDATE_STATUS, report_path)
         self.assertTrue((ROOT / f"docs/release/release-notes-v{version}.md").is_file())
         self.assertTrue((ROOT / f"docs/zh-CN/release/release-notes-v{version}.md").is_file())
         self.assertIn(
@@ -36,6 +63,33 @@ class ReleaseIntegrityTest(unittest.TestCase):
         )
         self.assertIn(f"release/release-notes-v{version}.md", (ROOT / "docs/README.md").read_text(encoding="utf-8"))
         self.assertIn(f"release/release-notes-v{version}.md", (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8"))
+
+    def test_v632_to_v636_candidate_notes_are_truthful_and_rollbackable(self):
+        docs_en = (ROOT / "docs/README.md").read_text(encoding="utf-8")
+        docs_zh = (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8")
+
+        for version in CANDIDATE_VERSIONS:
+            with self.subTest(version=version):
+                en_path = ROOT / f"docs/release/release-notes-v{version}.md"
+                zh_path = ROOT / f"docs/zh-CN/release/release-notes-v{version}.md"
+                self.assertTrue(en_path.is_file())
+                self.assertTrue(zh_path.is_file())
+                en = en_path.read_text(encoding="utf-8")
+                zh = zh_path.read_text(encoding="utf-8")
+
+                for marker in (
+                    "Unreleased candidate",
+                    "Plain-Language Update Notes",
+                    "Independent Rollback Boundary",
+                ):
+                    self.assertIn(marker, en)
+                for marker in ("未发布候选", "白话更新栏", "独立回滚边界"):
+                    self.assertIn(marker, zh)
+
+                self.assertIn(f"release-notes-v{version}.md", docs_en)
+                self.assertIn(f"release-notes-v{version}.md", docs_zh)
+                self.assertIn(f"../zh-CN/release/release-notes-v{version}.md", en)
+                self.assertIn(f"../../release/release-notes-v{version}.md", zh)
 
     def test_core_entry_scripts_exist(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
@@ -54,6 +108,18 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertTrue((ROOT / "scripts/doctor.sh").is_file())
         self.assertTrue((ROOT / "scripts/run-desktop.sh").is_file())
         self.assertTrue((ROOT / "apps/bridge/server.mjs").is_file())
+
+    def test_pages_workflow_only_executes_trusted_main_push_code(self):
+        workflow = (ROOT / ".github/workflows/pages.yml").read_text(encoding="utf-8")
+
+        self.assertIn("github.event.workflow_run.event == 'push'", workflow)
+        self.assertIn("github.event.workflow_run.conclusion == 'success'", workflow)
+        self.assertIn("github.event.workflow_run.head_branch == 'main'", workflow)
+        self.assertIn(
+            "github.event.workflow_run.head_repository.full_name == github.repository",
+            workflow,
+        )
+        self.assertIn("ref: ${{ github.event.workflow_run.head_sha }}", workflow)
 
     def test_docs_audit_passes(self):
         result = subprocess.run(
@@ -74,7 +140,12 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/quality/rendered-review-loop-v4.3.md",
-            "docs/release/release-notes-v6.1.0.md",
+            "docs/release/release-notes-v6.3.1.md",
+            "docs/release/release-notes-v6.3.2.md",
+            "docs/release/release-notes-v6.3.3.md",
+            "docs/release/release-notes-v6.3.4.md",
+            "docs/release/release-notes-v6.3.5.md",
+            "docs/release/release-notes-v6.3.6.md",
             "docs/release/release-notes-v5.4.1.md",
             "docs/release/release-notes-v5.3.0.md",
             "docs/release/release-notes-v5.2.0.md",
@@ -91,7 +162,12 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/quality/hybrid-editable-visual-workflow-v4.0.md",
             "docs/zh-CN/quality/deckir-ai-planning-workflow-v4.2.md",
             "docs/zh-CN/quality/rendered-review-loop-v4.3.md",
-            "docs/zh-CN/release/release-notes-v6.1.0.md",
+            "docs/zh-CN/release/release-notes-v6.3.1.md",
+            "docs/zh-CN/release/release-notes-v6.3.2.md",
+            "docs/zh-CN/release/release-notes-v6.3.3.md",
+            "docs/zh-CN/release/release-notes-v6.3.4.md",
+            "docs/zh-CN/release/release-notes-v6.3.5.md",
+            "docs/zh-CN/release/release-notes-v6.3.6.md",
             "docs/zh-CN/release/release-notes-v5.4.1.md",
             "docs/zh-CN/release/release-notes-v5.3.0.md",
             "docs/zh-CN/release/release-notes-v5.2.0.md",
@@ -116,21 +192,44 @@ class ReleaseIntegrityTest(unittest.TestCase):
             self.assertTrue("Document Moved" in text or "文档已迁移" in text)
             self.assertIn(canonical, text)
 
-    def test_v5_readmes_are_refactored_as_truthful_homepages(self):
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+    def test_readme_language_entrypoints_are_truthful_and_complete(self):
+        readme_zh = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_en = (ROOT / "README.en.md").read_text(encoding="utf-8")
+        compatibility = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
 
         for expected in (
-            "60-second quickstart",
-            "Real Proof Packs",
-            "Routes",
-            "Dependencies and Degradation",
-            "Known Limits",
-            "Acknowledgments",
+            "把真实资料变成可继续修改的原生 PowerPoint",
+            "两份可以直接检查的成品",
+            "一分钟安装",
+            "npx skills add kdnsna/ultimate-ppt-master-skill --skill ultimate-ppt-master",
+            "在线工作台",
+            "本地边界",
+            "三种交付路线",
+            "最佳效果提示增强器",
             "Style A Editorial Fixed Rhythm",
-            "Proof Packs",
-            "Release Notes - v5.2.0",
-            "Release Notes - v5.1.0",
+            "Design Doctor 内部自评",
+            "project-brief.json",
+            "asset_plan.json",
+            "current_generation_evidence",
+            "pipeline-state.json",
+            "Needs-Manual",
+            "expectationFit",
+            "已知限制",
+            "README.en.md",
+            "examples/executive-business-review-starter/executive-business-review-editable.pptx",
+        ):
+            self.assertIn(expected, readme_zh)
+
+        for expected in (
+            "Turn real source material into a native PowerPoint",
+            "Two finished artifacts you can inspect now",
+            "One-minute install",
+            "npx skills add kdnsna/ultimate-ppt-master-skill --skill ultimate-ppt-master",
+            "Live Workspace",
+            "Local boundary",
+            "Three delivery routes",
+            "Best-Effect Brief Enhancer",
+            "Style A Editorial Fixed Rhythm",
             "self-assessed by Design Doctor",
             "project-brief.json",
             "asset_plan.json",
@@ -138,63 +237,56 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "pipeline-state.json",
             "Needs-Manual",
             "expectationFit",
-            "./docs/release/release-notes-v5.2.0.md",
-            "./docs/release/release-notes-v5.1.0.md",
-            "./docs/release/release-notes-v5.0.0.md",
+            "Known limits",
+            "README.md",
+            "examples/executive-business-review-starter/executive-business-review-editable.pptx",
         ):
-            self.assertIn(expected, readme)
+            self.assertIn(expected, readme_en)
 
-        for expected in (
-            "60 秒开箱即用",
-            "真实 Proof Packs",
-            "路线选择",
-            "依赖与降级",
-            "已知限制",
-            "致谢",
-            "Style A Editorial Fixed Rhythm",
-            "Proof Packs",
-            "发布说明 - v5.2.0",
-            "发布说明 - v5.1.0",
-            "Design Doctor 自评",
-            "project-brief.json",
-            "asset_plan.json",
-            "current_generation_evidence",
-            "pipeline-state.json",
-            "Needs-Manual",
-            "expectationFit",
-            "./docs/zh-CN/release/release-notes-v5.2.0.md",
-            "./docs/zh-CN/release/release-notes-v5.1.0.md",
-            "./docs/zh-CN/release/release-notes-v5.0.0.md",
-        ):
-            self.assertIn(expected, readme_zh)
-
-        for banned in (
-            "Best Results Prompt",
-            "What v5 Changes",
-            "v5 Delivery Standard",
-            "Repository Map",
-            "Production Stability Guardrails",
-            "Quality Gates",
-            "Guizang-like",
-            "Benchmark Wall",
-            "Skill Market Distribution",
-        ):
-            self.assertNotIn(banned, readme)
-            self.assertNotIn(banned, readme_zh)
-
-        self.assertLessEqual(len(readme.splitlines()), 240)
-        self.assertLessEqual(len(readme_zh.splitlines()), 240)
-
-        for content in (readme, readme_zh):
+        for content in (readme_zh, readme_en):
+            self.assertGreaterEqual(len(content.splitlines()), 180)
+            self.assertLessEqual(len(content.splitlines()), 220)
+            self.assertIn("</p>\n\n<p", content)
             self.assertIn("</p>\n\n![", content)
-            self.assertIn(".png)\n\n[![", content)
-            self.assertIn("comparison.html)\n\n", content)
+            self.assertNotIn("Benchmark Wall", content)
+            self.assertNotIn("Skill Market Distribution", content)
+
+        zh_first_screen_order = (
+            readme_zh.index("把真实资料变成可继续修改的原生 PowerPoint"),
+            readme_zh.index("## 两份可以直接检查的成品"),
+            readme_zh.index("## 一分钟安装"),
+            readme_zh.index("需要可视化任务入口时"),
+            readme_zh.index("> **本地边界"),
+        )
+        self.assertEqual(zh_first_screen_order, tuple(sorted(zh_first_screen_order)))
+        self.assertLess(
+            readme_en.index("Turn real source material into a native PowerPoint"),
+            readme_en.index("## Two finished artifacts you can inspect now"),
+        )
+        self.assertLess(
+            readme_en.index("## Two finished artifacts you can inspect now"),
+            readme_en.index("## One-minute install"),
+        )
+        self.assertLess(readme_en.index("## One-minute install"), readme_en.index("For a guided intake surface"))
+        self.assertLess(readme_en.index("For a guided intake surface"), readme_en.index("> **Local boundary"))
+
+        self.assertLessEqual(len(compatibility.splitlines()), 20)
+        self.assertIn("中文 README 已迁移", compatibility)
+        self.assertIn("[打开中文主 README](./README.md)", compatibility)
+        self.assertIn("[Open the English README](./README.en.md)", compatibility)
+
+        docs_en = (ROOT / "docs/README.md").read_text(encoding="utf-8")
+        docs_zh = (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8")
+        self.assertIn("canonical GitHub homepage is the Chinese", docs_en)
+        self.assertIn("README.en.md", docs_en)
+        self.assertIn("GitHub 默认产品首页", docs_zh)
+        self.assertIn("README.en.md", docs_zh)
 
     def test_readme_top_routes_existing_powerpoints_to_pptlint(self):
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
-        english_top = "\n".join(readme.splitlines()[:10])
-        chinese_top = "\n".join(readme_zh.splitlines()[:10])
+        readme_zh = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_en = (ROOT / "README.en.md").read_text(encoding="utf-8")
+        chinese_top = "\n".join(readme_zh.splitlines()[:55])
+        english_top = "\n".join(readme_en.splitlines()[:55])
 
         self.assertIn("Already have a PowerPoint", english_top)
         self.assertIn("已有 PPT", chinese_top)
@@ -204,8 +296,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             self.assertNotIn(jargon, english_top + chinese_top)
 
     def test_maintainer_guardrails_live_outside_readme(self):
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_en = (ROOT / "README.en.md").read_text(encoding="utf-8")
         release_maintenance = (ROOT / "docs/release/release-maintenance.md").read_text(encoding="utf-8")
 
         for expected in (
@@ -216,10 +308,10 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "forbid bitmap text overlay repair",
         ):
             self.assertIn(expected, release_maintenance)
-            self.assertNotIn(expected, readme)
+            self.assertNotIn(expected, readme_en)
+            self.assertNotIn(expected, readme_zh)
 
         self.assertIn("audit:image-contracts", release_maintenance)
-        self.assertIn("audit:image-contracts", readme)
 
         for expected in (
             "UPSTREAM_SYNC.md",
@@ -230,12 +322,10 @@ class ReleaseIntegrityTest(unittest.TestCase):
         ):
             self.assertNotIn(expected, readme_zh)
 
-        self.assertIn("audit:image-contracts", readme_zh)
-
     def test_v54_swiss_deck_asset_factory_surface_is_documented(self):
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        release_en = (ROOT / "docs/release/release-notes-v5.4.1.md").read_text(encoding="utf-8")
+        release_zh = (ROOT / "docs/zh-CN/release/release-notes-v5.4.1.md").read_text(encoding="utf-8")
 
         self.assertEqual(
             package["scripts"]["audit:swiss-deck"],
@@ -245,33 +335,13 @@ class ReleaseIntegrityTest(unittest.TestCase):
             package["scripts"]["audit:magazine-deck"],
             "node scripts/validate-magazine-deck.mjs examples/magazine-v54-demo/index.html",
         )
-        for expected in (
-            "v5.4 Swiss Deck and Asset Factory",
-            "Style B Swiss International",
-            "asset_plan.json",
-            "current_generation_evidence",
-            "npm run audit:swiss-deck",
-            "examples/swiss-v54-demo/index.html",
-            "Baoyu Design",
-            "latest Guizang PPT Skill",
-        ):
-            self.assertIn(expected, readme)
-
-        for expected in (
-            "v5.4 瑞士风 Deck 与资产工厂",
-            "Style B 瑞士国际主义",
-            "asset_plan.json",
-            "current_generation_evidence",
-            "npm run audit:swiss-deck",
-            "examples/swiss-v54-demo/index.html",
-            "Baoyu Design",
-            "最新版 Guizang PPT Skill",
-        ):
-            self.assertIn(expected, readme_zh)
+        for expected in ("asset_plan.json", "current_generation_evidence", "npm run audit:swiss-deck"):
+            self.assertIn(expected, release_en)
+            self.assertIn(expected, release_zh)
 
     def test_skill_market_distribution_surface_is_ready(self):
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_en = (ROOT / "README.en.md").read_text(encoding="utf-8")
         docs_index = (ROOT / "docs/README.md").read_text(encoding="utf-8")
         docs_index_zh = (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8")
         openai_yaml = (ROOT / "agents/openai.yaml").read_text(encoding="utf-8")
@@ -279,7 +349,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
 
         self.assertTrue((ROOT / "docs/strategy/skill-market-distribution.md").is_file())
         self.assertTrue((ROOT / "docs/zh-CN/strategy/skill-market-distribution.md").is_file())
-        self.assertNotIn("Skill Market Distribution", readme)
+        self.assertNotIn("Skill Market Distribution", readme_en)
         self.assertNotIn("Skill 市场分发", readme_zh)
         self.assertIn("Skill Market Distribution", docs_index)
         self.assertIn("Skill 市场分发", docs_index_zh)
@@ -296,8 +366,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("quality-checked PPTX", openai_yaml)
 
     def test_v53_best_effect_brief_enhancer_is_public_and_actionable(self):
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.md").read_text(encoding="utf-8")
+        readme_en = (ROOT / "README.en.md").read_text(encoding="utf-8")
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         prompt = (ROOT / "PROMPT.md").read_text(encoding="utf-8")
         agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
@@ -316,7 +386,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "extremely thin prompt",
             "Auto-expanded brief",
         ):
-            self.assertIn(expected, readme)
+            self.assertIn(expected, readme_en)
 
         for expected in (
             "最佳效果提示增强器",
@@ -380,32 +450,37 @@ class ReleaseIntegrityTest(unittest.TestCase):
     def test_existing_pptx_repair_refuses_full_deck_reexport(self):
         skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
         bridge = (ROOT / "apps/bridge/server.mjs").read_text(encoding="utf-8")
-        readme_zh = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        readme_zh = (ROOT / "README.md").read_text(encoding="utf-8")
 
         self.assertIn("never import and re-export the whole source deck", skill)
         self.assertIn("native, package-preserving object edit path", skill)
         self.assertIn("do not generate a repaired PPTX", skill)
         self.assertIn("do not import/re-export the whole deck", bridge)
         self.assertIn("PowerPoint/WPS/LibreOffice", bridge)
-        self.assertIn("不再通过整份导入/重导出", readme_zh)
+        self.assertIn("不能通过导入并重导出整份演示", readme_zh)
 
     def test_public_proof_packs_page_lists_all_quality_proofs(self):
         benchmark = ROOT / "apps/web/public/benchmark/index.html"
         self.assertTrue(benchmark.is_file())
         page = benchmark.read_text(encoding="utf-8")
 
-        self.assertIn("Ultimate PPT Master Proof Packs", page)
-        self.assertIn("input -> preset -> output -> review", page)
-        self.assertIn("self-assessed by Design Doctor", page)
-        self.assertIn("Input excerpt", page)
-        self.assertIn("Rubric", page)
+        self.assertIn('lang="zh-CN"', page)
+        self.assertIn("先看成品", page)
+        self.assertIn("输入、策划、输出与质量复核", page)
+        self.assertIn("内部质量合同", page)
+        self.assertIn("不是第三方 benchmark", page)
+        self.assertIn("下载可编辑 PPTX", page)
+        self.assertIn("打开 GPT-5.6 Web Deck", page)
         self.assertNotIn("Skill Market Distribution", page)
         self.assertNotIn("Benchmark Wall", page)
         for path in (
+            "examples/executive-business-review-starter/executive-business-review-editable.pptx",
             "examples/executive-business-review-starter/web-demo.html",
             "examples/consulting-proposal-starter/web-demo.html",
             "examples/product-pitch-starter/web-demo.html",
             "examples/tech-trend-web-deck-starter/web-demo.html",
+            "examples/executive-business-review-starter/native-object-report.json",
+            "examples/executive-business-review-starter/pptlint-report.md",
             "examples/executive-business-review-starter/quality-report.json",
             "examples/consulting-proposal-starter/quality-report.json",
             "examples/product-pitch-starter/quality-report.json",
@@ -413,8 +488,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         ):
             self.assertIn(path, page)
 
-        self.assertIn("Design Doctor scorecard", page)
-        self.assertIn("report-only repair policy", page)
+        self.assertIn("Design Doctor 默认只报告问题", page)
+        self.assertIn("未经明确授权不自动改写内容", page)
 
     def test_v6_featured_gallery_contains_three_finished_source_grounded_decks(self):
         benchmark = (ROOT / "apps/web/public/benchmark/index.html").read_text(encoding="utf-8")
@@ -439,7 +514,15 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("\u672a\u627e\u5230 Grok 4.6", grok)
         self.assertNotIn("<title>Grok 4.6", grok)
         self.assertTrue((ROOT / "apps/web/public/benchmark/showcase.html").is_file())
-        self.assertTrue((ROOT / "assets/readme/v6-finished-decks.png").is_file())
+        finished_decks_png = ROOT / "assets/readme/v6-finished-decks.png"
+        finished_decks_source = ROOT / "assets/readme/v6-finished-decks-source.html"
+        self.assertTrue(finished_decks_png.is_file())
+        finished_png_bytes = finished_decks_png.read_bytes()
+        self.assertEqual(finished_png_bytes[:8], b"\x89PNG\r\n\x1a\n")
+        self.assertEqual((int.from_bytes(finished_png_bytes[16:20]), int.from_bytes(finished_png_bytes[20:24])), (1440, 810))
+        source_text = finished_decks_source.read_text(encoding="utf-8")
+        for marker in ("V6.3.6 未发布候选", "226 个原生矢量对象", "AI Web Deck"):
+            self.assertIn(marker, source_text)
 
         design_system = (ROOT / "DESIGN.md").read_text(encoding="utf-8")
         for heading in (
@@ -603,7 +686,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         flow = (ROOT / "assets/readme/agent-connect-flow.svg").read_text(encoding="utf-8")
         combined = "\n".join([hero, web_preview, flow])
 
-        self.assertIn("v6.1.0", hero)
+        self.assertIn(f"v{VERSION}", hero)
         self.assertIn("Best-effect", hero)
         self.assertIn("sourceConfidence", hero)
         self.assertIn("Plain-language glossary", web_preview)

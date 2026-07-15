@@ -22,6 +22,8 @@ apps/desktop/src-tauri/icons/ios/
 projects/
 exports/
 *.pptx
+!examples/executive-business-review-starter/executive-business-review-editable.pptx
+!apps/web/public/examples/executive-business-review-starter/executive-business-review-editable.pptx
 *.pptm
 *.key
 *.pdf

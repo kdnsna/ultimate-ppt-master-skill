@@ -29,7 +29,10 @@ jobs:
           python-version: "3.12"
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config
+        run: >-
+          sudo apt-get update && sudo apt-get install -y
+          libcairo2-dev pkg-config libwebkit2gtk-4.1-dev
+          libappindicator3-dev librsvg2-dev patchelf
 
       - name: Install Python dependencies
         run: |
@@ -46,14 +49,38 @@ jobs:
       - name: Build desktop frontend
         run: npm run build:desktop
 
+      - name: Check desktop Rust contract
+        run: |
+          rustup component add clippy rustfmt
+          cargo fmt --manifest-path apps/desktop/src-tauri/Cargo.toml --check
+          cargo clippy --locked --manifest-path apps/desktop/src-tauri/Cargo.toml --all-targets --all-features -- -D warnings
+          cargo test --locked --manifest-path apps/desktop/src-tauri/Cargo.toml --all-features
+
       - name: Build web experience
         run: npm run build:web
+
+      - name: Enforce Web bundle budget
+        run: npm run audit:web-bundle
+
+      - name: Run real Chrome v6 workspace regression
+        run: npm run test:web-browser
 
       - name: Audit documentation links
         run: npm run audit:docs
 
+      - name: Render READMEs with GitHub Markdown
+        run: npm run audit:readme-render
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Audit Web Experience console
         run: npm run audit:web-console
+
+      - name: Audit v6 workspace contract
+        run: npm run audit:v6-workspace
+
+      - name: Audit featured public decks
+        run: npm run audit:featured-decks
 
       - name: Audit preset starter packs
         run: npm run audit:presets
@@ -64,8 +91,14 @@ jobs:
       - name: Audit skill marketplace readiness
         run: npm run audit:market
 
+      - name: Audit repository hygiene
+        run: npm run audit:repo-hygiene
+
       - name: Audit desktop dependencies
         run: npm --prefix apps/desktop audit --audit-level=high
+
+      - name: Audit web dependencies
+        run: npm --prefix apps/web audit --audit-level=high
 
       - name: Run Node integration tests
         run: npm run test:node
