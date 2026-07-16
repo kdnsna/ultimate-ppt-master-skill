@@ -67,10 +67,10 @@ for (const item of secondaryCases) {
     }
   }
   const report = JSON.parse(fs.readFileSync(path.join(publicDir, 'quality-report.json'), 'utf8'));
-  if (report.releaseVersion !== '6.3.6' || report.releaseStatus !== 'github-released') {
+  if (report.releaseVersion !== '6.3.7' || report.releaseStatus !== 'github-released') {
     errors.push(`${item.dir}: quality report must distinguish its stable schema from the current GitHub release`);
   }
-  if (report.releaseEvidence !== 'https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6'
+  if (report.releaseEvidence !== 'https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.7'
     || report.marketplaceStatus !== 'independent-not-attested') {
     errors.push(`${item.dir}: quality report must bind GitHub release evidence without implying marketplace publication`);
   }
@@ -101,8 +101,8 @@ for (const item of cases) {
 
 const benchmarkMarkers = [
   '<html lang="zh-CN">',
-  'v6.3.6 正式版本',
-  'https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6',
+  'v6.3.7 正式版本',
+  'https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.7',
   '先看成品，',
   '再看交付证据。',
   '脱敏经营复盘',

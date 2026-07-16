@@ -2,7 +2,7 @@
 
 当你准备把 Ultimate PPT Master 放到 Skill 市场、Agent 目录或精选技能列表时，用这份清单检查。
 
-v6.3.6 GitHub 发布与 marketplace 分发是两个独立状态。GitHub 版本只从 [`v6.3.6` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6) 核验。`marketplaceStatus: independent-not-attested` 表示该 Release 既不上传、也不证明市场列表已发布；必须到目标 marketplace 独立查验。
+v6.3.7 GitHub 发布与 marketplace 分发是两个独立状态。GitHub 版本只从 [`v6.3.7` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.7) 核验。`marketplaceStatus: independent-not-attested` 表示该 Release 既不上传、也不证明市场列表已发布；必须到目标 marketplace 独立查验。
 
 ## 上架定位
 

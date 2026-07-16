@@ -5,44 +5,190 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="脱敏合成的产品路演次级公开案例，展示从真实资料到可检查交付的产品链路。">
   <title>产品路演 · 次级公开样例</title>
-  <link rel="icon" href="../../apps/web/public/brand.svg" type="image/svg+xml">
+  <link rel="icon" href="../../brand.svg" type="image/svg+xml">
   <style>
-    :root{--paper:#f6f3ed;--surface:#fffdf8;--ink:#171714;--muted:#67675f;--line:#d9d4c9;--blue:#1d4ed8;--blue-soft:#e8eef9;--coral:#d9573b;--coral-soft:#f7e8e2;--sage:#73866c;font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--paper)}
-    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}body{background:var(--paper)}h1,h2,h3,p{margin:0}.deck{display:flex;width:100%;height:100dvh;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}.deck::-webkit-scrollbar{display:none}
-    .slide{position:relative;flex:0 0 100vw;min-width:0;height:100dvh;padding:clamp(28px,4vw,58px);display:grid;grid-template-rows:auto 1fr auto;gap:clamp(22px,3vw,40px);overflow-y:auto;scroll-snap-align:start;scroll-snap-stop:always;background:var(--paper)}.slide::after{position:absolute;inset:16px;border:1px solid rgba(23,23,20,.1);border-radius:24px;pointer-events:none;content:""}.slide--blue{background:#eef2f8}
-    .chrome,.foot,.content{position:relative;z-index:1}.chrome,.foot{display:flex;justify-content:space-between;gap:18px;color:var(--muted);font-family:"IBM Plex Mono","Noto Sans SC",monospace;font-size:clamp(10px,.8vw,13px);letter-spacing:.03em}.chrome{padding-bottom:14px;border-bottom:1px solid var(--line)}.foot{align-self:end}.content{align-self:center;display:grid;gap:clamp(18px,2.6vw,32px)}
-    .eyebrow{color:var(--coral);font-size:13px;font-weight:800;letter-spacing:.06em}.title{max-width:14ch;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(43px,5.4vw,76px);font-weight:600;line-height:1.08;letter-spacing:-.04em}.subtitle{max-width:42em;color:var(--muted);font-size:clamp(17px,1.5vw,23px);line-height:1.65}
-    .workflow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.stage{min-width:0;min-height:250px;padding:clamp(20px,2.4vw,32px);display:grid;align-content:space-between;gap:22px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}.stage b{color:var(--blue);font-family:"IBM Plex Mono",monospace;font-size:13px}.stage h3{font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(25px,2.2vw,35px)}.stage p{color:var(--muted);line-height:1.65}
-    .proof{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.item{min-width:0;min-height:190px;padding:clamp(18px,2vw,28px);border:1px solid rgba(29,78,216,.22);border-radius:18px;background:rgba(255,253,248,.82)}.item b{display:block;margin-bottom:18px;color:var(--blue);font-family:"IBM Plex Mono",monospace}.item h3{margin-bottom:10px;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(21px,1.8vw,28px)}.item p{color:var(--muted);line-height:1.55}
-    @media(max-width:720px){.slide{padding:26px 24px 66px;gap:18px}.slide::after{inset:10px;border-radius:20px}.chrome span:first-child{max-width:62vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chrome span:last-child{white-space:nowrap}.title{max-width:none;font-size:clamp(39px,12vw,52px)}.subtitle{font-size:16px}.workflow{grid-template-columns:1fr;gap:10px}.stage{min-height:0;padding:17px;gap:8px}.stage h3{font-size:23px}.stage p{font-size:13px}.proof{grid-template-columns:1fr 1fr;gap:10px}.item{min-height:0;padding:16px}.item b{margin-bottom:8px}.item h3{font-size:20px}.item p{font-size:12px}.foot span:first-child{display:none}}
+    :root {
+      --paper: #f6f3ed;
+      --surface: #fffdf8;
+      --ink: #171714;
+      --ink-soft: #3a3a33;
+      --muted: #67675f;
+      --line: #d9d4c9;
+      --blue: #1d4ed8;
+      --blue-soft: #e8eef9;
+      --coral: #d9573b;
+      --coral-soft: #f4e9e4;
+      --sage: #73866c;
+      --radius-md: 18px;
+      --radius-lg: 24px;
+      --shadow-soft: 0 14px 34px rgba(40, 37, 30, 0.08);
+      --shadow-lift: 0 26px 56px rgba(40, 37, 30, 0.13);
+      --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+      --mono: "IBM Plex Mono", "SF Mono", "Noto Sans SC", monospace;
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: var(--paper); }
+    h1, h2, h3, p { margin: 0; }
+    a { color: inherit; }
+
+    .deck { display: flex; width: 100%; height: 100dvh; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; }
+    .deck::-webkit-scrollbar { display: none; }
+
+    .slide {
+      position: relative;
+      flex: 0 0 100vw;
+      min-width: 0;
+      height: 100dvh;
+      padding: clamp(28px, 4vw, 58px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: clamp(22px, 3vw, 40px);
+      overflow-y: auto;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      background-color: var(--paper);
+      background-image: var(--grain);
+      background-size: 170px 170px;
+    }
+    .slide::after { position: absolute; inset: 16px; border: 1px solid rgba(23, 23, 20, 0.1); border-radius:24px; pointer-events: none; content: ""; }
+    .slide--blue { background-color: #eef2f8; }
+
+    .glow { position: absolute; z-index: 0; border-radius: 50%; filter: blur(96px); pointer-events: none; }
+    .glow--blue { width: 44vw; height: 44vw; top: -16vw; right: -12vw; background: rgba(29, 78, 216, 0.10); }
+    .glow--coral { width: 42vw; height: 42vw; bottom: -14vw; left: -10vw; background: rgba(217, 87, 59, 0.09); }
+    .glow--sage { width: 38vw; height: 38vw; top: 24%; left: -8vw; background: rgba(115, 134, 108, 0.10); }
+
+    .chrome, .foot, .content { position: relative; z-index: 1; }
+    .chrome, .foot { display: flex; justify-content: space-between; gap: 18px; color: var(--muted); font-family: var(--mono); font-size: clamp(10px, .8vw, 13px); letter-spacing: .03em; }
+    .chrome { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .foot { align-self: end; }
+    .content { align-self: center; display: grid; gap: clamp(18px, 2.6vw, 32px); }
+
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.22, 1, .36, 1); transition-delay: var(--d, 0s); }
+    .slide.in-view .reveal { opacity: 1; transform: none; }
+
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; color: var(--coral); font-size: 13px; font-weight: 800; letter-spacing: .06em; }
+    .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; background: currentColor; content: ""; }
+    .title { max-width: 12em; font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(43px, 5.4vw, 76px); font-weight: 600; line-height: 1.08; letter-spacing: -.04em; text-wrap: balance; }
+    .subtitle { max-width: 42em; color: var(--muted); font-size: clamp(17px, 1.5vw, 23px); line-height: 1.65; }
+
+    .workflow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .stage { min-width: 0; min-height: 250px; padding: clamp(20px, 2.4vw, 32px); display: grid; align-content: space-between; gap: 22px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); transition: transform .45s cubic-bezier(.22, 1, .36, 1), box-shadow .45s; }
+    .stage:hover { transform: translateY(-5px); box-shadow: var(--shadow-lift); }
+    .stage b { color: var(--blue); font-family: var(--mono); font-size: 13px; }
+    .stage h3 { font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(25px, 2.2vw, 35px); }
+    .stage p { color: var(--muted); line-height: 1.65; }
+
+    .proof { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .item { min-width: 0; min-height: 190px; padding: clamp(18px, 2vw, 28px); border: 1px solid rgba(29, 78, 216, .22); border-radius: var(--radius-lg); background: rgba(255, 253, 248, .82); transition: transform .45s cubic-bezier(.22, 1, .36, 1), box-shadow .45s; }
+    .item:hover { transform: translateY(-5px); box-shadow: var(--shadow-lift); }
+    .item b { display: block; margin-bottom: 18px; color: var(--blue); font-family: var(--mono); }
+    .item h3 { margin-bottom: 10px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(21px, 1.8vw, 28px); }
+    .item p { color: var(--muted); line-height: 1.55; }
+
+    .pager { position: fixed; z-index: 20; right: 30px; bottom: 26px; display: flex; gap: 8px; padding: 8px; border: 1px solid rgba(23, 23, 20, 0.12); border-radius: 999px; background: rgba(255, 255, 255, 0.86); box-shadow: 0 14px 36px rgba(23, 23, 20, 0.12); backdrop-filter: blur(12px); }
+    .pager a { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 800; transition: color .25s, background .25s, transform .25s; }
+    .pager a:hover, .pager a:focus-visible, .pager a.is-active { color: #fff; background: var(--blue); outline: none; transform: scale(1.06); }
+
+    @media(max-width:720px) {
+      .slide { padding: 26px 24px 104px; gap: 18px; }
+      .slide::after { inset: 10px; border-radius: 20px; }
+      .chrome span:first-child { max-width: 62vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .chrome span:last-child { white-space: nowrap; }
+      .title { max-width: none; font-size: clamp(32px, 8.7vw, 44px); }
+      .subtitle { font-size: 16px; }
+      .workflow { grid-template-columns: 1fr; gap: 10px; }
+      .stage { min-height: 0; padding: 17px; gap: 8px; }
+      .stage h3 { font-size: 23px; }
+      .stage p { font-size: 13px; }
+      .proof { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .item { min-height: 0; padding: 16px; }
+      .item b { margin-bottom: 8px; }
+      .item h3 { font-size: 20px; }
+      .item p { font-size: 12px; }
+      .foot span:first-child { display: none; }
+      .pager { right: 12px; bottom: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .stage, .item { transition: none; }
+    }
   </style>
 </head>
 <body>
   <main class="deck" aria-label="产品路演次级公开样例">
     <section class="slide">
+      <div class="glow glow--coral" aria-hidden="true"></div>
       <div class="chrome"><span>产品路演 · 脱敏合成 Proof</span><span>01 / 03</span></div>
-      <div class="content"><p class="eyebrow">从好看的初稿，到真正的交付</p><h1 class="title">AI 演示文稿需要<br>一条生产交接链。</h1><p class="subtitle">产品价值不止是第一稿像不像成品，还要证明资料能进来、过程能恢复、输出能检查。</p></div>
+      <div class="content">
+        <p class="eyebrow reveal">从好看的初稿，到真正的交付</p>
+        <h1 class="title reveal" style="--d:.06s">AI 演示文稿需要<br>一条生产交接链。</h1>
+        <p class="subtitle reveal" style="--d:.12s">产品价值不止是第一稿像不像成品，还要证明资料能进来、过程能恢复、输出能检查。</p>
+      </div>
       <div class="foot"><span>公开合成案例 · 不含用户资料</span><span>滑动 / 方向键</span></div>
     </section>
+
     <section class="slide">
+      <div class="glow glow--blue" aria-hidden="true"></div>
       <div class="chrome"><span>01 · 产品链路</span><span>02 / 03</span></div>
-      <div class="content"><p class="eyebrow">把混乱资料变成可检查成品</p><h2 class="title">真实路径，<br>比抽象能力更有说服力。</h2><div class="workflow">
-        <article class="stage"><b>01 / WEB EXPERIENCE</b><h3>说清任务</h3><p>加入资料，确认受众、交付路线与证据缺口。</p></article>
-        <article class="stage"><b>02 / LOCAL BRIDGE</b><h3>创建本地项目</h3><p>写入 source、manifest、故事板和可恢复交接合同。</p></article>
-        <article class="stage"><b>03 / AGENT SKILL</b><h3>生产与复核</h3><p>生成、渲染、定向修订，最后导出真实 PPTX 或 Web Deck。</p></article>
-      </div></div>
+      <div class="content">
+        <p class="eyebrow reveal">把混乱资料变成可检查成品</p>
+        <h2 class="title reveal" style="--d:.06s">真实路径，<br>比抽象能力更有说服力。</h2>
+        <div class="workflow reveal" style="--d:.12s">
+          <article class="stage"><b>01 / WEB EXPERIENCE</b><h3>说清任务</h3><p>加入资料，确认受众、交付路线与证据缺口。</p></article>
+          <article class="stage"><b>02 / LOCAL BRIDGE</b><h3>创建本地项目</h3><p>写入 source、manifest、故事板和可恢复交接合同。</p></article>
+          <article class="stage"><b>03 / AGENT SKILL</b><h3>生产与复核</h3><p>生成、渲染、定向修订，最后导出真实 PPTX 或 Web Deck。</p></article>
+        </div>
+      </div>
       <div class="foot"><span>预设检查：产品证据必须可打开、可复核</span><span>02 / 03</span></div>
     </section>
+
     <section class="slide slide--blue">
+      <div class="glow glow--sage" aria-hidden="true"></div>
       <div class="chrome"><span>02 · 采用证据</span><span>03 / 03</span></div>
-      <div class="content"><p class="eyebrow">先让请求变得具体</p><h2 class="title">在邀请试用前，<br>先把证明放在台面上。</h2><div class="proof">
-        <article class="item"><b>FILES</b><h3>真实输入</h3><p>PDF、Word、PPTX、Excel、URL 与文字。</p></article>
-        <article class="item"><b>CONTRACT</b><h3>交接合同</h3><p>manifest、故事板、来源映射与质量清单。</p></article>
-        <article class="item"><b>OUTPUTS</b><h3>真实输出</h3><p>可编辑 PPTX 与完整 Web Deck，不是结构截图。</p></article>
-        <article class="item"><b>ASK</b><h3>低风险试用</h3><p>用一份脱敏真实资料，完成一次可回放验证。</p></article>
-      </div></div>
+      <div class="content">
+        <p class="eyebrow reveal">先让请求变得具体</p>
+        <h2 class="title reveal" style="--d:.06s">在邀请试用前，<br>先把证明放在台面上。</h2>
+        <div class="proof reveal" style="--d:.12s">
+          <article class="item"><b>FILES</b><h3>真实输入</h3><p>PDF、Word、PPTX、Excel、URL 与文字。</p></article>
+          <article class="item"><b>CONTRACT</b><h3>交接合同</h3><p>manifest、故事板、来源映射与质量清单。</p></article>
+          <article class="item"><b>OUTPUTS</b><h3>真实输出</h3><p>可编辑 PPTX 与完整 Web Deck，不是结构截图。</p></article>
+          <article class="item"><b>ASK</b><h3>低风险试用</h3><p>用一份脱敏真实资料，完成一次可回放验证。</p></article>
+        </div>
+      </div>
       <div class="foot"><span>主路线：Web Deck · 可选：可编辑 PPTX 附录</span><span>03 / 03</span></div>
     </section>
   </main>
+
+  <nav class="pager" aria-label="页码导航">
+    <a href="#page-1" aria-label="前往第 1 页">1</a>
+    <a href="#page-2" aria-label="前往第 2 页">2</a>
+    <a href="#page-3" aria-label="前往第 3 页">3</a>
+  </nav>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      var links = Array.prototype.slice.call(document.querySelectorAll('.pager a'));
+      function setActive(id) {
+        links.forEach(function (a) { a.classList.toggle('is-active', a.getAttribute('href') === '#' + id); });
+      }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('in-view'); setActive(e.target.id || 'page-' + (slides.indexOf(e.target) + 1)); }
+          });
+        }, { threshold: 0.55 });
+        slides.forEach(function (s, i) { s.id = s.id || 'page-' + (i + 1); io.observe(s); });
+      } else {
+        slides.forEach(function (s, i) { s.id = s.id || 'page-' + (i + 1); s.classList.add('in-view'); });
+      }
+      setActive('page-1');
+    })();
+  </script>
 </body>
 </html>

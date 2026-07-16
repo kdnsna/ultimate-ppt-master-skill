@@ -7,44 +7,194 @@
   <title>咨询方案 · 次级公开样例</title>
   <link rel="icon" href="../../brand.svg" type="image/svg+xml">
   <style>
-    :root{--paper:#f6f3ed;--surface:#fffdf8;--ink:#171714;--muted:#67675f;--line:#d9d4c9;--blue:#1d4ed8;--blue-soft:#e8eef9;--sage:#73866c;--sage-soft:#e8ece5;--coral:#d9573b;font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--paper)}
-    *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;overflow:hidden}body{background:var(--paper)}h1,h2,h3,p,dl,dd{margin:0}a{color:inherit}
-    .deck{display:flex;width:100%;height:100dvh;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}.deck::-webkit-scrollbar{display:none}
-    .slide{position:relative;flex:0 0 100vw;min-width:0;height:100dvh;padding:clamp(28px,4vw,58px);display:grid;grid-template-rows:auto 1fr auto;gap:clamp(22px,3vw,40px);overflow-y:auto;scroll-snap-align:start;scroll-snap-stop:always;background:var(--paper)}
-    .slide::after{position:absolute;inset:16px;border:1px solid rgba(23,23,20,.1);border-radius:24px;pointer-events:none;content:""}.slide--sage{background:#eff1eb}
-    .chrome,.foot,.content{position:relative;z-index:1}.chrome,.foot{display:flex;justify-content:space-between;gap:18px;color:var(--muted);font-family:"IBM Plex Mono","Noto Sans SC",monospace;font-size:clamp(10px,.8vw,13px);letter-spacing:.03em}.chrome{padding-bottom:14px;border-bottom:1px solid var(--line)}.foot{align-self:end}.content{align-self:center;display:grid;gap:clamp(18px,2.6vw,32px)}
-    .eyebrow{color:var(--blue);font-size:13px;font-weight:800;letter-spacing:.06em}.title{max-width:14ch;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(43px,5.4vw,76px);font-weight:600;line-height:1.08;letter-spacing:-.04em}.subtitle{max-width:42em;color:var(--muted);font-size:clamp(17px,1.5vw,23px);line-height:1.65}
-    .option-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.option{min-width:0;padding:clamp(20px,2.4vw,32px);border:1px solid var(--line);border-radius:18px;background:var(--surface)}.option--recommended{border-color:rgba(29,78,216,.42);background:var(--blue-soft);box-shadow:0 16px 36px rgba(29,78,216,.09)}.option small{color:var(--blue);font-weight:800}.option h3{margin:12px 0 22px;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(24px,2.2vw,34px);font-weight:600}.option dl{display:grid;gap:10px}.option dl div{display:flex;justify-content:space-between;gap:14px;padding-top:10px;border-top:1px solid rgba(23,23,20,.12)}.option dt{color:var(--muted)}.option dd{font-weight:800}
-    .road{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.phase{min-width:0;padding:clamp(18px,2vw,28px);border:1px solid rgba(115,134,108,.34);border-radius:18px;background:rgba(255,253,248,.78)}.phase b{display:block;margin-bottom:18px;color:var(--blue);font-family:"IBM Plex Mono",monospace;font-size:13px}.phase h3{margin-bottom:10px;font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(20px,1.8vw,28px)}.phase p{color:var(--muted);line-height:1.6}
-    @media(max-width:720px){.slide{padding:26px 24px 66px;gap:18px}.slide::after{inset:10px;border-radius:20px}.chrome span:first-child{max-width:62vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chrome span:last-child{white-space:nowrap}.title{max-width:none;font-size:clamp(39px,12vw,52px)}.subtitle{font-size:16px}.option-grid{grid-template-columns:1fr}.option{padding:18px}.option h3{margin:8px 0 14px;font-size:25px}.option dl{gap:5px}.option dl div{padding-top:7px;font-size:13px}.road{grid-template-columns:1fr 1fr;gap:10px}.phase{padding:16px}.phase b{margin-bottom:8px}.phase h3{font-size:20px}.phase p{font-size:13px}.foot span:first-child{display:none}}
+    :root {
+      --paper: #f6f3ed;
+      --surface: #fffdf8;
+      --ink: #171714;
+      --ink-soft: #3a3a33;
+      --muted: #67675f;
+      --line: #d9d4c9;
+      --blue: #1d4ed8;
+      --blue-soft: #e8eef9;
+      --sage: #73866c;
+      --sage-soft: #e8ece5;
+      --coral: #d9573b;
+      --coral-soft: #f4e9e4;
+      --radius-md: 18px;
+      --radius-lg: 24px;
+      --shadow-soft: 0 14px 34px rgba(40, 37, 30, 0.08);
+      --shadow-lift: 0 26px 56px rgba(40, 37, 30, 0.13);
+      --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+      --mono: "IBM Plex Mono", "SF Mono", "Noto Sans SC", monospace;
+      font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+    body { background: var(--paper); }
+    h1, h2, h3, p, dl, dd { margin: 0; }
+    a { color: inherit; }
+
+    .deck { display: flex; width: 100%; height: 100dvh; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; }
+    .deck::-webkit-scrollbar { display: none; }
+
+    .slide {
+      position: relative;
+      flex: 0 0 100vw;
+      min-width: 0;
+      height: 100dvh;
+      padding: clamp(28px, 4vw, 58px);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: clamp(22px, 3vw, 40px);
+      overflow-y: auto;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      background-color: var(--paper);
+      background-image: var(--grain);
+      background-size: 170px 170px;
+    }
+    .slide::after { position: absolute; inset: 16px; border: 1px solid rgba(23, 23, 20, 0.1); border-radius:24px; pointer-events: none; content: ""; }
+    .slide--sage { background-color: #eff1eb; }
+
+    .glow { position: absolute; z-index: 0; border-radius: 50%; filter: blur(96px); pointer-events: none; }
+    .glow--blue { width: 44vw; height: 44vw; top: -16vw; right: -12vw; background: rgba(29, 78, 216, 0.09); }
+    .glow--coral { width: 40vw; height: 40vw; bottom: -14vw; left: -10vw; background: rgba(217, 87, 59, 0.08); }
+    .glow--sage { width: 38vw; height: 38vw; top: 24%; left: -8vw; background: rgba(115, 134, 108, 0.10); }
+
+    .chrome, .foot, .content { position: relative; z-index: 1; }
+    .chrome, .foot { display: flex; justify-content: space-between; gap: 18px; color: var(--muted); font-family: var(--mono); font-size: clamp(10px, .8vw, 13px); letter-spacing: .03em; }
+    .chrome { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .foot { align-self: end; }
+    .content { align-self: center; display: grid; gap: clamp(18px, 2.6vw, 32px); }
+
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s cubic-bezier(.22, 1, .36, 1); transition-delay: var(--d, 0s); }
+    .slide.in-view .reveal { opacity: 1; transform: none; }
+
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; color: var(--blue); font-size: 13px; font-weight: 800; letter-spacing: .06em; }
+    .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; background: currentColor; content: ""; }
+    .title { max-width: 12em; font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(43px, 5.4vw, 76px); font-weight: 600; line-height: 1.08; letter-spacing: -.04em; text-wrap: balance; }
+    .subtitle { max-width: 42em; color: var(--muted); font-size: clamp(17px, 1.5vw, 23px); line-height: 1.65; }
+
+    .option-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .option { min-width: 0; padding: clamp(20px, 2.4vw, 32px); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); transition: transform .45s cubic-bezier(.22, 1, .36, 1), box-shadow .45s; }
+    .option:hover { transform: translateY(-5px); box-shadow: var(--shadow-lift); }
+    .option--recommended { border-color: rgba(29, 78, 216, .42); background: var(--blue-soft); box-shadow: 0 16px 36px rgba(29, 78, 216, .09); }
+    .option small { color: var(--blue); font-weight: 800; }
+    .option h3 { margin: 12px 0 22px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(24px, 2.2vw, 34px); font-weight: 600; }
+    .option dl { display: grid; gap: 10px; }
+    .option dl div { display: flex; justify-content: space-between; gap: 14px; padding-top: 10px; border-top: 1px solid rgba(23, 23, 20, .12); }
+    .option dt { color: var(--muted); }
+    .option dd { font-weight: 800; }
+
+    .road { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .phase { min-width: 0; padding: clamp(18px, 2vw, 28px); border: 1px solid rgba(115, 134, 108, .34); border-radius: var(--radius-lg); background: rgba(255, 253, 248, .78); transition: transform .45s cubic-bezier(.22, 1, .36, 1), box-shadow .45s; }
+    .phase:hover { transform: translateY(-5px); box-shadow: var(--shadow-lift); }
+    .phase b { display: block; margin-bottom: 18px; color: var(--blue); font-family: var(--mono); font-size: 13px; }
+    .phase h3 { margin-bottom: 10px; font-family: "Noto Serif SC", "Songti SC", serif; font-size: clamp(20px, 1.8vw, 28px); }
+    .phase p { color: var(--muted); line-height: 1.6; }
+
+    .pager { position: fixed; z-index: 20; right: 30px; bottom: 26px; display: flex; gap: 8px; padding: 8px; border: 1px solid rgba(23, 23, 20, 0.12); border-radius: 999px; background: rgba(255, 255, 255, 0.86); box-shadow: 0 14px 36px rgba(23, 23, 20, 0.12); backdrop-filter: blur(12px); }
+    .pager a { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: var(--muted); text-decoration: none; font-size: 12px; font-weight: 800; transition: color .25s, background .25s, transform .25s; }
+    .pager a:hover, .pager a:focus-visible, .pager a.is-active { color: #fff; background: var(--blue); outline: none; transform: scale(1.06); }
+
+    @media(max-width:720px) {
+      .slide { padding: 26px 24px 104px; gap: 18px; }
+      .slide::after { inset: 10px; border-radius: 20px; }
+      .chrome span:first-child { max-width: 62vw; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .chrome span:last-child { white-space: nowrap; }
+      .title { max-width: none; font-size: clamp(32px, 8.7vw, 44px); }
+      .subtitle { font-size: 16px; }
+      .option-grid { grid-template-columns: 1fr; }
+      .option { padding: 18px; }
+      .option h3 { margin: 8px 0 14px; font-size: 25px; }
+      .option dl { gap: 5px; }
+      .option dl div { padding-top: 7px; font-size: 13px; }
+      .road { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .phase { padding: 16px; }
+      .phase b { margin-bottom: 8px; }
+      .phase h3 { font-size: 20px; }
+      .phase p { font-size: 13px; }
+      .foot span:first-child { display: none; }
+      .pager { right: 12px; bottom: 12px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .option, .phase { transition: none; }
+    }
   </style>
 </head>
 <body>
   <main class="deck" aria-label="咨询方案次级公开样例">
     <section class="slide">
+      <div class="glow glow--blue" aria-hidden="true"></div>
       <div class="chrome"><span>咨询方案 · 脱敏合成 Proof</span><span>01 / 03</span></div>
-      <div class="content"><p class="eyebrow">先把问题说清楚</p><h1 class="title">先定义决策，<br>再展开分析。</h1><p class="subtitle">这是一份用于问题定义、方案比较、明确推荐、实施路线与治理机制的可复用结构。</p></div>
+      <div class="content">
+        <p class="eyebrow reveal">先把问题说清楚</p>
+        <h1 class="title reveal" style="--d:.06s">先定义决策，<br>再展开分析。</h1>
+        <p class="subtitle reveal" style="--d:.12s">这是一份用于问题定义、方案比较、明确推荐、实施路线与治理机制的可复用结构。</p>
+      </div>
       <div class="foot"><span>公开合成案例 · 不含客户资料</span><span>滑动 / 方向键</span></div>
     </section>
+
     <section class="slide">
+      <div class="glow glow--coral" aria-hidden="true"></div>
       <div class="chrome"><span>01 · 方案比较</span><span>02 / 03</span></div>
-      <div class="content"><p class="eyebrow">用明确标准，不用模糊的利弊</p><h2 class="title">推荐必须经得起<br>同一尺度的比较。</h2><div class="option-grid">
-        <article class="option"><small>方案 A</small><h3>快速改善</h3><dl><div><dt>影响</dt><dd>中</dd></div><div><dt>速度</dt><dd>快</dd></div><div><dt>治理</dt><dd>较弱</dd></div></dl></article>
-        <article class="option option--recommended"><small>推荐 · 方案 B</small><h3>跨部门增长专项</h3><dl><div><dt>影响</dt><dd>高</dd></div><div><dt>速度</dt><dd>中</dd></div><div><dt>治理</dt><dd>清晰</dd></div></dl></article>
-        <article class="option"><small>方案 C</small><h3>客户旅程重构</h3><dl><div><dt>影响</dt><dd>高</dd></div><div><dt>速度</dt><dd>慢</dd></div><div><dt>治理</dt><dd>复杂</dd></div></dl></article>
-      </div></div>
+      <div class="content">
+        <p class="eyebrow reveal">用明确标准，不用模糊的利弊</p>
+        <h2 class="title reveal" style="--d:.06s">推荐必须经得起<br>同一尺度的比较。</h2>
+        <div class="option-grid reveal" style="--d:.12s">
+          <article class="option"><small>方案 A</small><h3>快速改善</h3><dl><div><dt>影响</dt><dd>中</dd></div><div><dt>速度</dt><dd>快</dd></div><div><dt>治理</dt><dd>较弱</dd></div></dl></article>
+          <article class="option option--recommended"><small>推荐 · 方案 B</small><h3>跨部门增长专项</h3><dl><div><dt>影响</dt><dd>高</dd></div><div><dt>速度</dt><dd>中</dd></div><div><dt>治理</dt><dd>清晰</dd></div></dl></article>
+          <article class="option"><small>方案 C</small><h3>客户旅程重构</h3><dl><div><dt>影响</dt><dd>高</dd></div><div><dt>速度</dt><dd>慢</dd></div><div><dt>治理</dt><dd>复杂</dd></div></dl></article>
+        </div>
+      </div>
       <div class="foot"><span>预设检查：证据、评估标准与推荐逻辑</span><span>02 / 03</span></div>
     </section>
+
     <section class="slide slide--sage">
+      <div class="glow glow--sage" aria-hidden="true"></div>
       <div class="chrome"><span>02 · 实施路线</span><span>03 / 03</span></div>
-      <div class="content"><p class="eyebrow">把推荐变成可执行合同</p><h2 class="title">有责任人和复盘点，<br>路线才算成立。</h2><div class="road">
-        <article class="phase"><b>01 / 范围</b><h3>确认目标</h3><p>锁定问题边界、指标口径和负责人。</p></article>
-        <article class="phase"><b>02 / 试验</b><h3>聚焦验证</h3><p>针对高价值旅程运行小范围实验。</p></article>
-        <article class="phase"><b>03 / 扩展</b><h3>跨部门推进</h3><p>在证据成立后扩展项目与资源。</p></article>
-        <article class="phase"><b>04 / 治理</b><h3>复盘风险</h3><p>按程序检查结果、偏差与下一轮决策。</p></article>
-      </div></div>
+      <div class="content">
+        <p class="eyebrow reveal">把推荐变成可执行合同</p>
+        <h2 class="title reveal" style="--d:.06s">有责任人和复盘点，<br>路线才算成立。</h2>
+        <div class="road reveal" style="--d:.12s">
+          <article class="phase"><b>01 / 范围</b><h3>确认目标</h3><p>锁定问题边界、指标口径和负责人。</p></article>
+          <article class="phase"><b>02 / 试验</b><h3>聚焦验证</h3><p>针对高价值旅程运行小范围实验。</p></article>
+          <article class="phase"><b>03 / 扩展</b><h3>跨部门推进</h3><p>在证据成立后扩展项目与资源。</p></article>
+          <article class="phase"><b>04 / 治理</b><h3>复盘风险</h3><p>按程序检查结果、偏差与下一轮决策。</p></article>
+        </div>
+      </div>
       <div class="foot"><span>主路线：可编辑 PPTX · 可选：Web Deck</span><span>03 / 03</span></div>
     </section>
   </main>
+
+  <nav class="pager" aria-label="页码导航">
+    <a href="#page-1" aria-label="前往第 1 页">1</a>
+    <a href="#page-2" aria-label="前往第 2 页">2</a>
+    <a href="#page-3" aria-label="前往第 3 页">3</a>
+  </nav>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      var links = Array.prototype.slice.call(document.querySelectorAll('.pager a'));
+      function setActive(id) {
+        links.forEach(function (a) { a.classList.toggle('is-active', a.getAttribute('href') === '#' + id); });
+      }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('in-view'); setActive(e.target.id || 'page-' + (slides.indexOf(e.target) + 1)); }
+          });
+        }, { threshold: 0.55 });
+        slides.forEach(function (s, i) { s.id = s.id || 'page-' + (i + 1); io.observe(s); });
+      } else {
+        slides.forEach(function (s, i) { s.id = s.id || 'page-' + (i + 1); s.classList.add('in-view'); });
+      }
+      setActive('page-1');
+    })();
+  </script>
 </body>
 </html>
