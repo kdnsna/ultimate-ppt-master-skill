@@ -1,7 +1,7 @@
 {
   "name": "ultimate-ppt-master-desktop",
   "private": true,
-  "version": "6.3.6",
+  "version": "6.3.7",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",

@@ -32,7 +32,8 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 
 | 需求 | 阅读 |
 |---|---|
-| 查看当前 GitHub 正式版本 | [发布说明 - v6.3.6](./release/release-notes-v6.3.6.md) |
+| 查看当前 GitHub 正式版本 | [发布说明 - v6.3.7](./release/release-notes-v6.3.7.md) |
+| 查看上一正式版本 | [发布说明 - v6.3.6](./release/release-notes-v6.3.6.md) |
 | 查看 v6.3.5 精修与运行切片 | [候选说明 - v6.3.5](./release/release-notes-v6.3.5.md) |
 | 查看 v6.3.4 会话与交付切片 | [候选说明 - v6.3.4](./release/release-notes-v6.3.4.md) |
 | 查看 v6.3.3 资料与证据切片 | [候选说明 - v6.3.3](./release/release-notes-v6.3.3.md) |
@@ -67,4 +68,4 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 打开 Web Experience -> 加入真实资料 -> 确认故事板和视觉方向 -> 创建本地项目 -> 启动或复制 Codex 命令 -> 发现并下载真实产物 -> 通过质量门禁后交付
 ```
 
-v6.3.6 的源码机器状态为 `github-released`；是否真正发布，只以 [`v6.3.6` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6) 为权威证据。GitHub Release 不会自动发布 marketplace；市场记录需独立核验。主线继续保持中文任务入口、稳定故事板合同、本地 Agent 和真实产物下载。HTTP 字段、Provider 与兼容细节保留在专业指南中，不占据普通用户首屏。
+v6.3.7 的源码机器状态为 `github-released`；是否真正发布，只以 [`v6.3.7` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.7) 为权威证据。GitHub Release 不会自动发布 marketplace；市场记录需独立核验。主线继续保持中文任务入口、稳定故事板合同、本地 Agent 和真实产物下载。HTTP 字段、Provider 与兼容细节保留在专业指南中，不占据普通用户首屏。

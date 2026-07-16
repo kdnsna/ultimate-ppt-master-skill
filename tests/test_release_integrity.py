@@ -7,10 +7,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "6.3.6"
+VERSION = "6.3.7"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
 RELEASE_STATUS = "github-released"
-RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.7"
 MARKETPLACE_STATUS = "independent-not-attested"
 
 
@@ -76,7 +76,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn(f"release/release-notes-v{version}.md", (ROOT / "docs/README.md").read_text(encoding="utf-8"))
         self.assertIn(f"release/release-notes-v{version}.md", (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8"))
 
-    def test_v632_to_v635_candidate_notes_and_v636_release_contract_are_truthful(self):
+    def test_v632_to_v635_candidate_notes_and_current_release_contract_are_truthful(self):
         docs_en = (ROOT / "docs/README.md").read_text(encoding="utf-8")
         docs_zh = (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8")
 
@@ -123,8 +123,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "独立回滚边界",
         ):
             self.assertIn(marker, release_zh)
-        self.assertIn("../zh-CN/release/release-notes-v6.3.6.md", release_en)
-        self.assertIn("../../release/release-notes-v6.3.6.md", release_zh)
+        self.assertIn("../zh-CN/release/release-notes-v6.3.7.md", release_en)
+        self.assertIn("../../release/release-notes-v6.3.7.md", release_zh)
 
     def test_core_entry_scripts_exist(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
@@ -180,6 +180,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/release/release-notes-v6.3.3.md",
             "docs/release/release-notes-v6.3.4.md",
             "docs/release/release-notes-v6.3.5.md",
+            "docs/release/release-notes-v6.3.7.md",
             "docs/release/release-notes-v6.3.6.md",
             "docs/release/release-notes-v5.4.1.md",
             "docs/release/release-notes-v5.3.0.md",
@@ -202,6 +203,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/release/release-notes-v6.3.3.md",
             "docs/zh-CN/release/release-notes-v6.3.4.md",
             "docs/zh-CN/release/release-notes-v6.3.5.md",
+            "docs/zh-CN/release/release-notes-v6.3.7.md",
             "docs/zh-CN/release/release-notes-v6.3.6.md",
             "docs/zh-CN/release/release-notes-v5.4.1.md",
             "docs/zh-CN/release/release-notes-v5.3.0.md",
@@ -559,7 +561,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertEqual(finished_png_bytes[:8], b"\x89PNG\r\n\x1a\n")
         self.assertEqual((int.from_bytes(finished_png_bytes[16:20]), int.from_bytes(finished_png_bytes[20:24])), (1440, 810))
         source_text = finished_decks_source.read_text(encoding="utf-8")
-        for marker in ("V6.3.6 正式版本", "226 个原生矢量对象", "AI Web Deck"):
+        for marker in ("V6.3.7 正式版本", "226 个原生矢量对象", "AI Web Deck"):
             self.assertIn(marker, source_text)
 
         design_system = (ROOT / "DESIGN.md").read_text(encoding="utf-8")

@@ -2,7 +2,7 @@
 
 Use this checklist when preparing Ultimate PPT Master for a skill marketplace, agent directory, or curated skill list.
 
-The v6.3.6 GitHub release and marketplace distribution are separate states. Verify the GitHub version from the [`v6.3.6` tag and GitHub Release page](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.6). `marketplaceStatus: independent-not-attested` means that release neither uploads nor proves a marketplace listing; verify the target marketplace record independently.
+The v6.3.7 GitHub release and marketplace distribution are separate states. Verify the GitHub version from the [`v6.3.7` tag and GitHub Release page](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.7). `marketplaceStatus: independent-not-attested` means that release neither uploads nor proves a marketplace listing; verify the target marketplace record independently.
 
 ## Listing Positioning
 
