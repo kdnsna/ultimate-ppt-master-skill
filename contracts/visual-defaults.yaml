@@ -1,0 +1,40 @@
+# Visual defaults aligned with DESIGN.md and SKILL.md.
+schemaVersion: visual-defaults-v1
+version: "6.3.8"
+
+surfaces:
+  paper: "#F6F3ED"
+  ink: "#171714"
+  mineralBlue: "#1D4ED8"
+  signalCoral: "#D9573B"
+  sage: "#73866C"
+
+cover:
+  default: light-or-warm-paper
+  formalEditable: light-or-near-white
+  darkOnlyWhen:
+    - user-request
+    - brand-system
+    - explicit-art-direction
+    - image-led-launch
+  preferredComposition: asymmetric-light-hero
+
+pageRhythmExtremeThinWeb:
+  - light-or-warm-paper-cover
+  - light-context
+  - restrained-tension-or-opportunity
+  - light-structure
+  - large-divider
+  - evidence-or-scene
+  - point-of-view-dark-only-if-direction-requires
+  - light-closing
+
+typography:
+  formalBodyMinPx: 18
+  formalBodyPreferredPx: [18, 22]
+  webBodyPreferredPx: [28, 34]
+
+softEdge:
+  pptxContainerPt: [8, 14]
+  webSurfacePx: [12, 20]
+  coverHeroPt: [18, 24]

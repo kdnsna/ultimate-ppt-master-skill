@@ -115,3 +115,14 @@ flask>=3.0.0
 # ─────────────────────────────────────────────────────────────
 # Codex skill quick_validate.py reads SKILL.md frontmatter through PyYAML.
 PyYAML>=6.0.0
+
+# ─────────────────────────────────────────────────────────────
+# Visual review profile / 视觉复核 profile (optional)
+# bash scripts/bootstrap.sh --profile visual-review
+# ─────────────────────────────────────────────────────────────
+# Browser-based SVG preview rendering used by scripts/visual_review.py.
+# Not required for core source parsing or basic PPTX export.
+# 用于 scripts/visual_review.py 的浏览器渲染预览；核心解析/导出不强制。
+# playwright>=1.40.0
+# Then: python -m playwright install chromium
+

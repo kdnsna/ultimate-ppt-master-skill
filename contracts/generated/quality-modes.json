@@ -1,0 +1,133 @@
+{
+  "audit": {
+    "id": "audit",
+    "label": "Audit",
+    "aliases": [
+      "formal-audit"
+    ],
+    "useCases": [
+      "board materials",
+      "government",
+      "finance compliance",
+      "external release"
+    ],
+    "execution": {
+      "serialStrict": true,
+      "allowGroupedGeneration": false,
+      "allowSubAgentSvgGeneration": false,
+      "requirePerPageSpecLockReread": true,
+      "requireLongRunningPreviewServer": true,
+      "requireBrowserScreenshots": true,
+      "requireDesignQualityReport": true,
+      "requirePowerPointEnvironmentCheck": true,
+      "preserveCurrentFormalGates": true
+    },
+    "assets": {
+      "maxGeneratedImages": 8,
+      "preferNativeEvidence": true,
+      "allowAiImages": true
+    },
+    "gates": {
+      "structure": "fail",
+      "overflow": "fail",
+      "fileValidity": "fail",
+      "formalDelivery": "fail",
+      "designCompletion": "fail",
+      "visualReview": "fail",
+      "missingPreviewPng": "fail",
+      "missingDesignReport": "fail",
+      "blankPageRisk": "fail"
+    },
+    "budgets": {
+      "maxPlannerCalls": 2,
+      "maxVisualReviewCalls": 2,
+      "maxRetriesPerAsset": 1,
+      "maxCustomSlides": 6,
+      "budgetPolicy": "prefer-native-evidence"
+    }
+  },
+  "quick": {
+    "id": "quick",
+    "label": "Quick",
+    "useCases": [
+      "draft",
+      "internal discussion",
+      "content validation"
+    ],
+    "execution": {
+      "serialStrict": false,
+      "allowGroupedGeneration": true,
+      "allowDeterministicLayoutCompile": true,
+      "requirePerPageSpecLockReread": false,
+      "requireLongRunningPreviewServer": false,
+      "requireBrowserScreenshots": false,
+      "requireDesignQualityReport": false,
+      "requirePowerPointEnvironmentCheck": false
+    },
+    "assets": {
+      "maxGeneratedImages": 0,
+      "preferNativeEvidence": true,
+      "allowAiImages": false
+    },
+    "gates": {
+      "structure": "fail",
+      "overflow": "fail",
+      "fileValidity": "fail",
+      "visualReview": "warning",
+      "missingPreviewPng": "warning",
+      "missingDesignReport": "warning"
+    },
+    "budgets": {
+      "maxPlannerCalls": 1,
+      "maxVisualReviewCalls": 0,
+      "maxRetriesPerAsset": 0,
+      "maxCustomSlides": 1,
+      "budgetPolicy": "prefer-native-evidence"
+    }
+  },
+  "standard": {
+    "id": "standard",
+    "label": "Standard",
+    "useCases": [
+      "most formal reports",
+      "default production path"
+    ],
+    "execution": {
+      "serialStrict": false,
+      "allowGroupedGeneration": false,
+      "allowDeterministicLayoutCompile": true,
+      "refineCoverAndKeyPages": true,
+      "requirePerPageSpecLockReread": false,
+      "requireLongRunningPreviewServer": false,
+      "requireBrowserScreenshots": "recommended",
+      "requireDesignQualityReport": "recommended",
+      "requirePowerPointEnvironmentCheck": false
+    },
+    "assets": {
+      "maxGeneratedImages": 4,
+      "preferNativeEvidence": true,
+      "allowAiImages": true,
+      "aiImageTargets": [
+        "cover",
+        "section",
+        "concept"
+      ]
+    },
+    "gates": {
+      "structure": "fail",
+      "overflow": "fail",
+      "fileValidity": "fail",
+      "formalDelivery": "fail",
+      "visualReview": "warning",
+      "missingPreviewPng": "warning",
+      "missingDesignReport": "warning"
+    },
+    "budgets": {
+      "maxPlannerCalls": 1,
+      "maxVisualReviewCalls": 1,
+      "maxRetriesPerAsset": 1,
+      "maxCustomSlides": 3,
+      "budgetPolicy": "prefer-native-evidence"
+    }
+  }
+}

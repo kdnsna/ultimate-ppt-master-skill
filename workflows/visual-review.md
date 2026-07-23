@@ -41,12 +41,12 @@ For decks containing data charts, run [`verify-charts`](./verify-charts.md) firs
 pip install playwright
 python3 -m playwright install chromium
 
-# 2. live-preview server running for this project (provides inlined SVG fetch)
-python3 skills/ppt-master/scripts/svg_editor/server.py <project_path> --no-browser
+# 2. live-preview server (optional manual start)
+python3 scripts/svg_editor/server.py <project_path> --no-browser
 # (single instance per project — if it's already running, skip)
 ```
 
-The renderer (`visual_review.py`) does **not** auto-start the live-preview server. It expects the server to be reachable at `http://localhost:5050` (override with `--server-url`).
+The renderer (`visual_review.py`) **auto-starts a temporary preview server** when none is reachable, then shuts it down on exit. Pass `--no-auto-server` to require an already-running server at `http://localhost:5050` (override with `--server-url`). Install the visual-review profile first: `bash scripts/bootstrap.sh --profile visual-review`.
 
 > **Why playwright, not cairosvg**: cairo's text API has no font-fallback chain, so CJK characters render as tofu boxes for any deck whose font-family list relies on system fallback (Microsoft YaHei / PingFang SC / etc.). Playwright drives a real chromium and produces output identical to what the live-preview browser shows — the only fidelity-preserving option for bilingual decks.
 
@@ -55,7 +55,7 @@ The renderer (`visual_review.py`) does **not** auto-start the live-preview serve
 ## Step 1 — Pre-render all PNGs
 
 ```bash
-python3 skills/ppt-master/scripts/visual_review.py <project_path>
+python3 scripts/visual_review.py <project_path>
 ```
 
 This writes one PNG per page to `<project_path>/.preview/<page>.png` at 1280×720, with `<use data-icon>` inlined and `<image href>` resolved exactly as the live-preview browser sees them. Renders are serialized via a project-local file lock — safe to invoke concurrently.
@@ -91,7 +91,7 @@ The orchestrator prompt must be self-contained and is the **single** place where
 - Full page list with `page_role` per page (parse `<project>/design_spec.md` §IX outline; if §IX is absent, default every page to `content` and flag this in the final report)
 - Batch size `K` (default 5; raise to 10 for token-sensitive runs on large decks, lower to 3 for high-fidelity short decks — see rubric §6.1)
 - Iteration budget per page (default 1; 2 only for high-stakes / final-cut runs — see [Appendix: Iteration loop](#appendix-iteration-loop-opt-in))
-- Path to the rubric: `skills/ppt-master/references/visual-review.md`
+- Path to the rubric: `references/visual-review.md`
 - Dispatch contract reference: rubric [§6](../references/visual-review.md#6-dispatch--messaging-contract) (batched parallel spawn, self-contained prompts, mandatory `SendMessage` on idle, anonymous-name tolerance)
 - Subagent forbid list: do not edit any other page, `design_spec.md`, `spec_lock.md`, `animations.json`, `image_prompts.json`, or `images/`
 
@@ -134,9 +134,9 @@ If `brand_review.json` is non-empty, that's a single decision applied across the
 After the table is clean, continue to post-processing per [`SKILL.md`](../SKILL.md) Step 7:
 
 ```bash
-python3 skills/ppt-master/scripts/total_md_split.py <project_path>
-python3 skills/ppt-master/scripts/finalize_svg.py <project_path>
-python3 skills/ppt-master/scripts/svg_to_pptx.py <project_path>
+python3 scripts/total_md_split.py <project_path>
+python3 scripts/finalize_svg.py <project_path>
+python3 scripts/svg_to_pptx.py <project_path>
 ```
 
 ---

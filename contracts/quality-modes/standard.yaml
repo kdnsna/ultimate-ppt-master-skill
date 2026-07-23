@@ -1,0 +1,37 @@
+id: standard
+label: Standard
+useCases:
+  - most formal reports
+  - default production path
+execution:
+  serialStrict: false
+  allowGroupedGeneration: false
+  allowDeterministicLayoutCompile: true
+  refineCoverAndKeyPages: true
+  requirePerPageSpecLockReread: false
+  requireLongRunningPreviewServer: false
+  requireBrowserScreenshots: recommended
+  requireDesignQualityReport: recommended
+  requirePowerPointEnvironmentCheck: false
+assets:
+  maxGeneratedImages: 4
+  preferNativeEvidence: true
+  allowAiImages: true
+  aiImageTargets:
+    - cover
+    - section
+    - concept
+gates:
+  structure: fail
+  overflow: fail
+  fileValidity: fail
+  formalDelivery: fail
+  visualReview: warning
+  missingPreviewPng: warning
+  missingDesignReport: warning
+budgets:
+  maxPlannerCalls: 1
+  maxVisualReviewCalls: 1
+  maxRetriesPerAsset: 1
+  maxCustomSlides: 3
+  budgetPolicy: prefer-native-evidence

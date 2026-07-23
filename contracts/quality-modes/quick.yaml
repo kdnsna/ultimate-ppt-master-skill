@@ -1,0 +1,32 @@
+id: quick
+label: Quick
+useCases:
+  - draft
+  - internal discussion
+  - content validation
+execution:
+  serialStrict: false
+  allowGroupedGeneration: true
+  allowDeterministicLayoutCompile: true
+  requirePerPageSpecLockReread: false
+  requireLongRunningPreviewServer: false
+  requireBrowserScreenshots: false
+  requireDesignQualityReport: false
+  requirePowerPointEnvironmentCheck: false
+assets:
+  maxGeneratedImages: 0
+  preferNativeEvidence: true
+  allowAiImages: false
+gates:
+  structure: fail
+  overflow: fail
+  fileValidity: fail
+  visualReview: warning
+  missingPreviewPng: warning
+  missingDesignReport: warning
+budgets:
+  maxPlannerCalls: 1
+  maxVisualReviewCalls: 0
+  maxRetriesPerAsset: 0
+  maxCustomSlides: 1
+  budgetPolicy: prefer-native-evidence

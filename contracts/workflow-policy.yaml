@@ -1,0 +1,135 @@
+# Machine-readable workflow policy for Ultimate PPT Master.
+# Source of truth for agent entry fragments and runtime defaults.
+schemaVersion: workflow-policy-v1
+version: "6.3.8"
+
+sourceOfTruth:
+  skill: SKILL.md
+  design: DESIGN.md
+  contractsDir: contracts/
+
+bestEffectBrief:
+  required: true
+  recordFields:
+    - promptQuality
+    - autoExpandedAssumptions
+    - recommendedRoute
+    - decisionProvenance
+
+routing:
+  askBeforeGenerate: false
+  askOnlyWhenMateriallyAmbiguous: true
+  maxUserFacingQuestions: 3
+  rules:
+    - id: explicit-formal-signal
+      priority: 10
+      route: formal-editable-pptx
+      qualityMode: standard
+      signals:
+        - ".pptx"
+        - "pptx"
+        - "PowerPoint"
+        - "可编辑"
+        - "汇报"
+        - "报告"
+        - "政府"
+        - "金融"
+        - "培训"
+        - "审计"
+        - "consulting"
+        - "business report"
+        - "board deck"
+        - "editable"
+        - "stakeholder"
+        - "training"
+        - "government"
+        - "finance"
+        - "audit"
+    - id: explicit-web-signal
+      priority: 20
+      route: magazine-web-deck
+      qualityMode: standard
+      signals:
+        - "HTML"
+        - "web PPT"
+        - "网页"
+        - "magazine"
+        - "editorial"
+        - "e-ink"
+        - "电子墨水"
+        - "Swiss"
+        - "横滑"
+        - "keynote"
+        - "showcase"
+        - "demo-day"
+        - "browser-first"
+    - id: extreme-thin-fallback
+      priority: 90
+      route: guizang-web-fixed-style
+      qualityMode: standard
+      when:
+        promptQuality: extreme-thin
+        noFormalSignal: true
+        noWebSignal: true
+      defaults:
+        mode: "Mode 2: Magazine Web Deck"
+        style: "Style A · 电子杂志 × 电子墨水"
+        pages: 8
+        coverSurface: light-or-warm-paper
+        pageRhythm:
+          - "light or warm-paper cover with one strong title, minimal subtitle, and one soft-edged visual/evidence panel"
+          - "light context page for problem, trend, or setting"
+          - "image/text or restrained signal spread for tension or opportunity"
+          - "light structure page with a three-part framework, path, or method"
+          - "large-statement section divider"
+          - "evidence / scene / case page"
+          - "point-of-view page with final judgment or question; use dark only when the user, reference, or chosen direction calls for it"
+          - "light closing page with action, takeaway, or ending line"
+
+visualDefaults:
+  defaultCoverSurface: light-or-warm-paper
+  allowDarkCoverOnlyWhen: [user, brand, explicit-art-direction]
+  inkIsTextColorNotDefaultBackground: true
+  formalPptxDefaultCover: light-or-near-white
+  forbidFullPageBlackCoverByDefault: true
+
+sourceImport:
+  defaultMode: copy
+  allowMove: true
+  moveFlag: "--move"
+  copyFlag: "--copy"
+  archiveAndRemoveOriginalFlag: "--archive-and-remove-original"
+  repoInternalDefault: move
+  userFacingDefault: copy
+
+evidenceStates:
+  allowed:
+    - unmapped
+    - candidate
+    - grounded
+    - conflicted
+    - missing
+  draftWithReadySources: unmapped
+  groundedRequiresClaimBinding: true
+  neverGroundFromSourcePresenceAlone: true
+
+qualityModes:
+  default: standard
+  available: [quick, standard, audit]
+  formalDefault: standard
+  boardGovernmentFinanceExternal: audit
+
+agentEntryFragments:
+  generate:
+    - AGENTS.md
+    - CLAUDE.md
+    - PROMPT.md
+  skillSections:
+    - best-effect-brief
+    - extreme-thin-fallback
+    - source-import
+    - quality-modes
+  runtimeArtifacts:
+    - packages/workspace-core/src/generated/policy.ts
+    - scripts/generated/policy.py
+    - contracts/generated/route-policy.json

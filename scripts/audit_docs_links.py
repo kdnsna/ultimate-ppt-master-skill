@@ -11,10 +11,10 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "6.3.7"
+VERSION = "6.3.8"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
 RELEASE_STATUS = "github-released"
-RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.7"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.8"
 MARKETPLACE_STATUS = "independent-not-attested"
 README_BANNED_PHRASES = (
     "Best Results Prompt",

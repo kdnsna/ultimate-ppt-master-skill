@@ -7,14 +7,48 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "6.3.7"
+VERSION = "6.3.8"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
 RELEASE_STATUS = "github-released"
-RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.7"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.8"
 MARKETPLACE_STATUS = "independent-not-attested"
 
 
 class ReleaseIntegrityTest(unittest.TestCase):
+
+    def test_v638_consolidation_contracts_are_present(self):
+        for rel in (
+            "contracts/workflow-policy.yaml",
+            "contracts/route-policy.yaml",
+            "contracts/visual-defaults.yaml",
+            "contracts/quality-modes/quick.yaml",
+            "contracts/quality-modes/standard.yaml",
+            "contracts/quality-modes/audit.yaml",
+            "scripts/generate_contracts.py",
+            "scripts/sync_desktop_worker.py",
+            "packages/workspace-core/src/generated/policy.ts",
+            "scripts/generated/policy.py",
+        ):
+            self.assertTrue((ROOT / rel).is_file(), rel)
+
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        self.assertIn("generate:contracts", package["scripts"])
+        self.assertIn("check:contracts", package["scripts"])
+
+        doctor = (ROOT / "scripts/doctor.sh").read_text(encoding="utf-8")
+        bootstrap = (ROOT / "scripts/bootstrap.sh").read_text(encoding="utf-8")
+        self.assertIn("--profile", doctor)
+        self.assertIn("^20.19.0 || >=22.12.0", doctor)
+        self.assertIn("--profile", bootstrap)
+        self.assertIn("visual-review", bootstrap)
+
+        visual_review = (ROOT / "scripts/visual_review.py").read_text(encoding="utf-8")
+        self.assertIn("maybe_start_preview_server", visual_review)
+        self.assertNotIn("skills/ppt-master/requirements.txt", visual_review)
+
+        skill = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("Default to `--copy`", skill)
+
     def test_public_version_markers_are_aligned(self):
         version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
         web_version = json.loads((ROOT / "apps/web/package.json").read_text(encoding="utf-8"))["version"]
@@ -123,8 +157,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "独立回滚边界",
         ):
             self.assertIn(marker, release_zh)
-        self.assertIn("../zh-CN/release/release-notes-v6.3.7.md", release_en)
-        self.assertIn("../../release/release-notes-v6.3.7.md", release_zh)
+        self.assertIn("../zh-CN/release/release-notes-v6.3.8.md", release_en)
+        self.assertIn("../../release/release-notes-v6.3.8.md", release_zh)
 
     def test_core_entry_scripts_exist(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
@@ -181,6 +215,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/release/release-notes-v6.3.4.md",
             "docs/release/release-notes-v6.3.5.md",
             "docs/release/release-notes-v6.3.7.md",
+            "docs/release/release-notes-v6.3.8.md",
             "docs/release/release-notes-v6.3.6.md",
             "docs/release/release-notes-v5.4.1.md",
             "docs/release/release-notes-v5.3.0.md",
@@ -204,6 +239,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/release/release-notes-v6.3.4.md",
             "docs/zh-CN/release/release-notes-v6.3.5.md",
             "docs/zh-CN/release/release-notes-v6.3.7.md",
+            "docs/zh-CN/release/release-notes-v6.3.8.md",
             "docs/zh-CN/release/release-notes-v6.3.6.md",
             "docs/zh-CN/release/release-notes-v5.4.1.md",
             "docs/zh-CN/release/release-notes-v5.3.0.md",
@@ -561,7 +597,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertEqual(finished_png_bytes[:8], b"\x89PNG\r\n\x1a\n")
         self.assertEqual((int.from_bytes(finished_png_bytes[16:20]), int.from_bytes(finished_png_bytes[20:24])), (1440, 810))
         source_text = finished_decks_source.read_text(encoding="utf-8")
-        for marker in ("V6.3.7 正式版本", "226 个原生矢量对象", "AI Web Deck"):
+        for marker in ("V6.3.8 正式版本", "226 个原生矢量对象", "AI Web Deck"):
             self.assertIn(marker, source_text)
 
         design_system = (ROOT / "DESIGN.md").read_text(encoding="utf-8")

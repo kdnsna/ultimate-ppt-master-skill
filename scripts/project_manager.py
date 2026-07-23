@@ -3,7 +3,7 @@
 
 Usage:
     python3 scripts/project_manager.py init <project_name> [--format ppt169] [--dir projects]
-    python3 scripts/project_manager.py import-sources <project_path> <source1> [<source2> ...] [--move | --copy]
+    python3 scripts/project_manager.py import-sources <project_path> <source1> [<source2> ...] [--copy | --move]
     python3 scripts/project_manager.py validate <project_path>
     python3 scripts/project_manager.py info <project_path>
 """
@@ -571,6 +571,8 @@ class ProjectManager:
                 summary["skipped"].append(f"{item}: directories are not supported")
                 continue
 
+            # Default is copy for user files. Explicit --move archives/removes originals.
+            # Repo-internal generated research artifacts still move unless --copy is set.
             if copy:
                 effective_move = False
             elif move:
@@ -578,7 +580,7 @@ class ProjectManager:
             elif is_within_path(source_path, REPO_ROOT):
                 effective_move = True
                 print(
-                    f"note: {source_path} is inside the ppt-master repo; moved "
+                    f"note: {source_path} is inside the repository; moved "
                     f"(not copied) to avoid accidental commit. Pass --copy to override.",
                     file=sys.stderr,
                 )

@@ -16,7 +16,7 @@ V6 = ROOT / "apps/web/src/V6Workspace.tsx"
 V6_CSS = ROOT / "apps/web/src/v6-workspace.css"
 CORE = ROOT / "packages/workspace-core/src/index.ts"
 CLASSIC_VERSION = "5.4.1"
-V6_VERSION = "6.3.7"
+V6_VERSION = "6.3.8"
 
 
 def read(path: Path) -> str:

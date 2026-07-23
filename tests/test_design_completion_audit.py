@@ -1,5 +1,6 @@
 import json
 import subprocess
+import sys
 import unittest
 import zipfile
 from pathlib import Path
@@ -320,6 +321,46 @@ class DesignCompletionAuditTest(unittest.TestCase):
         combined = result.stdout + result.stderr
         self.assertIn("known IP mark", combined)
         self.assertIn("交通银行", combined)
+
+
+
+
+    def test_audit_mode_missing_preview_and_report_fail(self):
+        with TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            write_project(project)
+            # remove generated design report if write_project created one
+            report = project / "design-quality-report.md"
+            if report.exists():
+                report.unlink()
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts/audit_design_completion.py"), "--mode", "audit", str(project)],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+            combined = result.stdout + result.stderr
+            self.assertNotEqual(result.returncode, 0, combined)
+            self.assertIn("no rendered PNG screenshots", combined)
+            self.assertIn("design-quality-report.md missing", combined)
+
+    def test_standard_mode_missing_preview_is_warning_not_hard_fail_alone(self):
+        with TemporaryDirectory() as tmp:
+            project = Path(tmp)
+            write_project(project)
+            report = project / "design-quality-report.md"
+            if report.exists():
+                report.unlink()
+            # create empty report after audit writes? run standard mode against complete lock without preview
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts/audit_design_completion.py"), "--mode", "standard", str(project)],
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+            )
+            combined = result.stdout + result.stderr
+            # project fixtures are complete enough to pass structure; missing preview should warn
+            self.assertIn("no rendered PNG screenshots", combined)
 
 
 if __name__ == "__main__":

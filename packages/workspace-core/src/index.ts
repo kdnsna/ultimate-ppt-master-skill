@@ -1,6 +1,6 @@
 export type DeckPhase = "intake" | "outline" | "generating" | "review" | "delivered";
 export type OutputPurpose = "editable-pptx" | "web-deck" | "dual-delivery";
-export type EvidenceState = "grounded" | "partial" | "missing";
+export type EvidenceState = "unmapped" | "candidate" | "grounded" | "conflicted" | "missing";
 export type SlideStatus = "draft" | "ready" | "needs-review" | "approved";
 export type PromptQuality = "complete" | "thin" | "extreme-thin";
 export type RecommendedRoute = "formal-editable-pptx" | "guizang-web-fixed-style" | "dual-delivery";
@@ -336,9 +336,10 @@ export function createDraftSlides(request: string, sourceInput: number | string[
       role,
       title,
       takeaway: index === 0 ? requestTitle : "生成前确认本页要让受众记住的一句话。",
-      evidenceState: sourceCount > 0 ? (index === 0 ? "partial" : "grounded") : "missing",
+      // Presence of sources only yields unmapped placeholders. grounded requires claim binding later.
+      evidenceState: sourceCount > 0 ? "unmapped" : "missing",
       evidenceRefs: sourceCount > 0 ? [evidenceSourceIds[index % sourceCount]] : [],
-      status: sourceCount > 0 ? "ready" : "draft",
+      status: "draft",
       variants,
       selectedVariantId: variants[0].id
     };
@@ -408,3 +409,6 @@ export function nextPhase(phase: DeckPhase): DeckPhase {
   const index = deckPhases.indexOf(phase);
   return deckPhases[Math.min(deckPhases.length - 1, index + 1)];
 }
+
+export { generatedPolicy } from "./generated/policy.ts";
+export type { EvidenceStateId, QualityModeId, GeneratedPolicy } from "./generated/policy.ts";

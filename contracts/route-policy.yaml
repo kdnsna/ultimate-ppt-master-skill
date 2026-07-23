@@ -1,0 +1,94 @@
+# Canonical route policy consumed by agent docs, TypeScript, Python, Bridge, and Desktop Worker.
+schemaVersion: route-policy-v1
+version: "6.3.8"
+
+classifierRoutes:
+  - formal-editable-pptx
+  - magazine-web-deck
+  - guizang-web-fixed-style
+  - staged-questions
+  - source-first
+  - dual-delivery
+
+formalSignals:
+  - ".pptx"
+  - "pptx"
+  - "powerpoint"
+  - "可编辑"
+  - "汇报"
+  - "报告"
+  - "政府"
+  - "金融"
+  - "培训"
+  - "审计"
+  - "咨询"
+  - "consulting"
+  - "business report"
+  - "quarterly business review"
+  - "qbr"
+  - "board deck"
+  - "editable"
+  - "revise"
+  - "stakeholder"
+  - "training"
+  - "government"
+  - "finance"
+  - "audit"
+
+webSignals:
+  - "网页 ppt"
+  - "web deck"
+  - "web ppt"
+  - "html"
+  - "横滑"
+  - "浏览器"
+  - "browser"
+  - "magazine"
+  - "杂志"
+  - "editorial"
+  - "e-ink"
+  - "电子墨水"
+  - "swiss"
+  - "瑞士"
+  - "keynote"
+  - "showcase"
+  - "demo-day"
+
+promptQuality:
+  extremeThin:
+    maxCompactLength: 25
+    signalsRequired: 0
+  thin:
+    minSignals: 1
+  complete:
+    requiresSourceSignal: true
+    minSignals: 3
+
+decisions:
+  explicit-formal-signal:
+    route: formal-editable-pptx
+    qualityMode: standard
+  explicit-web-signal:
+    route: magazine-web-deck
+    qualityMode: standard
+  extreme-thin-fallback:
+    route: guizang-web-fixed-style
+    qualityMode: standard
+    coverSurface: light-or-warm-paper
+  thin-guided-intake:
+    route: staged-questions
+    qualityMode: standard
+  complete-source-first:
+    route: source-first
+    qualityMode: standard
+
+semanticAssertions:
+  defaultCoverSurface: light
+  extremeThinAutoRoutes: true
+  extremeThinDefaultFormat: web-deck
+  formalSignalDefaultFormat: editable-pptx
+  mustAskBeforeGenerate: false
+  askOnlyWhenMateriallyAmbiguous: true
+  aiImagesAllowedModes: [standard, audit]
+  aiImagesDefaultOffModes: [quick]
+  failOnMissingVisualEvidenceModes: [audit]

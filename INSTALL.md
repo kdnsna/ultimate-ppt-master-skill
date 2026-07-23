@@ -32,6 +32,7 @@ npm run desktop
 
 ```bash
 bash scripts/bootstrap.sh
+# or profiled: bash scripts/bootstrap.sh --profile pptx
 bash scripts/run-desktop.sh
 ```
 
@@ -50,6 +51,7 @@ git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skill
 cd ~/.codex/skills/ultimate-ppt-master
 npm run setup
 # 如果 Agent 环境没有 Node/npm，可用：bash scripts/bootstrap.sh
+# or profiled: bash scripts/bootstrap.sh --profile pptx
 ```
 
 重启 Codex 后使用：
@@ -65,6 +67,7 @@ git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.claude/skil
 cd ~/.claude/skills/ultimate-ppt-master
 npm run setup
 # 如果 Agent 环境没有 Node/npm，可用：bash scripts/bootstrap.sh
+# or profiled: bash scripts/bootstrap.sh --profile pptx
 ```
 
 Claude Code 可读取 `CLAUDE.md` 和 `SKILL.md`。如果你的 Claude Code 环境没有自动发现该 skill，请在对话中说明：
@@ -83,6 +86,7 @@ git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/agent-skills
 cd ~/agent-skills/ultimate-ppt-master
 npm run setup
 # 如果 Agent 环境没有 Node/npm，可用：bash scripts/bootstrap.sh
+# or profiled: bash scripts/bootstrap.sh --profile pptx
 ```
 
 然后在 OpenClaw、Hermes 或类似工具的项目规则、技能配置、上下文文件里引用：
@@ -243,6 +247,7 @@ Script fallback:
 
 ```bash
 bash scripts/bootstrap.sh
+# or profiled: bash scripts/bootstrap.sh --profile pptx
 bash scripts/run-desktop.sh
 ```
 
@@ -261,6 +266,7 @@ git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skill
 cd ~/.codex/skills/ultimate-ppt-master
 npm run setup
 # No Node/npm in this agent environment? Use: bash scripts/bootstrap.sh
+# or profiled: bash scripts/bootstrap.sh --profile pptx
 ```
 
 Restart Codex, then ask:
@@ -276,6 +282,7 @@ git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.claude/skil
 cd ~/.claude/skills/ultimate-ppt-master
 npm run setup
 # No Node/npm in this agent environment? Use: bash scripts/bootstrap.sh
+# or profiled: bash scripts/bootstrap.sh --profile pptx
 ```
 
 If your Claude Code setup does not auto-discover the skill, tell it:
@@ -294,6 +301,7 @@ git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/agent-skills
 cd ~/agent-skills/ultimate-ppt-master
 npm run setup
 # No Node/npm in this agent environment? Use: bash scripts/bootstrap.sh
+# or profiled: bash scripts/bootstrap.sh --profile pptx
 ```
 
 Then add this to the tool's rules, skill config, or project context:

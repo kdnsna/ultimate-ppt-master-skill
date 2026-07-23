@@ -15,6 +15,7 @@ Usage:
     python3 scripts/visual_review.py <project_path>
     python3 scripts/visual_review.py <project_path> --pages 02 03
     python3 scripts/visual_review.py <project_path> --server-url http://localhost:5050
+    python3 scripts/visual_review.py <project_path> --no-auto-server
 
 Exit codes (per references/visual-review.md §7):
     0 — all requested pages rendered
@@ -277,6 +278,119 @@ def build_design_doctor_summary(records: list[dict]) -> dict:
     }
 
 
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parents[1]
+
+
+def _preview_server_script() -> Path:
+    return _repo_root() / 'scripts' / 'svg_editor' / 'server.py'
+
+
+def server_is_up(server_url: str) -> bool:
+    try:
+        check_server(server_url)
+        return True
+    except RuntimeError:
+        return False
+
+
+def maybe_start_preview_server(project_path: Path, server_url: str, *, auto: bool) -> tuple[object | None, str]:
+    """Start a temporary live-preview server when none is reachable.
+
+    Returns (process_or_None, effective_server_url).
+    """
+    if server_is_up(server_url):
+        return None, server_url
+
+    if not auto:
+        raise RuntimeError(
+            f'live-preview server not reachable at {server_url}; '
+            f'start it with: python3 {_preview_server_script()} {project_path}'
+        )
+
+    script = _preview_server_script()
+    if not script.is_file():
+        raise RuntimeError(f'preview server script missing: {script}')
+
+    import socket
+    import subprocess
+    import time
+    from urllib.parse import urlparse
+
+    parsed = urlparse(server_url)
+    host = parsed.hostname or '127.0.0.1'
+    preferred_port = parsed.port or 5050
+
+    def free_port(start: int) -> int:
+        for port in range(start, start + 30):
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                try:
+                    sock.bind((host if host not in {'localhost'} else '127.0.0.1', port))
+                except OSError:
+                    continue
+                return port
+        raise RuntimeError('no free port available for temporary preview server')
+
+    port = free_port(preferred_port)
+    effective = f'http://127.0.0.1:{port}'
+    cmd = [
+        sys.executable,
+        str(script),
+        str(project_path),
+        '--port',
+        str(port),
+        '--no-browser',
+    ]
+    # Some server.py versions may not support --no-browser; fall back.
+    proc = subprocess.Popen(
+        cmd,
+        cwd=str(_repo_root()),
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    deadline = time.monotonic() + 12.0
+    last_err = ''
+    while time.monotonic() < deadline:
+        if proc.poll() is not None:
+            err = (proc.stderr.read() if proc.stderr else '') or ''
+            # Retry without --no-browser if flag unsupported
+            if '--no-browser' in ' '.join(cmd) and ('unrecognized' in err.lower() or 'no-browser' in err.lower() or 'error' in err.lower()):
+                cmd = [sys.executable, str(script), str(project_path), '--port', str(port)]
+                proc = subprocess.Popen(
+                    cmd,
+                    cwd=str(_repo_root()),
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                )
+                continue
+            raise RuntimeError(f'failed to start temporary preview server: {err.strip() or proc.returncode}')
+        if server_is_up(effective):
+            _safe_print(f'auto-started temporary preview server at {effective}')
+            return proc, effective
+        time.sleep(0.2)
+        last_err = 'server not ready yet'
+    if proc.poll() is None:
+        proc.terminate()
+    raise RuntimeError(f'timed out waiting for temporary preview server at {effective}: {last_err}')
+
+
+def stop_preview_server(proc: object | None) -> None:
+    if proc is None:
+        return
+    try:
+        proc.terminate()
+        try:
+            proc.wait(timeout=5)
+        except Exception:
+            proc.kill()
+    except Exception:
+        pass
+
+
+
 def check_server(server_url: str) -> None:
     """Probe server liveness via /api/slides. Raises RuntimeError if down."""
     url = f"{server_url.rstrip('/')}/api/slides"
@@ -306,6 +420,10 @@ def main() -> int:
         '--lock-timeout', type=float, default=30.0,
         help='Seconds to wait for render lock (default: 30)',
     )
+    parser.add_argument(
+        '--no-auto-server', action='store_true',
+        help='Do not auto-start a temporary preview server when none is reachable',
+    )
     args = parser.parse_args()
 
     project_path = Path(args.project_path).resolve()
@@ -320,59 +438,69 @@ def main() -> int:
             'playwright not installed. Install with:\n'
             '    pip install playwright\n'
             '    python3 -m playwright install chromium\n'
-            '(see skills/ppt-master/requirements.txt)'
+            f'(or: bash {_repo_root() / "scripts" / "bootstrap.sh"} --profile visual-review)'
         )
         return 3
 
+    preview_proc = None
+    server_url = args.server_url
     try:
-        check_server(args.server_url)
-    except RuntimeError as e:
-        _safe_print(str(e))
-        _safe_print(
-            'start it with:\n'
-            f'    python3 skills/ppt-master/scripts/svg_editor/server.py {project_path}'
-        )
-        return 2
-
-    try:
-        pages = discover_pages(project_path, args.pages)
-    except (FileNotFoundError, ValueError) as e:
-        _safe_print(str(e))
-        return 2
-
-    preview_dir = project_path / '.preview'
-    lock_path = preview_dir / '.render.lock'
-
-    with file_lock(lock_path, timeout=args.lock_timeout):
         try:
-            records = render_pages(args.server_url, pages, preview_dir)
-        except Exception as e:  # noqa: BLE001 — browser launch failure
-            _safe_print(f'browser session failed: {type(e).__name__}: {e}')
-            _safe_print(
-                'try:  python3 -m playwright install chromium'
+            preview_proc, server_url = maybe_start_preview_server(
+                project_path,
+                args.server_url,
+                auto=not args.no_auto_server,
             )
-            return 3
+        except RuntimeError as e:
+            _safe_print(str(e))
+            _safe_print(
+                'start it with:\n'
+                f'    python3 {_preview_server_script()} {project_path}'
+            )
+            return 2
 
-    for rec in records:
-        if not rec['ok']:
-            _safe_print(f"[FAIL] {rec['page']}: {rec.get('error')}")
-        elif rec.get('all_background'):
-            _safe_print(f"[WARN] {rec['page']}: PNG rendered but is all-background")
+        try:
+            pages = discover_pages(project_path, args.pages)
+        except (FileNotFoundError, ValueError) as e:
+            _safe_print(str(e))
+            return 2
 
-    summary = {
-        'project': str(project_path),
-        'server_url': args.server_url,
-        'rendered': sum(1 for r in records if r['ok']),
-        'failed': sum(1 for r in records if not r['ok']),
-        'all_background': sum(1 for r in records if r.get('all_background')),
-        'pages': records,
-        'designDoctor': build_design_doctor_summary(records),
-    }
-    print(json.dumps(summary, indent=2, ensure_ascii=False))
+        preview_dir = project_path / '.preview'
+        lock_path = preview_dir / '.render.lock'
 
-    if summary['failed']:
-        return 4
-    return 0
+        with file_lock(lock_path, timeout=args.lock_timeout):
+            try:
+                records = render_pages(server_url, pages, preview_dir)
+            except Exception as e:  # noqa: BLE001 — browser launch failure
+                _safe_print(f'browser session failed: {type(e).__name__}: {e}')
+                _safe_print(
+                    'try:  python3 -m playwright install chromium'
+                )
+                return 3
+
+        for rec in records:
+            if not rec['ok']:
+                _safe_print(f"[FAIL] {rec['page']}: {rec.get('error')}")
+            elif rec.get('all_background'):
+                _safe_print(f"[WARN] {rec['page']}: PNG rendered but is all-background")
+
+        summary = {
+            'project': str(project_path),
+            'server_url': server_url,
+            'autoStartedServer': preview_proc is not None,
+            'rendered': sum(1 for r in records if r['ok']),
+            'failed': sum(1 for r in records if not r['ok']),
+            'all_background': sum(1 for r in records if r.get('all_background')),
+            'pages': records,
+            'designDoctor': build_design_doctor_summary(records),
+        }
+        print(json.dumps(summary, indent=2, ensure_ascii=False))
+
+        if summary['failed']:
+            return 4
+        return 0
+    finally:
+        stop_preview_server(preview_proc)
 
 
 if __name__ == '__main__':

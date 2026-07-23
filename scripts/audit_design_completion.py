@@ -259,13 +259,42 @@ def brand_asset_failures(lock: dict[str, dict[str, str]], spec_text: str) -> lis
     return failures
 
 
-def audit_project(path: Path) -> dict[str, Any]:
+def resolve_quality_mode(manifests: list[Path], argv_mode: str | None = None) -> str:
+    if argv_mode:
+        return argv_mode.strip().lower()
+    for path in manifests:
+        data = load_json(path)
+        if not isinstance(data, dict):
+            continue
+        for key in ("qualityMode", "quality_mode"):
+            value = data.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip().lower()
+        gate = data.get("qualityGate") if isinstance(data.get("qualityGate"), dict) else {}
+        level = str(gate.get("level") or "").lower()
+        if level in {"audit", "formal-audit", "formal-business-audit"}:
+            return "audit"
+        mode = gate.get("mode") if isinstance(gate, dict) else None
+        if isinstance(mode, str) and mode.strip():
+            return mode.strip().lower()
+    return "standard"
+
+
+def promote_if_audit(mode: str, failures: list[str], warnings: list[str], message: str) -> None:
+    if mode in {"audit", "formal-audit"}:
+        failures.append(message)
+    else:
+        warnings.append(message)
+
+
+def audit_project(path: Path, quality_mode: str | None = None) -> dict[str, Any]:
     files = find_project_files(path)
     failures: list[str] = []
     warnings: list[str] = []
 
     gate = find_quality_gate(files["manifest"])
-    if gate and gate.get("level") != "formal-business":
+    mode = resolve_quality_mode(files["manifest"], quality_mode)
+    if gate and gate.get("level") != "formal-business" and mode not in {"quick"}:
         warnings.append("qualityGate exists but level is not formal-business")
 
     if not files["design_spec"]:
@@ -328,14 +357,25 @@ def audit_project(path: Path) -> dict[str, Any]:
             warnings.append(f"{pptx.name}: notesSlides count {notes} is lower than slide count {slides}")
 
     if not files["preview_png"]:
-        warnings.append("no rendered PNG screenshots found under .preview/ or screenshots/")
+        promote_if_audit(
+            mode,
+            failures,
+            warnings,
+            "no rendered PNG screenshots found under .preview/ or screenshots/",
+        )
 
     if not files["design_report"]:
-        warnings.append("design-quality-report.md missing; this script will report findings but no handoff report exists yet")
+        promote_if_audit(
+            mode,
+            failures,
+            warnings,
+            "design-quality-report.md missing; this script will report findings but no handoff report exists yet",
+        )
 
     return {
         "path": str(path),
         "status": "pass" if not failures else "fail",
+        "qualityMode": mode,
         "failures": failures,
         "warnings": warnings,
         "counts": {key: len(value) for key, value in files.items()},
@@ -366,13 +406,31 @@ def render_markdown(results: list[dict[str, Any]]) -> str:
 
 def main(argv: list[str]) -> int:
     if not argv:
-        print("Usage: python3 scripts/audit_design_completion.py <project_path_or_artifact> [...]", file=sys.stderr)
+        print("Usage: python3 scripts/audit_design_completion.py [--mode quick|standard|audit] <project_path_or_artifact> [...]", file=sys.stderr)
         return 2
 
-    results = [audit_project(Path(arg)) for arg in argv]
+    mode = None
+    paths: list[str] = []
+    i = 0
+    while i < len(argv):
+        if argv[i] in {"--mode", "--quality-mode"} and i + 1 < len(argv):
+            mode = argv[i + 1]
+            i += 2
+            continue
+        if argv[i].startswith("--mode="):
+            mode = argv[i].split("=", 1)[1]
+            i += 1
+            continue
+        paths.append(argv[i])
+        i += 1
+    if not paths:
+        print("Usage: python3 scripts/audit_design_completion.py [--mode quick|standard|audit] <project_path_or_artifact> [...]", file=sys.stderr)
+        return 2
+
+    results = [audit_project(Path(arg), quality_mode=mode) for arg in paths]
     print(json.dumps({"status": "pass" if all(r["status"] == "pass" for r in results) else "fail", "results": results}, ensure_ascii=False, indent=2))
 
-    for arg, result in zip(argv, results):
+    for arg, result in zip(paths, results):
         project = Path(arg).expanduser().resolve()
         if project.is_dir():
             (project / "design-quality-report.md").write_text(render_markdown([result]), encoding="utf-8")

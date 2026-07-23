@@ -1,6 +1,6 @@
 # Agent Connect Bridge
 
-Agent Connect Bridge is the v6.3.7 companion for the static Web Experience. It lets the GitHub Pages app talk to a service on `127.0.0.1`, stage real source files, preserve the user-approved `DeckSession` as the production storyboard, hand the project to Codex, and expose only finished artifacts that pass the local path boundary. The v6.3.7 source uses machine status `github-released`; the authoritative publication evidence is the [`v6.3.7` tag and GitHub Release page](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.7), not this source sentence. Marketplace publication and the currently deployed Pages SHA remain independent states.
+Agent Connect Bridge is the v6.3.8 companion for the static Web Experience. It lets the GitHub Pages app talk to a service on `127.0.0.1`, stage real source files, preserve the user-approved `DeckSession` as the production storyboard, hand the project to Codex, and expose only finished artifacts that pass the local path boundary. The v6.3.8 source uses machine status `github-released`; the authoritative publication evidence is the [`v6.3.8` tag and GitHub Release page](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.8), not this source sentence. Marketplace publication and the currently deployed Pages SHA remain independent states.
 
 ## Quick Start
 
@@ -132,7 +132,7 @@ CORS is limited to GitHub Pages and local development origins.
 
 ## HTTP API Boundary and Server Deployment
 
-The v6.3.7 Bridge is an HTTP preparation and orchestration API, not a public multi-tenant generation service. `POST /handoff` creates the project contract; `GET /events` reports progress; `POST /slides/regenerate` records a slide-level revision; the artifact endpoints discover and download files already produced by the local Agent. Final PPTX/Web generation still needs one of these execution layers:
+The v6.3.8 Bridge is an HTTP preparation and orchestration API, not a public multi-tenant generation service. `POST /handoff` creates the project contract; `GET /events` reports progress; `POST /slides/regenerate` records a slide-level revision; the artifact endpoints discover and download files already produced by the local Agent. Final PPTX/Web generation still needs one of these execution layers:
 
 1. **Agent runner** - install Codex, Claude Code, Hermes, or OpenClaw on the worker and let it execute the Skill against the handoff directory.
 2. **Custom orchestrator** - call the repository scripts directly, persist `DeckSession`, schedule retries/checkpoints, run the quality gates, and publish the final artifacts yourself.

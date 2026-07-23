@@ -33,5 +33,16 @@ class VisualReviewContractTest(unittest.TestCase):
         self.assertTrue(any("explicitly asks" in item["en"] for item in summary["repairRecommendations"]))
 
 
+
+
+    def test_auto_server_helpers_exist_and_paths_are_repo_local(self):
+        module = load_visual_review_module()
+        self.assertTrue(hasattr(module, "maybe_start_preview_server"))
+        self.assertTrue(hasattr(module, "stop_preview_server"))
+        script = module._preview_server_script()
+        self.assertTrue(str(script).endswith("scripts/svg_editor/server.py"))
+        self.assertNotIn("skills/ppt-master", str(script))
+
+
 if __name__ == "__main__":
     unittest.main()

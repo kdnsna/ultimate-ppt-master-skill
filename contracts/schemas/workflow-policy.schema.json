@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ultimate-ppt-master.local/schemas/workflow-policy.schema.json",
+  "title": "WorkflowPolicy",
+  "type": "object",
+  "required": ["schemaVersion", "version", "routing", "visualDefaults", "sourceImport", "evidenceStates", "qualityModes"],
+  "properties": {
+    "schemaVersion": {"type": "string"},
+    "version": {"type": "string"},
+    "routing": {"type": "object"},
+    "visualDefaults": {"type": "object"},
+    "sourceImport": {"type": "object"},
+    "evidenceStates": {"type": "object"},
+    "qualityModes": {"type": "object"}
+  }
+}

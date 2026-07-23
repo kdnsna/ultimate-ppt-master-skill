@@ -46,7 +46,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 const bridgeUrl = "http://127.0.0.1:43188";
 const sessionStorageKey = "ultimate-ppt-master-deck-session-v6";
 const legacyLocalStorageKey = sessionStorageKey;
-const appVersion = "6.3.7";
+const appVersion = "6.3.8";
 const brandAssetUrl = `${import.meta.env.BASE_URL}brand.svg`;
 const pptlintProofAssetUrl = `${import.meta.env.BASE_URL}pptlint-before-after-hero.png`;
 const maxSourceCount = 24;
@@ -173,7 +173,10 @@ const copy = {
     outlineTitle: "先确认故事，再开始设计",
     outlineLead: "每页只有一个任务。可以直接改标题、结论和结构方案，不需要整套重做。",
     focusedQuestions: "还需要确认",
-    evidenceGrounded: "已有证据",
+    evidenceGrounded: "已绑定证据",
+    evidenceCandidate: "候选证据",
+    evidenceUnmapped: "待映射",
+    evidenceConflicted: "证据冲突",
     evidencePartial: "证据待补",
     evidenceMissing: "没有证据",
     designTitle: "选一个明确的视觉方向",
@@ -359,7 +362,7 @@ export function V6Workspace() {
     const evidenceIds = sources.filter(sourceHasVerifiedText).map((source) => source.id);
     const slides = createDraftSlides(session.request, evidenceIds, inferSlideCount(session.request)).map((slide) => (
       evidenceIds.length === 0 && sources.some((source) => source.status === "local-parse")
-        ? { ...slide, evidenceState: "partial" as const, evidenceRefs: [], status: "draft" as const }
+        ? { ...slide, evidenceState: "candidate" as const, evidenceRefs: [], status: "draft" as const }
         : slide
     ));
     updateSession({
@@ -1325,7 +1328,14 @@ function DirectionPreview({ direction, index }: { direction: ReturnType<typeof r
 }
 
 function EvidenceBadge({ state, copy: t }: { state: DeckSlide["evidenceState"]; copy: typeof copy }) {
-  return <small className={`evidence-badge ${state}`}>{state === "grounded" ? t.evidenceGrounded : state === "partial" ? t.evidencePartial : t.evidenceMissing}</small>;
+  const label =
+    state === "grounded" ? t.evidenceGrounded
+    : state === "candidate" ? t.evidenceCandidate
+    : state === "unmapped" ? t.evidenceUnmapped
+    : state === "conflicted" ? t.evidenceConflicted
+    : state === "partial" ? t.evidencePartial
+    : t.evidenceMissing;
+  return <small className={`evidence-badge ${state}`}>{label}</small>;
 }
 
 function QualityRow({ label, status }: { label: string; status: "ok" | "warning" }) {
@@ -1519,7 +1529,7 @@ function loadSession(): DeckSession {
     const hasDeferredSource = restoredSources.some((source) => source.status === "local-parse");
     const restoredSlides = parsed.slides.map((slide) => ({
       ...slide,
-      evidenceState: preserveProjectReview ? slide.evidenceState : hasDeferredSource ? "partial" as const : "missing" as const,
+      evidenceState: preserveProjectReview ? slide.evidenceState : hasDeferredSource ? "unmapped" as const : "missing" as const,
       evidenceRefs: preserveProjectReview ? slide.evidenceRefs : [],
       status: preserveProjectReview ? slide.status : slide.status === "approved" ? "needs-review" as const : slide.status
     }));

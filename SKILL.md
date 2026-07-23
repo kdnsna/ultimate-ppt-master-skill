@@ -60,6 +60,79 @@ This mode is a targeted revision path. It must not silently turn a repair reques
 
 ## Best-Effect Brief Enhancer
 
+<!-- BEGIN GENERATED:workflow-policy -->
+## Generated Workflow Policy
+
+This section is generated from `contracts/`. Do not hand-edit; run `python3 scripts/generate_contracts.py`.
+
+### Source of truth
+
+- Primary workflow: `SKILL.md`
+- Design contract: `DESIGN.md`
+- Machine policy: `contracts/workflow-policy.yaml`, `contracts/route-policy.yaml`, `contracts/visual-defaults.yaml`, `contracts/quality-modes/`
+
+### Best-Effect Brief Enhancer
+
+Before choosing a route or generating files, rewrite the user's short instruction into `bestEffectBrief`. Record prompt quality, auto-expanded audience/scenario/message/page-count/style/source/asset assumptions, recommended route, and which decisions came from the user vs the Agent.
+
+### Routing
+
+- Auto-route by policy. Do **not** force the user to choose PPTX vs Web before generation when the request is classifiable.
+- Ask at most 3 focused questions, and only when facts, sources, brand/IP, compliance, or route choice would materially change the deliverable.
+- Formal / editable / government / finance / training / report / `.pptx` signals → `formal-editable-pptx` with quality mode `standard`.
+- HTML / web PPT / magazine / editorial / e-ink / Swiss / horizontal swipe / keynote / showcase / demo-day / browser-first signals → `magazine-web-deck`.
+- Extreme-thin topic-only prompts without formal/web signals use **Style A Editorial Fixed Rhythm** → `Mode 2: Magazine Web Deck`, style `Style A · 电子杂志 × 电子墨水`, 8 pages, cover surface `light-or-warm-paper`.
+
+### Extreme Thin Prompt Fallback page rhythm
+
+  1. light or warm-paper cover with one strong title, minimal subtitle, and one soft-edged visual/evidence panel
+  2. light context page for problem, trend, or setting
+  3. image/text or restrained signal spread for tension or opportunity
+  4. light structure page with a three-part framework, path, or method
+  5. large-statement section divider
+  6. evidence / scene / case page
+  7. point-of-view page with final judgment or question; use dark only when the user, reference, or chosen direction calls for it
+  8. light closing page with action, takeaway, or ending line
+
+### Visual defaults
+
+- Default cover surface: `light-or-warm-paper` (light / warm paper / near-white).
+- Dark covers are allowed only for: user-request, brand-system, explicit-art-direction, image-led-launch.
+- Do not use a full-page black cover unless the user, brand, or explicit art direction requires it.
+- Ink is primarily a text color, not the default full-page background.
+
+### Source import
+
+- Default import mode: `copy` (`--copy`).
+- `--move` / archive-and-remove-original is an explicit advanced option, not the default.
+- Repo-internal generated research artifacts may still move to avoid accidental commits.
+
+### Evidence states
+
+Allowed values: unmapped, candidate, grounded, conflicted, missing.
+Draft slides created only because sources exist must start as `unmapped`, never `grounded`.
+`grounded` requires claim-level source binding.
+
+### Quality modes
+
+Default mode: `standard`.
+Available modes: quick, standard, audit.
+
+| Mode | Use | Key gates |
+|---|---|---|
+| quick | draft, internal discussion, content validation | structure/file validity fail; visual evidence warning |
+| standard | most formal reports, default production path | formal delivery fail; visual evidence recommended |
+| audit | board materials, government, finance compliance, external release | missing preview PNG / design report / blank-page risk fail |
+
+Semantic assertions:
+- defaultCoverSurface=light
+- extremeThinAutoRoutes=True
+- extremeThinDefaultFormat=web-deck
+- formalSignalDefaultFormat=editable-pptx
+- mustAskBeforeGenerate=False
+<!-- END GENERATED:workflow-policy -->
+
+
 Before route selection or production, convert the user's raw request into a `bestEffectBrief`. This is mandatory for direct Agent use, because many users will only write a short topic or "帮我做个 PPT".
 
 The `bestEffectBrief` must record:
@@ -152,7 +225,7 @@ Plain-language wording for generic requests:
 
 ## Formal Business Delivery Gate
 
-Default to `qualityGate.level = "formal-business"` for business/report/consulting/training/government/finance decks and for any deliverable expected to be handed to a real stakeholder. This is the default quality bar unless the user explicitly asks for a quick draft.
+Choose a quality mode first: `quick` for drafts, `standard` (default) for most formal reports, `audit`/`formal-audit` for board/government/finance/external release. Default to `qualityGate.level = "formal-business"` for business/report/consulting/training/government/finance decks and for any deliverable expected to be handed to a real stakeholder. This is the default quality bar unless the user explicitly asks for a quick draft.
 
 Before generating final PPTX or Web Deck files, lock these items in `design_spec.md`, `spec_lock.md`, and `design-quality-report.md`:
 - Visual direction selection from `templates/visual-directions/`, or a documented `custom` benchmark when no direction fits.
@@ -461,13 +534,14 @@ Import source content (choose based on the situation):
 
 | Situation | Action |
 |-----------|--------|
-| Has source files (PDF/MD/etc.) | `python3 ${SKILL_DIR}/scripts/project_manager.py import-sources <project_path> <source_files...> --move` |
+| Has source files (PDF/MD/etc.) | `python3 ${SKILL_DIR}/scripts/project_manager.py import-sources <project_path> <source_files...> --copy` |
 | User provided text directly in conversation | No import needed — content is already in conversation context; subsequent steps can reference it directly |
 
-> ⚠️ **MUST use `--move`**: All source files (original PDF / MD / images) MUST be **moved** (not copied) into `sources/` for archiving.
-> - Markdown files generated in Step 1, original PDFs, original MDs — **all** must be moved into the project via `import-sources --move`
+> ✅ **Default to `--copy`**: Import creates project-local copies under `sources/` and leaves the user's original files in place.
+> - Prefer `--copy` for desktop, downloads, shared-drive, and multi-project reuse.
+> - Use `--move` / archive-and-remove-original only when the user explicitly wants originals removed after import.
+> - Repo-internal generated research artifacts may still move by default to avoid accidental commits; pass `--copy` to override.
 > - Intermediate artifacts (e.g., `_files/` directories) are handled automatically by `import-sources`
-> - After execution, source files no longer exist at their original location
 
 **✅ Checkpoint — Confirm project structure created successfully, `sources/` contains all source files, converted materials are ready. Proceed to Step 3.**
 

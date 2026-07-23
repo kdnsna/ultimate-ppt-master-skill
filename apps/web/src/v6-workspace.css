@@ -411,6 +411,9 @@ button:disabled { cursor: not-allowed; }
 .evidence-badge { padding: 4px 8px; border-radius: 999px; font-size: 9px; font-weight: 850; }
 .evidence-badge.grounded { color: #087a55; background: rgba(16, 185, 129, .1); }
 .evidence-badge.partial { color: #956311; background: rgba(214, 144, 32, .12); }
+.evidence-badge.unmapped { color: #7a5b16; background: rgba(214, 144, 32, .10); }
+.evidence-badge.candidate { color: #1d4ed8; background: rgba(29, 78, 216, .10); }
+.evidence-badge.conflicted { color: #9f1239; background: rgba(225, 29, 72, .10); }
 .evidence-badge.missing { color: #ae4d36; background: rgba(239, 91, 63, .1); }
 .story-fields { display: grid; gap: 10px; }
 .story-fields label { display: grid; gap: 5px; }

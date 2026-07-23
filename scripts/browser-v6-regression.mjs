@@ -468,7 +468,7 @@ async function newContext(client) {
 function health({ allowLaunch = false, available = false } = {}) {
   return {
     ok: true,
-    version: "6.3.7-test",
+    version: "6.3.8-test",
     outputDir: "/tmp/mock-output",
     repoRoot,
     allowLaunch,
