@@ -410,5 +410,5 @@ export function nextPhase(phase: DeckPhase): DeckPhase {
   return deckPhases[Math.min(deckPhases.length - 1, index + 1)];
 }
 
-export { generatedPolicy } from "./generated/policy.ts";
-export type { EvidenceStateId, QualityModeId, GeneratedPolicy } from "./generated/policy.ts";
+export { generatedPolicy } from "./generated/policy";
+export type { EvidenceStateId, QualityModeId, GeneratedPolicy } from "./generated/policy";
