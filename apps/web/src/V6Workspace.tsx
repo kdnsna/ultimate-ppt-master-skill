@@ -1333,7 +1333,6 @@ function EvidenceBadge({ state, copy: t }: { state: DeckSlide["evidenceState"]; 
     : state === "candidate" ? t.evidenceCandidate
     : state === "unmapped" ? t.evidenceUnmapped
     : state === "conflicted" ? t.evidenceConflicted
-    : state === "partial" ? t.evidencePartial
     : t.evidenceMissing;
   return <small className={`evidence-badge ${state}`}>{label}</small>;
 }
