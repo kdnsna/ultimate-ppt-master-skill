@@ -3033,9 +3033,30 @@ def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     }
 
 
+def run_inspect_pptx(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
+    """List the slides of an existing .pptx with a text preview per slide."""
+    source_raw = job.get("sourcePath") or job.get("source_path")
+    if not isinstance(source_raw, str) or not source_raw.strip():
+        raise ValueError("inspect-pptx requires sourcePath.")
+    source = Path(source_raw).expanduser()
+    if not source.is_file():
+        raise FileNotFoundError(f"source PPTX not found: {source}")
+    if source.suffix.lower() != ".pptx":
+        raise ValueError("sourcePath must be a .pptx file.")
+
+    module = _load_preserve_edit_module(repo_root)
+    texts = module.slide_texts(source)
+    slides = [{"slide": number, "texts": lines} for number, lines in texts.items()]
+    return {
+        "sourcePath": str(source),
+        "slideCount": len(slides),
+        "slides": slides,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Ultimate PPT Master desktop worker")
-    parser.add_argument("command", choices=["inspect", "run", "validate-job", "recommend", "list-projects", "preserve-edit"])
+    parser.add_argument("command", choices=["inspect", "run", "validate-job", "recommend", "list-projects", "preserve-edit", "inspect-pptx"])
     parser.add_argument("--repo-root")
     parser.add_argument("--stdin", action="store_true", help="Read job JSON from stdin")
     parser.add_argument("--job", help="Path to a job JSON file")
@@ -3064,6 +3085,8 @@ def main() -> int:
                 result = recommend_settings(source)
             elif args.command == "preserve-edit":
                 result = run_preserve_edit(job, repo_root)
+            elif args.command == "inspect-pptx":
+                result = run_inspect_pptx(job, repo_root)
             else:
                 result = run_job(job, repo_root)
         print(json.dumps(result, ensure_ascii=False))

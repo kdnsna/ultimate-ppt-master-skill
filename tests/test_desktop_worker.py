@@ -9,6 +9,7 @@ from apps.desktop.worker.desktop_worker import (
     inspect_environment,
     list_recent_projects,
     recommend_settings,
+    run_inspect_pptx,
     run_job,
     run_preserve_edit,
     validate_job,
@@ -558,6 +559,19 @@ class PreserveEditWorkerTest(unittest.TestCase):
                 run_preserve_edit({"edits": [{"slide": 1, "replacements": {"a": "b"}}]}, ROOT)
             with self.assertRaises(ValueError):
                 run_preserve_edit({"sourcePath": str(source), "edits": []}, ROOT)
+
+    def test_inspect_pptx_lists_slide_text_previews(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "deck.pptx"
+            _make_preserve_deck(source)
+
+            result = run_inspect_pptx({"sourcePath": str(source)}, ROOT)
+
+            self.assertEqual(result["slideCount"], 3)
+            self.assertEqual([slide["slide"] for slide in result["slides"]], [1, 2, 3])
+            self.assertIn("Alpha", result["slides"][0]["texts"])
+            self.assertIn("keep me", result["slides"][1]["texts"])
+            self.assertIn("Gamma", result["slides"][2]["texts"])
 
 
 if __name__ == "__main__":

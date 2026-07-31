@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 import xml.etree.ElementTree as ET
 import zipfile
@@ -61,6 +62,27 @@ def member_hashes(pptx_path: Path) -> dict[str, str]:
                 continue
             hashes[info.filename] = hashlib.sha256(package.read(info.filename)).hexdigest()
     return hashes
+
+
+_SLIDE_PART_RE = re.compile(r"ppt/slides/slide(\d+)\.xml$")
+_TEXT_RUN_RE = re.compile(r"<a:t[^>]*>(.*?)</a:t>", re.S)
+
+
+def slide_texts(pptx_path: Path) -> dict[int, list[str]]:
+    """Extract the visible ``<a:t>`` text runs per slide, keyed by 1-based index.
+
+    Used to let a user pick a slide and see what is on it before editing.
+    """
+    result: dict[int, list[str]] = {}
+    with zipfile.ZipFile(pptx_path, "r") as package:
+        for info in package.infolist():
+            match = _SLIDE_PART_RE.search(info.filename)
+            if not match:
+                continue
+            xml = package.read(info.filename).decode("utf-8", errors="replace")
+            texts = [text.strip() for text in _TEXT_RUN_RE.findall(xml)]
+            result[int(match.group(1))] = [text for text in texts if text]
+    return dict(sorted(result.items()))
 
 
 def patch_slide_xml(

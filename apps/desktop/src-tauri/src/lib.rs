@@ -45,6 +45,12 @@ struct PreserveEditRequest {
     edits: Vec<PreserveEditStep>,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct InspectPptxRequest {
+    source_path: String,
+}
+
 fn source_repo_root() -> Option<PathBuf> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let root = manifest_dir
@@ -221,6 +227,14 @@ fn preserve_edit_pptx(
 }
 
 #[tauri::command]
+fn inspect_pptx(app: AppHandle, request: InspectPptxRequest) -> Result<CommandResult, String> {
+    let payload = serde_json::to_string(&request)
+        .map_err(|err| format!("Failed to encode inspect-pptx request: {err}"))?;
+    let data = run_worker(&app, &["inspect-pptx", "--stdin"], Some(payload))?;
+    Ok(CommandResult { ok: true, data })
+}
+
+#[tauri::command]
 fn open_path(path: String) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     let mut command = Command::new("open");
@@ -250,6 +264,7 @@ pub fn run() {
             list_recent_projects,
             recommend_job_settings,
             preserve_edit_pptx,
+            inspect_pptx,
             open_path
         ])
         .run(tauri::generate_context!())
@@ -259,6 +274,7 @@ pub fn run() {
 #[cfg(test)]
 mod tests {
     use super::DesktopJob;
+    use super::InspectPptxRequest;
     use super::PreserveEditRequest;
     use serde_json::json;
 
@@ -309,6 +325,16 @@ mod tests {
         assert_eq!(encoded["outputPath"], payload["outputPath"]);
         assert_eq!(encoded["edits"][0]["slide"], 2);
         assert_eq!(encoded["edits"][0]["replacements"]["旧结论"], "新结论");
+        assert!(encoded.get("source_path").is_none());
+    }
+
+    #[test]
+    fn inspect_pptx_request_serializes_camel_case() {
+        let payload = json!({ "sourcePath": "/tmp/deck.pptx" });
+        let request: InspectPptxRequest =
+            serde_json::from_value(payload.clone()).expect("deserialize request");
+        let encoded = serde_json::to_value(request).expect("serialize request");
+        assert_eq!(encoded["sourcePath"], payload["sourcePath"]);
         assert!(encoded.get("source_path").is_none());
     }
 }
