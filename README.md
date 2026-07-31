@@ -1,6 +1,6 @@
-# Ultimate PPT Master v6 · 终极融合 PPT 大师
+# Ultimate PPT Master · 保真改 PPT
 
-> **把真实资料变成可继续修改的原生 PowerPoint。** 文字、形状、图表、备注等支持对象保持可编辑；来源、假设和质量问题在交付前可检查。
+> **指哪改哪，把你已有的 PPT 改到能交付。** 原生对象编辑，只动你点名的页和对象；其余页面、logo、母版、链接字节级保留；交回一份 WPS / PowerPoint 打开不乱的可编辑 `.pptx`。
 
 <p align="center">
   <a href="./README.en.md"><strong>English</strong></a> ·
@@ -17,7 +17,33 @@
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-2563EB?style=flat-square">
 </p>
 
-![Ultimate PPT Master v6 的完整演示案例](assets/readme/v6-finished-decks.png)
+![Ultimate PPT Master 的完整演示案例](assets/readme/v6-finished-decks.png)
+
+## 它现在专注做一件事：保真改好你已有的 PPT
+
+多数 AI PPT 工具在比「从零生成一份漂亮初稿」。这件事 Kimi、Gamma、ChatGPT 已经做得够好，我们不与它们竞争。
+
+我们解决的是更难、 frontier 模型也最不擅长的最后一公里——**你手上已经有一份真实品牌 PPT**（领导发的、客户给的、模板套的），你要改第 5 页的图表、第 7 页的结论，但：
+
+- 其余页一个字都不能动；
+- 官方 logo 不能糊、不能被替换成近似图形；
+- 母版、版式、透明度、分组、超链接不能被重做破坏；
+- 交出去 WPS / PowerPoint 要能正常打开、能继续改。
+
+模型的本能是「整套重新生成」，恰恰会破坏这些。Ultimate PPT Master 走相反的路：**preservation-first（保真优先）**——只处理你点名的页和对象，其余保持字节级不变，并把改动前后逐页渲染对比给你看。
+
+| 它做什么 | 它不做什么 |
+|---|---|
+| 对象级修改你指定页的标题、正文、图表、表格、形状 | 不替你从零生成整套演示（那请用 Kimi / Gamma） |
+| 保留未选页、logo、母版、链接、分组、透明度 | 不把整份 PPT 导入再整套重导出来冒充「局部修复」 |
+| 统一字体、对齐、间距、对比度等确定性修整 | 不要求你装 Node、跑命令、连本地服务才能用（桌面端正在做） |
+| 输出原生可编辑 `.pptx`，附改动与安全报告 | 不把占位内容包装成「已完成」 |
+
+> **现状与路线**：保真编辑引擎已经可用（双向原生 OOXML 转换 + preservation-first 修复模式）。当前生产路径仍是 Agent Skill + 本地 Bridge；面向普通办公用户的**本地桌面客户端（拖入 → 选页/对象 → 改 → 预览 → 存）是已确定的下一步**，同一引擎也会封装为 MCP/CLI 供 Agent 生态调用。
+
+### 冻结范围（ intentionally 不再扩张 ）
+
+为了让上面这一件事做到极致，以下能力**保留但不再新增投入**：杂志风 / 瑞士风 Web Deck、六套视觉方向的扩展、多生图后端、桌面 Tauri 之外的多形态、双语档的同步扩写，以及只校验「仓库自洽」而非「行为正确」的脆性自检。
 
 ## 两份可以直接检查的成品
 

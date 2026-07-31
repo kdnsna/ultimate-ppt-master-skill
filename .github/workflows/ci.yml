@@ -79,8 +79,11 @@ jobs:
       - name: Audit Web Experience console
         run: npm run audit:web-console
 
-      - name: Audit v6 workspace contract
-        run: npm run audit:v6-workspace
+      # Frozen (2026-07-31 repositioning): string-presence gate that checks the
+      # source contains certain tokens rather than testing behavior. Kept as a
+      # script but removed from the default gate. See README "冻结范围".
+      # - name: Audit v6 workspace contract
+      #   run: npm run audit:v6-workspace
 
       - name: Audit featured public decks
         run: npm run audit:featured-decks
@@ -91,11 +94,14 @@ jobs:
       - name: Audit stable quality proofs
         run: npm run audit:quality
 
-      - name: Audit skill marketplace readiness
-        run: npm run audit:market
-
-      - name: Audit repository hygiene
-        run: npm run audit:repo-hygiene
+      # Frozen (2026-07-31 repositioning): marketplace-metadata policing and a
+      # filename-regex hygiene check — they verify repo self-consistency, not
+      # engine behavior. Kept as scripts but removed from the default gate.
+      # - name: Audit skill marketplace readiness
+      #   run: npm run audit:market
+      #
+      # - name: Audit repository hygiene
+      #   run: npm run audit:repo-hygiene
 
       - name: Audit desktop dependencies
         run: npm --prefix apps/desktop audit --audit-level=high

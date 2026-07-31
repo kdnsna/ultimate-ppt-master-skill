@@ -158,7 +158,9 @@ def audit_version_markers(errors: list[str]) -> None:
         require(marker in release_en, f"v{VERSION} English release notes missing release-contract marker: {marker}", errors)
     for marker in ("GitHub 发布合同", "releaseStatus: github-released", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE, "白话更新栏", "独立回滚边界"):
         require(marker in release_zh, f"v{VERSION} Chinese release notes missing release-contract marker: {marker}", errors)
-    require("把真实资料变成可继续修改的原生 PowerPoint" in readme_zh, "README.md is not the Chinese canonical homepage", errors)
+    # Stable canonical-homepage marker: the Chinese docs index link, not the
+    # marketing tagline (the 2026-07-31 repositioning intentionally changed it).
+    require("./docs/zh-CN/README.md" in readme_zh, "README.md is not the Chinese canonical homepage", errors)
     require("Turn real source material into a native PowerPoint" in readme_en, "README.en.md is not the English mirror", errors)
     require("中文 README 已迁移" in compatibility and "./README.md" in compatibility, "README.zh-CN.md is not a compatibility entry", errors)
     require("GitHub_Release" in readme_zh and "GitHub_Release" in readme_en, "README release badges are missing", errors)

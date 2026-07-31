@@ -1,26 +1,31 @@
 ---
 name: ultimate-ppt-master
 description: >
-  终极融合PPT大师 / Ultimate Fusion PPT Master: AI-driven presentation
-  generation system. Converts source documents (PDF/DOCX/XLSX/URL/Markdown) into
-  either editable PPTX decks or editorial/Swiss magazine web slide decks. Use
-  automatically when the user asks to create or transform content into a
-  presentation, slide deck, PowerPoint, PPT, or PPTX, including phrases such as
-  "create PPT", "make presentation", "make a deck", "build slides",
-  "turn this into slides", "生成PPT", "做PPT", "做一个ppt", "做一个 PPT",
-  "做个PPT", "做个 PPT", "制作演示文稿", "生成演示文稿", "把这个做成PPT",
-  "把这份材料做成PPT", "杂志风PPT", "网页PPT", "horizontal swipe deck",
-  "editorial magazine presentation", or mentions "终极融合PPT大师",
-  "ultimate-ppt-master", "deckweaver", or "ppt-master".
+  保真改 PPT / Ultimate PPT Master: preservation-first editing of an EXISTING
+  branded PowerPoint. Edits only the slides/objects the user names, using native
+  editable objects, while keeping every other slide, the logo, masters, links,
+  grouping and transparency byte-for-byte unchanged, and writes back a .pptx that
+  opens clean in WPS / PowerPoint. Use automatically when the user asks to revise,
+  fix, refine, restyle, or repair an existing presentation, including phrases such
+  as "改PPT", "修改PPT", "修改这份PPT", "把这个ppt改一下", "调整这几页",
+  "只改第X页", "保真修改", "别动其他页", "edit this pptx", "fix my slides",
+  "revise this deck", "refine these slides", "repair the pptx". It can also
+  generate a new editable PPTX or magazine web deck from source material
+  (PDF/DOCX/XLSX/URL/Markdown) when asked — "create PPT", "make a deck",
+  "生成PPT", "做PPT", "制作演示文稿", "把这个做成PPT", "杂志风PPT", "网页PPT" —
+  but preserve-and-edit is the primary, differentiated mode. Also triggers on
+  "ultimate-ppt-master", "保真改PPT", "deckweaver", or "ppt-master".
 ---
 
-# 终极融合PPT大师 Skill
+# 保真改 PPT Skill (Ultimate PPT Master)
 
-> Ultimate Fusion PPT Master: a Codex skill that fuses editable PPTX generation with magazine-style web deck generation.
+> Preservation-first PowerPoint editing: change only the slides/objects the user names, keep everything else byte-for-byte, and hand back an editable `.pptx` that opens clean in WPS / PowerPoint. Generating a new editable PPTX or magazine web deck from source material is still supported, but it is secondary — do not turn a revise/repair request into a from-scratch regeneration.
 
-**Core Pipeline**: `Input → Storyboard → Design & Generate → Refine & Deliver`
+**Primary mode — preserve-and-edit an existing PPTX**: `Read repair plan → Touch only named slides/objects → Render before/after → Write back editable .pptx + safety report` (see **Existing PPTX Repair Mode** below).
 
-## v6 Task-First Operating Model
+**Secondary mode — generate from source**: `Input → Storyboard → Design & Generate → Refine & Deliver`.
+
+## Operating Model
 
 Treat this Skill as the local quality and workflow layer around PowerPoint, not as a replacement for PowerPoint's native editor. The default user-facing sequence is:
 
@@ -47,9 +52,15 @@ When a handoff includes `attachments/pptlint-repair-plan.json`, treat the source
 - read the selected repair tasks before planning and touch only their named slides;
 - keep every visible character, number, datum, conclusion, slide count, slide order, and unselected slide unchanged unless the user explicitly unlocks one of them;
 - never import and re-export the whole source deck through Artifact Tool, SVG, or another reconstruction pipeline for a local repair; these routes can reinterpret masters, transparency, placeholders, grouped objects, links, and untouched slides;
-- use only a native, package-preserving object edit path that can change the named PowerPoint objects without rebuilding the rest of the presentation;
-- improve hierarchy, alignment, spacing, contrast, font consistency, and visual completion with native editable PowerPoint objects;
-- if no native package-preserving editor is available, do not generate a repaired PPTX; return the short PowerPoint/WPS steps immediately instead of starting the normal deck-production pipeline;
+- use a native, package-preserving object edit path — the editor `scripts/preserve_edit_pptx.py`. It copies every package part verbatim and re-serializes only the named slide, so untouched slides, the logo, masters, layouts, themes, media and links stay byte-for-byte identical:
+  ```bash
+  python3 ${SKILL_DIR}/scripts/preserve_edit_pptx.py <source.pptx> <repaired.pptx> \
+      --slide <N> --replace "旧文本=新文本" --report <fidelity-report.json>
+  ```
+  Repeat `--replace` for each text change on that slide; run once per slide that needs editing. A no-match leaves even the named slide byte-identical;
+- the fidelity report is a hard gate: it must show only the named slide part changed and no parts added or removed (`ok: true`). Any unexpected changed, added, or removed part is a hard failure — stop and report it, do not deliver;
+- the editor currently rewrites text inside `<a:t>` runs of the named slide (the right tool for fixing titles, conclusions, wording, numbers-as-text, and font/wording consistency). For changes it does not yet support natively — chart data/series, table cell structure, shape geometry or position, adding/replacing images — do NOT round-trip the deck; return the short PowerPoint/WPS steps for exactly those objects instead;
+- if the editor is unavailable in the current environment, do not generate a repaired PPTX; return the short PowerPoint/WPS steps immediately instead of starting the normal deck-production pipeline;
 - if a selected problem cannot be improved without breaking a lock, preserve the original page and report the exact decision the user must make;
 - after an actual native edit, render the changed slides through PowerPoint, WPS, or LibreOffice and inspect the before/after at full size; missing visible objects, black/changed backgrounds, broken logos, changed links, or unintended movement are hard failures;
 - write a separate repaired PPTX, run `pptlint proof`, and treat its score/rule result as supporting evidence only. Never issue a success claim or Verified credential from text/rule checks without the rendered visual review.
