@@ -1,0 +1,18 @@
+{
+  "source": "examples/executive-business-review-starter/executive-business-review-editable.pptx",
+  "output": "assets/preserve-demo/executive-review-preserve-edited.pptx",
+  "editedSlide": 1,
+  "beforeTitle": "季度经营复盘",
+  "afterTitle": "季度经营复盘 · 已保真修订",
+  "totalParts": 81,
+  "changed": [
+    "ppt/slides/slide1.xml"
+  ],
+  "unchangedParts": 80,
+  "safe": true,
+  "slideChanges": {
+    "1": [
+      "1 text run(s) changed"
+    ]
+  }
+}

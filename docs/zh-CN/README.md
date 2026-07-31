@@ -57,6 +57,7 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 | 需求 | 阅读 |
 |---|---|
 | 理解产品定位 | [产品定位反思](./strategy/product-positioning.md) |
+| 保真改 PPT 的品牌定位与「我们不做」 | [保真改 PPT · 定位](./strategy/positioning-preserve-edit.md) |
 | 深度优化 PRD | [v5.2 深度优化指南 / PRD](./strategy/prd-v5.2-deep-optimization-guide.md) |
 | 改善 GitHub 公开曝光 | [Public Growth Playbook](../strategy/public-growth-playbook.md) |
 | 准备 Skill 市场分发 | [Skill 市场分发](./strategy/skill-market-distribution.md) |

@@ -19,6 +19,8 @@
 
 ![Ultimate PPT Master 的完整演示案例](assets/readme/v6-finished-decks.png)
 
+![保真改 PPT：只改第 1 页标题，其余 80/81 个 part 字节级不变（动画）](assets/preserve-demo/before-after.gif)
+
 ## 它现在专注做一件事：保真改好你已有的 PPT
 
 多数 AI PPT 工具在比「从零生成一份漂亮初稿」。这件事 Kimi、Gamma、ChatGPT 已经做得够好，我们不与它们竞争。
