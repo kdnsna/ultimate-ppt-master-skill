@@ -2985,6 +2985,8 @@ def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     module = _load_preserve_edit_module(repo_root)
 
     requested_slides: set[int] = set()
+    intended_parts: set[str] = set()
+    slide_parts_map: dict[int, list[str]] = {}
     intermediates: list[Path] = []
     current = source
     for index, edit in enumerate(edits):
@@ -3010,7 +3012,10 @@ def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
         target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
         if not last:
             intermediates.append(target)
-        module.patch_slide_xml(current, target, slide, module.apply_operations(operations))
+        part_edits = module.build_part_edits(current, slide, operations)
+        intended_parts.update(part_edits.keys())
+        slide_parts_map.setdefault(slide, []).extend(part_edits.keys())
+        module.patch_parts(current, target, part_edits)
         current = target
 
     for temp in intermediates:
@@ -3022,18 +3027,24 @@ def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     changed = sorted(name for name in before if name in after and before[name] != after[name])
     added = sorted(set(after) - set(before))
     removed = sorted(set(before) - set(after))
-    requested_parts = {module.slide_part_name(slide) for slide in requested_slides}
-    unexpected = [name for name in changed if name not in requested_parts]
+    unexpected = [name for name in changed if name not in intended_parts]
     safe = not unexpected and not added and not removed
 
     slide_changes: dict[int, list[str]] = {}
     for slide in sorted(requested_slides):
+        delta: list[str] = []
         before_xml = module.slide_xml(source, slide)
         after_xml = module.slide_xml(output, slide)
         if before_xml is not None and after_xml is not None:
-            delta = module.summarize_changes(before_xml, after_xml)
-            if delta:
-                slide_changes[slide] = delta
+            delta.extend(module.summarize_changes(before_xml, after_xml))
+        for part in slide_parts_map.get(slide, []):
+            if part.startswith("ppt/charts/"):
+                cb = module.part_text(source, part)
+                ca = module.part_text(output, part)
+                if cb is not None and ca is not None:
+                    delta.extend(module.summarize_chart_changes(cb, ca))
+        if delta:
+            slide_changes[slide] = delta
 
     return {
         "status": "ok" if safe else "fidelity-violation",

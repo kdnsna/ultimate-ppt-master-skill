@@ -95,6 +95,47 @@ def slide_xml(pptx_path: Path, slide_number: int) -> str | None:
         return package.read(name).decode("utf-8", errors="replace")
 
 
+def part_text(pptx_path: Path, part_name: str) -> str | None:
+    """Return the decoded text of an arbitrary package part, or None if absent."""
+    with zipfile.ZipFile(pptx_path, "r") as package:
+        names = {info.filename for info in package.infolist()}
+        if part_name not in names:
+            return None
+        return package.read(part_name).decode("utf-8", errors="replace")
+
+
+def patch_parts(
+    source: Path,
+    output: Path,
+    part_edits: dict[str, EditFn],
+) -> dict:
+    """Write ``output`` from ``source`` re-serializing only the named parts.
+
+    ``part_edits`` maps a package part name to an edit_fn applied to that part's
+    decoded XML. Every part not in the mapping is copied verbatim (same content
+    bytes), so the byte-level preservation guarantee holds for all of them; an
+    edit_fn that returns its input unchanged leaves that part byte-identical too.
+    """
+    rewritten: list[str] = []
+    with zipfile.ZipFile(source, "r") as src, zipfile.ZipFile(
+        output, "w", zipfile.ZIP_DEFLATED
+    ) as dst:
+        names = [info.filename for info in src.infolist() if not info.is_dir()]
+        missing = [part for part in part_edits if part not in names]
+        if missing:
+            raise FileNotFoundError(f"parts not found in {source.name}: {missing}")
+        for name in names:
+            raw = src.read(name)
+            if name in part_edits:
+                text = raw.decode("utf-8")
+                edited = part_edits[name](text)
+                if edited != text:
+                    rewritten.append(name)
+                raw = edited.encode("utf-8")
+            dst.writestr(name, raw)
+    return {"source": str(source), "output": str(output), "rewritten": rewritten}
+
+
 def patch_slide_xml(
     source: Path,
     output: Path,
@@ -107,26 +148,14 @@ def patch_slide_xml(
     report describing which part was rewritten.
     """
     target = slide_part_name(slide_number)
-    rewritten: list[str] = []
-
-    with zipfile.ZipFile(source, "r") as src, zipfile.ZipFile(
-        output, "w", zipfile.ZIP_DEFLATED
-    ) as dst:
-        names = [info.filename for info in src.infolist() if not info.is_dir()]
-        if target not in names:
-            raise FileNotFoundError(
-                f"{target} not found in {source.name}; "
-                f"deck has slides: {sorted(n for n in names if n.startswith('ppt/slides/slide'))}"
-            )
-        for name in names:
-            content = src.read(name)
-            if name == target:
-                edited = edit_fn(content.decode("utf-8"))
-                content = edited.encode("utf-8")
-                rewritten.append(name)
-            dst.writestr(name, content)
-
-    return {"source": str(source), "output": str(output), "rewritten": rewritten}
+    with zipfile.ZipFile(source, "r") as src:
+        names = {info.filename for info in src.infolist() if not info.is_dir()}
+    if target not in names:
+        raise FileNotFoundError(
+            f"{target} not found in {source.name}; "
+            f"deck has slides: {sorted(n for n in names if n.startswith('ppt/slides/slide'))}"
+        )
+    return patch_parts(source, output, {target: edit_fn})
 
 
 def replace_text(replacements: dict[str, str]) -> EditFn:
@@ -423,6 +452,184 @@ def summarize_changes(before_xml: str, after_xml: str) -> list[str]:
         summary.append(f"{cell_changes} table cell(s) changed")
 
     return summary
+
+
+# ---------------------------------------------------------------------------
+# Chart editing. Charts live in their own parts (ppt/charts/chartN.xml),
+# referenced from a slide via a graphicFrame -> c:chart r:id -> slide rels.
+# Editing a chart therefore re-serializes the chart part, not the slide part;
+# build_part_edits() composes the per-part edit_fns so patch_parts() keeps the
+# byte-level guarantee for every other part (other slides, media, masters, and
+# charts that are not targeted).
+# ---------------------------------------------------------------------------
+
+_C_NS = "http://schemas.openxmlformats.org/drawingml/2006/chart"
+ET.register_namespace("c", _C_NS)
+_R_NS = _NAMESPACES["r"]
+_PKG_REL_NS = "http://schemas.openxmlformats.org/package/2006/relationships"
+_CHART_REL_TYPE = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart"
+_CHART_GDATA_URI = "http://schemas.openxmlformats.org/drawingml/2006/chart"
+_C_V = f"{{{_C_NS}}}v"
+_C_SER = f"{{{_C_NS}}}ser"
+_C_VAL = f"{{{_C_NS}}}val"
+_C_NUMCACHE = f"{{{_C_NS}}}numCache"
+_C_PT = f"{{{_C_NS}}}pt"
+_A_GRAPHICDATA = f"{{{_A_NS}}}graphicData"
+_C_CHART = f"{{{_C_NS}}}chart"
+
+
+def _resolve_part(base_part: str, target: str) -> str:
+    base_dir = base_part.rsplit("/", 1)[0]
+    out: list[str] = []
+    for piece in (base_dir + "/" + target).split("/"):
+        if piece in ("", "."):
+            continue
+        if piece == "..":
+            if out:
+                out.pop()
+        else:
+            out.append(piece)
+    return "/".join(out)
+
+
+def chart_parts_for_slide(pptx_path: Path, slide_number: int) -> list[str]:
+    """Return the chart part names referenced by a slide, in document order."""
+    slide = slide_part_name(slide_number)
+    rels_part = f"ppt/slides/_rels/slide{slide_number}.xml.rels"
+    with zipfile.ZipFile(pptx_path, "r") as package:
+        names = {info.filename for info in package.infolist()}
+        if slide not in names:
+            return []
+        slide_xml = package.read(slide).decode("utf-8", errors="replace")
+        rels_xml = package.read(rels_part).decode("utf-8", errors="replace") if rels_part in names else ""
+
+    rel_targets: dict[str, str] = {}
+    if rels_xml:
+        for rel in ET.fromstring(rels_xml).findall(f"{{{_PKG_REL_NS}}}Relationship"):
+            if rel.get("Type") == _CHART_REL_TYPE:
+                rel_targets[rel.get("Id") or ""] = rel.get("Target") or ""
+
+    parts: list[str] = []
+    for gdata in ET.fromstring(slide_xml).iter(_A_GRAPHICDATA):
+        if gdata.get("uri") != _CHART_GDATA_URI:
+            continue
+        chart_el = gdata.find(_C_CHART)
+        if chart_el is None:
+            continue
+        target = rel_targets.get(chart_el.get(f"{{{_R_NS}}}id") or "")
+        if target:
+            parts.append(_resolve_part(slide, target))
+    return parts
+
+
+def _op_replace_chart_text(root, op: dict) -> bool:
+    old = str(op["old"])
+    new = str(op.get("new", ""))
+    changed = False
+    for v in root.iter(_C_V):
+        if v.text and old in v.text:
+            v.text = v.text.replace(old, new)
+            changed = True
+    return changed
+
+
+def _op_set_chart_value(root, op: dict) -> bool:
+    series = int(op["series"])
+    point = int(op["point"])
+    new_text = str(op["value"])
+    sers = list(root.iter(_C_SER))
+    if not 1 <= series <= len(sers):
+        return False
+    cache = sers[series - 1].find(f".//{_C_VAL}//{_C_NUMCACHE}")
+    if cache is None:
+        return False
+    pts = cache.findall(_C_PT)
+    target_pt = next((pt for pt in pts if pt.get("idx") == str(point - 1)), None)
+    if target_pt is None and 1 <= point <= len(pts):
+        target_pt = pts[point - 1]
+    if target_pt is None:
+        return False
+    v = target_pt.find(_C_V)
+    if v is None:
+        v = ET.SubElement(target_pt, _C_V)
+    if v.text == new_text:
+        return False
+    v.text = new_text
+    return True
+
+
+_CHART_OP_DISPATCH = {
+    "replace_chart_text": _op_replace_chart_text,
+    "set_chart_value": _op_set_chart_value,
+}
+
+
+def apply_chart_operations(operations: list[dict]) -> EditFn:
+    """Build an idempotent edit_fn applying chart-part operations."""
+    if not operations:
+        raise ValueError("chart operations must not be empty")
+    for index, op in enumerate(operations):
+        if not isinstance(op, dict) or op.get("op") not in _CHART_OP_DISPATCH:
+            raise ValueError(f"chart operations[{index}] has unknown or missing 'op'")
+
+    def _edit(xml_text: str) -> str:
+        root = ET.fromstring(xml_text)
+        changed = False
+        for op in operations:
+            if _CHART_OP_DISPATCH[op["op"]](root, op):
+                changed = True
+        if not changed:
+            return xml_text
+        return ET.tostring(root, encoding="unicode", xml_declaration=False)
+
+    return _edit
+
+
+def build_part_edits(
+    pptx_path: Path, slide_number: int, operations: list[dict]
+) -> dict[str, EditFn]:
+    """Split a slide edit's operations into per-part edit_fns (slide + its charts)."""
+    slide_ops = [op for op in operations if op.get("op") in _OP_DISPATCH]
+    chart_ops = [op for op in operations if op.get("op") in _CHART_OP_DISPATCH]
+    unknown = [
+        op.get("op")
+        for op in operations
+        if op.get("op") not in _OP_DISPATCH and op.get("op") not in _CHART_OP_DISPATCH
+    ]
+    if unknown:
+        raise ValueError(f"unknown operation(s): {unknown}")
+    if not slide_ops and not chart_ops:
+        raise ValueError("no operations supplied")
+
+    part_edits: dict[str, EditFn] = {}
+    if slide_ops:
+        part_edits[slide_part_name(slide_number)] = apply_operations(slide_ops)
+    if chart_ops:
+        parts = chart_parts_for_slide(pptx_path, slide_number)
+        groups: dict[str, list[dict]] = {}
+        for op in chart_ops:
+            match = op.get("chart", "all")
+            if match == "all":
+                targets = parts
+            else:
+                idx = int(match) - 1
+                if not 0 <= idx < len(parts):
+                    raise ValueError(
+                        f"chart index {match} out of range (slide {slide_number} has {len(parts)} chart(s))"
+                    )
+                targets = [parts[idx]]
+            for part in targets:
+                groups.setdefault(part, []).append(op)
+        for part, ops_for_part in groups.items():
+            part_edits[part] = apply_chart_operations(ops_for_part)
+    return part_edits
+
+
+def summarize_chart_changes(before_xml: str, after_xml: str) -> list[str]:
+    before = [node.text or "" for node in ET.fromstring(before_xml).iter(_C_V)]
+    after = [node.text or "" for node in ET.fromstring(after_xml).iter(_C_V)]
+    changed = sum(1 for a, b in zip(before, after) if a != b)
+    return [f"{changed} chart value(s) changed"] if changed else []
 
 
 def fidelity_report(

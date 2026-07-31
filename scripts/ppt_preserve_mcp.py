@@ -97,11 +97,15 @@ TOOLS: list[dict[str, Any]] = [
                             "operations": {
                                 "type": "array",
                                 "description": (
-                                    "Typed slide-local operations. replace_text {op,old,new}; "
+                                    "Typed operations. Slide-local: replace_text {op,old,new}; "
                                     "style_text {op, match?, font?, size?, bold?, color?} (match is 'all' "
                                     "or {text_contains|text_equals}); replace_table_cell {op, row?, col?, "
                                     "find?|old?, text?|new?}; set_shape_geometry {op, match, x?, y?, w?, "
-                                    "h?} (match is {index|name|text_contains|text_equals}; geometry in points)."
+                                    "h?} (match is {index|name|text_contains|text_equals}; geometry in points). "
+                                    "Chart ops edit the chart part (not the slide) and the fidelity gate "
+                                    "covers them: replace_chart_text {op, chart?, old, new}; set_chart_value "
+                                    "{op, chart?, series, point, value}. chart is a 1-based chart index on the "
+                                    "slide or 'all' (default 'all')."
                                 ),
                                 "items": {"type": "object"},
                             },
@@ -151,6 +155,8 @@ def tool_edit_pptx_preserving(args: dict[str, Any]) -> dict[str, Any]:
     output.parent.mkdir(parents=True, exist_ok=True)
 
     requested: set[int] = set()
+    intended_parts: set[str] = set()
+    slide_parts_map: dict[int, list[str]] = {}
     intermediates: list[Path] = []
     current = source
     try:
@@ -170,7 +176,10 @@ def tool_edit_pptx_preserving(args: dict[str, Any]) -> dict[str, Any]:
             target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
             if not last:
                 intermediates.append(target)
-            engine.patch_slide_xml(current, target, slide, engine.apply_operations(operations))
+            part_edits = engine.build_part_edits(current, slide, operations)
+            intended_parts.update(part_edits.keys())
+            slide_parts_map.setdefault(slide, []).extend(part_edits.keys())
+            engine.patch_parts(current, target, part_edits)
             current = target
     except Exception as exc:  # noqa: BLE001
         return _text_result(f"edit failed: {exc}", is_error=True)
@@ -184,19 +193,25 @@ def tool_edit_pptx_preserving(args: dict[str, Any]) -> dict[str, Any]:
     changed = sorted(name for name in before if name in after and before[name] != after[name])
     added = sorted(set(after) - set(before))
     removed = sorted(set(before) - set(after))
-    requested_parts = {engine.slide_part_name(slide) for slide in requested}
-    unexpected = [name for name in changed if name not in requested_parts]
+    unexpected = [name for name in changed if name not in intended_parts]
     safe = not unexpected and not added and not removed
     unchanged = sum(1 for name in before if name in after and before[name] == after[name])
 
     slide_changes: dict[int, list[str]] = {}
     for slide in sorted(requested):
+        delta: list[str] = []
         before_xml = engine.slide_xml(source, slide)
         after_xml = engine.slide_xml(output, slide)
         if before_xml is not None and after_xml is not None:
-            delta = engine.summarize_changes(before_xml, after_xml)
-            if delta:
-                slide_changes[slide] = delta
+            delta.extend(engine.summarize_changes(before_xml, after_xml))
+        for part in slide_parts_map.get(slide, []):
+            if part.startswith("ppt/charts/"):
+                cb = engine.part_text(source, part)
+                ca = engine.part_text(output, part)
+                if cb is not None and ca is not None:
+                    delta.extend(engine.summarize_chart_changes(cb, ca))
+        if delta:
+            slide_changes[slide] = delta
 
     summary = [
         f"status: {'ok' if safe else 'FIDELITY VIOLATION'}",
