@@ -1,6 +1,8 @@
-# Ultimate PPT Master · 保真改 PPT
+**PPT 改稿** · ppt-revise
 
-> **指哪改哪，把你已有的 PPT 改到能交付。** 原生对象编辑，只动你点名的页和对象；其余页面、logo、母版、链接字节级保留；交回一份 WPS / PowerPoint 打开不乱的可编辑 `.pptx`。
+# 领导发来的那份 PPT，改完还是原来那个模板。
+
+> 它不替你重做一份 PPT。你手上已有带品牌、带模板的那份——要改哪页就改哪页，其余一个字、一个 logo、一处母版都不动；交出去 WPS / PowerPoint 直接能开、能继续改。
 
 <p align="center">
   <a href="./README.en.md"><strong>English</strong></a> ·
@@ -17,191 +19,160 @@
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-2563EB?style=flat-square">
 </p>
 
-![Ultimate PPT Master 的完整演示案例](assets/readme/v6-finished-decks.png)
+![一份正式 PPT 被局部修改前后](assets/readme/v6-finished-decks.png)
 
-![保真改 PPT：只改第 1 页标题，其余 80/81 个 part 字节级不变（动画）](assets/preserve-demo/before-after.gif)
+![PPT 改稿：真实渲染，只改第 1 页标题，其余 80/81 个部分原样不动](assets/preserve-demo/before-after-real.png)
 
-## 它现在专注做一件事：保真改好你已有的 PPT
+## 它只解决一件事
 
-多数 AI PPT 工具在比「从零生成一份漂亮初稿」。这件事 Kimi、Gamma、ChatGPT 已经做得够好，我们不与它们竞争。
+多数 AI PPT 工具在比「谁更能从零生成一份漂亮初稿」。这件事 Kimi、Gamma、ChatGPT 已经做得够好，我们不抢。
 
-我们解决的是更难、 frontier 模型也最不擅长的最后一公里——**你手上已经有一份真实品牌 PPT**（领导发的、客户给的、模板套的），你要改第 5 页的图表、第 7 页的结论，但：
+我们解决的是生成之后、交付之前的那一步——**你手上已经有一份真实 PPT**（领导发的、客户给的、模板套的），要改第 5 页的图表、第 7 页的结论，可是：
 
 - 其余页一个字都不能动；
-- 官方 logo 不能糊、不能被替换成近似图形；
-- 母版、版式、透明度、分组、超链接不能被重做破坏；
+- 官方 logo 不能糊、不能被换成近似图形；
+- 母版、版式、透明度、分组、超链接不能被「重新生成」弄坏；
 - 交出去 WPS / PowerPoint 要能正常打开、能继续改。
 
-模型的本能是「整套重新生成」，恰恰会破坏这些。Ultimate PPT Master 走相反的路：**preservation-first（保真优先）**——只处理你点名的页和对象，其余保持字节级不变，并把改动前后逐页渲染对比给你看。
+模型的本能是「整套重做」，而这恰恰会弄坏上面这些。PPT 改稿走相反的路：**你点哪页，它只动哪页**，其余在文件里原样保留，并把改前改后摆给你看。也因此，它不能通过导入并重导出整份演示来冒充局部修改——那正是会弄坏母版、透明度、分组和链接的做法。
 
-| 它做什么 | 它不做什么 |
+> 好奇技术怎么做到的？没点名的部分在 `.pptx` 包里逐字节原样拷贝，只重写你点名的页和它引用的图表。详见 [定位说明](./docs/zh-CN/strategy/positioning-preserve-edit.md)。
+
+## 我们做 / 我们不做
+
+| 做 | 不做 |
 |---|---|
-| 对象级修改你指定页的标题、正文、图表、表格、形状 | 不替你从零生成整套演示（那请用 Kimi / Gamma） |
-| 保留未选页、logo、母版、链接、分组、透明度 | 不把整份 PPT 导入再整套重导出来冒充「局部修复」 |
-| 统一字体、对齐、间距、对比度等确定性修整 | 不要求你装 Node、跑命令、连本地服务才能用（桌面端已提供免命令入口） |
-| 输出原生可编辑 `.pptx`，附改动与安全报告 | 不把占位内容包装成「已完成」 |
+| 改你指定页的标题、正文、图表、表格、形状、字体 | 不替你从零生成整套演示（那请用 Kimi / Gamma） |
+| 没点名的页、logo、母版、链接、分组，原样不动 | 不把整份 PPT 倒进去再倒出来，冒充「局部修改」 |
+| 统一字体、对齐、间距、对比度 | 不要求你装 Node、跑命令、连服务才能用 |
+| 交回能编辑的 `.pptx`，附「改了哪些 / 没动哪些」清单 | 不把占位内容说成「已完成」 |
 
-> **现状与路线**：保真编辑引擎已经可用（双向原生 OOXML 转换 + preservation-first 修复模式）。当前生产路径仍是 Agent Skill + 本地 Bridge；面向普通办公用户的**本地桌面客户端（拖入 → 选页/对象 → 改 → 预览 → 存）已可用**；同一引擎已封装为零依赖 MCP server（`scripts/ppt_preserve_mcp.py`，见 [MCP 接入指南](./docs/zh-CN/guides/mcp-server.md)）供 Agent 生态调用。
+## 谁最适合用它
 
-### 冻结范围（ intentionally 不再扩张 ）
+- **银行 / 政务 / 国企**：模板严、logo 和印章不能动、一份材料要被改五轮再上交。
+- **咨询 / 财务 / 法务**：客户给的底稿，只换数字和结论，版式一个字都不能偏。
+- **培训 / 教研**：上学期课件，这学期只更新数据和案例，其余照旧。
+- **任何「手里已有一份 PPT，只想改几处」的人**——这恰恰是 AI 生成工具帮不上忙的地方。
 
-为了让上面这一件事做到极致，以下能力**保留但不再新增投入**：杂志风 / 瑞士风 Web Deck、六套视觉方向的扩展、多生图后端、桌面 Tauri 之外的多形态、双语档的同步扩写，以及只校验「仓库自洽」而非「行为正确」的脆性自检。
+## 为什么不让 AI 整套重做
 
-## 两份可以直接检查的成品
+因为你要交上去的，往往是**单位的那套模板**：固定的封面、固定的 logo 位置、固定的页脚和字号。AI 一旦「整套重做」，它是在凭印象重画这套模板——logo 偏两像素、页脚字体变了、母版颜色对不上，这些在屏幕上几乎看不出，但交上去就是「没按模板来」。
 
-| 代表案例 | 直接检查 |
-|---|---|
-| **正式办公 PPTX** · 脱敏经营复盘 | [下载仓库内可编辑 PPTX](./examples/executive-business-review-starter/executive-business-review-editable.pptx) · [看关键页](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) · [看质量报告](./examples/executive-business-review-starter/quality-report.json) |
-| **AI Web Deck** · GPT-5.6「三种轨道」 | [打开完整 9 页演示](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/ai-frontier-2026/gpt-5-6.html) · [进入成品库](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) |
+更糟的是重做会顺手抹掉原文件里你没注意到的东西：超链接、备注、分组、透明度、二维码背后的跳转。你只让它改第 7 页，它却把整份文件换了一遍，你连哪里变了都不知道。
 
-以上 PPTX 是脱敏演示 proof，不包含真实客户资料；公开文件仍应在目标 PowerPoint/WPS 环境复核后再用于正式场合。
+PPT 改稿的原则因此很简单：**没让你动的，就一个字节都不动。** 你只承担你那一处修改的责任，其余交给原文件自己。
 
-## 一分钟安装
+## 和「从零生成」的工具差在哪
+
+| | Kimi / Gamma / ChatGPT | PPT 改稿 |
+|---|---|---|
+| 擅长 | 从一句话 / 一份资料生成一份新演示 | 在你**已有**的那份上，指哪改哪 |
+| 改一处时 | 倾向整套重做，模板 / logo 容易跑偏 | 只动你点名的页，其余原样 |
+| 产物 | 常是网页 Deck 或需二次排版 | 能编辑的 `.pptx`，WPS / PowerPoint 直接开 |
+| 适合 | 还没有 PPT、要从头做 | 已经有 PPT、要改到能交付 |
+
+两者不冲突：先用生成工具起个草稿，再用 PPT 改稿把它收口成「能交出去的那份」。
+
+## 桌面端：四步改完
+
+1. **拖进去**：把 `.pptx` 拖到窗口，不用装任何东西、不用命令行。
+2. **看每页写了什么**：左侧列出每页的文字，点你要改的那页。
+3. **点要改的字**：点一下文字就填进「原文 → 新文本」，也能改字体、表格、形状位置、图表数值。
+4. **存**：得到一份新 `.pptx`，并告诉你「改了哪些、多少个部分没动」。
+
+## 一个真实例子：经营复盘改三处
+
+假设领导发来一份季度经营复盘，要你：把封面标题的「Q2」改成「Q3」、把第 4 页表格里的旧数字换成新数字、把第 6 页柱状图的图例「线上」改成「线上渠道」。
+
+你对 Agent 说一句，或在桌面端点三下，它会：
+
+- 在封面只替换那一个「Q2」，封面其余排版、logo 不动；
+- 在第 4 页只改你指的那几个单元格，表格样式和其余行不动；
+- 在第 6 页只改图例文字，图表的坐标、配色、数据系列不动；
+- 其余所有页、母版、备注、超链接，原样保留。
+
+最后它回报：「改了 3 处，涉及封面、第 4 页、第 6 页；其余 78 个部分原样没动。」你打开新文件，扫一眼这三页，就能交。
+
+## 给 Agent 用：它会怎么改
+
+零依赖的 MCP server（`scripts/ppt_preserve_mcp.py`）把同一套能力开放给任意 MCP 客户端。你对 Agent 说人话：
+
+> 把这份 PPT 第 3 页的「Q2」改成「Q3」，第 6 页结论换成附件里的新数字，别的都别动。
+
+Agent 会先读每页内容、再只改你点名的页，最后把「改了哪些 / 没动哪些」回报给你；如果它发现这次改动会越界，它会停下来告诉你，而不是悄悄交一份坏掉的文件。接入细节见 [MCP 接入指南](./docs/zh-CN/guides/mcp-server.md)。
+
+一分钟安装（给 Agent 的技能包）：
 
 ```bash
 npx skills add kdnsna/ultimate-ppt-master-skill --skill ultimate-ppt-master
 ```
 
-安装后直接对 Agent 说：“用 `$ultimate-ppt-master`，把这份材料做成 10 页、给管理层看的可编辑 PPTX，结论先行，所有数字可追溯。”
+> 安装令牌 `ultimate-ppt-master` 是机器标识，保持不变；「PPT 改稿 / ppt-revise」是给人看的名字。
 
-需要可视化任务入口时，打开 [v6 在线工作台](https://kdnsna.github.io/ultimate-ppt-master-skill/)；它只负责界面，生成时连接你电脑上的本地 Bridge。
+## 改前改后，摆给你看
 
-> **本地边界：**源文件、密钥和生成项目默认留在本机。项目不是托管式一键 PPT SaaS，也不会把当前 Bridge 直接暴露到公网。
-
-已有 PPT 想先检查？使用 [PPTLint](https://github.com/kdnsna/pptlint) 做本地交付检查；需要修改时，再由 Ultimate 按明确页面和对象处理。
-
-## 它解决的是交付，不只是预览
-
-多数 AI PPT 工具优化“第一眼像不像成品”。Ultimate 更在意这份文件能否：
-
-- 在 PowerPoint 中继续修改，而不是变成整页图片；
-- 说明每个数字、结论和素材来自哪里；
-- 修改单页时保留稳定 `slideId`，避免无故整套重做；
-- 在缺少模型或素材时明确降级，不伪装为已经完成；
-- 经过渲染审阅、原生对象检查和质量报告后再交付。
-
-它适合中文正式汇报、经营复盘、咨询方案、培训课件、政务金融材料、品牌发布，也支持面向演讲和发布会的杂志风 Web Deck。
-
-## 三种交付路线
-
-| 你要交付什么 | 推荐路线 | 产物 |
-|---|---|---|
-| 正式汇报、咨询、培训、政务/金融材料，或需要别人继续修改 | **可编辑 PowerPoint** | `.pptx`、备注、来源与质量证据 |
-| 发布会、公开演讲、Demo Day、浏览器优先展示 | **杂志风 Web Deck** | 响应式 HTML，支持编辑叙事或瑞士信息设计 |
-| 既要线上展示，又要正式文件 | **双交付** | 共用资料与策划记录，分别生成 Web 和 PPTX |
-
-PowerPoint 仍是正式成品的主要编辑环境。Ultimate 负责它周围最耗时的资料整理、叙事策划、视觉方向、素材边界、生成、审阅和失败恢复。
-
-## 可以从什么开始
-
-- PDF、Word、Excel、Markdown、网页链接或直接粘贴的文字；
-- 只有主题的一句话任务，由最佳效果 brief 补齐非风险设置；
-- 一份已有 PPTX，作为内容来源、视觉参考或明确的局部修复对象；
-- 用户提供的品牌手册、Logo、图片和上一版演示。
-
-参考 PPT 默认只学习母版、版式节奏、主题字体和颜色，不复制其中的私有内容。原始 Office 矢量素材会尽量作为一等素材保留。
-
-## 从一句任务到正式交付
-
-1. **输入**：加入文件、URL、文字或已有 PPTX，说明受众和用途。
-2. **故事板**：最多补问三个真正影响结果的问题，展示页面任务、证据和缺口。
-3. **设计与生成**：比较完整视觉方向，先出结构稿，再精修需要的页面。
-4. **精修与交付**：按稳定 `slideId` 修改，检查产物并回到 PowerPoint 完成最终确认。
-
-![v6 任务型工作台](assets/readme/v6-workspace.png)
-
-工作台不会先把 Bridge、Provider、DeckIR 和脚本堆给普通用户。专业合同和诊断能力仍保留；Classic 控制台在兼容周期内可通过 `?classic=1` 打开。
-
-## 极短指令也有稳定默认值
-
-**最佳效果提示增强器**会把极短指令扩写成可检查的 brief，记录受众、场景、核心信息、页数、路线、来源边界和 Agent 假设。
-
-- 明确要求可编辑、正式汇报、政府/金融/培训或 `.pptx`：走正式 PPTX。
-- 明确要求网页、杂志风、横滑、Swiss Style 或浏览器展示：走 Web Deck。
-- 只有主题且没有正式信号：使用 **Style A Editorial Fixed Rhythm**，先给出稳定的 8 页编辑叙事版本。
-
-真正影响事实、品牌/IP 权限或交付方式时才追问；普通视觉空白由固定默认值补齐。
-
-## 为什么适合中文正式办公
-
-- 默认使用 Office 安全中文字体和投影可读字号，不依赖冷门网页字体。
-- 先写结论与页面任务，再选择图表、图片、表格和版式。
-- 为官方 Logo、二维码、印章、卡面和活动 IP 保留明确来源或替换阻断。
-- 数字与结论进入 source map；证据不足时保持缺口，不把占位内容写成事实。
-- 六套视觉方向覆盖封面、正文、数据、图表、图片、章节与结尾，不只是同一模板换色。
-- 连续页面会检查布局与配方重复，避免整套收敛成“大标题＋三个卡片”。
-
-设计系统见 [`DESIGN.md`](./DESIGN.md)。这里借鉴了 [`guizang-ppt-skill`](https://github.com/op7418/guizang-ppt-skill)、[`baoyu-design`](https://github.com/JimLiu/baoyu-design) 和 [`awesome-design-md`](https://github.com/VoltAgent/awesome-design-md) 的生产方法；也以 clean-room 方式研究了 [`gzh-design-skill`](https://github.com/isjiamu/gzh-design-skill) 的浅色画布、阅读节奏和渲染质检思路。后者为 AGPL-3.0，本仓库没有复制它的代码、提示词、组件或模板。
-
-## 公开 Proof 怎么看
-
-[成品与 Proof 页面](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) 采用“输入 → 策划 → 输出 → 质量复核”的结构：
-
-- 正式 PPTX 展示脱敏 source、可编辑文件、关键页、原生对象检查和质量报告；
-- Web Deck 展示完整演示、资料来源和响应式结果；
-- 其他经营复盘、咨询方案、产品发布和科技趋势案例进入次级案例库；
-- Proof Pack 分数是 **Design Doctor 内部自评**，不是第三方 benchmark。
-
-已有 PPT 的公开前后证据另见 [PPTLint Proof Loop](https://kdnsna.github.io/pptlint/proof-loop/comparison.html)。检查分数只作为辅助证据，不能替代 PowerPoint/WPS 中的逐页视觉确认。
-
-## 可检查、可恢复的产物
-
-| 文件 | 作用 |
-|---|---|
-| `project-brief.json` | 任务、自动扩写 brief、路线、假设与 `expectationFit` |
-| `storyboard.json` | 稳定 `slideId`、页面角色、所选结构与证据引用 |
-| `asset_plan.json` | 素材来源策略、状态与 `current_generation_evidence` |
-| `source-map.json` | 实际使用的来源与主张 |
-| `spec_lock.md` | 视觉与页面执行合同 |
-| `quality-report.json` | 渲染发现、交付状态和已知阻断 |
-| `pipeline-state.json` | 导出是否绑定最新通过检查的产物 digest |
-
-没有可用生图后端时，素材项会进入 `Needs-Manual`，给出提示词、文件名和插入位置，不会静默制造“已完成”。
-
-## 完整工作台安装
-
-需要 Web 工作台、本地 Bridge 和仓库脚本时：
+每次修改都附一份清单：哪一页改了、改了什么、其余多少个部分原样没动。仓库里还有可复现的演示：
 
 ```bash
-git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
-cd ultimate-ppt-master-skill
-npm run setup
-npm run doctor
-npm run bridge
+python3 scripts/make_preserve_demo_proof.py
 ```
 
-然后打开在线工作台。托管页面只连接 `127.0.0.1`；Bridge 默认不提供公网认证、多租户队列或通用文件服务器。
+它对仓库内真实样例只改第 1 页标题，产出修复后的 `.pptx` 和改动清单 `fidelity-report.json`，以及两张对比图：矢量示意卡 `before-after.svg`、动画示意 `before-after.gif`。本机装了 LibreOffice 时，还会额外给真实像素级渲染 `before-after-real.png` / `before-after-real.gif`——上面首屏那张就是它；没装 LibreOffice 时只有示意卡。
 
-## 已有 PPTX 的修改边界
+## 本地优先，到底意味着什么
 
-已有文件的局部修改采用 preservation-first：只处理用户选中的页面和对象，并锁定原文、数字、结论、页数、顺序、链接与未选页。
+银行、政务、法务的材料常常不能出本机。PPT 改稿的桌面端和 MCP server 都在你自己的电脑上跑：你拖进去的文件、改完的文件、以及过程中产生的临时文件，都不上传、不经过任何第三方服务器。
 
-不能通过导入并重导出整份演示来冒充“局部修复”。如果当前环境没有原生、保包的对象级编辑路径，系统应立即返回 PowerPoint/WPS 操作步骤，而不是生成一份可能破坏母版、透明度、分组或链接的新文件。
+它也不是一个「注册账号、把 PPT 传上去」的在线服务。需要模型参与时（比如让 Agent 帮你判断该改哪几处），模型调用走你本机配置的 provider；不需要模型时，纯编辑连网都不用连。
 
-实际修改后仍需在 PowerPoint、WPS 或 LibreOffice 中渲染前后检查，再运行 PPTLint 作为补充证据。
+## 也能从零生成（次要路线）
+
+如果你确实要从一段资料生成一份新演示，它也能做：PDF / Word / Excel / 网页 / 粘贴文字 → 故事板 → 可编辑 PPTX 或杂志风网页 Deck。需要可视化入口时，打开 [在线工作台](https://kdnsna.github.io/ultimate-ppt-master-skill/)；它只负责界面，干活时连你电脑上的本地 Bridge，源文件、密钥和产物默认留在本机。这条路线的完整说明在 [中文文档索引](./docs/zh-CN/README.md) 与 [Web Experience](./docs/zh-CN/guides/web-experience.md)。但本项目的主场是「改好你已有的那份」。
+
+这条路线里，极短指令也会被「最佳效果提示增强器」自动扩写 brief，没有正式信号时用 Style A Editorial Fixed Rhythm 兜底。
+
+## 两份能直接打开的成品
+
+| 案例 | 直接检查 |
+|---|---|
+| 正式办公 PPTX · 脱敏经营复盘 | [下载可编辑 PPTX](./examples/executive-business-review-starter/executive-business-review-editable.pptx) · [看关键页](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) · [看质量报告](./examples/executive-business-review-starter/quality-report.json) |
+| AI Web Deck · 杂志风公开演讲 | [打开完整演示](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) |
+
+以上为脱敏演示，不含真实客户资料；正式场合请仍在目标 PowerPoint / WPS 中逐页复核。
+
+## 常见问题
+
+- **会不会动我的模板和 logo？** 不会。没点名的部分在文件里原样保留，模板、母版、logo、链接都不碰。
+- **能改图表和表格吗？** 能。图表数值、表格单元格、文字、字体、形状位置都支持。
+- **要联网 / 上传文件吗？** 不用。桌面端和 MCP 全程在本机跑，文件不出你的电脑。
+- **不会用命令行行吗？** 行。桌面端是拖拽界面；命令行只是给 Agent 和开发者的另一扇门。
+- **改完怎么确认没问题？** 看它给的「改了哪些 / 没动哪些」清单，并在 WPS / PowerPoint 里扫一眼改的那几页。
+- **改坏了能退回去吗？** 能。它从不覆盖你的原文件，永远另存一份新的；原文件始终在。
+- **支持 WPS 吗？** 支持。产物是标准 `.pptx`，WPS 和 PowerPoint 都能打开和继续编辑。
 
 ## 已知限制
 
-- 生产级生成仍由本地 Agent/编排器牵引；Bridge 不是独立的 `POST /generate` 云服务。
-- 超过约 16 页的项目建议在策划完成后使用断点续跑，避免上下文漂移。
-- PowerPoint 渲染会受 Office 版本和字体影响，公开 proof 不能保证所有环境像素一致。
-- Canva 式自由画布、多人实时协作、云账户和营销 Deal Room 不在当前范围。
-- 结构预览不是最终 PPTX；只有真实文件、质量状态和人工复核共同完成后才算交付。
+- 桌面端 / MCP 的「改」目前覆盖文本、字体、表格、形状位置和图表数值；更复杂的版式重排仍建议在 PowerPoint 里收尾。
+- 真实像素级「改前改后」对比需要本机有 LibreOffice；没有时给的是矢量对比卡。
+- 生产级「从零生成」仍由本地 Agent 牵引，不是托管的一键云服务。
+- Canva 式自由画布、多人实时协作、云账户不在范围内。
 
 ## 文档入口
 
 | 想做什么 | 查看 |
 |---|---|
 | 浏览中文文档 | [中文文档索引](./docs/zh-CN/README.md) |
+| 看品牌定位与「我们不做什么」 | [PPT 改稿 · 定位](./docs/zh-CN/strategy/positioning-preserve-edit.md) |
+| 让 Agent 安全改 PPT | [MCP 接入指南](./docs/zh-CN/guides/mcp-server.md) |
 | 了解任务型工作台 | [Web Experience](./docs/zh-CN/guides/web-experience.md) |
 | 连接本地 Bridge 与 Agent | [Agent Connect Bridge](./docs/zh-CN/guides/agent-connect-bridge.md) |
 | 安装 Agent Skill | [安装与启动](./docs/zh-CN/guides/agent-setup.md) |
-| 选择 PPTX、Web Deck 或 Desktop | [选择交付路线](./docs/zh-CN/guides/choosing-a-workflow.md) |
+| 选择交付路线 | [选择交付路线](./docs/zh-CN/guides/choosing-a-workflow.md) |
 | 配置模型与 Provider | [模型与 Provider 配置](./docs/zh-CN/guides/model-provider-setup.md) |
 | 排查问题 | [故障排查](./docs/zh-CN/guides/troubleshooting.md) |
 | 查看当前正式版本 | [v6.3.8 发布说明](./docs/zh-CN/release/release-notes-v6.3.8.md) |
 
-维护者的完整 API、产物表、发布门禁和兼容策略在 [`docs/`](./docs/zh-CN/README.md) 中，不占用第一次上手路径。
+维护者的 API、产物表、发布门禁和兼容策略在 [`docs/`](./docs/zh-CN/README.md)，不占第一次上手的路径。
 
 <details><summary><strong>English documentation compatibility</strong></summary>
 
@@ -212,6 +183,4 @@ npm run bridge
 
 ## 许可与致谢
 
-MIT。欢迎提交可复现资料、Proof、视觉方向和质量检查；公开承诺必须绑定真实文件、可执行审计或明确发布说明。
-
-如果它帮你把“AI 生成的幻灯片”变成真正能交付的文件，欢迎点一个 Star，让下一个需要它的人更容易找到。
+MIT。如果它帮你把「AI 生成的幻灯片」变成真正能交出去的文件，欢迎点一个 Star，让下一个需要它的人更容易找到。

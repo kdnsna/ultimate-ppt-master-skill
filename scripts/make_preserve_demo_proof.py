@@ -36,7 +36,7 @@ EXAMPLE = ROOT / "examples/executive-business-review-starter/executive-business-
 OUT_DIR = ROOT / "assets/preserve-demo"
 SLIDE = 1
 OLD_TITLE = "季度经营复盘"
-NEW_TITLE = "季度经营复盘 · 已保真修订"
+NEW_TITLE = "季度经营复盘 · 已修订"
 
 CORAL = (234, 88, 12)
 CORAL_SOFT = (255, 237, 213)
@@ -99,7 +99,7 @@ def _write_svg(report: dict) -> None:
     unchanged = report["unchangedParts"]
     before = html.escape(report["beforeTitle"])
     after = html.escape(report["afterTitle"])
-    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="保真改 PPT 保真证明">
+    svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="PPT 改稿 改动证明">
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#F97316"/><stop offset="1" stop-color="#FB7185"/>
@@ -117,8 +117,8 @@ def _write_svg(report: dict) -> None:
     </style>
   </defs>
   <rect width="1200" height="630" fill="#F8F6F1"/>
-  <text x="56" y="70" class="brand">保真改 PPT · PPT Preserve</text>
-  <text x="56" y="104" style="font:600 18px -apple-system,'PingFang SC',sans-serif;fill:#6B7280">只改第 {SLIDE} 页标题，其余每个 part 原样拷贝</text>
+  <text x="56" y="70" class="brand">PPT 改稿 · ppt-revise</text>
+  <text x="56" y="104" style="font:600 18px -apple-system,'PingFang SC',sans-serif;fill:#6B7280">只改第 {SLIDE} 页标题，其余每个部分原样拷贝</text>
 
   <g transform="translate(56,140)">
     <rect width="640" height="360" rx="22" fill="#FFFFFF" stroke="#E5E0D8"/>
@@ -130,19 +130,19 @@ def _write_svg(report: dict) -> None:
     <rect x="44" y="214" width="420" height="14" rx="7" class="line"/>
     <rect x="44" y="246" width="360" height="14" rx="7" class="line"/>
     <rect x="44" y="278" width="300" height="14" rx="7" class="line"/>
-    <text x="44" y="330" class="tag" fill="#9CA3AF">BEFORE（删除线）→ AFTER（保真修订）</text>
+    <text x="44" y="330" class="tag" fill="#9CA3AF">BEFORE（删除线）→ AFTER（修订后）</text>
   </g>
 
   <g transform="translate(740,140)">
     <rect width="404" height="360" rx="22" fill="#FFFFFF" stroke="#E5E0D8"/>
-    <text x="36" y="64" class="statl">字节级不变的 part</text>
+    <text x="36" y="64" class="statl">原样不变的部分</text>
     <text x="36" y="150" class="stat">{unchanged}/{total}</text>
-    <text x="36" y="200" class="statl">改变的 part</text>
+    <text x="36" y="200" class="statl">改动的部分</text>
     <text x="36" y="244" style="font:800 30px ui-monospace,Menlo,monospace;fill:#EA580C">ppt/slides/slide{SLIDE}.xml</text>
     <g transform="translate(36,288)">
       <circle cx="14" cy="14" r="14" fill="#DCFCE7"/>
       <path d="M8 14 l4 4 l8 -9" stroke="#16A34A" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="40" y="20" class="statl" fill="#16A34A">保真门禁通过 · 可交付</text>
+      <text x="40" y="20" class="statl" fill="#16A34A">校验通过 · 可交付</text>
     </g>
   </g>
   <text x="56" y="560" class="mono">reproducible: python3 scripts/make_preserve_demo_proof.py</text>
@@ -181,8 +181,8 @@ def _draw_card(report: dict, title_color, title_text, fidelity_state: str, alpha
     f_statl = _font(18)
     f_mono = _font(14)
 
-    d.text((44, 38), "保真改 PPT · PPT Preserve", font=f_brand, fill=CORAL)
-    d.text((44, 70), f"只改第 {SLIDE} 页标题，其余每个 part 原样拷贝", font=f_statl, fill=MUTED)
+    d.text((44, 38), "PPT 改稿 · ppt-revise", font=f_brand, fill=CORAL)
+    d.text((44, 70), f"只改第 {SLIDE} 页标题，其余每个部分原样拷贝", font=f_statl, fill=MUTED)
 
     # slide card
     sx, sy, sw, sh = 44, 110, 520, 320
@@ -205,14 +205,14 @@ def _draw_card(report: dict, title_color, title_text, fidelity_state: str, alpha
     # fidelity panel
     px, py, pw, ph = 600, 110, 316, 320
     d.rounded_rectangle([px, py, px + pw, py + ph], radius=20, fill=WHITE, outline=LINE)
-    d.text((px + 28, py + 30), "字节级不变的 part", font=f_statl, fill=MUTED)
+    d.text((px + 28, py + 30), "原样不变的部分", font=f_statl, fill=MUTED)
     if fidelity_state == "after":
         d.text((px + 28, py + 92), f"{report['unchangedParts']}/{report['totalParts']}", font=f_stat, fill=GREEN)
-        d.text((px + 28, py + 178), "改变的 part", font=f_statl, fill=MUTED)
+        d.text((px + 28, py + 178), "改动的部分", font=f_statl, fill=MUTED)
         d.text((px + 28, py + 206), f"slide{SLIDE}.xml", font=_font(24), fill=CORAL)
         d.ellipse([px + 28, py + 252, px + 56, py + 280], fill=(220, 252, 231))
         d.line([px + 35, py + 266, px + 41, py + 272, px + 50, py + 261], fill=GREEN, width=3)
-        d.text((px + 66, py + 258), "保真门禁通过", font=f_statl, fill=GREEN)
+        d.text((px + 66, py + 258), "校验通过", font=f_statl, fill=GREEN)
     else:
         d.text((px + 28, py + 92), "—", font=f_stat, fill=(209, 213, 219))
         d.text((px + 28, py + 190), "待编辑…", font=f_statl, fill=MUTED)
@@ -262,7 +262,7 @@ def main() -> int:
     be = ppt_render.backend()
     if be is not None:
         repaired = OUT_DIR / "executive-review-preserve-edited.pptx"
-        caption = f"{report['unchangedParts']}/{report['totalParts']} parts byte-identical"
+        caption = f"{report['unchangedParts']}/{report['totalParts']} 个部分原样不变"
         real_ok = bool(
             ppt_render.render_slide_diff_png(EXAMPLE, repaired, SLIDE, OUT_DIR / "before-after-real.png", caption)
             and ppt_render.render_slide_diff_gif(EXAMPLE, repaired, SLIDE, OUT_DIR / "before-after-real.gif", caption)
