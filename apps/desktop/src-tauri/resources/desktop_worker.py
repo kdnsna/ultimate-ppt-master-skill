@@ -2943,9 +2943,99 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     return manifest
 
 
+def _load_preserve_edit_module(repo_root: Path):
+    """Load scripts/preserve_edit_pptx.py by path so it works bundled or in source."""
+    script = repo_root / "scripts" / "preserve_edit_pptx.py"
+    if not script.exists():
+        raise RuntimeError("preserve_edit_pptx.py is missing at scripts/preserve_edit_pptx.py")
+    spec = importlib.util.spec_from_file_location("ultimate_ppt_preserve_edit", script)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Unable to load preserve_edit_pptx.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
+    """Edit only the named slides of an existing .pptx; keep everything else byte-identical.
+
+    Job shape:
+        {"sourcePath": "...pptx", "outputPath": "...pptx" (optional),
+         "edits": [{"slide": 1, "replacements": {"旧": "新"}}, ...]}
+    """
+    source_raw = job.get("sourcePath") or job.get("source_path")
+    if not isinstance(source_raw, str) or not source_raw.strip():
+        raise ValueError("preserve-edit requires sourcePath.")
+    source = Path(source_raw).expanduser()
+    if not source.is_file():
+        raise FileNotFoundError(f"source PPTX not found: {source}")
+    if source.suffix.lower() != ".pptx":
+        raise ValueError("sourcePath must be a .pptx file.")
+
+    output_raw = job.get("outputPath") or job.get("output_path")
+    output = Path(output_raw).expanduser() if output_raw else source.with_name(f"{source.stem}-repaired.pptx")
+    if output.resolve() == source.resolve():
+        raise ValueError("outputPath must differ from sourcePath.")
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    edits = job.get("edits")
+    if not isinstance(edits, list) or not edits:
+        raise ValueError("preserve-edit requires a non-empty edits list.")
+
+    module = _load_preserve_edit_module(repo_root)
+
+    requested_slides: set[int] = set()
+    intermediates: list[Path] = []
+    current = source
+    for index, edit in enumerate(edits):
+        if not isinstance(edit, dict):
+            raise ValueError(f"edits[{index}] must be an object.")
+        slide = edit.get("slide")
+        if not isinstance(slide, int) or isinstance(slide, bool) or slide < 1:
+            raise ValueError(f"edits[{index}].slide must be a positive integer.")
+        replacements = edit.get("replacements")
+        if not isinstance(replacements, dict) or not replacements:
+            raise ValueError(f"edits[{index}].replacements must be a non-empty object.")
+        replacements = {str(key): str(value) for key, value in replacements.items()}
+        requested_slides.add(slide)
+
+        last = index == len(edits) - 1
+        target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
+        if not last:
+            intermediates.append(target)
+        module.patch_slide_xml(current, target, slide, module.replace_text(replacements))
+        current = target
+
+    for temp in intermediates:
+        with contextlib.suppress(OSError):
+            temp.unlink()
+
+    before = module.member_hashes(source)
+    after = module.member_hashes(output)
+    changed = sorted(name for name in before if name in after and before[name] != after[name])
+    added = sorted(set(after) - set(before))
+    removed = sorted(set(before) - set(after))
+    requested_parts = {module.slide_part_name(slide) for slide in requested_slides}
+    unexpected = [name for name in changed if name not in requested_parts]
+    safe = not unexpected and not added and not removed
+
+    return {
+        "status": "ok" if safe else "fidelity-violation",
+        "safe": safe,
+        "output": str(output),
+        "slideCount": sum(1 for name in before if name.startswith("ppt/slides/slide") and name.endswith(".xml")),
+        "requestedSlides": sorted(requested_slides),
+        "changed": changed,
+        "unexpectedChanged": unexpected,
+        "added": added,
+        "removed": removed,
+        "unchangedCount": sum(1 for name in before if name in after and before[name] == after[name]),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Ultimate PPT Master desktop worker")
-    parser.add_argument("command", choices=["inspect", "run", "validate-job", "recommend", "list-projects"])
+    parser.add_argument("command", choices=["inspect", "run", "validate-job", "recommend", "list-projects", "preserve-edit"])
     parser.add_argument("--repo-root")
     parser.add_argument("--stdin", action="store_true", help="Read job JSON from stdin")
     parser.add_argument("--job", help="Path to a job JSON file")
@@ -2972,6 +3062,8 @@ def main() -> int:
                 if not isinstance(source, dict):
                     raise ValueError("recommend requires a source object.")
                 result = recommend_settings(source)
+            elif args.command == "preserve-edit":
+                result = run_preserve_edit(job, repo_root)
             else:
                 result = run_job(job, repo_root)
         print(json.dumps(result, ensure_ascii=False))

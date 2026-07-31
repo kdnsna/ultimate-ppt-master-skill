@@ -30,6 +30,21 @@ struct CommandResult {
     data: serde_json::Value,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct PreserveEditStep {
+    slide: u32,
+    replacements: std::collections::HashMap<String, String>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct PreserveEditRequest {
+    source_path: String,
+    output_path: Option<String>,
+    edits: Vec<PreserveEditStep>,
+}
+
 fn source_repo_root() -> Option<PathBuf> {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let root = manifest_dir
@@ -195,6 +210,17 @@ fn recommend_job_settings(app: AppHandle, source: SourceInput) -> Result<Command
 }
 
 #[tauri::command]
+fn preserve_edit_pptx(
+    app: AppHandle,
+    request: PreserveEditRequest,
+) -> Result<CommandResult, String> {
+    let payload = serde_json::to_string(&request)
+        .map_err(|err| format!("Failed to encode preserve-edit request: {err}"))?;
+    let data = run_worker(&app, &["preserve-edit", "--stdin"], Some(payload))?;
+    Ok(CommandResult { ok: true, data })
+}
+
+#[tauri::command]
 fn open_path(path: String) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     let mut command = Command::new("open");
@@ -223,6 +249,7 @@ pub fn run() {
             run_desktop_job,
             list_recent_projects,
             recommend_job_settings,
+            preserve_edit_pptx,
             open_path
         ])
         .run(tauri::generate_context!())
@@ -232,6 +259,7 @@ pub fn run() {
 #[cfg(test)]
 mod tests {
     use super::DesktopJob;
+    use super::PreserveEditRequest;
     use serde_json::json;
 
     #[test]
@@ -263,5 +291,24 @@ mod tests {
 
         assert_eq!(encoded["deckSession"], payload["deckSession"]);
         assert!(encoded.get("deck_session").is_none());
+    }
+
+    #[test]
+    fn preserve_edit_request_serializes_camel_case() {
+        let payload = json!({
+            "sourcePath": "/tmp/deck.pptx",
+            "outputPath": "/tmp/repaired.pptx",
+            "edits": [
+                {"slide": 2, "replacements": {"旧结论": "新结论"}}
+            ]
+        });
+        let request: PreserveEditRequest =
+            serde_json::from_value(payload.clone()).expect("deserialize request");
+        let encoded = serde_json::to_value(request).expect("serialize request");
+        assert_eq!(encoded["sourcePath"], payload["sourcePath"]);
+        assert_eq!(encoded["outputPath"], payload["outputPath"]);
+        assert_eq!(encoded["edits"][0]["slide"], 2);
+        assert_eq!(encoded["edits"][0]["replacements"]["旧结论"], "新结论");
+        assert!(encoded.get("source_path").is_none());
     }
 }

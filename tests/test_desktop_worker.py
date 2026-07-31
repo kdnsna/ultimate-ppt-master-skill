@@ -2,6 +2,7 @@ import json
 import subprocess
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 from apps.desktop.worker.desktop_worker import (
@@ -9,6 +10,7 @@ from apps.desktop.worker.desktop_worker import (
     list_recent_projects,
     recommend_settings,
     run_job,
+    run_preserve_edit,
     validate_job,
 )
 
@@ -473,6 +475,89 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertEqual(recent[0]["status"], "complete")
             self.assertTrue(recent[0]["generatedFiles"])
             self.assertTrue(recent[0]["thumbnail"].startswith("<svg"))
+
+
+def _preserve_slide_xml(title: str, body: str) -> str:
+    return (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+        '<p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"'
+        ' xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
+        "<p:cSld><p:spTree>"
+        "<p:sp><p:txBody><a:p><a:r><a:t>" + title + "</a:t></a:r></a:p></p:txBody></p:sp>"
+        "<p:sp><p:txBody><a:p><a:r><a:t>" + body + "</a:t></a:r></a:p></p:txBody></p:sp>"
+        "</p:spTree></p:cSld></p:sld>"
+    )
+
+
+def _make_preserve_deck(path: Path) -> None:
+    with zipfile.ZipFile(path, "w") as package:
+        package.writestr("[Content_Types].xml", "<Types></Types>")
+        package.writestr("ppt/presentation.xml", "<p:presentation></p:presentation>")
+        package.writestr("ppt/media/image1.png", b"\x89PNG-fake-logo")
+        package.writestr("ppt/slides/slide1.xml", _preserve_slide_xml("Alpha", "alpha body"))
+        package.writestr("ppt/slides/slide2.xml", _preserve_slide_xml("Beta", "keep me"))
+        package.writestr("ppt/slides/slide3.xml", _preserve_slide_xml("Gamma", "gamma body"))
+
+
+class PreserveEditWorkerTest(unittest.TestCase):
+    def test_single_slide_edit_is_safe_and_surgical(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "deck.pptx"
+            output = Path(tmp) / "deck-repaired.pptx"
+            _make_preserve_deck(source)
+
+            result = run_preserve_edit(
+                {
+                    "sourcePath": str(source),
+                    "outputPath": str(output),
+                    "edits": [{"slide": 2, "replacements": {"Beta": "BETA"}}],
+                },
+                ROOT,
+            )
+
+            self.assertEqual(result["status"], "ok")
+            self.assertTrue(result["safe"])
+            self.assertEqual(result["changed"], ["ppt/slides/slide2.xml"])
+            self.assertEqual(result["requestedSlides"], [2])
+            self.assertEqual(result["slideCount"], 3)
+            self.assertEqual(result["added"], [])
+            self.assertEqual(result["removed"], [])
+            with zipfile.ZipFile(output) as package:
+                edited = package.read("ppt/slides/slide2.xml").decode("utf-8")
+            self.assertIn("BETA", edited)
+            self.assertIn("keep me", edited)
+
+    def test_multi_slide_edit_changes_only_named_slides(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "deck.pptx"
+            output = Path(tmp) / "out" / "deck-repaired.pptx"
+            _make_preserve_deck(source)
+
+            result = run_preserve_edit(
+                {
+                    "sourcePath": str(source),
+                    "outputPath": str(output),
+                    "edits": [
+                        {"slide": 1, "replacements": {"Alpha": "ALPHA"}},
+                        {"slide": 3, "replacements": {"Gamma": "GAMMA"}},
+                    ],
+                },
+                ROOT,
+            )
+
+            self.assertTrue(result["safe"])
+            self.assertEqual(result["changed"], ["ppt/slides/slide1.xml", "ppt/slides/slide3.xml"])
+            self.assertEqual(result["requestedSlides"], [1, 3])
+            self.assertEqual(sorted(p.name for p in output.parent.iterdir()), ["deck-repaired.pptx"])
+
+    def test_rejects_missing_source_and_empty_edits(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "deck.pptx"
+            _make_preserve_deck(source)
+            with self.assertRaises(ValueError):
+                run_preserve_edit({"edits": [{"slide": 1, "replacements": {"a": "b"}}]}, ROOT)
+            with self.assertRaises(ValueError):
+                run_preserve_edit({"sourcePath": str(source), "edits": []}, ROOT)
 
 
 if __name__ == "__main__":
