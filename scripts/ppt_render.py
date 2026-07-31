@@ -66,13 +66,18 @@ def _pdf_rasterizer() -> str | None:
 
 
 def backend() -> str | None:
-    """Return the active render backend name, or None if none is available."""
+    """Return the active render backend name, or None if none is available.
+
+    ``libreoffice+sofficepng`` means only the first slide can be rasterized
+    (LibreOffice's ``--convert-to png`` emits the first slide); arbitrary slides
+    need ``libreoffice+fitz`` or ``libreoffice+pdftoppm``.
+    """
     if not _have_soffice():
         return None
     raster = _pdf_rasterizer()
-    if raster is None:
-        return None
-    return f"libreoffice+{raster}"
+    if raster is not None:
+        return f"libreoffice+{raster}"
+    return "libreoffice+sofficepng"
 
 
 def _soffice_bin() -> str:
@@ -99,6 +104,33 @@ def _pptx_to_pdf(pptx: Path, out_dir: Path) -> Path | None:
         return None
     pdf = out_dir / f"{pptx.stem}.pdf"
     return pdf if pdf.is_file() else None
+
+
+def _rasterize_first_slide_via_soffice(pptx: Path, out_png: Path) -> bool:
+    """Render the first slide to PNG using only LibreOffice (no PDF rasterizer)."""
+    with tempfile.TemporaryDirectory() as tmp:
+        profile = Path(tmp) / "profile"
+        profile.mkdir(parents=True, exist_ok=True)
+        cmd = [
+            _soffice_bin(),
+            "-headless",
+            f"-env:UserInstallation=file://{profile}",
+            "--convert-to",
+            "png",
+            "--outdir",
+            tmp,
+            str(pptx),
+        ]
+        try:
+            subprocess.run(cmd, check=True, capture_output=True, timeout=180)
+        except (subprocess.SubprocessError, OSError):
+            return False
+        produced = Path(tmp) / f"{pptx.stem}.png"
+        if not produced.is_file():
+            return False
+        out_png.parent.mkdir(parents=True, exist_ok=True)
+        out_png.write_bytes(produced.read_bytes())
+        return True
 
 
 def _rasterize_page(pdf: Path, page: int, out_png: Path, dpi: int = 144) -> bool:
@@ -130,9 +162,12 @@ def _rasterize_page(pdf: Path, page: int, out_png: Path, dpi: int = 144) -> bool
 
 def render_slide_png(pptx: Path, slide: int, out_png: Path) -> bool:
     """Render one slide (1-based) of a deck to PNG. False if no backend."""
-    if backend() is None:
+    be = backend()
+    if be is None:
         return False
     out_png.parent.mkdir(parents=True, exist_ok=True)
+    if be == "libreoffice+sofficepng":
+        return slide == 1 and _rasterize_first_slide_via_soffice(pptx, out_png)
     with tempfile.TemporaryDirectory() as tmp:
         pdf = _pptx_to_pdf(pptx, Path(tmp))
         if pdf is None:
@@ -162,13 +197,13 @@ def compose_side_by_side(
     H = header + h + pad + caption_h
     canvas = Image.new("RGB", (W, H), (248, 246, 241))
     d = ImageDraw.Draw(canvas)
-    d.text((pad, 16), "保真改 PPT · 真实渲染 BEFORE → AFTER", font=_cjk_font(20), fill=(234, 88, 12))
+    d.text((pad, 16), "PPT 改稿 · 真实渲染 BEFORE → AFTER", font=_cjk_font(20), fill=(234, 88, 12))
     canvas.paste(before.resize((bw, bh)), (pad, header))
     canvas.paste(after.resize((aw, ah)), (pad + bw + gap, header))
     d.text((pad, header + h + 6), "BEFORE", font=_cjk_font(15), fill=(107, 114, 128))
     d.text((pad + bw + gap, header + h + 6), "AFTER", font=_cjk_font(15), fill=(234, 88, 12))
     if caption:
-        d.text((pad, header + h + 6), caption, font=_cjk_font(13), fill=(107, 114, 128))
+        d.text((pad, header + h + 24), caption, font=_cjk_font(13), fill=(107, 114, 128))
     out_png.parent.mkdir(parents=True, exist_ok=True)
     canvas.save(out_png)
     return True

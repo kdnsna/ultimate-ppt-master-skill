@@ -43,11 +43,22 @@ class GracefulDegradationTest(unittest.TestCase):
         with mock.patch.object(ppt_render, "_have_soffice", return_value=False):
             self.assertIsNone(ppt_render.backend())
 
-    def test_backend_none_when_no_pdf_rasterizer(self):
+    def test_backend_sofficepng_when_soffice_but_no_pdf_rasterizer(self):
         with mock.patch.object(ppt_render, "_have_soffice", return_value=True), mock.patch.object(
             ppt_render, "_pdf_rasterizer", return_value=None
         ):
-            self.assertIsNone(ppt_render.backend())
+            self.assertEqual(ppt_render.backend(), "libreoffice+sofficepng")
+
+    def test_sofficepng_backend_only_renders_first_slide(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(
+            ppt_render, "_have_soffice", return_value=True
+        ), mock.patch.object(ppt_render, "_pdf_rasterizer", return_value=None), mock.patch.object(
+            ppt_render, "_rasterize_first_slide_via_soffice", return_value=True
+        ):
+            deck = Path(tmp) / "d.pptx"
+            deck.write_bytes(b"PK")
+            self.assertTrue(ppt_render.render_slide_png(deck, 1, Path(tmp) / "s1.png"))
+            self.assertFalse(ppt_render.render_slide_png(deck, 2, Path(tmp) / "s2.png"))
 
     def test_render_returns_false_without_backend(self):
         with tempfile.TemporaryDirectory() as tmp, mock.patch.object(ppt_render, "_have_soffice", return_value=False):
