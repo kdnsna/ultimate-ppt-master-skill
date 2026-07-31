@@ -15,6 +15,7 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 | 本地配置 Provider key | [模型与 Provider 配置](./guides/model-provider-setup.md) |
 | 使用桌面预览路径 | [选择交付路线](./guides/choosing-a-workflow.md) |
 | 排查安装、解析、输出、Provider 或 Agent 问题 | [故障排查](./guides/troubleshooting.md) |
+| 让任意 MCP Agent 安全修改已有 PPT（零依赖 server） | [MCP 接入指南](./guides/mcp-server.md) |
 
 ## 质量与审计
 
