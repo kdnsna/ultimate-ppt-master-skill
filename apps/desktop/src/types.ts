@@ -1,4 +1,4 @@
-export type ViewKey = "projects" | "create" | "preview" | "settings";
+export type ViewKey = "projects" | "create" | "preserve" | "preview" | "settings";
 export type OutputMode = "pptx" | "web";
 export type StylePreset = "business" | "consulting" | "academic" | "editorial" | "swiss";
 export type SourceKind = "file" | "text" | "url" | "markdown";
@@ -147,4 +147,40 @@ export interface RecentProject {
   thumbnail?: string;
   logsPath?: string;
 }
+
+export interface PptxSlideInfo {
+  slide: number;
+  texts: string[];
+}
+
+export interface PptxInspectResult {
+  sourcePath: string;
+  slideCount: number;
+  slides: PptxSlideInfo[];
+}
+
+export interface PreserveEditStep {
+  slide: number;
+  replacements: Record<string, string>;
+}
+
+export interface PreserveEditRequest {
+  sourcePath: string;
+  outputPath?: string;
+  edits: PreserveEditStep[];
+}
+
+export interface PreserveFidelityResult {
+  status: "ok" | "fidelity-violation";
+  safe: boolean;
+  output: string;
+  slideCount: number;
+  requestedSlides: number[];
+  changed: string[];
+  unexpectedChanged: string[];
+  added: string[];
+  removed: string[];
+  unchangedCount: number;
+}
+
 import type { DeckSession } from "../../../packages/workspace-core/src";

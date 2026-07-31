@@ -1,4 +1,14 @@
-import type { DesktopJob, EnvironmentStatus, RecentProject, Recommendation, SourceInput, WorkerResult } from "../types";
+import type {
+  DesktopJob,
+  EnvironmentStatus,
+  PreserveEditRequest,
+  PreserveFidelityResult,
+  PptxInspectResult,
+  RecentProject,
+  Recommendation,
+  SourceInput,
+  WorkerResult
+} from "../types";
 
 declare global {
   interface Window {
@@ -72,6 +82,22 @@ export async function listRecentProjects(projectDir?: string): Promise<RecentPro
   }
   const raw = window.localStorage.getItem(recentStorageKey);
   return raw ? JSON.parse(raw) : [];
+}
+
+export async function inspectPptx(sourcePath: string): Promise<PptxInspectResult> {
+  if (isTauri()) {
+    return invokeTauri<PptxInspectResult>("inspect_pptx", { request: { sourcePath } });
+  }
+  await delay(200);
+  throw new Error("Browser diagnostic mode cannot read a PPTX. Start the native desktop app with `npm run desktop` or `npm run app:desktop`.");
+}
+
+export async function preserveEditPptx(request: PreserveEditRequest): Promise<PreserveFidelityResult> {
+  if (isTauri()) {
+    return invokeTauri<PreserveFidelityResult>("preserve_edit_pptx", { request });
+  }
+  await delay(200);
+  throw new Error("Browser diagnostic mode cannot edit a PPTX. Start the native desktop app with `npm run desktop` or `npm run app:desktop`.");
 }
 
 export async function recommendJobSettings(source: SourceInput): Promise<Recommendation> {

@@ -25,9 +25,11 @@ import { useEffect, useMemo, useState } from "react";
 import { createDeckSession } from "../../../packages/workspace-core/src";
 import {
   inspectEnvironment,
+  inspectPptx,
   listRecentProjects,
   openPath,
   openProjectLog,
+  preserveEditPptx,
   recommendJobSettings,
   runDesktopJob,
   subscribeNativeFileDrop
@@ -41,6 +43,10 @@ import type {
   OutputMode,
   ProjectCheck,
   ProviderConfig,
+  PreserveEditRequest,
+  PreserveFidelityResult,
+  PptxInspectResult,
+  PptxSlideInfo,
   RecentProject,
   Recommendation,
   SourceExtraction,
@@ -116,6 +122,7 @@ const edgeVoiceOptions = [
 const navItems: Array<{ key: ViewKey; labelZh: string; labelEn: string; icon: typeof Sparkles }> = [
   { key: "projects", labelZh: "项目", labelEn: "Projects", icon: Sparkles },
   { key: "create", labelZh: "输入", labelEn: "Intake", icon: Wand2 },
+  { key: "preserve", labelZh: "保真编辑", labelEn: "Preserve Edit", icon: ShieldCheck },
   { key: "preview", labelZh: "精修", labelEn: "Refine", icon: MonitorPlay },
   { key: "settings", labelZh: "设置", labelEn: "Settings", icon: Settings }
 ];
@@ -610,6 +617,7 @@ export function App() {
             onGenerate={handleGenerate}
           />
         )}
+        {view === "preserve" && <PreserveEditView language={language} />}
         {view === "preview" && (
           <PreviewView
             language={language}
@@ -1333,6 +1341,254 @@ function HealthItem({ title, ok, detail }: { title: string; ok: boolean; detail:
         <span>{detail}</span>
       </div>
     </article>
+  );
+}
+
+function PreserveEditView({ language }: { language: AppLanguage }) {
+  const en = language === "en";
+  const [sourcePath, setSourcePath] = useState("");
+  const [sourceName, setSourceName] = useState("");
+  const [slides, setSlides] = useState<PptxSlideInfo[]>([]);
+  const [selectedSlide, setSelectedSlide] = useState<number | null>(null);
+  const [pairs, setPairs] = useState<Array<{ old: string; next: string }>>([{ old: "", next: "" }]);
+  const [isInspecting, setIsInspecting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [report, setReport] = useState<PreserveFidelityResult | null>(null);
+  const [error, setError] = useState("");
+
+  const currentSlide = slides.find((slide) => slide.slide === selectedSlide) || null;
+  const readyToSave = Boolean(sourcePath) && selectedSlide != null && pairs.some((pair) => pair.old.trim());
+
+  async function loadDeck(path: string) {
+    setIsInspecting(true);
+    setError("");
+    setReport(null);
+    setSlides([]);
+    setSelectedSlide(null);
+    setPairs([{ old: "", next: "" }]);
+    setSourcePath(path);
+    setSourceName(fileNameFromPath(path));
+    try {
+      const result: PptxInspectResult = await inspectPptx(path);
+      setSlides(result.slides);
+      setSelectedSlide(result.slides[0]?.slide ?? null);
+    } catch (err) {
+      setError(humanizeError(err, language));
+    } finally {
+      setIsInspecting(false);
+    }
+  }
+
+  function handleDrop(event: React.DragEvent<HTMLLabelElement>) {
+    event.preventDefault();
+    const file = event.dataTransfer.files.item(0);
+    if (!file) return;
+    const path = getDroppedFilePath(file);
+    if (!path) {
+      setError(en ? "Cannot read the dropped file path. Use the native desktop app." : "无法读取拖入文件路径，请使用原生桌面端。");
+      return;
+    }
+    if (!path.toLowerCase().endsWith(".pptx")) {
+      setError(en ? "Drop a .pptx file to preserve-edit it." : "请拖入 .pptx 文件进行保真编辑。");
+      return;
+    }
+    void loadDeck(path);
+  }
+
+  function resetDeck() {
+    setSourcePath("");
+    setSourceName("");
+    setSlides([]);
+    setSelectedSlide(null);
+    setPairs([{ old: "", next: "" }]);
+    setReport(null);
+    setError("");
+  }
+
+  function addPairFromText(text: string) {
+    setPairs((prev) => {
+      const firstEmpty = prev.findIndex((pair) => !pair.old.trim());
+      if (firstEmpty >= 0) {
+        const next = [...prev];
+        next[firstEmpty] = { old: text, next: "" };
+        return next;
+      }
+      return [...prev, { old: text, next: "" }];
+    });
+  }
+
+  function updatePair(index: number, field: "old" | "next", value: string) {
+    setPairs((prev) => prev.map((pair, i) => (i === index ? { ...pair, [field]: value } : pair)));
+  }
+
+  function removePair(index: number) {
+    setPairs((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : [{ old: "", next: "" }]));
+  }
+
+  async function handleSave() {
+    if (selectedSlide == null) return;
+    const replacements: Record<string, string> = {};
+    for (const pair of pairs) {
+      const old = pair.old.trim();
+      if (old) replacements[old] = pair.next;
+    }
+    if (Object.keys(replacements).length === 0) {
+      setError(en ? "Add at least one replacement with non-empty original text." : "请至少填写一组原文非空的替换。");
+      return;
+    }
+    setIsSaving(true);
+    setError("");
+    setReport(null);
+    try {
+      const request: PreserveEditRequest = { sourcePath, edits: [{ slide: selectedSlide, replacements }] };
+      setReport(await preserveEditPptx(request));
+    } catch (err) {
+      setError(humanizeError(err, language));
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  return (
+    <section className="screen preserve-screen">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">{en ? "Preservation-first editing" : "保真优先编辑"}</p>
+          <h1>{en ? "Change only the slides you name" : "只改你点名的页，其余字节级不动"}</h1>
+        </div>
+        {sourcePath && (
+          <button className="primary-action compact" onClick={handleSave} disabled={!readyToSave || isSaving}>
+            <ShieldCheck size={17} />
+            {isSaving ? (en ? "Saving" : "保存中") : (en ? "Save edit" : "保存修改")}
+          </button>
+        )}
+      </div>
+
+      {!sourcePath && (
+        <section className="input-panel preserve-drop-panel">
+          <div className="panel-title">
+            <Upload size={18} />
+            <span>{en ? "Drop an existing PowerPoint" : "拖入一份已有 PPT"}</span>
+          </div>
+          <label className="drop-zone preserve-drop" onDrop={handleDrop} onDragOver={(event) => event.preventDefault()}>
+            <FileText size={30} />
+            <strong>{en ? "Drop a .pptx here" : "把 .pptx 拖到这里"}</strong>
+            <span>{en ? "We edit the named slides natively and keep every other part byte-for-byte — logo, masters, links and untouched slides stay exactly as they are." : "只原生修改你点名的页，其余每个部分字节级保留——logo、母版、链接和未选页原样不动。"}</span>
+          </label>
+          <p className="preserve-local-note">{en ? "Runs fully on your machine. Nothing is uploaded." : "全程在本机运行，不上传任何文件。"}</p>
+          {error && <ActionError text={error} language={language} />}
+        </section>
+      )}
+
+      {sourcePath && (
+        <div className="preserve-grid">
+          <section className="input-panel preserve-slides-panel">
+            <div className="panel-title spaced">
+              <span className="preserve-file">
+                <Layers3 size={18} />
+                <strong>{sourceName}</strong>
+                <em>{slides.length} {en ? "slides" : "页"}</em>
+              </span>
+              <button className="text-button" onClick={resetDeck}>{en ? "Switch file" : "换一份"}</button>
+            </div>
+            {isInspecting && <p className="preserve-hint">{en ? "Reading slides…" : "正在读取页面…"}</p>}
+            <div className="preserve-slides">
+              {slides.map((slide) => (
+                <button
+                  key={slide.slide}
+                  className={slide.slide === selectedSlide ? "preserve-slide active" : "preserve-slide"}
+                  onClick={() => {
+                    setSelectedSlide(slide.slide);
+                    setReport(null);
+                  }}
+                >
+                  <span className="preserve-slide-num">{slide.slide}</span>
+                  <span className="preserve-slide-texts">
+                    {slide.texts.slice(0, 3).map((text, i) => (
+                      <span key={i}>{text}</span>
+                    ))}
+                    {slide.texts.length === 0 && <span className="preserve-muted">{en ? "(no text)" : "（无文本）"}</span>}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="choice-panel preserve-editor-panel">
+            <div className="panel-title">
+              <FileText size={18} />
+              <span>{en ? `Edit slide ${selectedSlide ?? "—"}` : `修改第 ${selectedSlide ?? "—"} 页`}</span>
+            </div>
+
+            {currentSlide && currentSlide.texts.length > 0 && (
+              <div className="preserve-chips">
+                <p className="preserve-chips-label">{en ? "Click text to replace it:" : "点选要替换的文本："}</p>
+                <div className="preserve-chip-wrap">
+                  {currentSlide.texts.map((text, i) => (
+                    <button key={i} className="preserve-chip" onClick={() => addPairFromText(text)} title={text}>
+                      {text}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="preserve-pairs">
+              {pairs.map((pair, index) => (
+                <div key={index} className="preserve-pair">
+                  <input className="field" value={pair.old} onChange={(event) => updatePair(index, "old", event.target.value)} placeholder={en ? "Original text" : "原文"} />
+                  <ChevronRight size={16} />
+                  <input className="field" value={pair.next} onChange={(event) => updatePair(index, "next", event.target.value)} placeholder={en ? "New text" : "新文本"} />
+                  <button className="preserve-pair-remove" onClick={() => removePair(index)} title={en ? "Remove" : "删除"}>
+                    ×
+                  </button>
+                </div>
+              ))}
+              <button className="text-button" onClick={() => setPairs((prev) => [...prev, { old: "", next: "" }])}>
+                + {en ? "Add replacement" : "再加一组"}
+              </button>
+            </div>
+
+            {error && <ActionError text={error} language={language} />}
+
+            {report && (
+              <div className={report.safe ? "preserve-report safe" : "preserve-report violation"}>
+                <div className="preserve-report-head">
+                  {report.safe ? <ShieldCheck size={22} /> : <CircleAlert size={22} />}
+                  <div>
+                    <strong>{report.safe ? (en ? "Saved — only the named slide changed" : "已保存 · 仅点名页发生变化") : (en ? "Fidelity check failed — not delivered" : "保真校验未通过 · 未交付")}</strong>
+                    <span>{en
+                      ? `${report.unchangedCount} package parts stayed byte-identical across ${report.slideCount} slides.`
+                      : `共 ${report.slideCount} 页，${report.unchangedCount} 个包内部分保持字节级不变。`}</span>
+                  </div>
+                  <button className="secondary-action compact" onClick={() => openPath(report.output)}>
+                    <FolderOpen size={16} />
+                    {en ? "Open output" : "打开输出"}
+                  </button>
+                </div>
+                {report.changed.length > 0 && (
+                  <ul className="preserve-report-parts">
+                    {report.changed.map((part) => (
+                      <li key={part}>
+                        <CheckCircle2 size={14} />
+                        {part}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {!report.safe && (report.unexpectedChanged.length > 0 || report.added.length > 0 || report.removed.length > 0) && (
+                  <div className="preserve-report-detail">
+                    {report.unexpectedChanged.length > 0 && <p>{en ? "Unexpected changes" : "意外改动"}：{report.unexpectedChanged.join(", ")}</p>}
+                    {report.added.length > 0 && <p>{en ? "Added parts" : "新增部分"}：{report.added.join(", ")}</p>}
+                    {report.removed.length > 0 && <p>{en ? "Removed parts" : "移除部分"}：{report.removed.join(", ")}</p>}
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
+    </section>
   );
 }
 
