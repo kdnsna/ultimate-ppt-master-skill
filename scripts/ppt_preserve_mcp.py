@@ -70,10 +70,13 @@ TOOLS: list[dict[str, Any]] = [
     {
         "name": "edit_pptx_preserving",
         "description": (
-            "Edit ONLY the named slides of an existing .pptx by text replacement, "
-            "keeping every other package part byte-for-byte identical (logo, "
-            "masters, links, untouched slides). Writes a new .pptx and returns a "
-            "fidelity report. If the report is not safe, the edit failed."
+            "Edit ONLY the named slides of an existing .pptx, keeping every other "
+            "package part byte-for-byte identical (logo, masters, links, untouched "
+            "slides). Each edit can use simple `replacements` (text find/replace) "
+            "and/or typed `operations`: style_text (font/size/bold/color), "
+            "replace_table_cell, set_shape_geometry (move/resize in points). Writes "
+            "a new .pptx and returns a fidelity report plus a per-slide change "
+            "summary. If the report is not safe, the edit failed."
         ),
         "inputSchema": {
             "type": "object",
@@ -88,11 +91,22 @@ TOOLS: list[dict[str, Any]] = [
                             "slide": {"type": "integer", "description": "1-based slide number."},
                             "replacements": {
                                 "type": "object",
-                                "description": "Map of original text -> replacement text for that slide.",
+                                "description": "Simple map of original text -> replacement text for that slide.",
                                 "additionalProperties": {"type": "string"},
                             },
+                            "operations": {
+                                "type": "array",
+                                "description": (
+                                    "Typed slide-local operations. replace_text {op,old,new}; "
+                                    "style_text {op, match?, font?, size?, bold?, color?} (match is 'all' "
+                                    "or {text_contains|text_equals}); replace_table_cell {op, row?, col?, "
+                                    "find?|old?, text?|new?}; set_shape_geometry {op, match, x?, y?, w?, "
+                                    "h?} (match is {index|name|text_contains|text_equals}; geometry in points)."
+                                ),
+                                "items": {"type": "object"},
+                            },
                         },
-                        "required": ["slide", "replacements"],
+                        "required": ["slide"],
                     },
                 },
                 "output_path": {
@@ -142,15 +156,21 @@ def tool_edit_pptx_preserving(args: dict[str, Any]) -> dict[str, Any]:
     try:
         for index, edit in enumerate(edits):
             slide = int(edit["slide"])
-            replacements = {str(k): str(v) for k, v in (edit.get("replacements") or {}).items() if str(k)}
-            if not replacements:
-                return _text_result(f"edits[{index}] has no non-empty replacement keys", is_error=True)
+            operations: list[dict[str, Any]] = []
+            for k, v in (edit.get("replacements") or {}).items():
+                if str(k):
+                    operations.append({"op": "replace_text", "old": str(k), "new": str(v)})
+            extra = edit.get("operations")
+            if isinstance(extra, list):
+                operations.extend(extra)
+            if not operations:
+                return _text_result(f"edits[{index}] needs replacements or operations", is_error=True)
             requested.add(slide)
             last = index == len(edits) - 1
             target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
             if not last:
                 intermediates.append(target)
-            engine.patch_slide_xml(current, target, slide, engine.replace_text(replacements))
+            engine.patch_slide_xml(current, target, slide, engine.apply_operations(operations))
             current = target
     except Exception as exc:  # noqa: BLE001
         return _text_result(f"edit failed: {exc}", is_error=True)
@@ -169,6 +189,15 @@ def tool_edit_pptx_preserving(args: dict[str, Any]) -> dict[str, Any]:
     safe = not unexpected and not added and not removed
     unchanged = sum(1 for name in before if name in after and before[name] == after[name])
 
+    slide_changes: dict[int, list[str]] = {}
+    for slide in sorted(requested):
+        before_xml = engine.slide_xml(source, slide)
+        after_xml = engine.slide_xml(output, slide)
+        if before_xml is not None and after_xml is not None:
+            delta = engine.summarize_changes(before_xml, after_xml)
+            if delta:
+                slide_changes[slide] = delta
+
     summary = [
         f"status: {'ok' if safe else 'FIDELITY VIOLATION'}",
         f"output: {output}",
@@ -183,6 +212,8 @@ def tool_edit_pptx_preserving(args: dict[str, Any]) -> dict[str, Any]:
         if removed:
             summary.append(f"removed parts: {removed}")
         summary.append("DO NOT treat this edit as successful.")
+    for slide in sorted(slide_changes):
+        summary.append(f"slide {slide}: " + "; ".join(slide_changes[slide]))
     return _text_result("\n".join(summary), is_error=not safe)
 
 

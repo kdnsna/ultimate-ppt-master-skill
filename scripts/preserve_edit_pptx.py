@@ -85,6 +85,16 @@ def slide_texts(pptx_path: Path) -> dict[int, list[str]]:
     return dict(sorted(result.items()))
 
 
+def slide_xml(pptx_path: Path, slide_number: int) -> str | None:
+    """Return the raw XML of one slide part, or None if the slide is absent."""
+    name = slide_part_name(slide_number)
+    with zipfile.ZipFile(pptx_path, "r") as package:
+        names = {info.filename for info in package.infolist()}
+        if name not in names:
+            return None
+        return package.read(name).decode("utf-8", errors="replace")
+
+
 def patch_slide_xml(
     source: Path,
     output: Path,
@@ -144,6 +154,275 @@ def replace_text(replacements: dict[str, str]) -> EditFn:
         return ET.tostring(root, encoding="unicode", xml_declaration=False)
 
     return _edit
+
+
+# ---------------------------------------------------------------------------
+# Typed, slide-local operations. Every op mutates only the parsed named slide,
+# so the byte-level preservation guarantee (untouched parts copied verbatim by
+# patch_slide_xml) still holds. Units for geometry are points (1pt = 12700 EMU).
+# ---------------------------------------------------------------------------
+
+_P_NS = _NAMESPACES["p"]
+_A_R = f"{{{_A_NS}}}r"
+_A_RPR = f"{{{_A_NS}}}rPr"
+_A_LATIN = f"{{{_A_NS}}}latin"
+_A_EA = f"{{{_A_NS}}}ea"
+_A_CS = f"{{{_A_NS}}}cs"
+_A_SOLIDFILL = f"{{{_A_NS}}}solidFill"
+_A_SRGBCLR = f"{{{_A_NS}}}srgbClr"
+_A_XFRM = f"{{{_A_NS}}}xfrm"
+_A_OFF = f"{{{_A_NS}}}off"
+_A_EXT = f"{{{_A_NS}}}ext"
+_A_TBL = f"{{{_A_NS}}}tbl"
+_A_TR = f"{{{_A_NS}}}tr"
+_A_TC = f"{{{_A_NS}}}tc"
+_P_SP = f"{{{_P_NS}}}sp"
+_P_SPPR = f"{{{_P_NS}}}spPr"
+_P_NVSPR = f"{{{_P_NS}}}nvSpPr"
+_P_TXBODY = f"{{{_P_NS}}}txBody"
+
+_EMU_PER_POINT = 12700
+
+
+def _run_text(run) -> str:
+    return "".join(node.text or "" for node in run.findall(_TEXT_TAG))
+
+
+def _run_style_sig(run) -> tuple:
+    rpr = run.find(_A_RPR)
+    if rpr is None:
+        return (None, None, None, None, None)
+    latin = rpr.find(_A_LATIN)
+    ea = rpr.find(_A_EA)
+    fill = rpr.find(_A_SOLIDFILL)
+    clr = fill.find(_A_SRGBCLR) if fill is not None else None
+    return (
+        rpr.get("sz"),
+        rpr.get("b"),
+        latin.get("typeface") if latin is not None else None,
+        ea.get("typeface") if ea is not None else None,
+        clr.get("val") if clr is not None else None,
+    )
+
+
+def _matches(match, text: str) -> bool:
+    if match in (None, "all"):
+        return True
+    if isinstance(match, dict):
+        if "text_equals" in match:
+            return text == match["text_equals"]
+        if "text_contains" in match:
+            return str(match["text_contains"]) in text
+    return False
+
+
+def _set_typeface(rpr, font: str) -> None:
+    for tag in (_A_LATIN, _A_EA, _A_CS):
+        node = rpr.find(tag)
+        if node is None:
+            node = ET.SubElement(rpr, tag)
+        node.set("typeface", font)
+
+
+def _set_color(rpr, color: str) -> None:
+    value = color.lstrip("#")
+    fill = rpr.find(_A_SOLIDFILL)
+    if fill is None:
+        fill = ET.Element(_A_SOLIDFILL)
+        rpr.insert(0, fill)  # fill group precedes latin/ea/cs in the schema
+    clr = fill.find(_A_SRGBCLR)
+    if clr is None:
+        clr = ET.SubElement(fill, _A_SRGBCLR)
+    clr.set("val", value)
+
+
+def _op_replace_text(root, op: dict) -> None:
+    old = str(op["old"])
+    new = str(op.get("new", ""))
+    for elem in root.iter(_TEXT_TAG):
+        if elem.text and old in elem.text:
+            elem.text = elem.text.replace(old, new)
+
+
+def _op_style_text(root, op: dict) -> None:
+    match = op.get("match", "all")
+    font = op.get("font")
+    size = op.get("size")
+    bold = op.get("bold")
+    color = op.get("color")
+    for run in root.iter(_A_R):
+        if not _matches(match, _run_text(run)):
+            continue
+        rpr = run.find(_A_RPR)
+        if rpr is None:
+            rpr = ET.Element(_A_RPR)
+            run.insert(0, rpr)
+        if size is not None:
+            rpr.set("sz", str(int(round(float(size) * 100))))
+        if bold is not None:
+            rpr.set("b", "1" if bold else "0")
+        if font:
+            _set_typeface(rpr, str(font))
+        if color:
+            _set_color(rpr, str(color))
+
+
+def _cell_text(cell) -> str:
+    return "".join(node.text or "" for node in cell.iter(_TEXT_TAG))
+
+
+def _set_cell_text(cell, text: str) -> None:
+    runs = list(cell.iter(_TEXT_TAG))
+    if not runs:
+        return
+    runs[0].text = text
+    for extra in runs[1:]:
+        extra.text = ""
+
+
+def _op_replace_table_cell(root, op: dict) -> None:
+    find = op.get("find", op.get("old"))
+    new = op.get("text", op.get("new"))
+    row = op.get("row")
+    col = op.get("col")
+    for table in root.iter(_A_TBL):
+        rows = table.findall(_A_TR)
+        if row is not None and col is not None:
+            cells = rows[int(row) - 1].findall(_A_TC) if 1 <= int(row) <= len(rows) else []
+            target = [cells[int(col) - 1]] if 1 <= int(col) <= len(cells) else []
+        else:
+            target = list(table.iter(_A_TC))
+        for cell in target:
+            if find is not None:
+                for elem in cell.iter(_TEXT_TAG):
+                    if elem.text and str(find) in elem.text:
+                        elem.text = elem.text.replace(str(find), str(new))
+            elif new is not None:
+                _set_cell_text(cell, str(new))
+
+
+def _shape_text(shape) -> str:
+    body = shape.find(_P_TXBODY)
+    if body is None:
+        return ""
+    return "".join(node.text or "" for node in body.iter(_TEXT_TAG))
+
+
+def _pick_shape(shapes, match):
+    if isinstance(match, dict) and "index" in match:
+        index = int(match["index"]) - 1
+        return shapes[index] if 0 <= index < len(shapes) else None
+    if isinstance(match, dict) and "name" in match:
+        name = str(match["name"])
+        for shape in shapes:
+            nv = shape.find(_P_NVSPR)
+            c_nv_pr = nv.find(f"{{{_P_NS}}}cNvPr") if nv is not None else None
+            if c_nv_pr is not None and c_nv_pr.get("name") == name:
+                return shape
+        return None
+    text_match = match if isinstance(match, dict) else {"text_contains": match}
+    for shape in shapes:
+        if _matches(text_match, _shape_text(shape)):
+            return shape
+    return None
+
+
+def _op_set_shape_geometry(root, op: dict) -> None:
+    shapes = list(root.iter(_P_SP))
+    shape = _pick_shape(shapes, op.get("match"))
+    if shape is None:
+        raise ValueError(f"set_shape_geometry: no shape matched {op.get('match')!r}")
+    spr = shape.find(_P_SPPR)
+    if spr is None:
+        spr = ET.Element(_P_SPPR)
+        nv = shape.find(_P_NVSPR)
+        shape.insert(list(shape).index(nv) + 1 if nv is not None else 0, spr)
+    xfrm = spr.find(_A_XFRM)
+    if xfrm is None:
+        xfrm = ET.Element(_A_XFRM)
+        spr.insert(0, xfrm)
+    off = xfrm.find(_A_OFF)
+    if off is None:
+        off = ET.SubElement(xfrm, _A_OFF)
+    ext = xfrm.find(_A_EXT)
+    if ext is None:
+        ext = ET.SubElement(xfrm, _A_EXT)
+    for attr, key in (("x", "x"), ("y", "y")):
+        if key in op:
+            off.set(attr, str(int(round(float(op[key]) * _EMU_PER_POINT))))
+    for attr, key in (("cx", "w"), ("cy", "h")):
+        if key in op:
+            ext.set(attr, str(int(round(float(op[key]) * _EMU_PER_POINT))))
+
+
+_OP_DISPATCH = {
+    "replace_text": _op_replace_text,
+    "style_text": _op_style_text,
+    "replace_table_cell": _op_replace_table_cell,
+    "set_shape_geometry": _op_set_shape_geometry,
+}
+
+
+def apply_operations(operations: list[dict]) -> EditFn:
+    """Build an edit_fn that applies a sequence of typed, slide-local operations."""
+    if not operations:
+        raise ValueError("operations must not be empty")
+    for index, op in enumerate(operations):
+        if not isinstance(op, dict) or op.get("op") not in _OP_DISPATCH:
+            raise ValueError(f"operations[{index}] has unknown or missing 'op'")
+
+    def _edit(xml_text: str) -> str:
+        root = ET.fromstring(xml_text)
+        for op in operations:
+            _OP_DISPATCH[op["op"]](root, op)
+        return ET.tostring(root, encoding="unicode", xml_declaration=False)
+
+    return _edit
+
+
+def summarize_changes(before_xml: str, after_xml: str) -> list[str]:
+    """Coarse structural diff of one slide: what text / geometry / cells changed."""
+    before = ET.fromstring(before_xml)
+    after = ET.fromstring(after_xml)
+    summary: list[str] = []
+
+    before_runs = [node.text or "" for node in before.iter(_TEXT_TAG)]
+    after_runs = [node.text or "" for node in after.iter(_TEXT_TAG)]
+    text_changes = sum(1 for a, b in zip(before_runs, after_runs) if a != b)
+    if text_changes:
+        summary.append(f"{text_changes} text run(s) changed")
+
+    before_sigs = [_run_style_sig(run) for run in before.iter(_A_R)]
+    after_sigs = [_run_style_sig(run) for run in after.iter(_A_R)]
+    restyled = sum(1 for a, b in zip(before_sigs, after_sigs) if a != b)
+    if restyled:
+        summary.append(f"{restyled} run(s) restyled")
+
+    def geoms(root):
+        out = []
+        for shape in root.iter(_P_SP):
+            xfrm = shape.find(f".//{_A_XFRM}")
+            off = xfrm.find(_A_OFF) if xfrm is not None else None
+            ext = xfrm.find(_A_EXT) if xfrm is not None else None
+            out.append((
+                off.get("x") if off is not None else None,
+                off.get("y") if off is not None else None,
+                ext.get("cx") if ext is not None else None,
+                ext.get("cy") if ext is not None else None,
+            ))
+        return out
+
+    moved = sum(1 for a, b in zip(geoms(before), geoms(after)) if a != b)
+    if moved:
+        summary.append(f"{moved} shape(s) moved/resized")
+
+    before_cells = [_cell_text(cell) for cell in before.iter(_A_TC)]
+    after_cells = [_cell_text(cell) for cell in after.iter(_A_TC)]
+    cell_changes = sum(1 for a, b in zip(before_cells, after_cells) if a != b)
+    if cell_changes:
+        summary.append(f"{cell_changes} table cell(s) changed")
+
+    return summary
 
 
 def fidelity_report(

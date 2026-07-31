@@ -2993,17 +2993,24 @@ def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
         slide = edit.get("slide")
         if not isinstance(slide, int) or isinstance(slide, bool) or slide < 1:
             raise ValueError(f"edits[{index}].slide must be a positive integer.")
+        operations: list[dict[str, Any]] = []
         replacements = edit.get("replacements")
-        if not isinstance(replacements, dict) or not replacements:
-            raise ValueError(f"edits[{index}].replacements must be a non-empty object.")
-        replacements = {str(key): str(value) for key, value in replacements.items()}
+        if isinstance(replacements, dict):
+            for key, value in replacements.items():
+                if str(key):
+                    operations.append({"op": "replace_text", "old": str(key), "new": str(value)})
+        extra_ops = edit.get("operations")
+        if isinstance(extra_ops, list):
+            operations.extend(extra_ops)
+        if not operations:
+            raise ValueError(f"edits[{index}] needs non-empty replacements or operations.")
         requested_slides.add(slide)
 
         last = index == len(edits) - 1
         target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
         if not last:
             intermediates.append(target)
-        module.patch_slide_xml(current, target, slide, module.replace_text(replacements))
+        module.patch_slide_xml(current, target, slide, module.apply_operations(operations))
         current = target
 
     for temp in intermediates:
@@ -3019,6 +3026,15 @@ def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     unexpected = [name for name in changed if name not in requested_parts]
     safe = not unexpected and not added and not removed
 
+    slide_changes: dict[int, list[str]] = {}
+    for slide in sorted(requested_slides):
+        before_xml = module.slide_xml(source, slide)
+        after_xml = module.slide_xml(output, slide)
+        if before_xml is not None and after_xml is not None:
+            delta = module.summarize_changes(before_xml, after_xml)
+            if delta:
+                slide_changes[slide] = delta
+
     return {
         "status": "ok" if safe else "fidelity-violation",
         "safe": safe,
@@ -3030,6 +3046,7 @@ def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
         "added": added,
         "removed": removed,
         "unchangedCount": sum(1 for name in before if name in after and before[name] == after[name]),
+        "slideChanges": slide_changes,
     }
 
 
