@@ -1270,6 +1270,11 @@ h2 {
 }
 
 /* ---- Preserve Edit screen ---- */
+.preserve-screen .section-heading h1 {
+  font-size: clamp(28px, 3.2vw, 42px);
+  line-height: 1.15;
+}
+
 .preserve-drop-panel {
   max-width: 720px;
 }
