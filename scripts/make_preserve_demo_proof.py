@@ -255,9 +255,22 @@ def main() -> int:
     report = _run_edit()
     _write_svg(report)
     gif_ok = _write_gif(report)
+
+    import ppt_render  # noqa: E402  (sibling module; scripts/ is on sys.path)
+
+    real_ok = False
+    be = ppt_render.backend()
+    if be is not None:
+        repaired = OUT_DIR / "executive-review-preserve-edited.pptx"
+        caption = f"{report['unchangedParts']}/{report['totalParts']} parts byte-identical"
+        real_ok = bool(
+            ppt_render.render_slide_diff_png(EXAMPLE, repaired, SLIDE, OUT_DIR / "before-after-real.png", caption)
+            and ppt_render.render_slide_diff_gif(EXAMPLE, repaired, SLIDE, OUT_DIR / "before-after-real.gif", caption)
+        )
     print(f"wrote {OUT_DIR.relative_to(ROOT)}/")
     print(f"  safe={report['safe']} changed={report['changed']} unchanged={report['unchangedParts']}/{report['totalParts']}")
-    print(f"  gif={'yes' if gif_ok else 'skipped (no Pillow/CJK font)'}")
+    print(f"  schematic_gif={'yes' if gif_ok else 'skipped (no Pillow/CJK font)'}")
+    print(f"  real_render={'yes' if real_ok else 'skipped (' + (be or 'no renderer: install LibreOffice + PyMuPDF') + ')'}")
     return 0
 
 
