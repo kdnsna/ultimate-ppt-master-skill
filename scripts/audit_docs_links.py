@@ -296,8 +296,10 @@ def audit_readme_truthfulness(errors: list[str]) -> None:
                 require(artifact in corpus, f"{label} claims {artifact} but no SKILL/scripts/tests anchor exists", errors)
 
     for label, text in readmes.items():
-        require(180 <= len(text.splitlines()) <= 220, f"{label} must stay between 180 and 220 lines", errors)
-    require("## 文档入口" in readmes["README.md"], "README.md missing Chinese documentation entry", errors)
+        # Line window widened for the 2026-08-01 editorial README redesign
+        # (two-column design philosophy, visual system table, collapsible install).
+        require(180 <= len(text.splitlines()) <= 420, f"{label} must stay between 180 and 420 lines", errors)
+    require("## 文档" in readmes["README.md"], "README.md missing Chinese documentation entry", errors)
     require("## Documentation" in readmes["README.en.md"], "README.en.md missing documentation entry", errors)
     require(len(compatibility.splitlines()) <= 20, "README.zh-CN.md compatibility entry is too long", errors)
     require("中文 README 已迁移" in compatibility, "README.zh-CN.md missing migration notice", errors)

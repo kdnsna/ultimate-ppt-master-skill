@@ -26,7 +26,7 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 | 用 DeckIR、页面地图和渲染审阅策划 AI 生成 deck | [v4.2 DeckIR AI 策划工作流](./quality/deckir-ai-planning-workflow-v4.2.md) |
 | 理解 v4.0 视觉契约 | [v4.0 混合可编辑视觉工作流](./quality/hybrid-editable-visual-workflow-v4.0.md) |
 | 查看稳定证明矩阵 | [v2.5 质量工作台](./quality/quality-workbench-v2.5.md) |
-| 查看 v2.5 完成审计 | [Completion Audit v2.5](../quality/completion-audit-v2.5.md) |
+| 查看 v2.5 完成审计 | [Completion Audit v2.5（英文）](../quality/completion-audit-v2.5.md) |
 | 查看本机上游基准测试 | [上游基准测试 - 2026 年 5 月](./quality/upstream-benchmark-2026-05.md) |
 | 查看 GitHub 技术趋势 | [GitHub 技术扫描 - 2026 年 5 月](./quality/github-tech-scan-2026-05.md) |
 
@@ -50,8 +50,8 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 | 查看 AI 策划发布 | [发布说明 - v4.2.0](./release/release-notes-v4.2.0.md) |
 | 查看混合可编辑发布 | [发布说明 - v4.0.0](./release/release-notes-v4.0.0.md) |
 | 查看正式 handoff 发布 | [发布说明 - v3.0.0](./release/release-notes-v3.0.0.md) |
-| 发布、Pages、Homebrew、签名、公证、隐私和维护 | [Release and Maintenance](../release/release-maintenance.md) |
-| 准备 Homebrew 分发 | [Homebrew Distribution Plan](../release/homebrew-distribution.md) |
+| 发布、Pages、Homebrew、签名、公证、隐私和维护 | [Release and Maintenance（英文）](../release/release-maintenance.md) |
+| 准备 Homebrew 分发 | [Homebrew Distribution Plan（英文）](../release/homebrew-distribution.md) |
 
 ## 策略
 
@@ -60,10 +60,10 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 | 理解产品定位 | [产品定位反思](./strategy/product-positioning.md) |
 | 保真改 PPT 的品牌定位与「我们不做」 | [保真改 PPT · 定位](./strategy/positioning-preserve-edit.md) |
 | 深度优化 PRD | [v5.2 深度优化指南 / PRD](./strategy/prd-v5.2-deep-optimization-guide.md) |
-| 改善 GitHub 公开曝光 | [Public Growth Playbook](../strategy/public-growth-playbook.md) |
+| 改善 GitHub 公开曝光 | [Public Growth Playbook（英文）](../strategy/public-growth-playbook.md) |
 | 准备 Skill 市场分发 | [Skill 市场分发](./strategy/skill-market-distribution.md) |
 | 回看 v2.5–v5.5 内容与模板历史路线 | [历史路线 - 内容与模板预设](./strategy/next-roadmap.md) |
-| 回看 v2.5 历史优化 backlog | [历史优化方向](../strategy/next-optimization-directions.md) |
+| 回看 v2.5 历史优化 backlog | [历史优化方向（英文）](../strategy/next-optimization-directions.md) |
 
 ## 推荐路线
 
@@ -79,5 +79,5 @@ v6.3.9 的源码机器状态为 `github-released`；是否真正发布，只以 
 
 ## 当前收敛工作
 
-- [v6.3.9 收敛工作说明](../strategy/v6-3-8-consolidation.md)
+- [v6.3.8 收敛工作说明](../strategy/v6-3-8-consolidation.md)
 

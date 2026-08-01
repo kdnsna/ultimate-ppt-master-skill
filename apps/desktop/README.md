@@ -4,10 +4,10 @@ Desktop product shell for Ultimate PPT Master: Tauri + React/TypeScript + local 
 
 Public user docs:
 
-- [Quickstart Desktop](../../docs/quickstart-desktop.md)
-- [Choosing a Workflow](../../docs/choosing-a-workflow.md)
-- [Model and Provider Setup](../../docs/model-provider-setup.md)
-- [Troubleshooting](../../docs/troubleshooting.md)
+- [Quickstart Desktop](../../docs/guides/quickstart-desktop.md)
+- [Choosing a Workflow](../../docs/guides/choosing-a-workflow.md)
+- [Model and Provider Setup](../../docs/guides/model-provider-setup.md)
+- [Troubleshooting](../../docs/guides/troubleshooting.md)
 
 The app keeps the first workflow intentionally simple:
 
@@ -20,7 +20,7 @@ The app keeps the first workflow intentionally simple:
 - Projects: reads real `desktop-manifest.json` files instead of static examples.
 - Create: supports drag/drop, Markdown/text/URL/file paths, DOCX and URL extraction status, smart recommendations, and style presets.
 - Workbench: shows generation progress, source extraction state, preview, outputs, logs, trust checks, source.md access, and Agent handoff prompt copy.
-- Settings: checks Python, Node, Rust/Cargo, Cairo, provider keys, model setup, output directory, and Chinese / English UI language.
+- Settings: checks Python, Node, Rust/Cargo, provider keys, model setup, output directory, and Chinese / English UI language.
 
 The desktop app does not upload user files and does not expose secret key values. Production-grade deck generation still uses the full repository workflow in `SKILL.md`.
 
@@ -61,7 +61,7 @@ npm run desktop
 
 `npm run desktop` starts the native Tauri app when Rust/Cargo are available. If Rust/Cargo are missing, it falls back to the browser UI shell; that shell is for interface inspection only and cannot run the Python worker or write PPTX/HTML outputs.
 
-Use `npm run doctor` when the app cannot launch or a worker/provider check fails. It checks Python, Node/npm, Rust/Cargo, Cairo, provider keys, and reserved model config without printing secret values.
+Use `npm run doctor` when the app cannot launch or a worker/provider check fails. It checks Python, Node/npm, Rust/Cargo, provider keys, and reserved model config without printing secret values.
 
 ## Run the Web Shell Directly
 
@@ -152,7 +152,7 @@ PIXABAY_API_KEY=your-pixabay-key
 
 Direct API worker driving is reserved for a future adapter and should not be described as complete in this app yet.
 
-For the full model/provider matrix, see [Model and Provider Setup](../../docs/model-provider-setup.md).
+For the full model/provider matrix, see [Model and Provider Setup](../../docs/guides/model-provider-setup.md).
 
 ## Worker Smoke Test
 

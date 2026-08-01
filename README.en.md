@@ -6,8 +6,8 @@
 
 <p align="center">
   <strong>Restrained editing. Sharp generation.</strong><br>
-  A local-first presentation workbench: surgical preserve-editing on existing PPTX,<br>
-  or source-to-slides generation with editorial intelligence built in.
+  Turn real source material into a native PowerPoint — and, when you already have<br>
+  a branded deck, change only the slides you name while everything else stays byte-for-byte intact.
 </p>
 
 <br>
@@ -19,7 +19,7 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square&color=171714"></a>&ensp;
   <a href="./LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-171714?style=flat-square"></a>&ensp;
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="v6.3.9" src="https://img.shields.io/badge/release-v6.3.9-1D4ED8?style=flat-square"></a>&ensp;
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="v6.3.9" src="https://img.shields.io/badge/GitHub_Release-v6.3.9-1D4ED8?style=flat-square"></a>&ensp;
   <img alt="local-first" src="https://img.shields.io/badge/local--first-yes-73866C?style=flat-square">&ensp;
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-1D4ED8?style=flat-square">
 </p>
@@ -27,6 +27,17 @@
 <br>
 
 ---
+
+<br>
+
+## Capability Matrix
+
+- **Preserve-Edit** — edit existing branded PPTX in place; masters, logos, and links stay byte-identical.
+- **One-minute install** — paste one command, run locally; no sign-in, no API dependency.
+- **Formal editable PPTX** — generate editable PowerPoint from source material; masters, links, and native objects stay byte-faithful.
+- **AI Web Deck** — magazine-style browser presentation, ideal for launches, roadshows, and demo days.
+- **Finished Work & Proof** — every case ships with before/after renders, quality reports, and Release evidence.
+- **Known limits** — honest boundaries in [FAQ](#faq) and [Known Boundaries](#known-boundaries); no inflated promises.
 
 <br>
 
@@ -98,6 +109,13 @@ Every page goes through brief enhancement, evidence grading, and visual review �
 npx skills add kdnsna/ultimate-ppt-master-skill --skill ultimate-ppt-master
 ```
 
+This copies the whole skill package to your machine (~100MB, including desktop app and examples). One more step installs the light Python deps (the preserve-edit engine is stdlib-only, but generation routes need them):
+
+```bash
+cd ~/.agents/skills/ultimate-ppt-master
+bash scripts/bootstrap.sh --profile core
+```
+
 Then tell your agent:
 
 > *Change "Q2" to "Q3" on slide 3, replace the conclusion on slide 6 with the new numbers from the attachment, and touch nothing else.*
@@ -167,7 +185,7 @@ Drop a `.pptx` → pick slides → edit → save. Original is never overwritten.
 python3 scripts/ppt_preserve_mcp.py
 ```
 
-Zero-dep stdio MCP exposing `inspect_pptx` / `edit_pptx_preserving`. See [MCP guide](./docs/zh-CN/guides/mcp-server.md).
+Zero-dep stdio MCP exposing `inspect_pptx` / `edit_pptx_preserving`. See [MCP guide](./docs/guides/mcp-server.md).
 
 </details>
 
@@ -317,9 +335,9 @@ Designed for banking, government, and legal environments.
 | | |
 |:---|:---|
 | **Install** | [INSTALL](./INSTALL.md)&ensp;·&ensp;[Agent Setup](./docs/guides/agent-setup.md) |
-| **Preserve-Edit** | [Product Positioning](./docs/strategy/product-positioning.md)&ensp;·&ensp;[Edit Prompts](./docs/zh-CN/guides/preserve-edit-prompts.md) |
+| **Preserve-Edit** | [Product Positioning](./docs/strategy/product-positioning.md)&ensp;·&ensp;[Edit Prompts](./docs/guides/preserve-edit-prompts.md) |
 | **Generate** | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md)&ensp;·&ensp;[Web Experience](./docs/guides/web-experience.md) |
-| **Integration** | [MCP Server](./docs/zh-CN/guides/mcp-server.md)&ensp;·&ensp;[Agent Bridge](./docs/guides/agent-connect-bridge.md)&ensp;·&ensp;[Providers](./docs/guides/model-provider-setup.md) |
+| **Integration** | [MCP Server](./docs/guides/mcp-server.md)&ensp;·&ensp;[Agent Bridge](./docs/guides/agent-connect-bridge.md)&ensp;·&ensp;[Providers](./docs/guides/model-provider-setup.md) |
 | **Design** | [Design System](./DESIGN.md)&ensp;·&ensp;[Visual Contract](./contracts/visual-defaults.yaml) |
 | **Troubleshooting** | [troubleshooting](./docs/guides/troubleshooting.md) |
 | **Release** | [v6.3.9 notes](./docs/release/release-notes-v6.3.9.md) |
@@ -354,6 +372,7 @@ The original is never overwritten. Every edit ships with a fidelity report.
 ## Known Boundaries
 
 - Preserve-edit covers text, style, table cells, shape geometry, and chart values — not add/remove slides, new images, or structural rebuilds
+- **No import-and-re-export of a whole deck**: existing PPTX files get per-slide faithful repair only, never a full-deck re-export
 - Pixel-level before/after comparison requires local LibreOffice; otherwise a vector diff card is produced
 - From-scratch generation is agent-driven, not hosted SaaS
 - No Canva-style multiplayer canvas or cloud accounts

@@ -62,31 +62,23 @@ def _run_edit() -> dict:
         f"expected title {OLD_TITLE!r} on slide {SLIDE} of the example deck"
     )
 
-    engine.patch_slide_xml(
+    # Use the real engine entry point so the committed fidelity-report.json
+    # matches the runtime schema (ok/expected_changed/unchanged_count/...).
+    result = engine.apply_edits(
         EXAMPLE,
         output,
-        SLIDE,
-        engine.apply_operations([{"op": "replace_text", "old": OLD_TITLE, "new": NEW_TITLE}]),
+        [{"slide": SLIDE, "operations": [{"op": "replace_text", "old": OLD_TITLE, "new": NEW_TITLE}]}],
     )
 
-    before = engine.member_hashes(EXAMPLE)
-    after = engine.member_hashes(output)
-    changed = sorted(n for n in before if n in after and before[n] != after[n])
-    unchanged = sum(1 for n in before if n in after and before[n] == after[n])
     after_xml = engine.slide_xml(output, SLIDE) or ""
-    summary = engine.summarize_changes(before_xml, after_xml)
-
+    result["slide_changes"] = {str(SLIDE): engine.summarize_changes(before_xml, after_xml)}
     report = {
         "source": str(EXAMPLE.relative_to(ROOT)),
         "output": str(output.relative_to(ROOT)),
         "editedSlide": SLIDE,
         "beforeTitle": OLD_TITLE,
         "afterTitle": NEW_TITLE,
-        "totalParts": len(before),
-        "changed": changed,
-        "unchangedParts": unchanged,
-        "safe": len(changed) == 1 and changed[0] == engine.slide_part_name(SLIDE),
-        "slideChanges": {str(SLIDE): summary},
+        **result,
     }
     (OUT_DIR / "fidelity-report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -95,8 +87,8 @@ def _run_edit() -> dict:
 
 
 def _write_svg(report: dict) -> None:
-    total = report["totalParts"]
-    unchanged = report["unchangedParts"]
+    total = report["total_parts"]
+    unchanged = report["unchanged_count"]
     before = html.escape(report["beforeTitle"])
     after = html.escape(report["afterTitle"])
     svg = f"""<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="PPT 改稿 改动证明">
@@ -207,7 +199,7 @@ def _draw_card(report: dict, title_color, title_text, fidelity_state: str, alpha
     d.rounded_rectangle([px, py, px + pw, py + ph], radius=20, fill=WHITE, outline=LINE)
     d.text((px + 28, py + 30), "原样不变的部分", font=f_statl, fill=MUTED)
     if fidelity_state == "after":
-        d.text((px + 28, py + 92), f"{report['unchangedParts']}/{report['totalParts']}", font=f_stat, fill=GREEN)
+        d.text((px + 28, py + 92), f"{report['unchanged_count']}/{report['total_parts']}", font=f_stat, fill=GREEN)
         d.text((px + 28, py + 178), "改动的部分", font=f_statl, fill=MUTED)
         d.text((px + 28, py + 206), f"slide{SLIDE}.xml", font=_font(24), fill=CORAL)
         d.ellipse([px + 28, py + 252, px + 56, py + 280], fill=(220, 252, 231))
@@ -262,13 +254,13 @@ def main() -> int:
     be = ppt_render.backend()
     if be is not None:
         repaired = OUT_DIR / "executive-review-preserve-edited.pptx"
-        caption = f"{report['unchangedParts']}/{report['totalParts']} 个部分原样不变"
+        caption = f"{report['unchanged_count']}/{report['total_parts']} 个部分原样不变"
         real_ok = bool(
             ppt_render.render_slide_diff_png(EXAMPLE, repaired, SLIDE, OUT_DIR / "before-after-real.png", caption)
             and ppt_render.render_slide_diff_gif(EXAMPLE, repaired, SLIDE, OUT_DIR / "before-after-real.gif", caption)
         )
     print(f"wrote {OUT_DIR.relative_to(ROOT)}/")
-    print(f"  safe={report['safe']} changed={report['changed']} unchanged={report['unchangedParts']}/{report['totalParts']}")
+    print(f"  safe={report['safe']} changed={report['changed']} unchanged={report['unchanged_count']}/{report['total_parts']}")
     print(f"  schematic_gif={'yes' if gif_ok else 'skipped (no Pillow/CJK font)'}")
     print(f"  real_render={'yes' if real_ok else 'skipped (' + (be or 'no renderer: install LibreOffice + PyMuPDF') + ')'}")
     return 0

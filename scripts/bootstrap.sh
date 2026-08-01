@@ -14,12 +14,12 @@ usage() {
 Usage: bash scripts/bootstrap.sh [--profile core|pptx|web|visual-review|desktop|all]
 
 Profiles:
-  core           Python venv + requirements core subset notes
-  pptx           Python deps for editable PPTX conversion
-  web            Web Experience + Bridge npm deps
-  visual-review  Python deps + Playwright Chromium
-  desktop        Web + desktop npm deps (Rust still separate)
-  all            Current full setup (default)
+  core           Light Python venv (preserve-edit needs almost nothing)
+  pptx           Light Python deps for editable PPTX conversion
+  web            Core Python + Web Experience / Bridge npm deps
+  visual-review  Full Python deps + Playwright Chromium (~150MB download)
+  desktop        Core Python + Web + desktop npm deps (Rust still separate)
+  all            Current full setup (default; includes the Chromium download)
 USAGE
 }
 
@@ -124,12 +124,17 @@ if [[ "$need_python" -eq 1 ]]; then
     info "Python virtual environment already exists"
   fi
 
-  info "Installing Python dependencies from requirements.txt"
+  info "Installing Python dependencies (profile=$PROFILE)"
   "$ROOT_DIR/.venv/bin/python" -m pip install --upgrade pip
-  "$ROOT_DIR/.venv/bin/python" -m pip install -r "$ROOT_DIR/requirements.txt"
+  if [[ "$PROFILE" == "core" || "$PROFILE" == "pptx" ]]; then
+    # Light set: preserve-edit engine is stdlib-only; core deps cover the rest.
+    "$ROOT_DIR/.venv/bin/python" -m pip install -r "$ROOT_DIR/requirements-core.txt"
+  else
+    "$ROOT_DIR/.venv/bin/python" -m pip install -r "$ROOT_DIR/requirements.txt"
+  fi
 
   if [[ "$need_visual" -eq 1 ]]; then
-    info "Ensuring Playwright Python package and Chromium browser"
+    info "Ensuring Playwright Python package and Chromium browser (~150MB download)"
     "$ROOT_DIR/.venv/bin/python" -m pip install 'playwright>=1.40.0'
     "$ROOT_DIR/.venv/bin/python" -m playwright install chromium
     INSTALL_PLAYWRIGHT_BROWSER=1
@@ -176,10 +181,6 @@ if [[ "$need_desktop" -eq 1 ]]; then
   if ! command -v cargo >/dev/null 2>&1 || ! command -v rustc >/dev/null 2>&1; then
     warn "Rust/Cargo not found. Desktop npm shell can run, but native packaging needs Rust. macOS: brew install rust"
   fi
-fi
-
-if command -v pkg-config >/dev/null 2>&1 && ! pkg-config --exists cairo >/dev/null 2>&1; then
-  warn "Cairo was not detected. PPTX/SVG compatibility checks may need it. macOS: brew install cairo pkg-config"
 fi
 
 info "Setup complete for profile=$PROFILE"

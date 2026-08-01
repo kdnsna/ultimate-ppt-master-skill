@@ -3009,6 +3009,14 @@ def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
             f"- 涉及页：{', '.join(str(s) for s in result.get('requested_slides') or [])}",
             f"- 未改动包内部分：{result.get('unchanged_count')}",
             "",
+        ]
+        if result.get("no_op"):
+            memo_lines.append(
+                "> 未匹配到任何要修改的内容：输出与源文件逐字节相同。"
+                "请先检查页面上要改的文字是否存在，再重试。"
+            )
+            memo_lines.append("")
+        memo_lines += [
             "## 改了什么",
             *bullets,
             "",

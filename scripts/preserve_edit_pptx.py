@@ -272,7 +272,11 @@ def patch_parts(
         names = [info.filename for info in src.infolist() if not info.is_dir()]
         missing = [part for part in part_edits if part not in names]
         if missing:
-            raise FileNotFoundError(f"parts not found in {source.name}: {missing}")
+            slides = sorted(n for n in names if n.startswith("ppt/slides/slide"))
+            raise FileNotFoundError(
+                f"parts not found in {source.name}: {missing}; "
+                f"deck has slides: {slides} (run --list to see each slide's text)"
+            )
         for name in names:
             raw = src.read(name)
             if name in part_edits:
@@ -550,10 +554,18 @@ def apply_operations(operations: list[dict]) -> EditFn:
             raise ValueError(f"operations[{index}] has unknown or missing 'op'")
 
     def _edit(xml_text: str) -> str:
+        before = ET.fromstring(xml_text)
         root = ET.fromstring(xml_text)
         for op in operations:
             _OP_DISPATCH[op["op"]](root, op)
-        return ET.tostring(root, encoding="unicode", xml_declaration=False)
+        out = ET.tostring(root, encoding="unicode", xml_declaration=False)
+        # Idempotent safety: if the re-serialized result is identical to the
+        # re-serialized input, no op actually changed anything. Return the
+        # original bytes so the named part stays byte-identical too — only
+        # touch what we really change.
+        if out == ET.tostring(before, encoding="unicode", xml_declaration=False):
+            return xml_text
+        return out
 
     return _edit
 
@@ -1074,6 +1086,7 @@ def apply_edits(
     return {
         "safe": safe,
         "status": "ok" if safe else "fidelity-violation",
+        "no_op": not changed,
         "output": str(output),
         "changed": changed,
         "expected_changed": sorted(intended_parts),
@@ -1093,8 +1106,15 @@ def inspect_pptx(source: Path) -> dict:
 
 
 def _load_edits_file(path: Path) -> list[dict]:
-    raw = path.read_text(encoding="utf-8")
-    data = json.loads(raw)
+    try:
+        raw = path.read_text(encoding="utf-8")
+        data = json.loads(raw)
+    except OSError as exc:
+        raise SystemExit(f"--edits file unreadable: {path} ({exc})") from exc
+    except json.JSONDecodeError as exc:
+        raise SystemExit(
+            f"--edits file is not valid JSON: {path} (line {exc.lineno}, column {exc.colno}: {exc.msg})"
+        ) from exc
     if isinstance(data, dict) and "edits" in data:
         data = data["edits"]
     if not isinstance(data, list) or not data:
@@ -1160,7 +1180,15 @@ def main(argv: list[str] | None = None) -> int:
         if not source.is_file():
             print(f"source not found: {source}", file=sys.stderr)
             return 2
-        info = inspect_pptx(source)
+        try:
+            info = inspect_pptx(source)
+        except zipfile.BadZipFile:
+            print(
+                f"[ERROR] {source} is not a valid .pptx (bad zip). "
+                "Only real PowerPoint/WPS .pptx files are supported.",
+                file=sys.stderr,
+            )
+            return 2
         print(f"slides: {info['slide_count']}")
         for item in info["slides"]:
             preview = " | ".join(item["texts"][:6]) if item["texts"] else "(no text)"
@@ -1197,6 +1225,13 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         result = apply_edits(args.source, args.output, edits)
+    except zipfile.BadZipFile:
+        print(
+            f"[ERROR] {args.source} is not a valid .pptx (bad zip). "
+            "Only real PowerPoint/WPS .pptx files are supported.",
+            file=sys.stderr,
+        )
+        return 2
     except (OSError, ValueError, FileNotFoundError) as exc:
         print(f"[ERROR] {exc}", file=sys.stderr)
         return 2
@@ -1230,9 +1265,12 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  slide {slide}: " + "; ".join(lines))
     else:
         print(
-            f"[OK] no matching content on slide(s) {slides}; output is byte-identical "
-            f"to source (unchanged_parts={result['unchanged_count']}/{result['total_parts']})"
+            f"[NOOP] nothing matched on slide(s) {slides}; output is byte-identical "
+            f"to source (unchanged_parts={result['unchanged_count']}/{result['total_parts']}). "
+            "Check the text you asked to replace actually exists (run --list to inspect).",
+            file=sys.stderr,
         )
+        return 3
     if preview:
         print(f"  preview={preview.get('kind')} svg={preview.get('svgPath')}")
         if preview.get("pngPath"):

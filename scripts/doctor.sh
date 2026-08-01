@@ -234,7 +234,10 @@ if [[ "$need_desktop" -eq 1 ]]; then
   if has_cmd rustc && has_cmd cargo; then
     ok "Rust/Cargo: $(rustc --version 2>/dev/null), $(cargo --version 2>/dev/null)"
   else
-    missing "Rust/Cargo is required for native desktop packaging (profile=$PROFILE)"
+    # Native Tauri packaging needs Rust, but the desktop npm shell degrades to a
+    # browser UI without it (see run-desktop.sh) — so this is a warning, not a
+    # hard failure.
+    warn "Rust/Cargo not found. Desktop runs in browser-shell mode; native packaging needs Rust. macOS: brew install rust"
   fi
 else
   [[ -f "$DESKTOP_DIR/package.json" ]] && ok "Desktop package found (optional for this profile)" || warn "Desktop package is missing at apps/desktop/package.json"
@@ -265,28 +268,27 @@ else
   warn "No provider .env file found. Run: npm run setup, then edit ~/.ppt-master/.env"
 fi
 
+# Provider keys are OPTIONAL: preserve-edit, generation via agents, and the
+# Skill all work without any key. Only image/LLM calls from scripts need one.
+key_configured=0
 if env_has_key OPENAI_API_KEY "$ENV_FILE" || env_has_key LLM_API_KEY "$ENV_FILE"; then
   ok "OpenAI-compatible provider key configured"
-else
-  warn "OpenAI-compatible provider key not configured"
+  key_configured=1
 fi
-
 if env_has_key GEMINI_API_KEY "$ENV_FILE" || env_has_key GOOGLE_API_KEY "$ENV_FILE"; then
   ok "Gemini provider key configured"
-else
-  warn "Gemini provider key not configured"
+  key_configured=1
 fi
-
 if env_has_key QWEN_API_KEY "$ENV_FILE" || env_has_key DASHSCOPE_API_KEY "$ENV_FILE"; then
   ok "Qwen/DashScope provider key configured"
-else
-  warn "Qwen/DashScope provider key not configured"
+  key_configured=1
 fi
-
 if env_has_key DEEPSEEK_API_KEY "$ENV_FILE"; then
   ok "DeepSeek provider key configured"
-else
-  warn "DeepSeek provider key not configured"
+  key_configured=1
+fi
+if [[ "$key_configured" -eq 0 ]]; then
+  printf "\033[1;36m[note]\033[0m No provider key configured (optional). Preserve-edit and agent workflows run without one; LLM/image calls need ~/.ppt-master/.env.\n"
 fi
 
 printf "\nSummary: %s critical issue(s), %s warning(s) [profile=%s]\n" "$CRITICAL_FAILURES" "$WARNINGS" "$PROFILE"

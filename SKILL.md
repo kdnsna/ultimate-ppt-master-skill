@@ -25,6 +25,22 @@ description: >
 
 **Secondary mode — generate from source**: `Input → Storyboard → Design & Generate → Refine & Deliver`.
 
+## Step 0 — Environment check (do this before running scripts)
+
+Before any script run, verify the runtime once (fast; preserve-edit itself is Python-stdlib-only, generation routes need more):
+
+```bash
+python3 --version        # needs 3.10+; picks python3.13/3.12/3.11/3.10/python3 on PATH
+```
+
+- If `${SKILL_DIR}/.venv` exists, prefer `${SKILL_DIR}/.venv/bin/python` for everything.
+- If it does not exist, install the light Python deps once:
+  ```bash
+  bash ${SKILL_DIR}/scripts/bootstrap.sh --profile core
+  ```
+  (`--profile core` installs `requirements-core.txt` only — no Chromium, no npm. Use `--profile all` or `visual-review` when the task needs source conversion, image generation, or Playwright rendering.)
+- When a script fails with `ModuleNotFoundError`, the missing package is a per-route optional dep — install it inside `${SKILL_DIR}/.venv` via `pip install <package>` (see `requirements.txt` section headers for the route it belongs to), do not silently skip the step.
+
 ## Operating Model
 
 Treat this Skill as the local quality and workflow layer around PowerPoint, not as a replacement for PowerPoint's native editor. The default user-facing sequence is:

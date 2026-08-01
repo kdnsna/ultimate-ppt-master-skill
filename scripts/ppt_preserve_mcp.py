@@ -76,7 +76,9 @@ TOOLS: list[dict[str, Any]] = [
             "and/or typed `operations`: style_text (font/size/bold/color), "
             "replace_table_cell, set_shape_geometry (move/resize in points). Writes "
             "a new .pptx and returns a fidelity report plus a per-slide change "
-            "summary. If the report is not safe, the edit failed."
+            "summary. If the report is not safe, the edit failed. If status is "
+            "no-op, none of the requested text/ops matched and nothing changed — "
+            "inspect the deck and retry."
         ),
         "inputSchema": {
             "type": "object",
@@ -159,8 +161,10 @@ def tool_edit_pptx_preserving(args: dict[str, Any]) -> dict[str, Any]:
         return _text_result(f"edit failed: {exc}", is_error=True)
 
     safe = bool(result["safe"])
+    no_op = bool(result.get("no_op"))
+    status = "fidelity-violation" if not safe else ("no-op" if no_op else "ok")
     summary = [
-        f"status: {'ok' if safe else 'FIDELITY VIOLATION'}",
+        f"status: {status}",
         f"output: {result['output']}",
         f"changed: {result['changed']}",
         f"unchanged parts: {result['unchanged_count']} / {result['total_parts']}",
@@ -173,6 +177,9 @@ def tool_edit_pptx_preserving(args: dict[str, Any]) -> dict[str, Any]:
         if result["removed"]:
             summary.append(f"removed parts: {result['removed']}")
         summary.append("DO NOT treat this edit as successful.")
+    elif no_op:
+        summary.append("NO CHANGES APPLIED: none of the requested text/ops matched. "
+                       "Inspect the deck first (inspect_pptx) and adjust the edit.")
     for slide in sorted(result["slide_changes"]):
         summary.append(f"slide {slide}: " + "; ".join(result["slide_changes"][slide]))
     return _text_result("\n".join(summary), is_error=not safe)

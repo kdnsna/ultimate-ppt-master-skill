@@ -1,0 +1,19 @@
+# PPT Master Core Dependencies / PPT Master 核心依赖
+# =====================================================
+#
+# Lightweight set for the preserve-edit engine and Agent Skill usage.
+# Everything in here is imported by scripts that ship with the repo;
+# profiles `core` and `pptx` install only this file, so preserve-edit
+# stays fast to set up (the engine itself is Python-stdlib-only).
+#
+# 轻量依赖集：覆盖保真编辑引擎与 Agent Skill 的常规使用。
+# `core` 与 `pptx` profile 只安装本文件，保真编辑链路安装快速
+# （引擎本身仅使用 Python 标准库）。
+#
+# Install / 安装方式：
+#   pip install -r requirements-core.txt
+
+python-pptx>=0.6.21
+PyYAML>=6.0.0
+Pillow>=9.0.0
+numpy>=1.20.0

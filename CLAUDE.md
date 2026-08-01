@@ -98,13 +98,11 @@ Recommended location:
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.claude/skills/ultimate-ppt-master
 ```
 
-Then install runtime dependencies:
+Then install runtime dependencies (prefers any Python 3.10+ on PATH — `python3.13` / `3.12` / `3.11` / `3.10` / `python3`):
 
 ```bash
 cd ~/.claude/skills/ultimate-ppt-master
-python3.10 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install -r requirements.txt
+bash scripts/bootstrap.sh --profile core
 ```
 
 For optional profiles:

@@ -17,7 +17,7 @@ die() {
   exit 1
 }
 
-command -v npm >/dev/null 2>&1 || die "npm was not found. Install Node.js 18+, then run: npm run setup"
+command -v npm >/dev/null 2>&1 || die "npm was not found. Install Node.js ^20.19.0 || >=22.12.0, then run: npm run setup"
 
 if [[ ! -d "$DESKTOP_DIR/node_modules" ]]; then
   info "Desktop dependencies are missing; installing now"

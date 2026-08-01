@@ -19,7 +19,7 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square&color=171714"></a>&ensp;
   <a href="./LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-171714?style=flat-square"></a>&ensp;
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="v6.3.9" src="https://img.shields.io/badge/release-v6.3.9-1D4ED8?style=flat-square"></a>&ensp;
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="v6.3.9" src="https://img.shields.io/badge/GitHub_Release-v6.3.9-1D4ED8?style=flat-square"></a>&ensp;
   <img alt="local-first" src="https://img.shields.io/badge/local--first-yes-73866C?style=flat-square">&ensp;
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-1D4ED8?style=flat-square">
 </p>
@@ -27,6 +27,17 @@
 <br>
 
 ---
+
+<br>
+
+## 能力一览
+
+- **保真改 PPT** — 对已有品牌 PPTX 指哪改哪，母版 / logo / 链接字节级不动。
+- **一分钟安装** — 复制粘贴一条命令，本机即用；无需登录，无 API 依赖。
+- **正式办公 PPTX** — 从素材生成可编辑的 PowerPoint，母版、链接、对象字节级保真。
+- **AI Web Deck** — 杂志风网页演示，发布会 / 路演 / Demo Day 首选。
+- **成品与 Proof** — 每个案例附改前改后渲染、质量报告与 Release 证据。
+- **已知限制** — 诚实边界见 [FAQ](#faq) 与 [已知边界](#已知边界)，不做夸大承诺。
 
 <br>
 
@@ -96,6 +107,13 @@ PDF、Word、Excel、网页、粘贴文字——先确认故事板和证据链�
 
 ```bash
 npx skills add kdnsna/ultimate-ppt-master-skill --skill ultimate-ppt-master
+```
+
+该命令会把整个技能包复制到本机（约 100MB，含桌面端与示例）。**还需要装一次轻量 Python 依赖**（保真编辑引擎本身纯标准库，但生成路线需要）：
+
+```bash
+cd ~/.agents/skills/ultimate-ppt-master
+bash scripts/bootstrap.sh --profile core
 ```
 
 然后对你的 Agent 说：
@@ -334,7 +352,7 @@ scripts/preserve_edit_pptx.py        保真引擎（标准库，CLI + apply_edit
 ## FAQ
 
 **会动我的模板和 logo 吗？**<br>
-不会。没点名的 package part 原样拷贝，一个字节都不改。
+不会。没点名的 package part 原样拷贝，一个字节都不动。
 
 **支持 WPS 吗？**<br>
 支持。输出标准 `.pptx`，WPS 与 PowerPoint 均可继续编辑。
@@ -354,6 +372,7 @@ scripts/preserve_edit_pptx.py        保真引擎（标准库，CLI + apply_edit
 ## 已知边界
 
 - 保真编辑覆盖文本、样式、表格单元格、形状几何与图表数值；增删页 / 插图 / 重建结构不在范围
+- **不做「导入再整份导出」**：已有 PPTX 只能逐页保真修复，不能整份导入后重导出
 - 像素级改前改后对比需本机 LibreOffice，否则产出矢量对比卡
 - 从零生成由本地 Agent 驱动，不是托管云服务
 - 无 Canva 式多人画布或云账号

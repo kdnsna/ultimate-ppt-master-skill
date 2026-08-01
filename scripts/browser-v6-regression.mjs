@@ -208,6 +208,26 @@ async function focus(client, page, selector) {
   })()`);
 }
 
+// The v6.3.9 product surface defaults to the "revise" landing path; the
+// generate workspace (intake/storyboard/review) is hidden until the user
+// switches to the "generate" tab. Every fixture-driven regression targets the
+// generate workspace, so tests switch paths right after mount.
+async function enterGenerateFlow(client, page) {
+  const alreadyVisible = await evaluate(client, page, `(() => {
+    const flow = document.getElementById('v6-generate-flow');
+    if (!flow) throw new Error('Missing v6-generate-flow container');
+    if (!flow.hidden) return true;
+    const tabs = [...document.querySelectorAll('.v6-path-switch [role="tab"]')];
+    const generateTab = tabs.find((tab) => tab.getAttribute('aria-selected') !== 'true');
+    if (!(generateTab instanceof HTMLElement)) throw new Error('Missing generate path tab');
+    generateTab.click();
+    return false;
+  })()`);
+  if (!alreadyVisible) {
+    await waitForExpression(client, page, "!document.getElementById('v6-generate-flow')?.hidden", "generate flow visibility");
+  }
+}
+
 async function insertText(client, page, selector, text) {
   await focus(client, page, selector);
   await client.send("Input.insertText", { text }, page.sessionId);
@@ -432,6 +452,7 @@ async function createPage(client, baseUrl, contextId, config = {}, { reducedMoti
   }
   await client.send("Page.navigate", { url: baseUrl }, sessionId);
   await waitForExpression(client, page, "Boolean(document.querySelector('.v6-app'))", "v6 workspace mount");
+  await enterGenerateFlow(client, page);
   return page;
 }
 
@@ -827,6 +848,7 @@ async function testTabIsolationAndRefresh(client, baseUrl) {
 
     await client.send("Page.reload", { ignoreCache: true }, tabA.sessionId);
     await waitForExpression(client, tabA, "document.querySelector('.v6-app')?.dataset.phase === 'review' && document.querySelector('.handoff-ready code')?.textContent.includes('/tmp/mock/project-a')", "tab A refresh restore");
+    await enterGenerateFlow(client, tabA);
     const restoredA = await evaluate(client, tabA, `JSON.parse(sessionStorage.getItem(${JSON.stringify(storageKey)}))`);
     assert.equal(restoredA.sessionId, stateA.sessionId);
     assert.equal(restoredA.projectPath, stateA.projectPath);

@@ -132,6 +132,19 @@ fn worker_path(app: &AppHandle, root: &Path) -> Result<PathBuf, String> {
     Err("Unable to locate desktop worker. Reinstall the app or run npm run setup from the source checkout.".to_string())
 }
 
+/// Strip Python traceback noise so the UI shows the actual error, not the stack.
+fn friendly_worker_error(stderr: &str, stdout: &str) -> String {
+    let raw = if stderr.trim().is_empty() { stdout } else { stderr };
+    let lines: Vec<&str> = raw.lines().map(str::trim).filter(|l| !l.is_empty()).collect();
+    if lines.is_empty() {
+        return raw.trim().to_string();
+    }
+    if lines.iter().any(|l| l.contains("Traceback (most recent call last):")) {
+        return (*lines.last().unwrap_or(&"")).to_string();
+    }
+    raw.trim().to_string()
+}
+
 fn run_worker(
     app: &AppHandle,
     args: &[&str],
@@ -167,9 +180,9 @@ fn run_worker(
         .map_err(|err| format!("Failed to read worker output: {err}"))?;
 
     if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr).trim().to_string();
-        let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
-        return Err(if stderr.is_empty() { stdout } else { stderr });
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        return Err(friendly_worker_error(&stderr, &stdout));
     }
 
     serde_json::from_slice(&output.stdout)

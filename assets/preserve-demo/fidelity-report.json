@@ -1,16 +1,27 @@
 {
   "source": "examples/executive-business-review-starter/executive-business-review-editable.pptx",
-  "output": "assets/preserve-demo/executive-review-preserve-edited.pptx",
+  "output": "/Users/kdnsna/Documents/06-项目代码/ai-tools/ultimate-ppt-master-skill/assets/preserve-demo/executive-review-preserve-edited.pptx",
   "editedSlide": 1,
   "beforeTitle": "季度经营复盘",
   "afterTitle": "季度经营复盘 · 已修订",
-  "totalParts": 81,
+  "safe": true,
+  "status": "ok",
+  "no_op": false,
   "changed": [
     "ppt/slides/slide1.xml"
   ],
-  "unchangedParts": 80,
-  "safe": true,
-  "slideChanges": {
+  "expected_changed": [
+    "ppt/slides/slide1.xml"
+  ],
+  "unexpected_changed": [],
+  "added": [],
+  "removed": [],
+  "unchanged_count": 80,
+  "total_parts": 81,
+  "requested_slides": [
+    1
+  ],
+  "slide_changes": {
     "1": [
       "1 text run(s) changed"
     ]

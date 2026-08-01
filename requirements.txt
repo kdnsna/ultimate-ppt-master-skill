@@ -5,7 +5,14 @@
 # 大部分工具仅使用 Python 标准库，以下为可选依赖。
 #
 # Install / 安装方式：
-#   pip install -r requirements.txt
+#   pip install -r requirements.txt          # full set (all profiles)
+#   pip install -r requirements-core.txt     # light set (core / pptx profiles)
+#
+# The core set ships separately in requirements-core.txt so preserve-edit
+# installs stay fast; this file adds source-conversion, image, and audio deps.
+# 核心依赖单独放在 requirements-core.txt，保真编辑安装保持轻量；
+# 本文件在其基础上补充资料转换、图片与音频等依赖。
+-r requirements-core.txt
 
 # ─────────────────────────────────────────────────────────────
 # SVG to PPTX tool / SVG 转 PPTX 工具 (skills/ppt-master/scripts/svg_to_pptx.py)
@@ -14,23 +21,15 @@
 # 用于将 SVG 文件批量转换为 PowerPoint 演示文稿
 # Uses Office-compatible mode (PNG + SVG dual format) by default, supports all Office versions.
 # 默认使用 Office 兼容模式（PNG + SVG 双格式），支持所有 Office 版本
-python-pptx>=0.6.21
 
 # Recorded narration / 录制计时和旁白
 # notes_to_audio.py generates per-slide narration audio on macOS/Linux/Windows.
 # notes_to_audio.py 用于在 macOS/Linux/Windows 上生成逐页旁白音频。
 edge-tts>=7.2.8
 
-# Office compatibility dependencies (choose one, CairoSVG preferred)
-# Office 兼容模式依赖（二选一，优先使用 cairosvg）
+# Office compatibility dependency / Office 兼容依赖
 # Converts SVG to PNG fallback images for Office LTSC 2021 etc.
 # 用于将 SVG 转换为 PNG 后备图片，确保 Office LTSC 2021 等版本正常显示
-#
-# Option A / 方案 A: CairoSVG (recommended / 推荐, ~25MB, full gradient/filter support)
-#   pip install cairosvg
-#   macOS: brew install cairo
-#
-# Option B / 方案 B: svglib (lightweight / 轻量, ~5MB, some gradients may be lost)
 svglib>=1.5.0
 reportlab>=4.0.0
 

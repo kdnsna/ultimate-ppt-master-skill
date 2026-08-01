@@ -207,8 +207,10 @@ export interface PreservePreview {
 }
 
 export interface PreserveFidelityResult {
-  status: "ok" | "fidelity-violation";
+  status: "ok" | "fidelity-violation" | "no-op";
   safe: boolean;
+  /** True when the requested text/ops matched nothing and output is byte-identical. */
+  noOp?: boolean;
   output: string;
   slideCount: number;
   requestedSlides: number[];

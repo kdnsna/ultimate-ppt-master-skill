@@ -12,7 +12,7 @@
 
 | 你想… | 推荐方式 |
 |---|---|
-| 桌面拖拽改 PPT | 克隆后 `npm run setup` → `npm run desktop` |
+| 桌面拖拽改 PPT | 克隆后 `npm run setup` → `npm run desktop`（`setup` 会下载约 150MB Chromium；只改 PPT 可用 `--profile pptx`） |
 | 一句话让 Agent 改 | `npx skills add kdnsna/ultimate-ppt-master-skill --skill ultimate-ppt-master` |
 | 接任意 MCP 客户端 | `python3 scripts/ppt_preserve_mcp.py` |
 | Codex | 装到 `~/.codex/skills/ultimate-ppt-master` 后 `npm run setup` |
@@ -31,12 +31,13 @@ npm run setup
 npm run desktop
 ```
 
+> ⚠️ `npm run setup`（profile `all`）会安装完整 Python 依赖、Web/桌面 npm 依赖，**并下载约 150MB 的 Chromium**（供视觉复核）。网速慢或只想改 PPT 时，建议用轻量 profile：`bash scripts/bootstrap.sh --profile pptx`（只装 Python 核心依赖，无 Chromium、无 npm 安装）。
+
 如果你不想使用根目录 npm 脚本，可以直接运行：
 
 ```bash
-bash scripts/bootstrap.sh
-# or profiled: bash scripts/bootstrap.sh --profile pptx
-bash scripts/run-desktop.sh
+bash scripts/bootstrap.sh --profile pptx   # 无 Node/npm 环境的推荐方式
+bash scripts/run-desktop.sh                # 桌面端（需要 Node/npm 与 Python）
 ```
 
 环境检查：
@@ -45,7 +46,7 @@ bash scripts/run-desktop.sh
 npm run doctor
 ```
 
-`npm run setup` 会创建 `.venv`、安装 Python 依赖、安装桌面端 npm 依赖，并生成 `~/.ppt-master/.env` 模板。它不会自动安装 Rust、Homebrew、Cairo 这类系统依赖；缺什么可以用 `npm run doctor` 看清楚。
+`npm run setup` 会创建 `.venv`、按 profile 安装 Python 依赖、安装桌面端 npm 依赖，并生成 `~/.ppt-master/.env` 模板。它不会自动安装 Rust 这类系统依赖；缺什么可以用 `npm run doctor` 看清楚（Rust 缺失只会告警——桌面端会降级为浏览器 UI，不会阻断保真编辑）。
 
 ## 1. Codex
 
@@ -53,8 +54,8 @@ npm run doctor
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
 cd ~/.codex/skills/ultimate-ppt-master
 npm run setup
-# 如果 Agent 环境没有 Node/npm，可用：bash scripts/bootstrap.sh
-# or profiled: bash scripts/bootstrap.sh --profile pptx
+# 如果 Agent 环境没有 Node/npm：只装轻量 Python 依赖（保真编辑足够用）
+bash scripts/bootstrap.sh --profile pptx
 ```
 
 重启 Codex 后使用：
@@ -69,8 +70,8 @@ npm run setup
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.claude/skills/ultimate-ppt-master
 cd ~/.claude/skills/ultimate-ppt-master
 npm run setup
-# 如果 Agent 环境没有 Node/npm，可用：bash scripts/bootstrap.sh
-# or profiled: bash scripts/bootstrap.sh --profile pptx
+# 如果 Agent 环境没有 Node/npm：只装轻量 Python 依赖（保真编辑足够用）
+bash scripts/bootstrap.sh --profile pptx
 ```
 
 Claude Code 可读取 `CLAUDE.md` 和 `SKILL.md`。如果你的 Claude Code 环境没有自动发现该 skill，请在对话中说明：
@@ -88,8 +89,8 @@ mkdir -p ~/agent-skills
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/agent-skills/ultimate-ppt-master
 cd ~/agent-skills/ultimate-ppt-master
 npm run setup
-# 如果 Agent 环境没有 Node/npm，可用：bash scripts/bootstrap.sh
-# or profiled: bash scripts/bootstrap.sh --profile pptx
+# 如果 Agent 环境没有 Node/npm：只装轻量 Python 依赖（保真编辑足够用）
+bash scripts/bootstrap.sh --profile pptx
 ```
 
 然后在 OpenClaw、Hermes 或类似工具的项目规则、技能配置、上下文文件里引用：
@@ -134,7 +135,9 @@ npm run setup
 手动安装方式仍然可用：
 
 ```bash
-python3.10 -m venv .venv
+# Uses any Python 3.10+ found on PATH (python3.13 / 3.12 / 3.11 / 3.10 / python3)
+python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
@@ -145,11 +148,6 @@ node --version
 node scripts/validate-swiss-deck.mjs <project_path>/ppt/index.html
 ```
 
-macOS 上如果要保证 PPTX 兼容导出，建议安装 Cairo：
-
-```bash
-brew install cairo pkg-config
-```
 
 ## 桌面应用
 
@@ -198,11 +196,6 @@ ls SKILL.md AGENTS.md CLAUDE.md PROMPT.md README.md
 npm run doctor
 ```
 
-如果你使用 Codex 的 skill 校验脚本，可以运行：
-
-```bash
-python ~/.codex/skills/.system/skill-creator/scripts/quick_validate.py .
-```
 
 发布前本地检查：
 
@@ -246,11 +239,10 @@ npm run setup
 npm run desktop
 ```
 
-Script fallback:
+Script fallback (no Node/npm? use `--profile pptx` — light Python deps only):
 
 ```bash
-bash scripts/bootstrap.sh
-# or profiled: bash scripts/bootstrap.sh --profile pptx
+bash scripts/bootstrap.sh --profile pptx
 bash scripts/run-desktop.sh
 ```
 
@@ -260,7 +252,7 @@ Environment check:
 npm run doctor
 ```
 
-`npm run setup` creates `.venv`, installs Python dependencies, installs desktop npm dependencies, and creates a `~/.ppt-master/.env` template. It does not install system dependencies such as Rust, Homebrew, or Cairo automatically; `npm run doctor` tells you exactly what is missing.
+`npm run setup` (profile `all`) creates `.venv`, installs Python dependencies, installs desktop npm dependencies, and creates a `~/.ppt-master/.env` template — and it downloads ~150MB of Chromium for visual review. Slow network or preserve-edit only? Use the light path: `bash scripts/bootstrap.sh --profile pptx` (no Chromium, no npm installs). Rust is not installed automatically; a missing Rust is only a warning — the desktop app degrades to a browser UI shell, and preserve-edit does not need it. `npm run doctor` tells you exactly what is missing.
 
 ## 1. Codex
 
@@ -268,8 +260,8 @@ npm run doctor
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.codex/skills/ultimate-ppt-master
 cd ~/.codex/skills/ultimate-ppt-master
 npm run setup
-# No Node/npm in this agent environment? Use: bash scripts/bootstrap.sh
-# or profiled: bash scripts/bootstrap.sh --profile pptx
+# No Node/npm in this agent environment? Install the light Python deps only:
+bash scripts/bootstrap.sh --profile pptx
 ```
 
 Restart Codex, then ask:
@@ -284,8 +276,8 @@ Use $ultimate-ppt-master to make a PPT.
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/.claude/skills/ultimate-ppt-master
 cd ~/.claude/skills/ultimate-ppt-master
 npm run setup
-# No Node/npm in this agent environment? Use: bash scripts/bootstrap.sh
-# or profiled: bash scripts/bootstrap.sh --profile pptx
+# No Node/npm in this agent environment? Install the light Python deps only:
+bash scripts/bootstrap.sh --profile pptx
 ```
 
 If your Claude Code setup does not auto-discover the skill, tell it:
@@ -303,8 +295,8 @@ mkdir -p ~/agent-skills
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git ~/agent-skills/ultimate-ppt-master
 cd ~/agent-skills/ultimate-ppt-master
 npm run setup
-# No Node/npm in this agent environment? Use: bash scripts/bootstrap.sh
-# or profiled: bash scripts/bootstrap.sh --profile pptx
+# No Node/npm in this agent environment? Install the light Python deps only:
+bash scripts/bootstrap.sh --profile pptx
 ```
 
 Then add this to the tool's rules, skill config, or project context:
@@ -347,7 +339,9 @@ npm run setup
 Manual setup is still available:
 
 ```bash
-python3.10 -m venv .venv
+# Uses any Python 3.10+ found on PATH (python3.13 / 3.12 / 3.11 / 3.10 / python3)
+python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
@@ -358,11 +352,6 @@ node --version
 node scripts/validate-swiss-deck.mjs <project_path>/ppt/index.html
 ```
 
-For robust PPTX compatibility output on macOS:
-
-```bash
-brew install cairo pkg-config
-```
 
 ## Desktop App
 

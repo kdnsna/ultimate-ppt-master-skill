@@ -10,9 +10,11 @@ The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`
 |---|---|
 | Understand the web front door | [Web Experience](./guides/web-experience.md) |
 | Connect the web page to local files and Agents | [Agent Connect Bridge](./guides/agent-connect-bridge.md) |
+| Expose preserve-edit to any MCP-capable agent | [MCP Server](./guides/mcp-server.md) |
 | Install and invoke the Skill | [Agent Setup](./guides/agent-setup.md) |
 | Choose PPTX, Web Deck, dual delivery, or desktop preview | [Choosing a Workflow](./guides/choosing-a-workflow.md) |
 | Configure provider keys locally | [Model and Provider Setup](./guides/model-provider-setup.md) |
+| Copyable prompts for preserve-edit tasks | [Preserve-Edit Prompts](./guides/preserve-edit-prompts.md) |
 | Use the desktop preview path | [Quickstart Desktop](./guides/quickstart-desktop.md) |
 | Debug setup, parsing, output, provider, or Agent issues | [Troubleshooting](./guides/troubleshooting.md) |
 
@@ -56,7 +58,7 @@ The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`
 | Need | Read |
 |---|---|
 | Understand product positioning | [Product Positioning](./strategy/product-positioning.md) |
-| Review the v5.2 deep optimization PRD | [v5.2 Deep Optimization Guide / PRD](./zh-CN/strategy/prd-v5.2-deep-optimization-guide.md) |
+| Review the v5.2 deep optimization PRD (Chinese) | [v5.2 Deep Optimization Guide / PRD](./zh-CN/strategy/prd-v5.2-deep-optimization-guide.md) |
 | Improve public GitHub exposure | [Public Growth Playbook](./strategy/public-growth-playbook.md) |
 | Prepare marketplace or agent-directory distribution | [Skill Market Distribution](./strategy/skill-market-distribution.md) |
 | Review the archived v2.5–v5.5 content/template roadmap | [Historical Roadmap - Content and Template Presets](./strategy/next-roadmap.md) |
@@ -76,5 +78,5 @@ The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`
 
 ## Active consolidation
 
-- [v6.3.9 consolidation working note](./strategy/v6-3-8-consolidation.md)
+- [v6.3.8 consolidation working note](./strategy/v6-3-8-consolidation.md)
 
