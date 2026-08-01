@@ -1,55 +1,115 @@
-# Ultimate PPT Master · Preserve-Edit
+<p align="center">
+  <img src="assets/readme/hero.svg" alt="Ultimate PPT Master" width="800">
+</p>
 
-> **Turn real source material into a native PowerPoint** you can keep editing — and, when you already have a branded deck, **change only the slides you name** while everything else stays byte-for-byte intact.
-
-Kimi, Gamma, and ChatGPT are already good at generating decks from scratch. This project does not compete there. Primary mode: surgical preserve-edit on an existing `.pptx`. Secondary mode: source → storyboard → editable PPTX or magazine Web Deck.
+<h1 align="center">Ultimate PPT Master</h1>
 
 <p align="center">
-  <a href="./README.md"><strong>中文</strong></a> ·
-  <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Live Workspace</strong></a> ·
-  <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Finished Work & Proof</strong></a> ·
-  <a href="./docs/README.md"><strong>English Docs</strong></a>
+  <strong>Restrained editing. Sharp generation.</strong><br>
+  A local-first presentation workbench: surgical preserve-editing on existing PPTX,<br>
+  or source-to-slides generation with editorial intelligence built in.
+</p>
+
+<br>
+
+<p align="center">
+  <a href="./README.md"><strong>中文</strong></a>&ensp;·&ensp;<a href="https://kdnsna.github.io/ultimate-ppt-master-skill/"><strong>Live Workspace</strong></a>&ensp;·&ensp;<a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/"><strong>Gallery</strong></a>&ensp;·&ensp;<a href="./docs/README.md"><strong>Docs</strong></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square"></a>
-  <a href="./LICENSE"><img alt="MIT license" src="https://img.shields.io/badge/license-MIT-172033?style=flat-square"></a>
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="GitHub Release v6.3.9" src="https://img.shields.io/badge/GitHub_Release-v6.3.9-1D4ED8?style=flat-square"></a>
-  <img alt="local-first" src="https://img.shields.io/badge/local--first-yes-10B981?style=flat-square">
-  <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-2563EB?style=flat-square">
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square&color=171714"></a>&ensp;
+  <a href="./LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-171714?style=flat-square"></a>&ensp;
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="v6.3.9" src="https://img.shields.io/badge/release-v6.3.9-1D4ED8?style=flat-square"></a>&ensp;
+  <img alt="local-first" src="https://img.shields.io/badge/local--first-yes-73866C?style=flat-square">&ensp;
+  <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-1D4ED8?style=flat-square">
 </p>
+
+<br>
+
+---
+
+<br>
+
+## Design Philosophy
+
+> *"Content determines rhythm; decoration never substitutes for argument."*
+
+Ultimate PPT Master is not another "enter a topic, get a template" slide generator. It is designed as an **editorial studio** — treating every slide the way a magazine editor treats a proof: composition backed by evidence, color carrying structural roles, whitespace as rhythm.
+
+It solves two problems, each with its own edge:
+
+<br>
+
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### &ensp;&#9698;&ensp;Preserve-Edit
+
+**You already have a branded PPTX.**
+
+A real file from leadership, a client, or a locked template — you need to change a few numbers or conclusions without breaking masters, logos, stamps, or hyperlinks.
+
+Ultimate PPT Master treats `.pptx` as a zip archive: **unnamed parts are copied verbatim; only the slides you point to get rewritten.** A fidelity report documents exactly what changed and what stayed intact.
+
+```
+3 edits · cover / slide 4 / slide 6
+78 other parts unchanged
+```
+
+</td>
+<td width="50%" valign="top">
+
+### &ensp;&#9700;&ensp;Generate from Source
+
+**You don't have a deck yet — just scattered material.**
+
+PDF, Word, Excel, web pages, pasted text — the system confirms the storyboard and evidence chain first, then selects a visual direction, generates page by page, and delivers:
+
+- **Editable PPTX** — formal reports, consulting, government
+- **Magazine Web Deck** — launches, roadshows, Demo Day
+
+Every page goes through brief enhancement, evidence grading, and visual review — not template fill-in.
+
+</td>
+</tr>
+</table>
+
+<br>
 
 ![Preserve-edit: only the title on slide 1 changes; everything else stays intact](assets/preserve-demo/before-after-real.png)
 
-> Real sample in this repo, title on slide 1 only. `fidelity-report.json` records what changed. Reproduce: `python3 scripts/make_preserve_demo_proof.py`
+<p align="center"><sub>Real sample: only slide 1 title modified. Reproducible — <code>python3 scripts/make_preserve_demo_proof.py</code></sub></p>
+
+<br>
 
 ---
 
-## Why this exists
+<br>
 
-| Job | Generators (Kimi, Gamma, …) | Preserve-Edit |
-|---|---|---|
-| No deck yet — need a first draft | ✅ Strength | Secondary |
-| Branded template — numbers / conclusions only | Tends to rebuild; masters & logos drift | ✅ Named slides only |
-| Hand off to PowerPoint / WPS | Often a web deck or re-layout | ✅ Native editable `.pptx` |
-| Bank / gov / legal files stay on-device | Usually requires upload | ✅ Local-first by default |
+## Quick Start
 
-**Rule: if you did not ask for it, not one byte changes.**  
-A `.pptx` is a zip of parts: untouched parts are copied verbatim; only named slides (and chart parts touched by chart ops) are re-serialized. See [product positioning](./docs/strategy/product-positioning.md).
+<details open>
+<summary><strong>Agent Skill</strong> (recommended)</summary>
 
----
-
-## One-minute install
-
-### Agent skill (recommended)
+<br>
 
 ```bash
 npx skills add kdnsna/ultimate-ppt-master-skill --skill ultimate-ppt-master
 ```
 
-> Tell your agent: On this PPTX, change “Q2” to “Q3” on slide 3, replace the conclusion on slide 6 with the attachment numbers, and touch nothing else.
+Then tell your agent:
 
-### CLI (stdlib-only preserve engine)
+> *Change "Q2" to "Q3" on slide 3, replace the conclusion on slide 6 with the new numbers from the attachment, and touch nothing else.*
+
+> *Turn this material into a 10-slide editable PPTX, formal report style.*
+
+</details>
+
+<details>
+<summary><strong>CLI</strong> (stdlib-only)</summary>
+
+<br>
 
 ```bash
 # Inspect visible text per slide
@@ -81,7 +141,12 @@ Example `edits.json`:
 ]
 ```
 
-### Desktop
+</details>
+
+<details>
+<summary><strong>Desktop</strong></summary>
+
+<br>
 
 ```bash
 git clone https://github.com/kdnsna/ultimate-ppt-master-skill.git
@@ -89,121 +154,214 @@ cd ultimate-ppt-master-skill
 npm run setup && npm run desktop
 ```
 
-Drop a `.pptx` → pick slides → edit → save. Original is never overwritten. See [INSTALL.md](./INSTALL.md) and [Agent Setup](./docs/guides/agent-setup.md).
+Drop a `.pptx` → pick slides → edit → save. Original is never overwritten.
 
-### MCP (any agent)
+</details>
+
+<details>
+<summary><strong>MCP Server</strong> (any agent)</summary>
+
+<br>
 
 ```bash
 python3 scripts/ppt_preserve_mcp.py
 ```
 
-Zero third-party deps, stdio MCP: `inspect_pptx` / `edit_pptx_preserving`. Chinese MCP write-up: [mcp-server](./docs/zh-CN/guides/mcp-server.md).
+Zero-dep stdio MCP exposing `inspect_pptx` / `edit_pptx_preserving`. See [MCP guide](./docs/zh-CN/guides/mcp-server.md).
+
+</details>
+
+<br>
 
 ---
 
-## What you can edit today
+<br>
 
-| Capability | Notes |
-|---|---|
-| Text | Titles, body, labels — find/replace |
-| Style | Font / size / bold / color (optional match) |
-| Tables | Cell by row/col or find text |
-| Shapes | Move / resize (points) |
-| Charts | Legend/label text and data-point values |
-| Fidelity gate | Change list; unexpected mutations fail delivery |
+## Editing Capabilities
 
-**Not yet (use PowerPoint / WPS):** add/remove slides, insert new images, rebuild table structure, free-form redesign.
+| Operation | Notes |
+|:---|:---|
+| **Text** | Titles, body, labels — find/replace |
+| **Style** | Font / size / bold / color, with optional text matching |
+| **Tables** | Cell by row/col or content search |
+| **Shapes** | Move / resize (points) |
+| **Charts** | Legend/label text and data-point values |
+| **Fidelity gate** | Change manifest + unexpected mutation = hard failure |
 
----
+<sub>Not yet supported: add/remove slides, insert new images, rebuild table structure, free-form redesign — finish those in PowerPoint / WPS.</sub>
 
-## A concrete example
-
-Quarterly review from leadership: cover “Q2” → “Q3”; a few table cells on slide 4; chart legend on slide 6.
-
-Only those slides (and related chart parts) change. Masters, logo, notes, and hyperlinks stay as-is:
-
-> 3 edits on cover / slide 4 / slide 6; 78 other parts unchanged.
+<br>
 
 ---
 
-## Secondary: generate from scratch
+<br>
 
-If you do not have a deck yet: PDF / Word / Excel / URL / paste → storyboard → editable PPTX or magazine Web Deck.
+## Visual System
 
-- [Live Workspace](https://kdnsna.github.io/ultimate-ppt-master-skill/) (UI in browser; work via local [Bridge](./docs/guides/agent-connect-bridge.md))
-- Agent: `Use $ultimate-ppt-master to turn this source into a 10-slide editable PPTX`
-- Routes: [choosing a workflow](./docs/guides/choosing-a-workflow.md) · [Web Experience](./docs/guides/web-experience.md)
+<img src="assets/readme/style-matrix.svg" alt="Four output strengths" width="100%">
 
-| Public sample | Open |
-|---|---|
-| Formal editable PPTX · sanitized executive review | [Download PPTX](./examples/executive-business-review-starter/executive-business-review-editable.pptx) · [Key slides](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) |
-| AI Web Deck · magazine | [Gallery](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) |
+<br>
 
-Primary product remains **fix the deck you already have**.
+Ultimate PPT Master ships a full design contract, not random beautification:
+
+<table>
+<tr>
+<td align="center" width="20%">
+<br>
+<strong>Paper</strong><br>
+<code>#F6F3ED</code><br>
+<sub>Warm editorial surface</sub>
+<br><br>
+</td>
+<td align="center" width="20%">
+<br>
+<strong>Ink</strong><br>
+<code>#171714</code><br>
+<sub>Titles & body</sub>
+<br><br>
+</td>
+<td align="center" width="20%">
+<br>
+<strong>Mineral Blue</strong><br>
+<code>#1D4ED8</code><br>
+<sub>Evidence & emphasis</sub>
+<br><br>
+</td>
+<td align="center" width="20%">
+<br>
+<strong>Signal Coral</strong><br>
+<code>#D9573B</code><br>
+<sub>Decisive conclusion</sub>
+<br><br>
+</td>
+<td align="center" width="20%">
+<br>
+<strong>Sage</strong><br>
+<code>#73866C</code><br>
+<sub>Long-horizon accent</sub>
+<br><br>
+</td>
+</tr>
+</table>
+
+- **Typography as role system** — Serif for display, sans for evidence, body in gothic, mono for metadata only
+- **Light covers by default** — Dark covers are an explicit art-direction choice, never automatic
+- **Color as structure** — Marks section boundaries, evidence ownership, risk, and action — not decoration
+- **Soft-edge contract** — Container radii 8-14 pt (PPTX) / 12-20 px (Web), maintaining editorial discipline
+
+Full design system in [DESIGN.md](./DESIGN.md).
+
+<br>
 
 ---
 
-## Three surfaces, one engine
+<br>
+
+## Architecture
 
 ```
-scripts/preserve_edit_pptx.py   ← preserve engine (stdlib CLI + apply_edits API)
-        ├── Desktop  apps/desktop
-        ├── MCP      scripts/ppt_preserve_mcp.py
-        └── Skill    SKILL.md
+scripts/preserve_edit_pptx.py        Preserve engine (stdlib, CLI + apply_edits API)
+        │
+        ├── apps/desktop             Desktop · drag-and-drop editing
+        ├── scripts/ppt_preserve_mcp.py   MCP Server · any agent
+        ├── SKILL.md                 Agent Skill · Cursor / Claude / Codex
+        └── apps/web + apps/bridge   Web Workspace · browser + local bridge
 ```
 
 | You are… | Use |
-|---|---|
-| Business user | Desktop drag-and-drop |
-| Cursor / Claude / Codex | Install the Skill |
-| Building an agent | MCP or CLI / `apply_edits` |
+|:---|:---|
+| Business user | Desktop — drop it in, edit, done |
+| Cursor / Claude / Codex user | Install the Skill, talk naturally |
+| Building your own agent | MCP or CLI / `apply_edits` API |
 | Developer / CI | CLI + fidelity report gate |
 
----
-
-## Local-first
-
-Desktop and MCP run on your machine; sources and outputs stay local by default. Model calls use your [local providers](./docs/guides/model-provider-setup.md) when needed; pure preserve-edit can run fully offline.
+<br>
 
 ---
 
-## FAQ
+<br>
 
-- **Template / logo?** Untouched package parts are copied byte-for-byte.
-- **WPS?** Yes — standard `.pptx`.
-- **Bad edit?** Original never overwritten; check the fidelity report.
-- **pptlint?** [pptlint](https://github.com/kdnsna/pptlint) for delivery check, then preserve-edit named issues.
-- **Hard layout?** Finish in PowerPoint / WPS; see [troubleshooting](./docs/guides/troubleshooting.md).
+## Gallery
+
+<p align="center">
+  <a href="https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/">
+    <img src="assets/readme/output-gallery.svg" alt="Gallery" width="720">
+  </a>
+</p>
+
+| Sample | View |
+|:---|:---|
+| Formal editable PPTX · sanitized executive review | [Download PPTX](./examples/executive-business-review-starter/executive-business-review-editable.pptx)&ensp;·&ensp;[Key slides](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) |
+| Magazine Web Deck · editorial aesthetic | [Full demo](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) |
+
+<br>
 
 ---
 
-## Known limits
+<br>
 
-- Preserve-edit covers text, style, table cells, shape geometry, and chart values — not add/remove slides, new images, or free redesign.
-- Pixel before/after needs LibreOffice; otherwise a vector card is produced.
-- From-scratch generation is Agent-driven, not hosted SaaS.
-- No Canva-style multiplayer canvas or cloud accounts.
+## Local-First
+
+Files stay on your machine by default. Desktop and MCP run locally; sources and outputs never leave. Model calls use your own [provider config](./docs/guides/model-provider-setup.md) when needed; pure preserve-edit works fully offline.
+
+Designed for banking, government, and legal environments.
+
+<br>
 
 ---
+
+<br>
 
 ## Documentation
 
-| Goal | Link |
-|---|---|
-| English docs index | [docs/README.md](./docs/README.md) |
-| Install | [INSTALL](./INSTALL.md) · [Agent Setup](./docs/guides/agent-setup.md) |
-| Positioning | [product-positioning](./docs/strategy/product-positioning.md) |
-| Local Bridge | [agent-connect-bridge](./docs/guides/agent-connect-bridge.md) |
-| Web workspace | [web-experience](./docs/guides/web-experience.md) |
-| Choose a route | [choosing-a-workflow](./docs/guides/choosing-a-workflow.md) |
-| Providers | [model-provider-setup](./docs/guides/model-provider-setup.md) |
-| Troubleshooting | [troubleshooting](./docs/guides/troubleshooting.md) |
-| Current release | [v6.3.9](./docs/release/release-notes-v6.3.9.md) |
+| | |
+|:---|:---|
+| **Install** | [INSTALL](./INSTALL.md)&ensp;·&ensp;[Agent Setup](./docs/guides/agent-setup.md) |
+| **Preserve-Edit** | [Product Positioning](./docs/strategy/product-positioning.md)&ensp;·&ensp;[Edit Prompts](./docs/zh-CN/guides/preserve-edit-prompts.md) |
+| **Generate** | [Choosing a Workflow](./docs/guides/choosing-a-workflow.md)&ensp;·&ensp;[Web Experience](./docs/guides/web-experience.md) |
+| **Integration** | [MCP Server](./docs/zh-CN/guides/mcp-server.md)&ensp;·&ensp;[Agent Bridge](./docs/guides/agent-connect-bridge.md)&ensp;·&ensp;[Providers](./docs/guides/model-provider-setup.md) |
+| **Design** | [Design System](./DESIGN.md)&ensp;·&ensp;[Visual Contract](./contracts/visual-defaults.yaml) |
+| **Troubleshooting** | [troubleshooting](./docs/guides/troubleshooting.md) |
+| **Release** | [v6.3.9 notes](./docs/release/release-notes-v6.3.9.md) |
+| **English docs index** | [docs/README.md](./docs/README.md) |
 
-Maintainer APIs and release gates live under [`docs/`](./docs/README.md).
+<br>
 
 ---
 
-## License
+<br>
 
-[MIT](./LICENSE). If this turns “almost ready” slides into something you can hand over, a star helps the next person find it.
+## FAQ
+
+**Will it touch my template or logo?**<br>
+No. Unnamed package parts are copied byte-for-byte.
+
+**WPS compatible?**<br>
+Yes. Standard `.pptx` output — works in both WPS and PowerPoint.
+
+**What if an edit goes wrong?**<br>
+The original is never overwritten. Every edit ships with a fidelity report.
+
+**Relationship with pptlint?**<br>
+[pptlint](https://github.com/kdnsna/pptlint) runs delivery checks; Ultimate PPT Master does the preserve-repair on named issues.
+
+<br>
+
+---
+
+<br>
+
+## Known Boundaries
+
+- Preserve-edit covers text, style, table cells, shape geometry, and chart values — not add/remove slides, new images, or structural rebuilds
+- Pixel-level before/after comparison requires local LibreOffice; otherwise a vector diff card is produced
+- From-scratch generation is agent-driven, not hosted SaaS
+- No Canva-style multiplayer canvas or cloud accounts
+
+<br>
+
+---
+
+<p align="center">
+  <sub><a href="./LICENSE">MIT</a>&ensp;·&ensp;If this turns "almost ready" slides into something you can actually hand over, a star helps the next person find it.</sub>
+</p>
