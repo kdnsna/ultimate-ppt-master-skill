@@ -152,92 +152,30 @@ def tool_edit_pptx_preserving(args: dict[str, Any]) -> dict[str, Any]:
     output = Path(str(output_raw)).expanduser() if output_raw else source.with_name(f"{source.stem}-repaired.pptx")
     if output.resolve() == source.resolve():
         return _text_result("output_path must differ from source_path", is_error=True)
-    output.parent.mkdir(parents=True, exist_ok=True)
 
-    requested: set[int] = set()
-    intended_parts: set[str] = set()
-    slide_parts_map: dict[int, list[str]] = {}
-    intermediates: list[Path] = []
-    current = source
     try:
-        for index, edit in enumerate(edits):
-            slide = int(edit["slide"])
-            operations: list[dict[str, Any]] = []
-            for k, v in (edit.get("replacements") or {}).items():
-                if str(k):
-                    operations.append({"op": "replace_text", "old": str(k), "new": str(v)})
-            extra = edit.get("operations")
-            if isinstance(extra, list):
-                operations.extend(extra)
-            if not operations:
-                return _text_result(f"edits[{index}] needs replacements or operations", is_error=True)
-            requested.add(slide)
-            last = index == len(edits) - 1
-            target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
-            if not last:
-                intermediates.append(target)
-            part_edits = engine.build_part_edits(current, slide, operations)
-            intended_parts.update(part_edits.keys())
-            slide_parts_map.setdefault(slide, []).extend(part_edits.keys())
-            engine.patch_parts(current, target, part_edits)
-            current = target
+        result = engine.apply_edits(source, output, edits)
     except Exception as exc:  # noqa: BLE001
         return _text_result(f"edit failed: {exc}", is_error=True)
-    finally:
-        for temp in intermediates:
-            with _suppress_oserror():
-                temp.unlink()
 
-    before = engine.member_hashes(source)
-    after = engine.member_hashes(output)
-    changed = sorted(name for name in before if name in after and before[name] != after[name])
-    added = sorted(set(after) - set(before))
-    removed = sorted(set(before) - set(after))
-    unexpected = [name for name in changed if name not in intended_parts]
-    safe = not unexpected and not added and not removed
-    unchanged = sum(1 for name in before if name in after and before[name] == after[name])
-
-    slide_changes: dict[int, list[str]] = {}
-    for slide in sorted(requested):
-        delta: list[str] = []
-        before_xml = engine.slide_xml(source, slide)
-        after_xml = engine.slide_xml(output, slide)
-        if before_xml is not None and after_xml is not None:
-            delta.extend(engine.summarize_changes(before_xml, after_xml))
-        for part in slide_parts_map.get(slide, []):
-            if part.startswith("ppt/charts/"):
-                cb = engine.part_text(source, part)
-                ca = engine.part_text(output, part)
-                if cb is not None and ca is not None:
-                    delta.extend(engine.summarize_chart_changes(cb, ca))
-        if delta:
-            slide_changes[slide] = delta
-
+    safe = bool(result["safe"])
     summary = [
         f"status: {'ok' if safe else 'FIDELITY VIOLATION'}",
-        f"output: {output}",
-        f"changed: {changed}",
-        f"unchanged parts: {unchanged} / {len(before)}",
+        f"output: {result['output']}",
+        f"changed: {result['changed']}",
+        f"unchanged parts: {result['unchanged_count']} / {result['total_parts']}",
     ]
     if not safe:
-        if unexpected:
-            summary.append(f"unexpected changes: {unexpected}")
-        if added:
-            summary.append(f"added parts: {added}")
-        if removed:
-            summary.append(f"removed parts: {removed}")
+        if result["unexpected_changed"]:
+            summary.append(f"unexpected changes: {result['unexpected_changed']}")
+        if result["added"]:
+            summary.append(f"added parts: {result['added']}")
+        if result["removed"]:
+            summary.append(f"removed parts: {result['removed']}")
         summary.append("DO NOT treat this edit as successful.")
-    for slide in sorted(slide_changes):
-        summary.append(f"slide {slide}: " + "; ".join(slide_changes[slide]))
+    for slide in sorted(result["slide_changes"]):
+        summary.append(f"slide {slide}: " + "; ".join(result["slide_changes"][slide]))
     return _text_result("\n".join(summary), is_error=not safe)
-
-
-class _suppress_oserror:
-    def __enter__(self) -> "_suppress_oserror":
-        return self
-
-    def __exit__(self, exc_type, exc, tb) -> bool:
-        return isinstance(exc, OSError)
 
 
 _HANDLERS = {

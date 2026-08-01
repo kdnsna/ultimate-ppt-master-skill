@@ -197,7 +197,14 @@ button:disabled { cursor: not-allowed; }
 .v6-hero-copy { position: relative; z-index: 1; }
 .v6-kicker { margin: 0; color: var(--v6-coral); font-size: 12px; font-weight: 900; letter-spacing: .09em; }
 .v6-hero h1 { max-width: 860px; margin: 11px 0 0; font-size: clamp(32px, 3.15vw, 40px); line-height: 1.08; letter-spacing: -.045em; font-weight: 920; }
-.v6-hero-copy > p:last-child { max-width: 780px; margin: 14px 0 0; color: var(--v6-muted); font-size: clamp(14px, 1.15vw, 16px); line-height: 1.6; }
+.v6-hero-copy > p { max-width: 780px; margin: 14px 0 0; color: var(--v6-muted); font-size: clamp(14px, 1.15vw, 16px); line-height: 1.6; }
+.v6-path-switch { display: inline-flex; gap: 6px; margin-top: 16px; padding: 3px; border-radius: 999px; background: rgba(255,255,255,.72); border: 1px solid rgba(24,32,28,.08); }
+.v6-path-switch button { display: inline-flex; align-items: center; gap: 5px; border: 0; background: 0; color: var(--v6-muted); font: inherit; font-size: 13px; font-weight: 800; padding: 7px 12px; border-radius: 999px; cursor: pointer; }
+.v6-path-switch button.active { background: #18201c; color: #f8f5ee; }
+.v6-path-panel { margin-top: 12px; max-width: 720px; padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,.68); border: 1px solid rgba(24,32,28,.08); }
+.v6-path-panel > p { margin: 0; color: var(--v6-ink); font-size: 13px; line-height: 1.5; }
+.v6-path-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.primary-button.compact, .secondary-button.compact { display: inline-flex; align-items: center; gap: 5px; min-height: 34px; padding: 0 11px; font-size: 13px; }
 
 .v6-hero-status {
   padding: 20px;

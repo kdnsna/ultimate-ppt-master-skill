@@ -25,15 +25,14 @@ import { useEffect, useMemo, useState } from "react";
 import { createDeckSession } from "../../../packages/workspace-core/src";
 import {
   inspectEnvironment,
-  inspectPptx,
   listRecentProjects,
   openPath,
   openProjectLog,
-  preserveEditPptx,
   recommendJobSettings,
   runDesktopJob,
   subscribeNativeFileDrop
 } from "./lib/desktopApi";
+import { PreserveEditView } from "./preserve/PreserveEditView";
 import type {
   DesktopJob,
   EnvironmentStatus,
@@ -43,10 +42,6 @@ import type {
   OutputMode,
   ProjectCheck,
   ProviderConfig,
-  PreserveEditRequest,
-  PreserveFidelityResult,
-  PptxInspectResult,
-  PptxSlideInfo,
   RecentProject,
   Recommendation,
   SourceExtraction,
@@ -120,9 +115,9 @@ const edgeVoiceOptions = [
 ];
 
 const navItems: Array<{ key: ViewKey; labelZh: string; labelEn: string; icon: typeof Sparkles }> = [
+  { key: "preserve", labelZh: "改稿", labelEn: "Revise", icon: ShieldCheck },
+  { key: "create", labelZh: "从零生成", labelEn: "Generate", icon: Wand2 },
   { key: "projects", labelZh: "项目", labelEn: "Projects", icon: Sparkles },
-  { key: "create", labelZh: "输入", labelEn: "Intake", icon: Wand2 },
-  { key: "preserve", labelZh: "保真编辑", labelEn: "Preserve Edit", icon: ShieldCheck },
   { key: "preview", labelZh: "精修", labelEn: "Refine", icon: MonitorPlay },
   { key: "settings", labelZh: "设置", labelEn: "Settings", icon: Settings }
 ];
@@ -274,7 +269,7 @@ const driverModes = [
 ];
 
 export function App() {
-  const [view, setView] = useState<ViewKey>("projects");
+  const [view, setView] = useState<ViewKey>("preserve");
   const [language, setLanguage] = useState<AppLanguage>(() => readStoredLanguage());
   const [sourceKind, setSourceKind] = useState<SourceKind>("markdown");
   const [sourceValue, setSourceValue] = useState(sampleMarkdown);
@@ -298,6 +293,7 @@ export function App() {
   const [recommendation, setRecommendation] = useState<Recommendation | null>(null);
   const [manualChoice, setManualChoice] = useState(false);
   const [error, setError] = useState("");
+  const [pendingPreservePath, setPendingPreservePath] = useState<string | null>(null);
 
   useEffect(() => {
     inspectEnvironment()
@@ -320,6 +316,12 @@ export function App() {
       const path = paths[0];
       if (!path) return;
       setError("");
+      const lower = path.toLowerCase();
+      if (lower.endsWith(".pptx")) {
+        setPendingPreservePath(path);
+        setView("preserve");
+        return;
+      }
       setManualChoice(false);
       setSourceKind("file");
       setSourceValue(path);
@@ -514,8 +516,8 @@ export function App() {
             <BrandGlyph />
           </div>
           <div>
-            <strong>{language === "en" ? "Ultimate PPT Master" : "终极融合 PPT 大师"}</strong>
-            <span>Creator Desktop</span>
+            <strong>{language === "en" ? "Preserve-Edit PPT" : "保真改 PPT"}</strong>
+            <span>{language === "en" ? "Local revise desk" : "本地改稿工作台"}</span>
           </div>
         </div>
 
@@ -617,7 +619,14 @@ export function App() {
             onGenerate={handleGenerate}
           />
         )}
-        {view === "preserve" && <PreserveEditView language={language} />}
+        {view === "preserve" && (
+          <PreserveEditView
+            language={language}
+            repoRoot={environment?.repoRoot}
+            pendingSourcePath={pendingPreservePath}
+            onPendingSourceConsumed={() => setPendingPreservePath(null)}
+          />
+        )}
         {view === "preview" && (
           <PreviewView
             language={language}
@@ -702,17 +711,17 @@ function ProjectsView({
     <section className="screen projects-screen">
       <div className="hero-panel">
         <div>
-          <p className="eyebrow">Creator-first desktop</p>
-          <h1>{en ? "Drop real source material. Generate decks people can ship." : "把真实资料拖进去，生成能交付的演示文稿。"}</h1>
+          <p className="eyebrow">{en ? "Secondary · projects & generate" : "次要 · 项目与从零生成"}</p>
+          <h1>{en ? "Generated projects live here. Prefer Revise for an existing PPTX." : "生成项目在这里管理；已有 PPT 请优先用「改稿」。"}</h1>
           <p className="hero-copy">
             {en
-              ? "A task-first flow: add real sources, confirm the storyboard, generate, then refine by slide. Advanced model and narration controls stay out of the first decision layer."
-              : "以任务为中心：放入真实资料、确认故事板、生成，再按页精修。模型和旁白等专业控制不再挤占首层决策。"}
+              ? "Primary path: open Revise and drop a branded .pptx. Generation remains available when you start from source material only."
+              : "主路径：打开「改稿」拖入带品牌的 .pptx。只有从资料起稿时才走从零生成。"}
           </p>
           <div className="hero-actions">
             <button className="primary-action" onClick={onCreate}>
               <Upload size={19} />
-              {en ? "Start creating" : "开始生成"}
+              {en ? "Generate from sources" : "从资料生成"}
             </button>
             <button className="secondary-action" onClick={onSettings}>
               <Settings size={18} />
@@ -735,19 +744,19 @@ function ProjectsView({
       </div>
 
       <div className="trust-strip" aria-label="Trust signals">
+        <TrustBadge icon={ShieldCheck} title={en ? "Preserve-edit" : "保真改稿"} detail={en ? "Named slides only; masters stay byte-stable" : "只动点名页，母版字节级保留"} />
         <TrustBadge icon={FileText} title={en ? "Editable PPTX" : "真实可编辑 PPTX"} detail={en ? "Not screenshots; keep editing later" : "不是截图，后续可继续改"} />
-        <TrustBadge icon={ShieldCheck} title={en ? "Local-first" : "本地优先"} detail={en ? "Sources stay in local project folders" : "源文件默认留在本机项目目录"} />
-        <TrustBadge icon={Layers3} title={en ? "Two output modes" : "双路线输出"} detail={en ? "Formal handoff and visual talks" : "正式交付和视觉演示都覆盖"} />
-        <TrustBadge icon={KeyRound} title={en ? "Agent-compatible" : "Agent 兼容"} detail={en ? "Codex, Hermes, OpenClaw ready" : "Codex、Hermes、OpenClaw 可接入"} />
-        <TrustBadge icon={Gauge} title={en ? "Provider status" : "Provider 状态"} detail={providerCount > 0 ? en ? `${providerCount} configured` : `${providerCount} 个已配置` : en ? "Preview now, configure later" : "可先预览，后续配置"} />
+        <TrustBadge icon={Layers3} title={en ? "Local-first" : "本地优先"} detail={en ? "Sources stay on your machine" : "源文件默认不出本机"} />
+        <TrustBadge icon={KeyRound} title={en ? "Agent-compatible" : "Agent 兼容"} detail={en ? "Skill / MCP / CLI same engine" : "Skill / MCP / CLI 同一引擎"} />
+        <TrustBadge icon={Gauge} title={en ? "Provider status" : "Provider 状态"} detail={providerCount > 0 ? en ? `${providerCount} configured` : `${providerCount} 个已配置` : en ? "Revise works offline" : "改稿可不联网"} />
       </div>
 
       <div className="creator-steps">
         {[
-          ["1", en ? "Intake" : "输入", en ? "Task, real sources, and delivery purpose" : "任务、真实资料和交付用途"],
-          ["2", en ? "Storyboard" : "故事板", en ? "Confirm the story and evidence gaps" : "确认故事线和证据缺口"],
-          ["3", en ? "Design & generate" : "设计与生成", en ? "Choose a direction, then generate progressively" : "确认方向后逐页生成"],
-          ["4", en ? "Refine & deliver" : "精修与交付", en ? "Review by slide and finish in PowerPoint" : "按页审阅，回到 PowerPoint 定稿"]
+          ["1", en ? "Revise" : "改稿", en ? "Drop a branded .pptx and edit named slides" : "拖入品牌 PPT，只改点名页"],
+          ["2", en ? "Queue" : "排队", en ? "Accumulate multi-slide edits, save once" : "跨页改动进队列，一次保存"],
+          ["3", en ? "Fidelity" : "保真", en ? "Readable change list; untouched parts stay" : "可读变更清单，未点名部分原样"],
+          ["4", en ? "Generate (optional)" : "生成（可选）", en ? "Only when you have no deck yet" : "仅在还没有 PPT 时使用"]
         ].map(([index, title, detail]) => (
           <article key={index} className="step-card">
             <span>{index}</span>
@@ -852,7 +861,7 @@ function CreateView(props: {
     <section className="screen create-screen">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">Guided creator flow</p>
+          <p className="eyebrow">{en ? "Secondary · generate from scratch" : "次要 · 从零生成"}</p>
           <h1>{en ? "Start with the task and real sources" : "从任务和真实资料开始"}</h1>
         </div>
         <button className="primary-action compact" onClick={props.onGenerate} disabled={props.isGenerating || !props.sourceValue.trim()}>
@@ -1343,255 +1352,6 @@ function HealthItem({ title, ok, detail }: { title: string; ok: boolean; detail:
     </article>
   );
 }
-
-function PreserveEditView({ language }: { language: AppLanguage }) {
-  const en = language === "en";
-  const [sourcePath, setSourcePath] = useState("");
-  const [sourceName, setSourceName] = useState("");
-  const [slides, setSlides] = useState<PptxSlideInfo[]>([]);
-  const [selectedSlide, setSelectedSlide] = useState<number | null>(null);
-  const [pairs, setPairs] = useState<Array<{ old: string; next: string }>>([{ old: "", next: "" }]);
-  const [isInspecting, setIsInspecting] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [report, setReport] = useState<PreserveFidelityResult | null>(null);
-  const [error, setError] = useState("");
-
-  const currentSlide = slides.find((slide) => slide.slide === selectedSlide) || null;
-  const readyToSave = Boolean(sourcePath) && selectedSlide != null && pairs.some((pair) => pair.old.trim());
-
-  async function loadDeck(path: string) {
-    setIsInspecting(true);
-    setError("");
-    setReport(null);
-    setSlides([]);
-    setSelectedSlide(null);
-    setPairs([{ old: "", next: "" }]);
-    setSourcePath(path);
-    setSourceName(fileNameFromPath(path));
-    try {
-      const result: PptxInspectResult = await inspectPptx(path);
-      setSlides(result.slides);
-      setSelectedSlide(result.slides[0]?.slide ?? null);
-    } catch (err) {
-      setError(humanizeError(err, language));
-    } finally {
-      setIsInspecting(false);
-    }
-  }
-
-  function handleDrop(event: React.DragEvent<HTMLLabelElement>) {
-    event.preventDefault();
-    const file = event.dataTransfer.files.item(0);
-    if (!file) return;
-    const path = getDroppedFilePath(file);
-    if (!path) {
-      setError(en ? "Cannot read the dropped file path. Use the native desktop app." : "无法读取拖入文件路径，请使用原生桌面端。");
-      return;
-    }
-    if (!path.toLowerCase().endsWith(".pptx")) {
-      setError(en ? "Drop a .pptx file to preserve-edit it." : "请拖入 .pptx 文件进行保真编辑。");
-      return;
-    }
-    void loadDeck(path);
-  }
-
-  function resetDeck() {
-    setSourcePath("");
-    setSourceName("");
-    setSlides([]);
-    setSelectedSlide(null);
-    setPairs([{ old: "", next: "" }]);
-    setReport(null);
-    setError("");
-  }
-
-  function addPairFromText(text: string) {
-    setPairs((prev) => {
-      const firstEmpty = prev.findIndex((pair) => !pair.old.trim());
-      if (firstEmpty >= 0) {
-        const next = [...prev];
-        next[firstEmpty] = { old: text, next: "" };
-        return next;
-      }
-      return [...prev, { old: text, next: "" }];
-    });
-  }
-
-  function updatePair(index: number, field: "old" | "next", value: string) {
-    setPairs((prev) => prev.map((pair, i) => (i === index ? { ...pair, [field]: value } : pair)));
-  }
-
-  function removePair(index: number) {
-    setPairs((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : [{ old: "", next: "" }]));
-  }
-
-  async function handleSave() {
-    if (selectedSlide == null) return;
-    const replacements: Record<string, string> = {};
-    for (const pair of pairs) {
-      const old = pair.old.trim();
-      if (old) replacements[old] = pair.next;
-    }
-    if (Object.keys(replacements).length === 0) {
-      setError(en ? "Add at least one replacement with non-empty original text." : "请至少填写一组原文非空的替换。");
-      return;
-    }
-    setIsSaving(true);
-    setError("");
-    setReport(null);
-    try {
-      const request: PreserveEditRequest = { sourcePath, edits: [{ slide: selectedSlide, replacements }] };
-      setReport(await preserveEditPptx(request));
-    } catch (err) {
-      setError(humanizeError(err, language));
-    } finally {
-      setIsSaving(false);
-    }
-  }
-
-  return (
-    <section className="screen preserve-screen">
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">{en ? "Preservation-first editing" : "保真优先编辑"}</p>
-          <h1>{en ? "Change only the slides you name" : "只改你点名的页，其余字节级不动"}</h1>
-        </div>
-        {sourcePath && (
-          <button className="primary-action compact" onClick={handleSave} disabled={!readyToSave || isSaving}>
-            <ShieldCheck size={17} />
-            {isSaving ? (en ? "Saving" : "保存中") : (en ? "Save edit" : "保存修改")}
-          </button>
-        )}
-      </div>
-
-      {!sourcePath && (
-        <section className="input-panel preserve-drop-panel">
-          <div className="panel-title">
-            <Upload size={18} />
-            <span>{en ? "Drop an existing PowerPoint" : "拖入一份已有 PPT"}</span>
-          </div>
-          <label className="drop-zone preserve-drop" onDrop={handleDrop} onDragOver={(event) => event.preventDefault()}>
-            <FileText size={30} />
-            <strong>{en ? "Drop a .pptx here" : "把 .pptx 拖到这里"}</strong>
-            <span>{en ? "We edit the named slides natively and keep every other part byte-for-byte — logo, masters, links and untouched slides stay exactly as they are." : "只原生修改你点名的页，其余每个部分字节级保留——logo、母版、链接和未选页原样不动。"}</span>
-          </label>
-          <p className="preserve-local-note">{en ? "Runs fully on your machine. Nothing is uploaded." : "全程在本机运行，不上传任何文件。"}</p>
-          {error && <ActionError text={error} language={language} />}
-        </section>
-      )}
-
-      {sourcePath && (
-        <div className="preserve-grid">
-          <section className="input-panel preserve-slides-panel">
-            <div className="panel-title spaced">
-              <span className="preserve-file">
-                <Layers3 size={18} />
-                <strong>{sourceName}</strong>
-                <em>{slides.length} {en ? "slides" : "页"}</em>
-              </span>
-              <button className="text-button" onClick={resetDeck}>{en ? "Switch file" : "换一份"}</button>
-            </div>
-            {isInspecting && <p className="preserve-hint">{en ? "Reading slides…" : "正在读取页面…"}</p>}
-            <div className="preserve-slides">
-              {slides.map((slide) => (
-                <button
-                  key={slide.slide}
-                  className={slide.slide === selectedSlide ? "preserve-slide active" : "preserve-slide"}
-                  onClick={() => {
-                    setSelectedSlide(slide.slide);
-                    setReport(null);
-                  }}
-                >
-                  <span className="preserve-slide-num">{slide.slide}</span>
-                  <span className="preserve-slide-texts">
-                    {slide.texts.slice(0, 3).map((text, i) => (
-                      <span key={i}>{text}</span>
-                    ))}
-                    {slide.texts.length === 0 && <span className="preserve-muted">{en ? "(no text)" : "（无文本）"}</span>}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="choice-panel preserve-editor-panel">
-            <div className="panel-title">
-              <FileText size={18} />
-              <span>{en ? `Edit slide ${selectedSlide ?? "—"}` : `修改第 ${selectedSlide ?? "—"} 页`}</span>
-            </div>
-
-            {currentSlide && currentSlide.texts.length > 0 && (
-              <div className="preserve-chips">
-                <p className="preserve-chips-label">{en ? "Click text to replace it:" : "点选要替换的文本："}</p>
-                <div className="preserve-chip-wrap">
-                  {currentSlide.texts.map((text, i) => (
-                    <button key={i} className="preserve-chip" onClick={() => addPairFromText(text)} title={text}>
-                      {text}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="preserve-pairs">
-              {pairs.map((pair, index) => (
-                <div key={index} className="preserve-pair">
-                  <input className="field" value={pair.old} onChange={(event) => updatePair(index, "old", event.target.value)} placeholder={en ? "Original text" : "原文"} />
-                  <ChevronRight size={16} />
-                  <input className="field" value={pair.next} onChange={(event) => updatePair(index, "next", event.target.value)} placeholder={en ? "New text" : "新文本"} />
-                  <button className="preserve-pair-remove" onClick={() => removePair(index)} title={en ? "Remove" : "删除"}>
-                    ×
-                  </button>
-                </div>
-              ))}
-              <button className="text-button" onClick={() => setPairs((prev) => [...prev, { old: "", next: "" }])}>
-                + {en ? "Add replacement" : "再加一组"}
-              </button>
-            </div>
-
-            {error && <ActionError text={error} language={language} />}
-
-            {report && (
-              <div className={report.safe ? "preserve-report safe" : "preserve-report violation"}>
-                <div className="preserve-report-head">
-                  {report.safe ? <ShieldCheck size={22} /> : <CircleAlert size={22} />}
-                  <div>
-                    <strong>{report.safe ? (en ? "Saved — only the named slide changed" : "已保存 · 仅点名页发生变化") : (en ? "Fidelity check failed — not delivered" : "保真校验未通过 · 未交付")}</strong>
-                    <span>{en
-                      ? `${report.unchangedCount} package parts stayed byte-identical across ${report.slideCount} slides.`
-                      : `共 ${report.slideCount} 页，${report.unchangedCount} 个包内部分保持字节级不变。`}</span>
-                  </div>
-                  <button className="secondary-action compact" onClick={() => openPath(report.output)}>
-                    <FolderOpen size={16} />
-                    {en ? "Open output" : "打开输出"}
-                  </button>
-                </div>
-                {report.changed.length > 0 && (
-                  <ul className="preserve-report-parts">
-                    {report.changed.map((part) => (
-                      <li key={part}>
-                        <CheckCircle2 size={14} />
-                        {part}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {!report.safe && (report.unexpectedChanged.length > 0 || report.added.length > 0 || report.removed.length > 0) && (
-                  <div className="preserve-report-detail">
-                    {report.unexpectedChanged.length > 0 && <p>{en ? "Unexpected changes" : "意外改动"}：{report.unexpectedChanged.join(", ")}</p>}
-                    {report.added.length > 0 && <p>{en ? "Added parts" : "新增部分"}：{report.added.join(", ")}</p>}
-                    {report.removed.length > 0 && <p>{en ? "Removed parts" : "移除部分"}：{report.removed.join(", ")}</p>}
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
-        </div>
-      )}
-    </section>
-  );
-}
-
 function CheckItem({ check }: { check: ProjectCheck }) {
   return (
     <article className={`check-item ${check.status}`}>

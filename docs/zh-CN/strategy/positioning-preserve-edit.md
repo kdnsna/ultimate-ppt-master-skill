@@ -34,9 +34,20 @@ PPT 改稿走相反的路：**只重写你点名的那一页，其余每一处�
 
 ## 三种形态，同一个引擎
 
-- **引擎** `scripts/preserve_edit_pptx.py`：纯标准库，「只改你点名的页」与校验门禁的唯一实现。
+- **引擎** `scripts/preserve_edit_pptx.py`：纯标准库，「只改你点名的页」与校验门禁的唯一实现（`apply_edits` API + CLI）。
 - **桌面端**：拖入 → 选页 → 改 → 预览 → 存，免命令。
 - **MCP server** `scripts/ppt_preserve_mcp.py`：零依赖、stdio，给 Agent 生态。
+
+### CLI 能力（与引擎对齐）
+
+```bash
+python3 scripts/preserve_edit_pptx.py --list deck.pptx
+python3 scripts/preserve_edit_pptx.py deck.pptx out.pptx --slide 1 --replace "Q2=Q3"
+python3 scripts/preserve_edit_pptx.py deck.pptx out.pptx --slide 2 --op '{"op":"style_text","size":24}'
+python3 scripts/preserve_edit_pptx.py deck.pptx out.pptx --edits edits.json --report fidelity.json
+```
+
+原生 ops：`replace_text` · `style_text` · `replace_table_cell` · `set_shape_geometry` · `replace_chart_text` · `set_chart_value`。
 
 ## 看一眼它怎么改
 

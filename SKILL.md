@@ -52,14 +52,28 @@ When a handoff includes `attachments/pptlint-repair-plan.json`, treat the source
 - read the selected repair tasks before planning and touch only their named slides;
 - keep every visible character, number, datum, conclusion, slide count, slide order, and unselected slide unchanged unless the user explicitly unlocks one of them;
 - never import and re-export the whole source deck through Artifact Tool, SVG, or another reconstruction pipeline for a local repair; these routes can reinterpret masters, transparency, placeholders, grouped objects, links, and untouched slides;
-- use a native, package-preserving object edit path — the editor `scripts/preserve_edit_pptx.py`. It copies every package part verbatim and re-serializes only the named slide, so untouched slides, the logo, masters, layouts, themes, media and links stay byte-for-byte identical:
+- use a native, package-preserving object edit path — the editor `scripts/preserve_edit_pptx.py`. It copies every package part verbatim and re-serializes only the named slide (and any chart parts that slide's chart ops touch), so untouched slides, the logo, masters, layouts, themes, media and links stay byte-for-byte identical.
+  Inspect first, then edit:
   ```bash
+  python3 ${SKILL_DIR}/scripts/preserve_edit_pptx.py --list <source.pptx>
   python3 ${SKILL_DIR}/scripts/preserve_edit_pptx.py <source.pptx> <repaired.pptx> \
       --slide <N> --replace "旧文本=新文本" --report <fidelity-report.json>
   ```
-  Repeat `--replace` for each text change on that slide; run once per slide that needs editing. A no-match leaves even the named slide byte-identical;
-- the fidelity report is a hard gate: it must show only the named slide part changed and no parts added or removed (`ok: true`). Any unexpected changed, added, or removed part is a hard failure — stop and report it, do not deliver;
-- the editor currently rewrites text inside `<a:t>` runs of the named slide (the right tool for fixing titles, conclusions, wording, numbers-as-text, and font/wording consistency). For changes it does not yet support natively — chart data/series, table cell structure, shape geometry or position, adding/replacing images — do NOT round-trip the deck; return the short PowerPoint/WPS steps for exactly those objects instead;
+  Supported native ops (prefer these over whole-deck regeneration):
+  - text: `--replace OLD=NEW` or op `replace_text`
+  - style: op `style_text` — font / size / bold / color (optional match)
+  - table: op `replace_table_cell` — by row/col or find text
+  - shape: op `set_shape_geometry` — move/resize in points (match by index/name/text)
+  - chart: ops `replace_chart_text`, `set_chart_value` (rewrites the linked chart part only)
+  Multi-slide / mixed ops in one shot:
+  ```bash
+  python3 ${SKILL_DIR}/scripts/preserve_edit_pptx.py <source.pptx> <repaired.pptx> \
+      --edits edits.json --report <fidelity-report.json>
+  # edits.json: [{"slide":1,"replacements":{"Q2":"Q3"}},{"slide":4,"operations":[{"op":"replace_table_cell","row":2,"col":1,"text":"128"}]}]
+  ```
+  Or one typed op on a single slide: `--op '{"op":"style_text","size":24,"bold":true}'`. A no-match leaves even the named slide byte-identical.
+- the fidelity report is a hard gate: `safe` must be true — only intended slide/chart parts may change, and no parts may be added or removed. Any unexpected changed, added, or removed part is a hard failure — stop and report it, do not deliver;
+- for changes the editor does **not** yet support natively — adding/removing slides, inserting new images, rebuilding table structure, or free-form redesign — do NOT round-trip the whole deck; return the short PowerPoint/WPS steps for exactly those objects instead;
 - if the editor is unavailable in the current environment, do not generate a repaired PPTX; return the short PowerPoint/WPS steps immediately instead of starting the normal deck-production pipeline;
 - if a selected problem cannot be improved without breaking a lock, preserve the original page and report the exact decision the user must make;
 - after an actual native edit, render the changed slides through PowerPoint, WPS, or LibreOffice and inspect the before/after at full size; missing visible objects, black/changed backgrounds, broken logos, changed links, or unintended movement are hard failures;

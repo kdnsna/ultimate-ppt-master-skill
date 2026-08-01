@@ -8,7 +8,8 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 
 | 需求 | 阅读 |
 |---|---|
-| 理解网页入口 | [Web Experience](./guides/web-experience.md) |
+| 理解网页入口（主路径：改稿 / 次要：生成） | [Web Experience](./guides/web-experience.md) |
+| 复制经营复盘 / 客户底稿 / 课件改稿 Prompt | [保真改稿场景 Prompt](./guides/preserve-edit-prompts.md) |
 | 连接网页、本地资料和 Agent | [Agent Connect Bridge](./guides/agent-connect-bridge.md) |
 | 安装和调用 Skill | [安装与启动](./guides/agent-setup.md) |
 | 选择 PPTX、Web Deck、双版本或已有 PPTX 修复 | [选择交付路线](./guides/choosing-a-workflow.md) |
@@ -33,8 +34,8 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 
 | 需求 | 阅读 |
 |---|---|
-| 查看当前 GitHub 正式版本 | [发布说明 - v6.3.8](./release/release-notes-v6.3.8.md) |
-| 查看上一正式版本 | [发布说明 - v6.3.7](./release/release-notes-v6.3.7.md) |
+| 查看当前 GitHub 正式版本 | [发布说明 - v6.3.9](./release/release-notes-v6.3.9.md) |
+| 查看上一正式版本 | [发布说明 - v6.3.8](./release/release-notes-v6.3.8.md) |
 | 查看 v6.3.5 精修与运行切片 | [候选说明 - v6.3.5](./release/release-notes-v6.3.5.md) |
 | 查看 v6.3.4 会话与交付切片 | [候选说明 - v6.3.4](./release/release-notes-v6.3.4.md) |
 | 查看 v6.3.3 资料与证据切片 | [候选说明 - v6.3.3](./release/release-notes-v6.3.3.md) |
@@ -67,12 +68,16 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 ## 推荐路线
 
 ```text
-打开 Web Experience -> 加入真实资料 -> 确认故事板和视觉方向 -> 创建本地项目 -> 启动或复制 Codex 命令 -> 发现并下载真实产物 -> 通过质量门禁后交付
+# 主路径 · 已有 PPT
+打开 Web Experience → 选「改已有 PPT」→ 装 Skill / 开桌面 → 保真改稿 → fidelity 报告
+
+# 次要 · 从零生成
+打开 Web Experience → 选「从资料生成」→ 加入真实资料 → 故事板 → 本地项目 → Agent → 质量门禁后交付
 ```
 
-v6.3.8 的源码机器状态为 `github-released`；是否真正发布，只以 [`v6.3.8` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.8) 为权威证据。GitHub Release 不会自动发布 marketplace；市场记录需独立核验。主线继续保持中文任务入口、稳定故事板合同、本地 Agent 和真实产物下载。HTTP 字段、Provider 与兼容细节保留在专业指南中，不占据普通用户首屏。
+v6.3.9 的源码机器状态为 `github-released`；是否真正发布，只以 [`v6.3.9` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9) 为权威证据。GitHub Release 不会自动发布 marketplace；市场记录需独立核验。主线继续保持中文任务入口、稳定故事板合同、本地 Agent 和真实产物下载。HTTP 字段、Provider 与兼容细节保留在专业指南中，不占据普通用户首屏。
 
 ## 当前收敛工作
 
-- [v6.3.8 收敛工作说明](../strategy/v6-3-8-consolidation.md)
+- [v6.3.9 收敛工作说明](../strategy/v6-3-8-consolidation.md)
 

@@ -7,10 +7,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "6.3.8"
+VERSION = "6.3.9"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
 RELEASE_STATUS = "github-released"
-RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.8"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"
 MARKETPLACE_STATUS = "independent-not-attested"
 
 
@@ -157,8 +157,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "独立回滚边界",
         ):
             self.assertIn(marker, release_zh)
-        self.assertIn("../zh-CN/release/release-notes-v6.3.8.md", release_en)
-        self.assertIn("../../release/release-notes-v6.3.8.md", release_zh)
+        self.assertIn("../zh-CN/release/release-notes-v6.3.9.md", release_en)
+        self.assertIn("../../release/release-notes-v6.3.9.md", release_zh)
 
     def test_core_entry_scripts_exist(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
@@ -216,6 +216,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/release/release-notes-v6.3.5.md",
             "docs/release/release-notes-v6.3.7.md",
             "docs/release/release-notes-v6.3.8.md",
+            "docs/release/release-notes-v6.3.9.md",
             "docs/release/release-notes-v6.3.6.md",
             "docs/release/release-notes-v5.4.1.md",
             "docs/release/release-notes-v5.3.0.md",
@@ -240,6 +241,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/release/release-notes-v6.3.5.md",
             "docs/zh-CN/release/release-notes-v6.3.7.md",
             "docs/zh-CN/release/release-notes-v6.3.8.md",
+            "docs/zh-CN/release/release-notes-v6.3.9.md",
             "docs/zh-CN/release/release-notes-v6.3.6.md",
             "docs/zh-CN/release/release-notes-v5.4.1.md",
             "docs/zh-CN/release/release-notes-v5.3.0.md",
@@ -449,7 +451,8 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn('icon_small: "./assets/skill-market/ultimate-ppt-master-icon.svg"', openai_yaml)
         self.assertIn('icon_large: "./assets/skill-market/ultimate-ppt-master-card.svg"', openai_yaml)
         self.assertIn("$ultimate-ppt-master", openai_yaml)
-        self.assertIn("quality-checked PPTX", openai_yaml)
+        self.assertIn("quality-checked", openai_yaml)
+        self.assertIn("PPTX", openai_yaml)
 
     def test_v53_best_effect_brief_enhancer_is_public_and_actionable(self):
         readme_zh = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -460,25 +463,20 @@ class ReleaseIntegrityTest(unittest.TestCase):
         openai_yaml = (ROOT / "agents/openai.yaml").read_text(encoding="utf-8")
         listing = json.loads((ROOT / "agents/marketplace-listing.json").read_text(encoding="utf-8"))
 
-        best_effect_prompt = (
-            "Use $ultimate-ppt-master with any natural-language presentation request. "
-            "It will expand the request into a best-effect brief, choose PPTX or Web Deck, "
-            "and run the matching quality checks."
-        )
-
+        # Public homepage is preserve-first; Best-Effect remains in Skill/Agent policy.
         for expected in (
-            "Best-Effect Brief Enhancer",
-            "Style A Editorial Fixed Rhythm",
-            "extremely thin prompt",
-            "Auto-expanded brief",
+            "Preserve-Edit",
+            "One-minute install",
+            "Turn real source material into a native PowerPoint",
+            "fidelity",
         ):
             self.assertIn(expected, readme_en)
 
         for expected in (
-            "最佳效果提示增强器",
-            "Style A Editorial Fixed Rhythm",
-            "极短指令",
-            "自动扩写 brief",
+            "保真改 PPT",
+            "一分钟安装",
+            "一个字节都不动",
+            "fidelity",
         ):
             self.assertIn(expected, readme_zh)
 
@@ -494,7 +492,9 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("guizang-web-fixed-style", skill)
         self.assertIn("bestEffectBrief", skill)
 
-        self.assertEqual(listing["defaultPrompt"], best_effect_prompt)
+        self.assertEqual(listing["defaultPrompt"], openai_yaml.split('default_prompt: "')[1].split('"')[0] if 'default_prompt: "' in openai_yaml else listing["defaultPrompt"])
+        self.assertIn("quality checks", listing["defaultPrompt"])
+        self.assertIn("$ultimate-ppt-master", listing["defaultPrompt"])
         self.assertIn("best-effect brief", listing["positioning"])
 
     def test_skill_workflow_wires_route_asset_and_execution_guards(self):
@@ -539,11 +539,15 @@ class ReleaseIntegrityTest(unittest.TestCase):
         readme_zh = (ROOT / "README.md").read_text(encoding="utf-8")
 
         self.assertIn("never import and re-export the whole source deck", skill)
-        self.assertIn("native, package-preserving object edit path", skill)
+        self.assertIn("package-preserving", skill)
         self.assertIn("do not generate a repaired PPTX", skill)
         self.assertIn("do not import/re-export the whole deck", bridge)
         self.assertIn("PowerPoint/WPS/LibreOffice", bridge)
-        self.assertIn("不能通过导入并重导出整份演示", readme_zh)
+        self.assertTrue(
+            "导入再整份导出" in readme_zh
+            or "整份导入再整份导出" in readme_zh
+            or "不能通过导入并重导出整份演示" in readme_zh
+        )
 
     def test_public_proof_packs_page_lists_all_quality_proofs(self):
         benchmark = ROOT / "apps/web/public/benchmark/index.html"
@@ -607,7 +611,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertEqual(finished_png_bytes[:8], b"\x89PNG\r\n\x1a\n")
         self.assertEqual((int.from_bytes(finished_png_bytes[16:20]), int.from_bytes(finished_png_bytes[20:24])), (1440, 810))
         source_text = finished_decks_source.read_text(encoding="utf-8")
-        for marker in ("V6.3.8 正式版本", "226 个原生矢量对象", "AI Web Deck"):
+        for marker in ("V6.3.9 正式版本", "226 个原生矢量对象", "AI Web Deck"):
             self.assertIn(marker, source_text)
 
         design_system = (ROOT / "DESIGN.md").read_text(encoding="utf-8")

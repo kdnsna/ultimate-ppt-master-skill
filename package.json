@@ -1,12 +1,12 @@
 {
   "name": "ultimate-ppt-master",
   "private": true,
-  "version": "6.3.8",
+  "version": "6.3.9",
   "type": "module",
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
-  "description": "AI PPT delivery system that clarifies the brief first, then turns local source material into editable PPTX/Web Decks with visual review and audit trails.",
+  "description": "Preservation-first PPT editing: change only the slides you name on an existing branded deck (byte-stable masters/logo), plus secondary source-to-editable PPTX/Web Deck generation.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
     "update": "git pull --ff-only && npm run setup",

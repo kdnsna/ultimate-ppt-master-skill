@@ -2983,81 +2983,58 @@ def run_preserve_edit(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
         raise ValueError("preserve-edit requires a non-empty edits list.")
 
     module = _load_preserve_edit_module(repo_root)
-
-    requested_slides: set[int] = set()
-    intended_parts: set[str] = set()
-    slide_parts_map: dict[int, list[str]] = {}
-    intermediates: list[Path] = []
-    current = source
-    for index, edit in enumerate(edits):
-        if not isinstance(edit, dict):
-            raise ValueError(f"edits[{index}] must be an object.")
-        slide = edit.get("slide")
-        if not isinstance(slide, int) or isinstance(slide, bool) or slide < 1:
-            raise ValueError(f"edits[{index}].slide must be a positive integer.")
-        operations: list[dict[str, Any]] = []
-        replacements = edit.get("replacements")
-        if isinstance(replacements, dict):
-            for key, value in replacements.items():
-                if str(key):
-                    operations.append({"op": "replace_text", "old": str(key), "new": str(value)})
-        extra_ops = edit.get("operations")
-        if isinstance(extra_ops, list):
-            operations.extend(extra_ops)
-        if not operations:
-            raise ValueError(f"edits[{index}] needs non-empty replacements or operations.")
-        requested_slides.add(slide)
-
-        last = index == len(edits) - 1
-        target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
-        if not last:
-            intermediates.append(target)
-        part_edits = module.build_part_edits(current, slide, operations)
-        intended_parts.update(part_edits.keys())
-        slide_parts_map.setdefault(slide, []).extend(part_edits.keys())
-        module.patch_parts(current, target, part_edits)
-        current = target
-
-    for temp in intermediates:
-        with contextlib.suppress(OSError):
-            temp.unlink()
-
+    result = module.apply_edits(source, output, edits)
     before = module.member_hashes(source)
-    after = module.member_hashes(output)
-    changed = sorted(name for name in before if name in after and before[name] != after[name])
-    added = sorted(set(after) - set(before))
-    removed = sorted(set(before) - set(after))
-    unexpected = [name for name in changed if name not in intended_parts]
-    safe = not unexpected and not added and not removed
-
-    slide_changes: dict[int, list[str]] = {}
-    for slide in sorted(requested_slides):
-        delta: list[str] = []
-        before_xml = module.slide_xml(source, slide)
-        after_xml = module.slide_xml(output, slide)
-        if before_xml is not None and after_xml is not None:
-            delta.extend(module.summarize_changes(before_xml, after_xml))
-        for part in slide_parts_map.get(slide, []):
-            if part.startswith("ppt/charts/"):
-                cb = module.part_text(source, part)
-                ca = module.part_text(output, part)
-                if cb is not None and ca is not None:
-                    delta.extend(module.summarize_chart_changes(cb, ca))
-        if delta:
-            slide_changes[slide] = delta
-
+    preview = None
+    memo_path = None
+    try:
+        preview = module.write_trust_preview(source, output, result)
+    except Exception as exc:  # noqa: BLE001 — preview must never fail the edit
+        preview = {"kind": "none", "error": str(exc)}
+    try:
+        memo_path = output.with_name(f"{output.stem}-change-memo.md")
+        bullets = []
+        for slide, lines in sorted((result.get("slide_changes") or {}).items(), key=lambda item: int(item[0])):
+            bullets.append(f"- 第 {slide} 页：{'; '.join(lines)}")
+        if not bullets:
+            bullets = ["- （无文本级 delta 摘要）"]
+        tech = [f"- `{part}`" for part in (result.get("changed") or [])]
+        if not tech:
+            tech = ["- （无）"]
+        memo_lines = [
+            "# 保真改稿变更说明",
+            "",
+            f"- 状态：{'通过' if result['safe'] else '未通过'}",
+            f"- 输出：{output}",
+            f"- 涉及页：{', '.join(str(s) for s in result.get('requested_slides') or [])}",
+            f"- 未改动包内部分：{result.get('unchanged_count')}",
+            "",
+            "## 改了什么",
+            *bullets,
+            "",
+            "## 技术细节",
+            *tech,
+            "",
+        ]
+        memo_path.write_text("\n".join(memo_lines), encoding="utf-8")
+    except Exception:
+        memo_path = None
     return {
-        "status": "ok" if safe else "fidelity-violation",
-        "safe": safe,
-        "output": str(output),
-        "slideCount": sum(1 for name in before if name.startswith("ppt/slides/slide") and name.endswith(".xml")),
-        "requestedSlides": sorted(requested_slides),
-        "changed": changed,
-        "unexpectedChanged": unexpected,
-        "added": added,
-        "removed": removed,
-        "unchangedCount": sum(1 for name in before if name in after and before[name] == after[name]),
-        "slideChanges": slide_changes,
+        "status": result["status"],
+        "safe": result["safe"],
+        "output": result["output"],
+        "slideCount": sum(
+            1 for name in before if name.startswith("ppt/slides/slide") and name.endswith(".xml")
+        ),
+        "requestedSlides": result["requested_slides"],
+        "changed": result["changed"],
+        "unexpectedChanged": result["unexpected_changed"],
+        "added": result["added"],
+        "removed": result["removed"],
+        "unchangedCount": result["unchanged_count"],
+        "slideChanges": result["slide_changes"],
+        "preview": preview,
+        "memoPath": str(memo_path) if memo_path else None,
     }
 
 
@@ -3073,12 +3050,11 @@ def run_inspect_pptx(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
         raise ValueError("sourcePath must be a .pptx file.")
 
     module = _load_preserve_edit_module(repo_root)
-    texts = module.slide_texts(source)
-    slides = [{"slide": number, "texts": lines} for number, lines in texts.items()]
+    detail = module.inspect_deck(source)
     return {
         "sourcePath": str(source),
-        "slideCount": len(slides),
-        "slides": slides,
+        "slideCount": detail.get("slideCount") or detail.get("slide_count") or 0,
+        "slides": detail.get("slides") or [],
     }
 
 

@@ -46,7 +46,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 const bridgeUrl = "http://127.0.0.1:43188";
 const sessionStorageKey = "ultimate-ppt-master-deck-session-v6";
 const legacyLocalStorageKey = sessionStorageKey;
-const appVersion = "6.3.8";
+const appVersion = "6.3.9";
 const brandAssetUrl = `${import.meta.env.BASE_URL}brand.svg`;
 const pptlintProofAssetUrl = `${import.meta.env.BASE_URL}pptlint-before-after-hero.png`;
 const maxSourceCount = 24;
@@ -141,23 +141,32 @@ interface HandoffResult {
 }
 
 const copy = {
-    product: "终极融合 PPT 大师",
-    promise: "本地演示文稿质量工作台",
-    title: "从真实资料，到能放心交付的演示文稿。",
-    subtitle: "先确认任务与证据，再决定视觉；生成后按页精修，最后回到 PowerPoint 完成正式交付。",
+    product: "保真改 PPT",
+    promise: "指哪改哪 · 本地优先",
+    title: "领导发来的那份 PPT，改完还是原来那个模板。",
+    subtitle: "主能力：已有品牌 PPT 指哪改哪，母版/logo/链接字节级不动。次要：从资料生成可编辑 PPTX 或 Web Deck。",
     diagnostics: "环境与诊断",
     connected: "本机已连接",
     disconnected: "需要连接本机",
     checkExistingPpt: "检查已有 PPT",
-    pptlintKicker: "真实交付闭环 · ULTIMATE × PPTLINT",
+    pathRevise: "改已有 PPT",
+    pathGenerate: "从资料生成",
+    pathReviseLead: "桌面 / Skill / MCP：拖入 .pptx，点哪改哪，附保真报告。",
+    pathGenerateLead: "本页：资料 → 故事板 → Bridge → 可编辑交付。",
+    enterGenerate: "进入生成工作台",
+    reviseInstallSkill: "安装 Skill",
+    reviseDesktop: "桌面改稿",
+    reviseProof: "改前改后",
+    reviseMcp: "MCP",
+    pptlintKicker: "交付闭环 · 保真改稿 × PPTLINT",
     pptlintTitle: "一份可编辑 PPT，从 49 分修到 100 分。",
-    pptlintText: "Ultimate PPT Master 负责生成与定向修复，PPTLint 在本机独立检查。真实九页案例解决 103 项问题，未新增高置信风险。",
+    pptlintText: "保真定点修复 + PPTLint 本机检查。九页案例解决 103 项问题。",
     pptlintOpen: "用 PPTLint 检查 PPT",
     pptlintProof: "查看完整前后证据",
     pptlintBefore: "修改前 · 49",
     pptlintAfter: "修改后 · 100",
-    intakeTitle: "先把任务和真实资料放进来",
-    intakeLead: "一句话也可以开始。首层只保留任务、资料和交付用途，其余由 Agent 推断后再确认。",
+    intakeTitle: "次要路线：从真实资料生成",
+    intakeLead: "没有现成 PPT 时再用这条路。一句话也可开始；首层只保留任务、资料和交付用途。",
     requestLabel: "这份演示要完成什么？",
     requestPlaceholder: "例如：把季度经营数据整理成一份给管理层看的 10 页可编辑 PPTX，结论先行，不能编造数据。",
     sourceTitle: "资料",
@@ -235,6 +244,7 @@ export function V6Workspace() {
   const [agentStatus, setAgentStatus] = useState<AgentStatusResult | null>(null);
   const [activeSlideId, setActiveSlideId] = useState(session.slides[0]?.slideId || "P01");
   const [diagnosticsOpen, setDiagnosticsOpen] = useState(false);
+  const [entryPath, setEntryPath] = useState<"revise" | "generate">("revise");
   const [eventMessage, setEventMessage] = useState("");
   const [liveAnnouncement, setLiveAnnouncement] = useState("");
   const [workspaceError, setWorkspaceError] = useState("");
@@ -745,19 +755,45 @@ export function V6Workspace() {
       <main id="v6-workspace" className="v6-workspace">
         <section className="v6-hero">
           <div className="v6-hero-copy">
-            <p className="v6-kicker">v{appVersion} · LOCAL-FIRST PRESENTATION AGENT</p>
+            <p className="v6-kicker">v{appVersion} · PRESERVE-EDIT · LOCAL-FIRST</p>
             <h1>{t.title}</h1>
             <p>{t.subtitle}</p>
+            <div className="v6-path-switch" role="tablist" aria-label="工作路径">
+              <button type="button" role="tab" aria-selected={entryPath === "revise"} className={entryPath === "revise" ? "active" : ""} onClick={() => setEntryPath("revise")}>
+                <ShieldCheck size={16} />{t.pathRevise}
+              </button>
+              <button type="button" role="tab" aria-selected={entryPath === "generate"} className={entryPath === "generate" ? "active" : ""} onClick={() => setEntryPath("generate")}>
+                <Sparkles size={16} />{t.pathGenerate}
+              </button>
+            </div>
+            {entryPath === "revise" ? (
+              <div className="v6-path-panel" role="tabpanel">
+                <p>{t.pathReviseLead}</p>
+                <div className="v6-path-links">
+                  <a className="primary-button compact" href="https://github.com/kdnsna/ultimate-ppt-master-skill#一分钟安装"><ShieldCheck size={16} />{t.reviseInstallSkill}</a>
+                  <a className="secondary-button compact" href="https://github.com/kdnsna/ultimate-ppt-master-skill/blob/main/INSTALL.md">{t.reviseDesktop}</a>
+                  <a className="secondary-button compact" href={`${import.meta.env.BASE_URL}preserve-demo/before-after-real.png`} target="_blank" rel="noreferrer">{t.reviseProof}</a>
+                  <a className="secondary-button compact" href="https://github.com/kdnsna/ultimate-ppt-master-skill/blob/main/docs/zh-CN/guides/mcp-server.md">{t.reviseMcp}</a>
+                </div>
+              </div>
+            ) : (
+              <div className="v6-path-panel" role="tabpanel">
+                <p>{t.pathGenerateLead}</p>
+                <button type="button" className="primary-button compact" onClick={() => {
+                  document.getElementById("v6-generate-flow")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}><ArrowRight size={16} />{t.enterGenerate}</button>
+              </div>
+            )}
           </div>
           <div className="v6-hero-status" aria-label={t.readiness}>
-            <span>{t.readiness}</span>
-            <strong>{readiness}%</strong>
-            <div className="v6-readiness-track" aria-hidden="true"><span style={{ width: `${readiness}%` }} /></div>
-            <small>{sources.some(sourceHasVerifiedText) ? `${sources.filter(sourceHasVerifiedText).length} ${t.sourceTitle}` : t.realSourceRequired}</small>
+            <span>{entryPath === "revise" ? "主路径" : t.readiness}</span>
+            <strong>{entryPath === "revise" ? "改稿" : `${readiness}%`}</strong>
+            <div className="v6-readiness-track" aria-hidden="true"><span style={{ width: entryPath === "revise" ? "100%" : `${readiness}%` }} /></div>
+            <small>{entryPath === "revise" ? "桌面 / Skill / MCP · 文件不出本机" : (sources.some(sourceHasVerifiedText) ? `${sources.filter(sourceHasVerifiedText).length} ${t.sourceTitle}` : t.realSourceRequired)}</small>
           </div>
         </section>
 
-        <nav className="phase-rail" aria-label={language === "zh" ? "任务阶段" : "Task phases"}>
+        <nav id="v6-generate-flow" className="phase-rail" aria-label={language === "zh" ? "任务阶段" : "Task phases"} hidden={entryPath === "revise"}>
           {deckPhases.map((phase, index) => {
             const complete = index < phaseIndex || (phase === "delivered" && session.phase === "delivered");
             const current = phase === session.phase;
@@ -778,7 +814,7 @@ export function V6Workspace() {
           })}
         </nav>
 
-        <section className="active-phase-shell">
+        <section className="active-phase-shell" hidden={entryPath === "revise"}>
           <header className="phase-heading">
             <div>
               <p>{phaseLabels[language][session.phase]}</p>

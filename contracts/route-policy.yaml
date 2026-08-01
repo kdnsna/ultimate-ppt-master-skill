@@ -1,6 +1,6 @@
 # Canonical route policy consumed by agent docs, TypeScript, Python, Bridge, and Desktop Worker.
 schemaVersion: route-policy-v1
-version: "6.3.8"
+version: "6.3.9"
 
 classifierRoutes:
   - formal-editable-pptx

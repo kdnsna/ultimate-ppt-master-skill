@@ -4,11 +4,15 @@ import zipfile
 from pathlib import Path
 
 from scripts.preserve_edit_pptx import (
+    apply_edits,
+    build_trust_card_svg,
     fidelity_report,
+    main as preserve_main,
     member_hashes,
     patch_slide_xml,
     replace_text,
     slide_part_name,
+    write_trust_preview,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -123,6 +127,92 @@ class PreserveEditFidelityTest(unittest.TestCase):
             output = Path(temp_dir) / "real-noop.pptx"
             patch_slide_xml(REAL_FIXTURE, output, 1, lambda xml: xml)
             self.assertEqual(member_hashes(REAL_FIXTURE), member_hashes(output))
+
+
+class ApplyEditsAndCliTest(unittest.TestCase):
+    def test_apply_edits_multi_slide_preserves_untouched(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            source = Path(temp_dir) / "source.pptx"
+            output = Path(temp_dir) / "edited.pptx"
+            _make_deck(source)
+            before = member_hashes(source)
+
+            result = apply_edits(
+                source,
+                output,
+                [
+                    {"slide": 1, "replacements": {"Alpha title": "ALPHA"}},
+                    {
+                        "slide": 3,
+                        "operations": [
+                            {"op": "replace_text", "old": "Gamma title", "new": "GAMMA"},
+                            {"op": "style_text", "match": {"text_equals": "GAMMA"}, "bold": True},
+                        ],
+                    },
+                ],
+            )
+
+            self.assertTrue(result["safe"], result)
+            self.assertEqual(
+                set(result["changed"]),
+                {slide_part_name(1), slide_part_name(3)},
+            )
+            after = member_hashes(output)
+            self.assertEqual(before[slide_part_name(2)], after[slide_part_name(2)])
+            self.assertEqual(before["ppt/media/image1.png"], after["ppt/media/image1.png"])
+            self.assertIn(1, result["slide_changes"])
+            self.assertIn(3, result["slide_changes"])
+
+    def test_cli_list_and_edits_file(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            source = Path(temp_dir) / "source.pptx"
+            output = Path(temp_dir) / "edited.pptx"
+            report = Path(temp_dir) / "report.json"
+            edits_file = Path(temp_dir) / "edits.json"
+            _make_deck(source)
+            edits_file.write_text(
+                '[{"slide": 2, "replacements": {"Beta title": "B2"}}]',
+                encoding="utf-8",
+            )
+
+            self.assertEqual(preserve_main(["--list", str(source)]), 0)
+            code = preserve_main(
+                [str(source), str(output), "--edits", str(edits_file), "--report", str(report)]
+            )
+            self.assertEqual(code, 0)
+            payload = report.read_text(encoding="utf-8")
+            self.assertIn("ppt/slides/slide2.xml", payload)
+            with zipfile.ZipFile(output) as package:
+                self.assertIn("B2", package.read("ppt/slides/slide2.xml").decode("utf-8"))
+                self.assertIn("Alpha title", package.read("ppt/slides/slide1.xml").decode("utf-8"))
+
+    def test_trust_card_svg_and_preview_files(self):
+        svg = build_trust_card_svg(
+            safe=True,
+            slide=1,
+            before_lines=["季度经营复盘"],
+            after_lines=["季度经营复盘 · 已修订"],
+            change_lines=["1 text run(s) changed"],
+            unchanged_count=80,
+            total_parts=81,
+        )
+        self.assertIn("BEFORE", svg)
+        self.assertIn("AFTER", svg)
+        self.assertIn("80/81", svg)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            source = Path(temp_dir) / "source.pptx"
+            output = Path(temp_dir) / "edited.pptx"
+            _make_deck(source)
+            result = apply_edits(
+                source,
+                output,
+                [{"slide": 1, "replacements": {"Alpha title": "ALPHA"}}],
+            )
+            preview = write_trust_preview(source, output, result)
+            self.assertEqual(preview["kind"], "svg")
+            self.assertTrue(Path(preview["svgPath"]).is_file())
+            self.assertIn("<svg", preview["svg"])
 
 
 if __name__ == "__main__":

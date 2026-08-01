@@ -1,13 +1,23 @@
 # Web Experience
 
-Web Experience 是 Ultimate PPT Master 当前的中文主入口。v6.3.8 源码元数据将这个静态 React/Vite 任务型工作台标记为 `github-released`。是否真正发布，只以 [`v6.3.8` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.8) 为准，源码或 Pages 可见本身不是证据。对应 `main` 提交只有通过 CI 后才能进入 GitHub Pages，marketplace 发布仍是独立操作。Classic 控制台已经冻结，只在 v6.3 兼容期通过 `?classic=1` 保留，不进入主导航。
+Web Experience 是 **保真改 PPT**（Ultimate PPT Master）的中文主入口。v6.3.9 源码元数据将这个静态 React/Vite 任务型工作台标记为 `github-released`。是否真正发布，只以 [`v6.3.9` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9) 为准。Classic 控制台已冻结，仅 `?classic=1` 兼容保留。
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/
 ```
 
+## 双路径首屏
+
+| 路径 | 用途 | 用户下一步 |
+|---|---|---|
+| **改已有 PPT（主）** | 品牌 PPT 保真改稿 | Skill / 桌面 / MCP；看改前改后 proof |
+| **从资料生成（次）** | 没有 PPT 时起稿 | 本页故事板 → Bridge → Agent |
+
+保真改稿不在浏览器内改 `.pptx`（避免上传与保真假象）；网页负责分流与安装，改写在本机完成。
+
 ## 它做什么
 
+- 首屏默认强调保真改稿，再提供从资料生成的次要工作台；
 - 接收一句任务、文件、URL 或已有 PPTX，自动推断页数，不把技术设置堆在首层；
 - 最多补问三个关键问题，生成可编辑故事板；每页有稳定 `slideId`、证据状态和三种结构方案；
 - 从六套 v6 完整视觉包中推荐三个真实方向，不再只展示抽象风格标签；

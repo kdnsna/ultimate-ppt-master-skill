@@ -2,20 +2,23 @@
 
 **中文** | [English](#english)
 
-终极融合PPT大师是一个跨 Agent 的技能包。它不是只为 Codex 准备的：任何能读取本地 Markdown 指令、访问文件系统、运行 Python/Node/Bash 脚本的 AI 编程助手，都可以使用它。
+**保真改 PPT**（仓库名 `ultimate-ppt-master-skill`）是一个跨 Agent 的技能包：主能力是**在已有品牌 PPT 上指哪改哪、其余原样不动**；次要能力才是从资料生成可编辑 PPTX / 杂志风 Web Deck。
+
+它不是只为 Codex 准备的：任何能读取本地 Markdown 指令、访问文件系统、运行 Python/Node/Bash 脚本的 AI 编程助手，都可以使用它。产品说明见根目录 [`README.md`](./README.md)。
 
 完整文档入口见 [`docs/README.md`](./docs/README.md)，中文索引见 [`docs/zh-CN/README.md`](./docs/zh-CN/README.md)。如果你只想快速安装，继续看本文件。
 
 ## 快速选择
 
-| 工具 | 推荐方式 |
+| 你想… | 推荐方式 |
 |---|---|
-| Desktop App | 克隆仓库后运行 `npm run setup` 和 `npm run desktop` |
-| Codex | 安装到 `~/.codex/skills/ultimate-ppt-master` 后运行 `npm run setup` |
-| Claude Code | 安装到 `~/.claude/skills/ultimate-ppt-master` 后运行 `npm run setup` |
-| OpenClaw / Hermes / 类 Claude Code Agent | 克隆仓库，运行 `npm run setup`，并在工具的规则/技能/项目上下文里引用 `AGENTS.md` 或 `SKILL.md` |
-| Cursor / Cline / Roo Code / Windsurf 等 AI IDE | 克隆到项目或全局目录，并把 `AGENTS.md` / `PROMPT.md` 加入项目规则 |
-| 不支持 skill 目录的工具 | 复制 `PROMPT.md` 到系统提示、项目规则或自定义指令 |
+| 桌面拖拽改 PPT | 克隆后 `npm run setup` → `npm run desktop` |
+| 一句话让 Agent 改 | `npx skills add kdnsna/ultimate-ppt-master-skill --skill ultimate-ppt-master` |
+| 接任意 MCP 客户端 | `python3 scripts/ppt_preserve_mcp.py` |
+| Codex | 装到 `~/.codex/skills/ultimate-ppt-master` 后 `npm run setup` |
+| Claude Code | 装到 `~/.claude/skills/ultimate-ppt-master` 后 `npm run setup` |
+| Cursor / Cline / Roo / Windsurf | 克隆到项目或全局，引用 `AGENTS.md` / `PROMPT.md` / `SKILL.md` |
+| 无 skill 目录的工具 | 把 `PROMPT.md` 放进系统提示或项目规则 |
 
 ## 一键桌面端安装
 

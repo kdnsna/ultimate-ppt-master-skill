@@ -11,8 +11,13 @@ Untouched parts therefore keep identical content bytes (verified by
 ``fidelity_report``), which a whole-deck SVG round-trip cannot guarantee.
 
 CLI:
+    python3 scripts/preserve_edit_pptx.py --list <source.pptx>
     python3 scripts/preserve_edit_pptx.py <source.pptx> <output.pptx> \
         --slide 2 --replace "旧结论=新结论" [--report report.json]
+    python3 scripts/preserve_edit_pptx.py <source.pptx> <output.pptx> \
+        --slide 1 --op '{"op":"style_text","size":24,"bold":true}'
+    python3 scripts/preserve_edit_pptx.py <source.pptx> <output.pptx> \
+        --edits edits.json
 """
 
 from __future__ import annotations
@@ -83,6 +88,150 @@ def slide_texts(pptx_path: Path) -> dict[int, list[str]]:
             texts = [text.strip() for text in _TEXT_RUN_RE.findall(xml)]
             result[int(match.group(1))] = [text for text in texts if text]
     return dict(sorted(result.items()))
+
+
+def _table_previews_from_xml(xml_text: str) -> list[dict]:
+    """Return compact table previews from one slide XML."""
+    tbl_tag = f"{{{_A_NS}}}tbl"
+    tr_tag = f"{{{_A_NS}}}tr"
+    tc_tag = f"{{{_A_NS}}}tc"
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return []
+    previews: list[dict] = []
+    for tbl in root.iter(tbl_tag):
+        rows: list[list[str]] = []
+        for tr in tbl.findall(tr_tag):
+            cells = []
+            for tc in tr.findall(tc_tag):
+                bits = [
+                    (node.text or "").strip()
+                    for node in tc.iter(_TEXT_TAG)
+                    if (node.text or "").strip()
+                ]
+                cells.append(" ".join(bits))
+            if any(cells):
+                rows.append(cells)
+        if rows:
+            previews.append(
+                {
+                    "rowCount": len(rows),
+                    "colCount": max(len(r) for r in rows),
+                    "rows": rows[:6],
+                }
+            )
+    return previews
+
+
+def _chart_previews_for_slide(pptx_path: Path, slide_number: int) -> list[dict]:
+    """Return compact chart value previews for charts linked from a slide."""
+    # chart_parts_for_slide / _C_NS are defined later; resolve at call time.
+    chart_ns = "http://schemas.openxmlformats.org/drawingml/2006/chart"
+    parts = chart_parts_for_slide(pptx_path, slide_number)
+    previews: list[dict] = []
+    for index, part in enumerate(parts, start=1):
+        raw = part_text(pptx_path, part)
+        if not raw:
+            continue
+        try:
+            root = ET.fromstring(raw)
+        except ET.ParseError:
+            continue
+        values: list[str] = []
+        for node in root.iter(f"{{{chart_ns}}}v"):
+            text = (node.text or "").strip()
+            if text:
+                values.append(text)
+        previews.append(
+            {
+                "chart": index,
+                "part": part,
+                "sampleValues": values[:12],
+                "valueCount": len(values),
+            }
+        )
+    return previews
+
+
+def inspect_deck(pptx_path: Path) -> dict:
+    """Rich inspect: texts plus table/chart previews per slide (stdlib only)."""
+    pptx_path = Path(pptx_path)
+    texts = slide_texts(pptx_path)
+    slides: list[dict] = []
+    for number, runs in texts.items():
+        xml = slide_xml(pptx_path, number) or ""
+        slides.append(
+            {
+                "slide": number,
+                "texts": runs,
+                "tables": _table_previews_from_xml(xml) if xml else [],
+                "charts": _chart_previews_for_slide(pptx_path, number),
+            }
+        )
+    return {
+        "source": str(pptx_path),
+        "sourcePath": str(pptx_path),
+        "slide_count": len(slides),
+        "slideCount": len(slides),
+        "slides": slides,
+    }
+
+
+_NL_SLIDE_RE = re.compile(
+    r"(?:第\s*(\d+)\s*页|slide\s*(\d+)|p\.?\s*(\d+))",
+    re.I,
+)
+_NL_REPLACE_RES = (
+    re.compile(r"[「『\"“']([^」』\"”']+)[」』\"”']\s*(?:改成|改为|换成|→|->|=)\s*[「『\"“']?([^」』\"”'\n,，;；]+)[」』\"”']?"),
+    re.compile(r"把\s*[「『\"“']?([^」』\"”'\n]+?)[」』\"”']?\s*(?:改成|改为|换成)\s*[「『\"“']?([^」』\"”'\n,，;；]+)[」』\"”']?"),
+    re.compile(r"([^\s,，;；→\-=]{1,40}?)\s*(?:改成|改为|换成|→|->)\s*([^\s,，;；]{1,40})"),
+)
+
+
+def parse_nl_edit_plan(instruction: str, default_slide: int | None = None) -> list[dict]:
+    """Parse a short Chinese/English revise instruction into preserve edits.
+
+    Supports patterns like:
+      - 第3页的「Q2」改成「Q3」
+      - 第1页 Q2 改成 Q3，第4页 线上 改成 线上渠道
+      - slide 2: old -> new
+    Returns ``[{slide, replacements}]`` (may be empty if nothing matched).
+    """
+    text = (instruction or "").strip()
+    if not text:
+        return []
+
+    # Split on Chinese/English separators while keeping slide markers attached.
+    chunks = re.split(r"[;；\n]+|(?=\s*第\s*\d+\s*页)|(?=\s*slide\s*\d+)", text, flags=re.I)
+    chunks = [c.strip(" ,，") for c in chunks if c and c.strip(" ,，")]
+    if not chunks:
+        chunks = [text]
+
+    edits: list[dict] = []
+    for chunk in chunks:
+        slide = default_slide
+        slide_match = _NL_SLIDE_RE.search(chunk)
+        if slide_match:
+            slide = int(next(g for g in slide_match.groups() if g))
+        remainder = _NL_SLIDE_RE.sub(" ", chunk)
+        remainder = re.sub(r"的\s*", " ", remainder).strip(" :：,，")
+        old = new = None
+        for pattern in _NL_REPLACE_RES:
+            m = pattern.search(remainder)
+            if m:
+                old, new = m.group(1).strip(), m.group(2).strip()
+                break
+        if not old or new is None or slide is None:
+            continue
+        # Merge into existing slide entry when possible.
+        for edit in edits:
+            if edit["slide"] == slide:
+                edit["replacements"][old] = new
+                break
+        else:
+            edits.append({"slide": slide, "replacements": {old: new}})
+    return edits
 
 
 def slide_xml(pptx_path: Path, slide_number: int) -> str | None:
@@ -667,6 +816,151 @@ def fidelity_report(
     }
 
 
+def _svg_escape(text: str) -> str:
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
+
+
+def _svg_lines(lines: list[str], limit: int = 3, width: int = 28) -> list[str]:
+    out: list[str] = []
+    for raw in lines:
+        text = (raw or "").strip()
+        if not text:
+            continue
+        if len(text) > width:
+            text = text[: width - 1] + "…"
+        out.append(_svg_escape(text))
+        if len(out) >= limit:
+            break
+    return out or ["(empty)"]
+
+
+def build_trust_card_svg(
+    *,
+    safe: bool,
+    slide: int,
+    before_lines: list[str],
+    after_lines: list[str],
+    change_lines: list[str],
+    unchanged_count: int,
+    total_parts: int,
+) -> str:
+    """Stdlib-only before/after trust card (always available, no LibreOffice)."""
+    before = _svg_lines(before_lines)
+    after = _svg_lines(after_lines)
+    changes = " · ".join(_svg_escape(line) for line in change_lines[:3]) or "no text delta"
+    if len(changes) > 90:
+        changes = changes[:89] + "…"
+    status = "SAFE" if safe else "CHECK"
+    status_color = "#16A34A" if safe else "#DC2626"
+    ratio = f"{unchanged_count}/{total_parts}"
+    before_tspans = "".join(
+        f'<tspan x="56" dy="{"0" if i == 0 else "26"}">{line}</tspan>' for i, line in enumerate(before)
+    )
+    after_tspans = "".join(
+        f'<tspan x="514" dy="{"0" if i == 0 else "26"}">{line}</tspan>' for i, line in enumerate(after)
+    )
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" role="img">
+  <rect width="960" height="420" fill="#F8F6F1"/>
+  <text x="36" y="42" fill="#EA580C" font-size="18" font-weight="700" font-family="system-ui,PingFang SC,Microsoft YaHei,sans-serif">保真改稿 · trust card</text>
+  <text x="36" y="72" fill="#6B7280" font-size="14" font-family="system-ui,sans-serif">slide {slide} · {ratio} package parts unchanged</text>
+  <rect x="36" y="96" width="430" height="210" rx="18" fill="#FFFFFF" stroke="#E5E0D6"/>
+  <text x="56" y="128" fill="#9CA3AF" font-size="13" font-weight="700" font-family="system-ui,sans-serif">BEFORE</text>
+  <text x="56" y="168" fill="#1F2937" font-size="18" font-weight="600" font-family="system-ui,PingFang SC,Microsoft YaHei,sans-serif">{before_tspans}</text>
+  <rect x="494" y="96" width="430" height="210" rx="18" fill="#FFF7ED" stroke="#FDBA74"/>
+  <text x="514" y="128" fill="#EA580C" font-size="13" font-weight="700" font-family="system-ui,sans-serif">AFTER</text>
+  <text x="514" y="168" fill="#9A3412" font-size="18" font-weight="600" font-family="system-ui,PingFang SC,Microsoft YaHei,sans-serif">{after_tspans}</text>
+  <rect x="36" y="328" width="888" height="60" rx="14" fill="#FFFFFF" stroke="#E5E0D6"/>
+  <text x="56" y="354" fill="{status_color}" font-size="16" font-weight="800" font-family="system-ui,sans-serif">{status}</text>
+  <text x="56" y="376" fill="#6B7280" font-size="13" font-family="system-ui,PingFang SC,Microsoft YaHei,sans-serif">{changes}</text>
+</svg>
+"""
+
+
+def write_trust_preview(
+    source: Path,
+    output: Path,
+    result: dict,
+    *,
+    real: bool | None = None,
+) -> dict:
+    """Write trust-card SVG (+ optional real PNG) next to the repaired deck.
+
+    Returns a preview dict for CLI/desktop UI. SVG is always free and instant.
+    Real pixel render is optional (LibreOffice + rasterizer via ppt_render) and
+    defaults to off unless ``real=True`` or env ``PRESERVE_REAL_PREVIEW=1``, so
+    desktop save stays snappy.
+    """
+    import os
+
+    slides = result.get("requested_slides") or []
+    slide = int(slides[0]) if slides else 1
+    before_lines = (slide_texts(source).get(slide) or [])[:4]
+    after_lines = (slide_texts(output).get(slide) or [])[:4]
+    change_map = result.get("slide_changes") or {}
+    change_lines = change_map.get(slide) or change_map.get(str(slide)) or []
+    if not isinstance(change_lines, list):
+        change_lines = [str(change_lines)]
+
+    svg = build_trust_card_svg(
+        safe=bool(result.get("safe")),
+        slide=slide,
+        before_lines=before_lines,
+        after_lines=after_lines,
+        change_lines=[str(line) for line in change_lines],
+        unchanged_count=int(result.get("unchanged_count") or 0),
+        total_parts=int(result.get("total_parts") or 0),
+    )
+    svg_path = output.with_name(f"{output.stem}-before-after.svg")
+    svg_path.write_text(svg, encoding="utf-8")
+
+    preview: dict = {
+        "kind": "svg",
+        "slide": slide,
+        "svgPath": str(svg_path),
+        "svg": svg,
+        "pngPath": None,
+        "backend": None,
+        "label": "vector trust card",
+    }
+
+    want_real = real if real is not None else os.environ.get("PRESERVE_REAL_PREVIEW", "0") == "1"
+    if not want_real:
+        return preview
+
+    # Optional real render — never fail the edit if rendering is unavailable.
+    try:
+        scripts_dir = Path(__file__).resolve().parent
+        if str(scripts_dir) not in sys.path:
+            sys.path.insert(0, str(scripts_dir))
+        import ppt_render  # type: ignore
+
+        backend = ppt_render.backend()
+        if backend:
+            png_path = output.with_name(f"{output.stem}-before-after.png")
+            caption = (
+                f"{result.get('unchanged_count', 0)}/{result.get('total_parts', 0)} "
+                "package parts unchanged"
+            )
+            ok = ppt_render.render_slide_diff_png(source, output, slide, png_path, caption)
+            if ok and png_path.is_file():
+                preview.update(
+                    {
+                        "kind": "png",
+                        "pngPath": str(png_path),
+                        "backend": backend,
+                        "label": "real render",
+                    }
+                )
+    except Exception:
+        pass
+    return preview
+
+
 def _parse_replacements(pairs: list[str]) -> dict[str, str]:
     result: dict[str, str] = {}
     for pair in pairs:
@@ -679,56 +973,270 @@ def _parse_replacements(pairs: list[str]) -> dict[str, str]:
     return result
 
 
+def _operations_from_edit(edit: dict, index: int = 0) -> tuple[int, list[dict]]:
+    """Normalize one edit dict into ``(slide_number, operations)``."""
+    if not isinstance(edit, dict):
+        raise ValueError(f"edits[{index}] must be an object")
+    slide = edit.get("slide")
+    if not isinstance(slide, int) or isinstance(slide, bool) or slide < 1:
+        raise ValueError(f"edits[{index}].slide must be a positive integer")
+    operations: list[dict] = []
+    replacements = edit.get("replacements")
+    if isinstance(replacements, dict):
+        for key, value in replacements.items():
+            if str(key):
+                operations.append({"op": "replace_text", "old": str(key), "new": str(value)})
+    extra = edit.get("operations")
+    if isinstance(extra, list):
+        operations.extend(extra)
+    if not operations:
+        raise ValueError(f"edits[{index}] needs non-empty replacements or operations")
+    return slide, operations
+
+
+def apply_edits(
+    source: Path,
+    output: Path,
+    edits: list[dict],
+) -> dict:
+    """Apply multi-slide package-preserving edits and return a fidelity summary.
+
+    Each edit is ``{"slide": N, "replacements": {old: new}, "operations": [...]}``.
+    Only the package parts required by those edits are re-serialized; everything
+    else is copied byte-for-byte. The returned dict is the shared contract used by
+    the CLI, MCP server, and desktop worker:
+
+    ``safe``, ``output``, ``changed``, ``unexpected_changed``, ``added``,
+    ``removed``, ``unchanged_count``, ``requested_slides``, ``slide_changes``,
+    ``total_parts``.
+    """
+    source = Path(source)
+    output = Path(output)
+    if not source.is_file():
+        raise FileNotFoundError(f"source PPTX not found: {source}")
+    if output.resolve() == source.resolve():
+        raise ValueError("output path must differ from source path")
+    if not isinstance(edits, list) or not edits:
+        raise ValueError("edits must be a non-empty list")
+
+    output.parent.mkdir(parents=True, exist_ok=True)
+
+    requested: set[int] = set()
+    intended_parts: set[str] = set()
+    slide_parts_map: dict[int, list[str]] = {}
+    intermediates: list[Path] = []
+    current = source
+    try:
+        for index, edit in enumerate(edits):
+            slide, operations = _operations_from_edit(edit, index)
+            requested.add(slide)
+            last = index == len(edits) - 1
+            target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
+            if not last:
+                intermediates.append(target)
+            part_edits = build_part_edits(current, slide, operations)
+            intended_parts.update(part_edits.keys())
+            slide_parts_map.setdefault(slide, []).extend(part_edits.keys())
+            patch_parts(current, target, part_edits)
+            current = target
+    finally:
+        for temp in intermediates:
+            try:
+                temp.unlink()
+            except OSError:
+                pass
+
+    before = member_hashes(source)
+    after = member_hashes(output)
+    changed = sorted(name for name in before if name in after and before[name] != after[name])
+    added = sorted(set(after) - set(before))
+    removed = sorted(set(before) - set(after))
+    unexpected = [name for name in changed if name not in intended_parts]
+    safe = not unexpected and not added and not removed
+    unchanged = sum(1 for name in before if name in after and before[name] == after[name])
+
+    slide_changes: dict[int, list[str]] = {}
+    for slide in sorted(requested):
+        delta: list[str] = []
+        before_xml = slide_xml(source, slide)
+        after_xml = slide_xml(output, slide)
+        if before_xml is not None and after_xml is not None:
+            delta.extend(summarize_changes(before_xml, after_xml))
+        for part in slide_parts_map.get(slide, []):
+            if part.startswith("ppt/charts/"):
+                cb = part_text(source, part)
+                ca = part_text(output, part)
+                if cb is not None and ca is not None:
+                    delta.extend(summarize_chart_changes(cb, ca))
+        if delta:
+            slide_changes[slide] = delta
+
+    return {
+        "safe": safe,
+        "status": "ok" if safe else "fidelity-violation",
+        "output": str(output),
+        "changed": changed,
+        "expected_changed": sorted(intended_parts),
+        "unexpected_changed": unexpected,
+        "added": added,
+        "removed": removed,
+        "unchanged_count": unchanged,
+        "total_parts": len(before),
+        "requested_slides": sorted(requested),
+        "slide_changes": slide_changes,
+    }
+
+
+def inspect_pptx(source: Path) -> dict:
+    """Return slide count and per-slide text/table/chart previews for CLI / tooling."""
+    return inspect_deck(Path(source))
+
+
+def _load_edits_file(path: Path) -> list[dict]:
+    raw = path.read_text(encoding="utf-8")
+    data = json.loads(raw)
+    if isinstance(data, dict) and "edits" in data:
+        data = data["edits"]
+    if not isinstance(data, list) or not data:
+        raise SystemExit(f"--edits must be a non-empty JSON array (or {{edits:[...]}}): {path}")
+    return data
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
-        description="Package-preserving single-slide PPTX editor."
+        description=(
+            "Package-preserving PPTX editor: change only the slides you name, "
+            "keep every other package part byte-for-byte identical."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "examples:\n"
+            "  %(prog)s --list deck.pptx\n"
+            "  %(prog)s deck.pptx out.pptx --slide 1 --replace 'Q2=Q3'\n"
+            "  %(prog)s deck.pptx out.pptx --slide 2 --op '{\"op\":\"style_text\",\"size\":24}'\n"
+            "  %(prog)s deck.pptx out.pptx --edits edits.json\n"
+        ),
     )
-    parser.add_argument("source", type=Path)
-    parser.add_argument("output", type=Path)
-    parser.add_argument("--slide", type=int, required=True, help="1-based slide number to edit")
+    parser.add_argument(
+        "--list",
+        dest="list_source",
+        type=Path,
+        metavar="PPTX",
+        help="inspect slides and visible text, then exit",
+    )
+    parser.add_argument("source", type=Path, nargs="?", help="source .pptx")
+    parser.add_argument("output", type=Path, nargs="?", help="output .pptx (never overwrites source)")
+    parser.add_argument("--slide", type=int, help="1-based slide number to edit (single-slide mode)")
     parser.add_argument(
         "--replace",
         action="append",
         default=[],
         metavar="OLD=NEW",
-        help="text replacement inside the named slide; repeatable",
+        help="text replacement on --slide; repeatable",
+    )
+    parser.add_argument(
+        "--op",
+        action="append",
+        default=[],
+        metavar="JSON",
+        help="one typed operation JSON object for --slide; repeatable",
+    )
+    parser.add_argument(
+        "--edits",
+        type=Path,
+        metavar="FILE",
+        help="JSON file of multi-slide edits: [{slide, replacements?, operations?}, ...]",
     )
     parser.add_argument("--report", type=Path, help="write a fidelity report JSON here")
+    parser.add_argument(
+        "--preview",
+        action="store_true",
+        help="write before/after trust card SVG (and real PNG if LibreOffice is available)",
+    )
     args = parser.parse_args(argv)
 
-    replacements = _parse_replacements(args.replace)
-    target = slide_part_name(args.slide)
-    patch_slide_xml(args.source, args.output, args.slide, replace_text(replacements))
+    if args.list_source is not None:
+        source = args.list_source
+        if not source.is_file():
+            print(f"source not found: {source}", file=sys.stderr)
+            return 2
+        info = inspect_pptx(source)
+        print(f"slides: {info['slide_count']}")
+        for item in info["slides"]:
+            preview = " | ".join(item["texts"][:6]) if item["texts"] else "(no text)"
+            print(f"  {item['slide']}: {preview}")
+        if args.report:
+            args.report.parent.mkdir(parents=True, exist_ok=True)
+            args.report.write_text(json.dumps(info, ensure_ascii=False, indent=2), encoding="utf-8")
+        return 0
 
-    report = fidelity_report(args.source, args.output, {target})
+    if args.source is None or args.output is None:
+        parser.error("source and output are required unless --list is used")
+
+    edits: list[dict]
+    if args.edits is not None:
+        edits = _load_edits_file(args.edits)
+    else:
+        if args.slide is None:
+            parser.error("provide --slide (with --replace/--op) or --edits FILE")
+        operations: list[dict] = []
+        replacements = _parse_replacements(args.replace)
+        for old, new in replacements.items():
+            operations.append({"op": "replace_text", "old": old, "new": new})
+        for raw in args.op:
+            try:
+                op = json.loads(raw)
+            except json.JSONDecodeError as exc:
+                raise SystemExit(f"--op must be JSON object: {exc}") from exc
+            if not isinstance(op, dict) or "op" not in op:
+                raise SystemExit("--op must be a JSON object with an 'op' field")
+            operations.append(op)
+        if not operations:
+            parser.error("provide at least one --replace or --op, or use --edits")
+        edits = [{"slide": args.slide, "operations": operations}]
+
+    try:
+        result = apply_edits(args.source, args.output, edits)
+    except (OSError, ValueError, FileNotFoundError) as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
+        return 2
+
+    preview = None
+    if args.preview and result.get("safe"):
+        try:
+            preview = write_trust_preview(args.source, args.output, result, real=True)
+            result["preview"] = preview
+        except Exception as exc:  # noqa: BLE001
+            print(f"[WARN] preview failed: {exc}", file=sys.stderr)
+
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(
-            json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+            json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8"
         )
 
-    # CLI safety gate: at most the named slide may change, and no part may be
-    # added or removed. A no-match (nothing changed) is a success, not a fault.
-    safe = (
-        not report["unexpected_changed"]
-        and not report["added"]
-        and not report["removed"]
-    )
-    if not safe:
+    if not result["safe"]:
         print("[FIDELITY VIOLATION]", file=sys.stderr)
-        print(json.dumps(report, ensure_ascii=False, indent=2), file=sys.stderr)
+        print(json.dumps(result, ensure_ascii=False, indent=2), file=sys.stderr)
         return 1
 
-    if report["changed"]:
+    slides = ",".join(str(s) for s in result["requested_slides"])
+    if result["changed"]:
         print(
-            f"[OK] edited slide {args.slide}; changed={report['changed']} "
-            f"unchanged_parts={report['unchanged_count']}"
+            f"[OK] edited slide(s) {slides}; changed={result['changed']} "
+            f"unchanged_parts={result['unchanged_count']}/{result['total_parts']}"
         )
+        for slide, lines in sorted(result["slide_changes"].items()):
+            print(f"  slide {slide}: " + "; ".join(lines))
     else:
         print(
-            f"[OK] no matching text on slide {args.slide}; output is byte-identical "
-            f"to source (unchanged_parts={report['unchanged_count']})"
+            f"[OK] no matching content on slide(s) {slides}; output is byte-identical "
+            f"to source (unchanged_parts={result['unchanged_count']}/{result['total_parts']})"
         )
+    if preview:
+        print(f"  preview={preview.get('kind')} svg={preview.get('svgPath')}")
+        if preview.get("pngPath"):
+            print(f"  real_png={preview['pngPath']} backend={preview.get('backend')}")
     return 0
 
 

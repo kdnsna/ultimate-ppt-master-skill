@@ -32,8 +32,8 @@ The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`
 
 | Need | Read |
 |---|---|
-| Review the current GitHub release | [Release Notes - v6.3.8](./release/release-notes-v6.3.8.md) |
-| Review the previous formal release | [Release Notes - v6.3.7](./release/release-notes-v6.3.7.md) |
+| Review the current GitHub release | [Release Notes - v6.3.9](./release/release-notes-v6.3.9.md) |
+| Review the previous formal release | [Release Notes - v6.3.8](./release/release-notes-v6.3.8.md) |
 | Review the v6.3.5 refinement and runtime slice | [Candidate Notes - v6.3.5](./release/release-notes-v6.3.5.md) |
 | Review the v6.3.4 session and delivery slice | [Candidate Notes - v6.3.4](./release/release-notes-v6.3.4.md) |
 | Review the v6.3.3 source and evidence slice | [Candidate Notes - v6.3.3](./release/release-notes-v6.3.3.md) |
@@ -76,5 +76,5 @@ The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`
 
 ## Active consolidation
 
-- [v6.3.8 consolidation working note](./strategy/v6-3-8-consolidation.md)
+- [v6.3.9 consolidation working note](./strategy/v6-3-8-consolidation.md)
 

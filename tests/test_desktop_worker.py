@@ -549,7 +549,11 @@ class PreserveEditWorkerTest(unittest.TestCase):
             self.assertTrue(result["safe"])
             self.assertEqual(result["changed"], ["ppt/slides/slide1.xml", "ppt/slides/slide3.xml"])
             self.assertEqual(result["requestedSlides"], [1, 3])
-            self.assertEqual(sorted(p.name for p in output.parent.iterdir()), ["deck-repaired.pptx"])
+            names = {p.name for p in output.parent.iterdir()}
+            self.assertIn("deck-repaired.pptx", names)
+            # Sidecar trust artifacts written next to the repaired deck.
+            self.assertTrue(any(name.endswith("-before-after.svg") for name in names) or "preview" in result)
+            self.assertTrue(result.get("preview", {}).get("kind") in {"svg", "png", "none"})
 
     def test_rejects_missing_source_and_empty_edits(self):
         with tempfile.TemporaryDirectory() as tmp:

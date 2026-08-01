@@ -1,7 +1,7 @@
 # Machine-readable workflow policy for Ultimate PPT Master.
 # Source of truth for agent entry fragments and runtime defaults.
 schemaVersion: workflow-policy-v1
-version: "6.3.8"
+version: "6.3.9"
 
 sourceOfTruth:
   skill: SKILL.md

@@ -148,9 +148,24 @@ export interface RecentProject {
   logsPath?: string;
 }
 
+export interface PptxTablePreview {
+  rowCount: number;
+  colCount: number;
+  rows: string[][];
+}
+
+export interface PptxChartPreview {
+  chart: number;
+  part: string;
+  sampleValues: string[];
+  valueCount: number;
+}
+
 export interface PptxSlideInfo {
   slide: number;
   texts: string[];
+  tables?: PptxTablePreview[];
+  charts?: PptxChartPreview[];
 }
 
 export interface PptxInspectResult {
@@ -159,15 +174,36 @@ export interface PptxInspectResult {
   slides: PptxSlideInfo[];
 }
 
+/** One typed package-preserving operation (mirrors preserve_edit_pptx ops). */
+export type PreserveOperation =
+  | { op: "replace_text"; old: string; new: string }
+  | { op: "style_text"; match?: "all" | { text_contains?: string; text_equals?: string }; font?: string; size?: number; bold?: boolean; color?: string }
+  | { op: "replace_table_cell"; row?: number; col?: number; find?: string; old?: string; text?: string; new?: string }
+  | { op: "set_shape_geometry"; match: { index?: number; name?: string; text_contains?: string; text_equals?: string }; x?: number; y?: number; w?: number; h?: number }
+  | { op: "replace_chart_text"; chart?: number | "all"; old: string; new: string }
+  | { op: "set_chart_value"; chart?: number | "all"; series: number; point: number; value: number | string };
+
 export interface PreserveEditStep {
   slide: number;
-  replacements: Record<string, string>;
+  replacements?: Record<string, string>;
+  operations?: PreserveOperation[];
 }
 
 export interface PreserveEditRequest {
   sourcePath: string;
   outputPath?: string;
   edits: PreserveEditStep[];
+}
+
+export interface PreservePreview {
+  kind: "svg" | "png" | "none";
+  slide?: number;
+  svg?: string;
+  svgPath?: string;
+  pngPath?: string | null;
+  backend?: string | null;
+  label?: string;
+  error?: string;
 }
 
 export interface PreserveFidelityResult {
@@ -181,6 +217,10 @@ export interface PreserveFidelityResult {
   added: string[];
   removed: string[];
   unchangedCount: number;
+  /** Human-readable per-slide deltas from the engine (keys may be stringified). */
+  slideChanges?: Record<string | number, string[]>;
+  preview?: PreservePreview | null;
+  memoPath?: string | null;
 }
 
 import type { DeckSession } from "../../../packages/workspace-core/src";

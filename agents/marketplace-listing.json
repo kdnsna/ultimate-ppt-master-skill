@@ -2,9 +2,9 @@
   "id": "ultimate-ppt-master",
   "name": "Ultimate PPT Master",
   "displayName": "Ultimate PPT Master",
-  "version": "6.3.8",
+  "version": "6.3.9",
   "releaseStatus": "github-released",
-  "releaseEvidence": "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.8",
+  "releaseEvidence": "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9",
   "marketplaceStatus": "independent-not-attested",
   "invocation": "$ultimate-ppt-master",
   "category": [
@@ -13,9 +13,9 @@
     "web deck",
     "office productivity"
   ],
-  "shortDescription": "Expand any brief into quality-checked PPTX and Web Decks",
-  "positioning": "A local-first presentation Agent and quality operating system for Chinese formal-office delivery, with a best-effect brief, task-first intake, stable slide identities, reference-PPT learning, editable PowerPoint objects, source boundaries, and audit-ready handoff.",
-  "defaultPrompt": "Use $ultimate-ppt-master with any natural-language presentation request. It will expand the request into a best-effect brief, choose PPTX or Web Deck, and run the matching quality checks.",
+  "shortDescription": "Preserve-edit branded PPTX; quality-checked PPTX & Web Decks",
+  "positioning": "A local-first presentation Agent for Chinese formal-office delivery: preservation-first revise of existing branded PPTX (byte-stable masters/logo), plus a best-effect brief for quality-checked generation of editable PowerPoint and magazine Web Decks with source boundaries and audit-ready handoff.",
+  "defaultPrompt": "Use $ultimate-ppt-master to revise an EXISTING branded .pptx (change only named slides; keep masters/logo/links byte-stable with a fidelity report) or generate quality-checked editable PPTX / magazine Web Decks from sources, then run matching quality checks.",
   "metadata": {
     "openai": "agents/openai.yaml",
     "skillEntrypoint": "SKILL.md",
