@@ -134,12 +134,23 @@ fn worker_path(app: &AppHandle, root: &Path) -> Result<PathBuf, String> {
 
 /// Strip Python traceback noise so the UI shows the actual error, not the stack.
 fn friendly_worker_error(stderr: &str, stdout: &str) -> String {
-    let raw = if stderr.trim().is_empty() { stdout } else { stderr };
-    let lines: Vec<&str> = raw.lines().map(str::trim).filter(|l| !l.is_empty()).collect();
+    let raw = if stderr.trim().is_empty() {
+        stdout
+    } else {
+        stderr
+    };
+    let lines: Vec<&str> = raw
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty())
+        .collect();
     if lines.is_empty() {
         return raw.trim().to_string();
     }
-    if lines.iter().any(|l| l.contains("Traceback (most recent call last):")) {
+    if lines
+        .iter()
+        .any(|l| l.contains("Traceback (most recent call last):"))
+    {
         return (*lines.last().unwrap_or(&"")).to_string();
     }
     raw.trim().to_string()
