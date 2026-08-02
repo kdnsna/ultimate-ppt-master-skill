@@ -6,6 +6,7 @@
 
 <p align="center">
   <strong>编辑的克制，生成的锋利。</strong><br>
+  把真实资料变成可继续修改的原生 PowerPoint。<br>
   一套本地优先的演示文稿工作台：对已有 PPTX 做外科手术级保真编辑，<br>
   或从原始素材生成具有编辑智性的可编辑幻灯片与杂志风 Web Deck。
 </p>
