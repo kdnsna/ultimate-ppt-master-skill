@@ -308,10 +308,10 @@ function makeSession({ phase = "intake", projectPath, status = "draft", sessionI
     progress: { percent: phase === "review" ? 100 : 0, message: phase === "review" ? "本地项目已创建" : "等待生成" },
     routeDecision: {
       promptQuality: "complete",
-      recommendedRoute: "formal-editable-pptx",
+      recommendedRoute: "editable-deck",
       decisionReason: "browser fixture",
       source: "user",
-      classifierRoute: "formal-editable-pptx"
+      classifierRoute: "editable-deck"
     },
     ...(projectPath ? { projectPath } : {}),
     createdAt: now,
@@ -1139,7 +1139,7 @@ async function createGroundedBridgeProject(bridgeBaseUrl, sessionId, title) {
       projectBrief: {
         bestEffectBrief: {
           promptQuality: "complete",
-          recommendedRoute: "formal-editable-pptx",
+          recommendedRoute: "editable-deck",
           decisionReason: "real-browser-runtime-fixture",
           source: "user"
         }

@@ -196,9 +196,10 @@ Before choosing a route or generating files, rewrite the user's short instructio
 
 - Auto-route by policy. Do **not** force the user to choose PPTX vs Web before generation when the request is classifiable.
 - Ask at most {workflow['routing']['maxUserFacingQuestions']} focused questions, and only when facts, sources, brand/IP, compliance, or route choice would materially change the deliverable.
-- Formal / editable / government / finance / training / report / `.pptx` signals → `formal-editable-pptx` with quality mode `{route['decisions']['explicit-formal-signal']['qualityMode']}`.
-- HTML / web PPT / magazine / editorial / e-ink / Swiss / horizontal swipe / keynote / showcase / demo-day / browser-first signals → `magazine-web-deck`.
-- Extreme-thin topic-only prompts without formal/web signals use **Style A Editorial Fixed Rhythm** → `{defaults['mode']}`, style `{defaults['style']}`, {defaults['pages']} pages, cover surface `{defaults['coverSurface']}`.
+- Editing an existing PPTX (`改PPT` / `保真修改` / `edit this pptx`) → `preserve-edit` (Preserve Edit Engine).
+- Formal / editable / government / finance / training / report / `.pptx` signals → `editable-deck` with quality mode `{route['decisions']['explicit-formal-signal']['qualityMode']}`.
+- HTML / web PPT / magazine / editorial / e-ink / Swiss / horizontal swipe / keynote / showcase / demo-day / browser-first signals → `web-deck` (enabled only on explicit request).
+- Extreme-thin topic-only prompts without formal/web signals use the **editable-deck fallback** → `{defaults['mode']}`, style `{defaults['style']}`, {defaults['pages']} pages, cover surface `{defaults['coverSurface']}`.
 
 ### Extreme Thin Prompt Fallback page rhythm
 
@@ -251,16 +252,16 @@ def render_prompt_fragment(data: dict[str, Any]) -> str:
     rhythm = "; ".join(defaults["pageRhythm"])
     return f"""Best-Effect Brief Enhancer: before route selection or production, rewrite the user's short instruction into `bestEffectBrief`. Record prompt quality (`complete`, `thin`, or `extreme-thin`), auto-expanded audience/scenario/message/page-count/style/source/asset assumptions, recommended route, and what was inferred.
 
-Extreme Thin Prompt Fallback: for a generic request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", "turn this into slides", or only a topic with no source material, do not make the user write a perfect prompt. Unless the user explicitly asks for formal / editable / government / finance / training PPTX, use Style A Editorial Fixed Rhythm by default:
+Extreme Thin Prompt Fallback: for a generic request such as "做一个 PPT", "做个 PPT", "帮我做 PPT", "make a deck", "turn this into slides", or only a topic with no source material, do not make the user write a perfect prompt. Default to the editable-deck fallback:
 
-- Mode 2: Magazine Web Deck;
-- Style A · 电子杂志 × 电子墨水;
-- 8 pages by default;
+- Editable Deck (DeckIR → PPTD → editable PPTX);
+- 正式商务 PPTX / 微软雅黑 / 可编辑正文;
+- {defaults['pages']} pages by default;
 - cover surface: {defaults['coverSurface']};
 - page rhythm: {rhythm};
 - ask only when facts, sources, brand/IP, compliance, or route choice would materially change the deliverable.
 
-If the user explicitly asks for a formal editable deck, government/finance/training/report material, or `.pptx`, switch to formal editable PPTX while keeping `bestEffectBrief` and the same quality checks. Default formal cover is light/near-white; dark covers only when user/brand/art-direction require them.
+If the user explicitly asks for a formal editable deck, government/finance/training/report material, or `.pptx`, stay on editable-deck while keeping `bestEffectBrief` and the same quality checks. Editing an existing PPTX (`改PPT` / `保真修改` / `edit this pptx`) routes to the preserve-edit engine, never a from-scratch regeneration. Web Deck is enabled only on an explicit web/magazine request. Default formal cover is light/near-white; dark covers only when user/brand/art-direction require them.
 
 Do not force a PPTX vs Web choice before generation when the request is classifiable. Auto-route from policy. Quality modes: quick / standard (default) / audit. Source import defaults to --copy; --move is advanced. Draft evidence states start as unmapped when sources exist but claims are not bound.
 Default visual foundation: paper {visual['surfaces']['paper']}, ink {visual['surfaces']['ink']}.

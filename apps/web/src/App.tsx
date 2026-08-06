@@ -156,10 +156,10 @@ interface ExpectationFit {
 
 interface BestEffectBrief {
   version: "v5.3-best-effect-v1";
-  strategy: "source-confirmed" | "best-effect-expanded" | "best-effect-fixed-style";
+  strategy: "source-confirmed" | "best-effect-expanded" | "best-effect-expanded-editable";
   promptQuality: "complete" | "thin" | "extreme-thin";
   userRequestSummary: string;
-  recommendedRoute: "formal-editable-pptx" | "guizang-web-fixed-style" | "dual-delivery";
+  recommendedRoute: "preserve-edit" | "editable-deck" | "web-deck";
   defaultStyle: string;
   autoExpandedBrief: string[];
   fixedStyleFallback: {
@@ -4207,26 +4207,22 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
   const webDeck = buildWebDeckPlan(form, sources);
   const strategy: BestEffectBrief["strategy"] =
     promptQuality === "extreme-thin" && !formalEditable
-      ? "best-effect-fixed-style"
+      ? "best-effect-expanded-editable"
       : promptQuality === "complete"
         ? "source-confirmed"
         : "best-effect-expanded";
   const recommendedRoute: BestEffectBrief["recommendedRoute"] =
-    strategy === "best-effect-fixed-style"
-      ? "guizang-web-fixed-style"
-      : form.outputMode === "both"
-        ? "dual-delivery"
-        : formalEditable
-          ? "formal-editable-pptx"
-          : "guizang-web-fixed-style";
-  const routeName = swissIntent && !formalEditable ? "Swiss Style Web Deck locked Sxx route" : "Style A Editorial Fixed Rhythm";
-  const styleName = swissIntent && !formalEditable ? "Style B · Swiss International" : "Style A · 电子杂志 × 电子墨水";
+    form.outputMode === "web"
+      ? "web-deck"
+      : "editable-deck";
+  const routeName = recommendedRoute === "web-deck" ? (swissIntent ? "Swiss Style Web Deck" : "Style A Editorial Web Deck") : "Editable Deck 正式可编辑 PPTX";
+  const styleName = recommendedRoute === "web-deck" ? (swissIntent ? "Style B · Swiss International" : "Style A · 电子杂志 × 电子墨水") : "正式商务 / 微软雅黑 / 可编辑正文";
   const fixedStyleFallback = {
     trigger: zh
-      ? "Extreme Thin Prompt Fallback: 用户只给主题、一句话或没有资料，且没有明确要求正式可编辑 PPTX。"
-      : "Extreme Thin Prompt Fallback: the user gives only a topic, one line, or no source material, and did not explicitly ask for formal editable PPTX.",
+      ? "Extreme Thin Prompt Fallback: 用户只给主题、一句话或没有资料；默认生成可编辑 PPTX，只有明确要求网页/杂志时启用 Web Deck。"
+      : "Extreme Thin Prompt Fallback: the user gives only a topic, one line, or no source material; default to an editable PPTX, and enable Web Deck only on an explicit web request.",
     routeName,
-    outputMode: "Mode 2: Magazine Web Deck",
+    outputMode: "Editable Deck",
     styleName,
     pageRhythm: swissIntent && !formalEditable
       ? webDeck.pageRhythm.map((page) => `${String(page.page).padStart(2, "0")} ${page.layout}: ${page.role}${page.imageSlot ? ` (${page.imageSlot})` : ""}`)
@@ -4271,8 +4267,8 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
       `主题：${form.title || "按用户一句话主题命名"}`,
       `目标受众：${form.audience || "默认面向普通业务听众 / 公开分享听众"}`,
       `核心叙事：${form.coreMessage || "先建立问题，再给出结构化判断和行动建议"}`,
-      `推荐路线：${recommendedRoute === "formal-editable-pptx" ? "正式可编辑 PPTX" : recommendedRoute === "dual-delivery" ? "PPTX + Web Deck 双交付" : routeName}`,
-      `视觉基调：${recommendedRoute === "guizang-web-fixed-style" ? styleName : "正式商务、微软雅黑、可编辑正文和图表"}`,
+      `推荐路线：${recommendedRoute === "web-deck" ? "Web Deck" : "正式可编辑 PPTX（DeckIR → PPTD → PPTX）"}`,
+      `视觉基调：${styleName}`,
       `用户信号：${selectedTags.join(" / ") || "无显式标签，按最佳效果默认补全"}`,
       "输出前必须把这些假设写入 project-brief.json / quality-report.json。"
     ]
@@ -4280,29 +4276,29 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
       `Topic: ${form.title || "name the deck from the user's one-line topic"}`,
       `Audience: ${form.audience || "default to general business or public-sharing audience"}`,
       `Narrative: ${form.coreMessage || "establish the problem, then give structured judgment and action"}`,
-      `Recommended route: ${recommendedRoute === "formal-editable-pptx" ? "formal editable PPTX" : recommendedRoute === "dual-delivery" ? "PPTX plus Web Deck" : routeName}`,
-      `Visual direction: ${recommendedRoute === "guizang-web-fixed-style" ? styleName : "formal business, Microsoft YaHei, editable body and charts"}`,
+      `Recommended route: ${recommendedRoute === "web-deck" ? "Web Deck" : "formal editable PPTX (DeckIR -> PPTD -> PPTX)"}`,
+      `Visual direction: ${styleName}`,
       `User signals: ${selectedTags.join(" / ") || "no explicit tags; complete with best-effect defaults"}`,
       "Record these assumptions in project-brief.json / quality-report.json before output."
     ];
   const assumptions = [
     ...expectationFit.assumptions,
-    ...(strategy === "best-effect-fixed-style"
-      ? [zh ? "用户未明确给出正式可编辑需求，因此优先交付固定高质量杂志 Web Deck。" : "No formal editable requirement was explicit, so the fixed high-quality magazine Web Deck route is preferred."]
+    ...(strategy === "best-effect-expanded-editable"
+      ? [zh ? "用户未明确要求网页/杂志，因此默认交付可编辑 PPTX；Web Deck 仅在明确要求时启用。" : "No explicit web/magazine request; default to an editable PPTX; Web Deck is enabled only on explicit request."]
       : [zh ? "先自动扩写 brief，再根据来源充分度决定是否需要一轮关键澄清。" : "Expand the brief first, then use source confidence to decide whether one focused clarification is needed."])
   ];
   const agentInstructions = zh
     ? [
       "Best-Effect Brief Enhancer: 生产前先把用户短指令改写成 bestEffectBrief，不要直接用原句开做。",
-      "Extreme Thin Prompt Fallback: 如果只有主题或一句话，且没有明确要求正式可编辑 PPTX，默认使用 Style A Editorial Fixed Rhythm。",
-      "若用户明确说正式汇报、政府/金融/培训、可编辑 PPTX，则走 formal-editable-pptx，但保留同样的 bestEffectBrief 和质量检查。",
+      "Extreme Thin Prompt Fallback: 如果只有主题或一句话，默认生成可编辑 PPTX；只有明确要求网页/杂志时才启用 Web Deck。",
+      "若用户明确说正式汇报、政府/金融/培训、可编辑 PPTX，则走 editable-deck（DeckIR → PPTD → PPTX），但保留同样的 bestEffectBrief 和质量检查。",
       "只有事实、品牌/IP、合规或来源边界会实质改变交付时才暂停追问；一般风格和结构由 bestEffectBrief 自动补齐。",
       "最终交付要说明哪些内容来自用户、哪些是自动扩写假设。"
     ]
     : [
       "Best-Effect Brief Enhancer: rewrite the user's short instruction into bestEffectBrief before production.",
-      "Extreme Thin Prompt Fallback: if there is only a topic or one line, and no explicit formal editable PPTX request, default to Style A Editorial Fixed Rhythm.",
-      "If the user explicitly asks for formal reporting, government/finance/training, or editable PPTX, use formal-editable-pptx while keeping the same bestEffectBrief and quality checks.",
+      "Extreme Thin Prompt Fallback: if there is only a topic or one line, default to an editable PPTX; enable Web Deck only on an explicit web request.",
+      "If the user explicitly asks for formal reporting, government/finance/training, or editable PPTX, use editable-deck (DeckIR -> PPTD -> PPTX) while keeping the same bestEffectBrief and quality checks.",
       "Pause only when missing facts, brand/IP, compliance, or source boundaries would materially change delivery; fill normal style and structure gaps automatically.",
       "Final delivery must state what came from the user and what was auto-expanded."
     ];
@@ -4313,7 +4309,7 @@ function buildBestEffectBrief(form: FormState, sources: UploadedSource[], expect
     promptQuality,
     userRequestSummary: bestEffectSignalText(form, sources).slice(0, 320) || (zh ? "用户尚未提供明确文本。" : "No explicit user text yet."),
     recommendedRoute,
-    defaultStyle: recommendedRoute === "guizang-web-fixed-style" ? styleName : (zh ? "正式商务 PPTX / 微软雅黑 / 可编辑正文" : "formal business PPTX / Microsoft YaHei / editable body"),
+    defaultStyle: styleName,
     autoExpandedBrief,
     fixedStyleFallback,
     assumptions,
@@ -4616,7 +4612,7 @@ function buildV52Contract(form: FormState, sources: UploadedSource[], expectatio
 function determineBriefMode(form: FormState, expectationFit: ExpectationFit, sources: UploadedSource[]): BriefMode {
   if (draftAccepted(form)) return "draft-with-assumptions";
   const bestEffectBrief = buildBestEffectBrief(form, sources, expectationFit);
-  if (bestEffectBrief.strategy === "best-effect-fixed-style") return "best-effect-fixed-style";
+  if (bestEffectBrief.strategy === "best-effect-expanded-editable") return "best-effect-expanded";
   if (bestEffectBrief.strategy === "best-effect-expanded") return "best-effect-expanded";
   if (form.agentTool === "codex" && !expectationFit.readyForProduction) return "codex-guided-intake";
   if (selectedTagCount(form.visualBrief) > 0 || form.visualBrief.backgroundText || form.visualBrief.referenceLinks.length > 0) return "visual-tags";
@@ -5015,7 +5011,7 @@ function buildQualityReport(form: FormState, sources: UploadedSource[], qualityC
       },
       {
         id: "best-effect-brief",
-        status: bestEffectBrief.strategy === "best-effect-fixed-style" ? "fixed-style-ready" : "expanded-brief-ready",
+        status: bestEffectBrief.strategy === "best-effect-expanded-editable" ? "fixed-style-ready" : "expanded-brief-ready",
         summary: bestEffectBrief.userVisibleHint
       },
       {

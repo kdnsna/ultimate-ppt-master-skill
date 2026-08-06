@@ -35,20 +35,19 @@ Before choosing a route or generating files, rewrite the user's short instructio
 
 - Auto-route by policy. Do **not** force the user to choose PPTX vs Web before generation when the request is classifiable.
 - Ask at most 3 focused questions, and only when facts, sources, brand/IP, compliance, or route choice would materially change the deliverable.
-- Formal / editable / government / finance / training / report / `.pptx` signals → `formal-editable-pptx` with quality mode `standard`.
-- HTML / web PPT / magazine / editorial / e-ink / Swiss / horizontal swipe / keynote / showcase / demo-day / browser-first signals → `magazine-web-deck`.
-- Extreme-thin topic-only prompts without formal/web signals use **Style A Editorial Fixed Rhythm** → `Mode 2: Magazine Web Deck`, style `Style A · 电子杂志 × 电子墨水`, 8 pages, cover surface `light-or-warm-paper`.
+- Editing an existing PPTX (`改PPT` / `保真修改` / `edit this pptx`) → `preserve-edit` (Preserve Edit Engine).
+- Formal / editable / government / finance / training / report / `.pptx` signals → `editable-deck` with quality mode `standard`.
+- HTML / web PPT / magazine / editorial / e-ink / Swiss / horizontal swipe / keynote / showcase / demo-day / browser-first signals → `web-deck` (enabled only on explicit request).
+- Extreme-thin topic-only prompts without formal/web signals use the **editable-deck fallback** → `Editable Deck`, style `正式商务 PPTX / 微软雅黑 / 可编辑正文`, 6 pages, cover surface `light-or-warm-paper`.
 
 ### Extreme Thin Prompt Fallback page rhythm
 
   1. light or warm-paper cover with one strong title, minimal subtitle, and one soft-edged visual/evidence panel
-  2. light context page for problem, trend, or setting
-  3. image/text or restrained signal spread for tension or opportunity
-  4. light structure page with a three-part framework, path, or method
-  5. large-statement section divider
-  6. evidence / scene / case page
-  7. point-of-view page with final judgment or question; use dark only when the user, reference, or chosen direction calls for it
-  8. light closing page with action, takeaway, or ending line
+  2. context page for problem, trend, or setting
+  3. evidence / data page with source-bound claims
+  4. comparison or process page
+  5. risk or action page
+  6. light closing page with takeaway and next step
 
 ### Visual defaults
 
@@ -83,7 +82,7 @@ Available modes: quick, standard, audit.
 Semantic assertions:
 - defaultCoverSurface=light
 - extremeThinAutoRoutes=True
-- extremeThinDefaultFormat=web-deck
+- extremeThinDefaultFormat=editable-deck
 - formalSignalDefaultFormat=editable-pptx
 - mustAskBeforeGenerate=False
 <!-- END GENERATED:workflow-policy -->

@@ -158,7 +158,7 @@ function fastProjectBrief(extra = {}) {
   return {
     bestEffectBrief: {
       promptQuality: "complete",
-      recommendedRoute: "formal-editable-pptx",
+      recommendedRoute: "editable-deck",
       decisionReason: "test-fixture",
       source: "user"
     },
@@ -304,7 +304,7 @@ test("handoff merges 4, 10, and 24 page DeckSessions without rewriting user stor
         assert.ok(storyboard.slides.every((slide) => slide.evidenceRefs.every((id) => claimIds.has(id))));
         assert.ok(!sourceMap.claims.some((claim) => claim.text.includes("不应当作来源证据")));
         assert.equal(brief.bestEffectBrief.promptQuality, "complete");
-        assert.equal(brief.bestEffectBrief.recommendedRoute, "formal-editable-pptx");
+        assert.equal(brief.bestEffectBrief.recommendedRoute, "editable-deck");
         assert.match(brief.bestEffectBrief.decisionReason, /output-mode=pptx/);
         assert.equal(brief.bestEffectBrief.source, "auto");
       }
