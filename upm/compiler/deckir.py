@@ -101,10 +101,14 @@ def _chunk_claims(claims: list[dict[str, str]], target: int) -> list[list[dict[s
         return [[]]
     if len(claims) <= target:
         return [[claim] for claim in claims]
-    # Aim for roughly even groups without splitting a claim.
-    chunk_count = max(2, target)
-    per_chunk = max(1, (len(claims) + chunk_count - 1) // chunk_count)
-    return [claims[start : start + per_chunk] for start in range(0, len(claims), per_chunk)]
+    # Exactly `target` groups with balanced sizes (no claim is split).
+    groups: list[list[dict[str, str]]] = []
+    for index in range(target):
+        start = (index * len(claims)) // target
+        end = ((index + 1) * len(claims)) // target
+        if end > start:
+            groups.append(claims[start:end])
+    return groups
 
 
 def _load_recipe_index() -> dict[str, Any]:

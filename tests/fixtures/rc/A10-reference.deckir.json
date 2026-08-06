@@ -1,0 +1,214 @@
+{
+  "deckIRVersion": "upm-v7",
+  "createdAt": "2026-08-06T00:00:00Z",
+  "planningMode": "manual-reference",
+  "delivery": {
+    "outputMode": "editable-deck",
+    "qualityGate": "standard"
+  },
+  "directionId": "swiss-information",
+  "title": "参考风格 DeckIR 验收稿",
+  "sourceMap": {
+    "version": "source-map-v1",
+    "createdAt": "2026-08-06T00:00:00Z",
+    "source": "sources/source.md",
+    "claims": [
+      {
+        "id": "c001",
+        "sourceLine": "3",
+        "text": "季度收入 24.6 亿元，同比增长 18.2%。"
+      },
+      {
+        "id": "c002",
+        "sourceLine": "5",
+        "text": "新签客户 42 家，续约率 91%。"
+      },
+      {
+        "id": "c003",
+        "sourceLine": "7",
+        "text": "交付周期中位数从 32 天缩短到 21 天。"
+      }
+    ]
+  },
+  "slides": [
+    {
+      "page": "P01",
+      "slideId": "P01",
+      "role": "hero",
+      "title": "季度经营发布：增长与效率",
+      "takeaway": "增长 18.2%，交付提速 34%",
+      "intent": "建立主题",
+      "recipeId": "product_stage.full_bleed_safe",
+      "layoutFamily": "product_stage",
+      "visualLayer": "full-bleed-real-or-generated-image",
+      "rasterPolicy": "allowed-cover",
+      "editabilityTarget": "editable text",
+      "evidenceState": "missing",
+      "evidenceRefs": [],
+      "sourceLines": [],
+      "speakerIntent": "开场",
+      "status": "draft"
+    },
+    {
+      "page": "P02",
+      "slideId": "P02",
+      "role": "section",
+      "title": "第一部分：增长",
+      "takeaway": "",
+      "intent": "章节过渡",
+      "recipeId": "section_divider.hero_light",
+      "layoutFamily": "section_divider",
+      "visualLayer": "quiet-light-atmosphere",
+      "rasterPolicy": "allowed-section-tail",
+      "editabilityTarget": "editable text",
+      "evidenceState": "missing",
+      "evidenceRefs": [],
+      "sourceLines": [],
+      "speakerIntent": "章节",
+      "status": "draft"
+    },
+    {
+      "page": "P03",
+      "slideId": "P03",
+      "role": "benefit",
+      "title": "季度收入创新高",
+      "takeaway": "24.6 亿元，同比 +18.2%",
+      "intent": "突出指标",
+      "recipeId": "metric_panel.large_number_strip",
+      "layoutFamily": "metric_panel",
+      "visualLayer": "generated-metric-accent",
+      "rasterPolicy": "prohibited-formal-body",
+      "editabilityTarget": "editable text and chart",
+      "evidenceState": "candidate",
+      "evidenceRefs": [
+        "c001"
+      ],
+      "sourceLines": [
+        3
+      ],
+      "speakerIntent": "指标",
+      "status": "draft",
+      "chart": {
+        "type": "bar",
+        "title": "季度收入（亿元）",
+        "data": {
+          "cols": [
+            "季度",
+            "收入"
+          ],
+          "rows": [
+            [
+              "Q1",
+              19.2
+            ],
+            [
+              "Q2",
+              20.8
+            ],
+            [
+              "Q3",
+              22.3
+            ],
+            [
+              "Q4",
+              24.6
+            ]
+          ]
+        },
+        "series": [
+          {
+            "type": "bar",
+            "encode": {
+              "x": "季度",
+              "y": "收入"
+            },
+            "name": "收入",
+            "fill": "$primary"
+          }
+        ]
+      }
+    },
+    {
+      "page": "P04",
+      "slideId": "P04",
+      "role": "evidence",
+      "title": "客户结构持续优化",
+      "takeaway": "新签 42 家，续约率 91%",
+      "intent": "证据",
+      "recipeId": "evidence_board.source_table",
+      "layoutFamily": "evidence_board",
+      "visualLayer": "none",
+      "rasterPolicy": "prohibited-formal-body",
+      "editabilityTarget": "editable table",
+      "evidenceState": "candidate",
+      "evidenceRefs": [
+        "c002"
+      ],
+      "sourceLines": [
+        5
+      ],
+      "speakerIntent": "证据",
+      "status": "draft",
+      "table": {
+        "headers": [
+          "客户类型",
+          "新签",
+          "续约率"
+        ],
+        "rows": [
+          [
+            "战略客户",
+            8,
+            "96%"
+          ],
+          [
+            "成长客户",
+            22,
+            "90%"
+          ],
+          [
+            "标准客户",
+            12,
+            "87%"
+          ]
+        ]
+      }
+    },
+    {
+      "page": "P05",
+      "slideId": "P05",
+      "role": "risk",
+      "title": "风险与边界",
+      "takeaway": "汇率与交付并行度是主要变量",
+      "intent": "风险",
+      "recipeId": "risk_callout.qa_stack",
+      "layoutFamily": "risk_callout",
+      "visualLayer": "none",
+      "rasterPolicy": "prohibited-formal-body",
+      "editabilityTarget": "editable text",
+      "evidenceState": "missing",
+      "evidenceRefs": [],
+      "sourceLines": [],
+      "speakerIntent": "风险",
+      "status": "draft"
+    },
+    {
+      "page": "P06",
+      "slideId": "P06",
+      "role": "closing",
+      "title": "总结与下一步",
+      "takeaway": "保持增长，提速交付，控制风险",
+      "intent": "收尾",
+      "recipeId": "closing_commitment.brand_tail",
+      "layoutFamily": "closing_commitment",
+      "visualLayer": "generated-background",
+      "rasterPolicy": "allowed-section-tail",
+      "editabilityTarget": "editable text",
+      "evidenceState": "missing",
+      "evidenceRefs": [],
+      "sourceLines": [],
+      "speakerIntent": "收尾",
+      "status": "draft"
+    }
+  ]
+}

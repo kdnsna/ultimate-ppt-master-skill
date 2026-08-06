@@ -232,6 +232,17 @@ def _layout(
         )
         return elements, "", notes
 
+    image = images.get(str(slide.get("slideId") or slide.get("page") or ""))
+    if image is not None or recipe.startswith("image_story") or recipe.startswith("product_stage"):
+        if image:
+            elements.append(_card(W - MARGIN - 400, y - 10, 400, 320, fill="$surface", radius=16000))
+            elements.append(image_element("story-image", (W - MARGIN - 400, y - 10, 400, 320), image, fit={"mode": "cover"}))
+            elements.append(_text("story-body", MARGIN, y + 10, 400, 300, body, style="$body"))
+        else:
+            elements.append(_text("body", MARGIN, y, 848, 300, body or "内容待补充（占位）。", style="$body"))
+        elements.append(_text("story-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
+        return elements, "", notes
+
     if recipe.startswith("evidence_board") or role == "evidence":
         elements.append(_text("evidence-body", MARGIN, y, 848, 300, body or "证据内容待补充（占位）。", style="$body"))
         elements.append(_text("evidence-source", MARGIN, FOOTER_Y - 22, 700, 22, source or "占位证据：请补充来源。", style="$note"))
@@ -264,11 +275,14 @@ def _layout(
 
     if recipe.startswith("metric_panel") or recipe.startswith("data_hero"):
         value, label = _extract_number(body or title)
-        elements.append(_text("metric-value", MARGIN, y + 10, 500, 120, value or "待补充", style="$statNum", font_size=64))
-        elements.append(_text("metric-label", MARGIN, y + 150, 700, 60, label or title, style="$statLabel", font_size=18))
-        elements.append(_text("metric-definition", MARGIN, y + 220, 848, 100, body, style="$body"))
-        elements.append(_text("metric-source", MARGIN, FOOTER_Y - 22, 700, 22, source or "口径与来源见备注。", style="$note"))
-        return elements, "", notes
+        if value:
+            elements.append(_text("metric-value", MARGIN, y + 10, 500, 120, value, style="$statNum", font_size=64))
+            elements.append(_text("metric-label", MARGIN, y + 150, 700, 60, label or title, style="$statLabel", font_size=18))
+            elements.append(_text("metric-definition", MARGIN, y + 220, 848, 100, body, style="$body"))
+            elements.append(_text("metric-source", MARGIN, FOOTER_Y - 22, 700, 22, source or "口径与来源见备注。", style="$note"))
+            return elements, "", notes
+        # No metric value found: fall back to the standard statement layout
+        # instead of rendering a fake "待补充" number.
 
     if recipe.startswith("risk_callout"):
         rows = _split_items(body.replace("<p>", "").replace("</p>", "；"))
@@ -288,17 +302,6 @@ def _layout(
             elements.append(_rule(MARGIN, ry + 10, 848, color="#D9D5CC"))
             elements.append(_text(f"action-{index}", MARGIN + 16, ry + 8, 820, row_height - 16, f"□ {row}", style="$body", font_size=16))
         elements.append(_text("action-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
-        return elements, "", notes
-
-    if recipe.startswith("image_story") or recipe.startswith("product_stage"):
-        image = images.get(str(slide.get("slideId") or slide.get("page") or ""))
-        if image:
-            elements.append(_card(W - MARGIN - 400, y - 10, 400, 320, fill="$surface", radius=16000))
-            elements.append(image_element("story-image", (W - MARGIN - 400, y - 10, 400, 320), image, fit={"mode": "cover"}))
-            elements.append(_text("story-body", MARGIN, y + 10, 400, 300, body, style="$body"))
-        else:
-            elements.append(_text("body", MARGIN, y, 848, 300, body or "内容待补充（占位）。", style="$body"))
-        elements.append(_text("story-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
 
     if recipe.startswith("native_chart"):
