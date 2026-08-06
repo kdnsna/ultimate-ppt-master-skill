@@ -1,0 +1,92 @@
+pageType: risk
+elements:
+- elementId: eyebrow
+  elementType: text
+  bounds:
+  - 56.0
+  - 48.0
+  - 700
+  - 26
+  content:
+    text: 明确边界与不确定性
+    style: $eyebrow
+- elementId: page-title
+  elementType: text
+  bounds:
+  - 56.0
+  - 82.0
+  - 848
+  - 52
+  content:
+    text: 主要风险包括供应链波动和汇率变化。
+    style: $pageTitle
+- elementId: rule-56-144
+  elementType: shape
+  bounds:
+  - 56.0
+  - 144.0
+  - 96
+  - 3.0
+  shapeName: rect
+  fill:
+    type: solid
+    color: $primary
+- elementId: page-num
+  elementType: text
+  bounds:
+  - 804.0
+  - 502.0
+  - 100
+  - 22
+  content:
+    text: 05 / 07
+    style: $note
+    align:
+    - right
+    - middle
+- elementId: rule-56-154
+  elementType: shape
+  bounds:
+  - 56.0
+  - 154.0
+  - 8
+  - 34
+  shapeName: rect
+  fill:
+    type: solid
+    color: $accent
+- elementId: risk-0
+  elementType: text
+  bounds:
+  - 80.0
+  - 148.0
+  - 820
+  - 52
+  content:
+    text: 主要风险包括供应链波动和汇率变化。；
+    style: $body
+    fontSize: 16
+- elementId: risk-source
+  elementType: text
+  bounds:
+  - 56.0
+  - 480.0
+  - 700
+  - 22
+  content:
+    text: 来源：source.md L1
+    style: $note
+background:
+  type: solid
+  color: $paper
+notes: '核心信息：主要风险包括供应链波动和汇率变化。
+
+  [c004] L1: 主要风险包括供应链波动和汇率变化。'
+upm:
+  schemaVersion: upm-pptd-v1
+  slideId: P05
+  role: risk
+  recipeId: risk_callout.qa_stack
+  evidenceRefs:
+  - c004
+  evidenceState: candidate

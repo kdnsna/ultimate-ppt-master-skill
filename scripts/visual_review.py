@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 """
+[DEPRECATED for new projects] This legacy visual-review renderer is kept for
+existing SVG projects only. New UPM projects must use `bin/upm review`
+(upm/qa: render -> contact sheet -> rubric -> repair -> quality report).
+
 PPT Master - Visual Review Renderer
 
 Renders project SVGs to 1280x720 PNGs that match the live-preview browser view

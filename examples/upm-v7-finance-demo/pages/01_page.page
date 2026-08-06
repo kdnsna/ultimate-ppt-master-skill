@@ -1,0 +1,53 @@
+pageType: anchor
+elements:
+- elementId: eyebrow
+  elementType: text
+  bounds:
+  - 56.0
+  - 120
+  - 500
+  - 26
+  content:
+    text: ULTIMATE PPT MASTER · 正式汇报
+    style: $eyebrow
+- elementId: cover-title
+  elementType: text
+  bounds:
+  - 56.0
+  - 170
+  - 560
+  - 180
+  content:
+    text: 2024 经营分析汇报
+    style: $coverTitle
+- elementId: cover-subtitle
+  elementType: text
+  bounds:
+  - 56.0
+  - 366
+  - 540
+  - 100
+  content:
+    text: 以 DeckIR 规划、PPTD 编译、视觉复检和可编辑导出为生产链路。
+    style: $coverSubtitle
+- elementId: cover-note
+  elementType: text
+  bounds:
+  - 56.0
+  - 502.0
+  - 480
+  - 22
+  content:
+    text: 可编辑 PPTX · 视觉复检 · 证据可追溯
+    style: $note
+background:
+  type: solid
+  color: $paper
+notes: 建立主题与核心信息
+upm:
+  schemaVersion: upm-pptd-v1
+  slideId: P01
+  role: anchor
+  recipeId: cover_brand.hero_left_visual
+  evidenceRefs: []
+  evidenceState: unmapped

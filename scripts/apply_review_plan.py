@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Apply low-risk rendered-review repair plans.
 
+[DEPRECATED for new projects] Kept for existing SVG projects. New UPM projects
+use `bin/upm review` (upm/qa) for page-level repair planning.
+
 The script deliberately avoids changing source facts or final slide content. It
 only writes planning hints into DeckIR, project briefs, quality reports, and
 Agent instructions so a human or Agent can perform the next revision safely.

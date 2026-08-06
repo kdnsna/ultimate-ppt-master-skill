@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Review rendered PPT/Web artifacts and merge findings into quality-report.json."""
+"""Review rendered PPT/Web artifacts and merge findings into quality-report.json.
+
+[DEPRECATED for new projects] Kept for existing SVG projects. New UPM projects
+use `bin/upm review` (upm/qa) which performs the same review with page-level
+repair plans and a two-round budget.
+"""
 
 from __future__ import annotations
 

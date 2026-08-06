@@ -1,0 +1,113 @@
+version: v2
+title: 2024 经营分析汇报
+size:
+- 960
+- 540
+pages:
+- pages/01_page.page
+- pages/02_page.page
+- pages/03_page.page
+- pages/04_page.page
+- pages/05_page.page
+- pages/06_page.page
+- pages/07_page.page
+theme:
+  colors:
+    paper: '#F7F5F0'
+    ink: '#171714'
+    primary: '#173A63'
+    accent: '#B44535'
+    muted: '#687078'
+    white: '#FFFFFF'
+    surface: '#FFFFFF'
+  textStyles:
+    coverTitle:
+      fontSize: 60
+      color: $ink
+      bold: true
+      fontFamily: Microsoft YaHei
+      lineHeight: 1.15
+    coverSubtitle:
+      fontSize: 22
+      color: $muted
+      fontFamily: Microsoft YaHei
+      lineHeight: 1.5
+    sectionTitle:
+      fontSize: 48
+      color: $ink
+      bold: true
+      fontFamily: Microsoft YaHei
+    pageTitle:
+      fontSize: 34
+      color: $ink
+      bold: true
+      fontFamily: Microsoft YaHei
+      lineHeight: 1.2
+    eyebrow:
+      fontSize: 14
+      color: $primary
+      bold: true
+      fontFamily: Microsoft YaHei
+      letterSpacing: 2
+    body:
+      fontSize: 18
+      color: $ink
+      fontFamily: Microsoft YaHei
+      lineHeight: 1.6
+    lead:
+      fontSize: 20
+      color: $ink
+      fontFamily: Microsoft YaHei
+      lineHeight: 1.55
+    note:
+      fontSize: 12
+      color: $muted
+      fontFamily: Microsoft YaHei
+      lineHeight: 1.4
+    statNum:
+      fontSize: 40
+      color: $primary
+      bold: true
+      fontFamily: Microsoft YaHei
+    statLabel:
+      fontSize: 14
+      color: $muted
+      fontFamily: Microsoft YaHei
+      lineHeight: 1.4
+    cell:
+      fontSize: 15
+      color: $ink
+      fontFamily: Microsoft YaHei
+      lineHeight: 1.3
+  tableStyles:
+    default:
+      cellStyle:
+        align:
+        - left
+        - middle
+        border:
+          style: solid
+          width: 1
+          color: '#E5E1D8'
+      firstRowStyle:
+        fill:
+          type: solid
+          color: $primary
+        color: '#FFFFFF'
+        bold: true
+        align:
+        - left
+        - middle
+      bodyStyles:
+      - fill:
+          type: solid
+          color: '#FFFFFF'
+      - fill:
+          type: solid
+          color: '#F7F5F0'
+upm:
+  schemaVersion: upm-pptd-v1
+  projectName: 2024_经营分析汇报_20260806
+  qualityMode: standard
+  directionId: formal-finance
+  deckir: deckir.json

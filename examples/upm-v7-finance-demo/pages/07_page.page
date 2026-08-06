@@ -1,0 +1,44 @@
+pageType: closing
+elements:
+- elementId: closing-title
+  elementType: text
+  bounds:
+  - 56.0
+  - 190
+  - 848
+  - 80
+  content:
+    text: 总结与下一步
+    style: $coverTitle
+    fontSize: 44
+- elementId: closing-body
+  elementType: text
+  bounds:
+  - 56.0
+  - 300
+  - 800
+  - 120
+  content:
+    text: 决策与行动建议见演讲者备注。
+    style: $lead
+- elementId: closing-source
+  elementType: text
+  bounds:
+  - 56.0
+  - 502.0
+  - 700
+  - 22
+  content:
+    text: ''
+    style: $note
+background:
+  type: solid
+  color: $paper
+notes: 强化结论或行动号召
+upm:
+  schemaVersion: upm-pptd-v1
+  slideId: P07
+  role: closing
+  recipeId: closing_commitment.brand_tail
+  evidenceRefs: []
+  evidenceState: unmapped

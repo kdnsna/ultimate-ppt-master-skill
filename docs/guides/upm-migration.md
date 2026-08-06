@@ -32,12 +32,15 @@ deck.pptd / pages/ / media/ / sources/ / exports/ / preview/ / .upm/
 
 ## 计划删除（Phase 8 尾项）
 
-- `docs/choosing-a-workflow.md`（已被 `docs/guides/upm-cli.md` 替代）
+- `docs/choosing-a-workflow.md` 保持为跳转 stub（`docs/guides/choosing-a-workflow.md` 仍描述 Web/Bridge/Skill 产品入口，非路由文档，不删除；`audit_docs_links.py` 依赖该映射）。
 - 旧路由在 `SKILL.md`、`AGENTS.md`、`CLAUDE.md`、`PROMPT.md` 的文档引用（已随 v7 重写清除）
 - `SKILL.md` 中旧 Mode 1/2 长流程（889 → 约 250 行）
 - 旧路由名称在契约生成物中的残留（已清理）
 
-未删除但降级为专业/诊断入口的旧脚本（`svg_to_pptx.py`、`finalize_svg.py`、`visual_review.py` 等）保留供既有项目与审计使用。
+未删除但**明确标记为 deprecated** 的旧脚本：
+
+- 旧视觉 QA（`visual_review.py`、`review_rendered_deck.py`、`apply_review_plan.py`）：仅供存量项目诊断，新项目一律走 `upm review` / `upm/qa`，避免两套平行质检体系长期并存。
+- SVG 旧流水线（`svg_to_pptx.py`、`finalize_svg.py`、`spec_lock_slice.py` 等）：仅作专业/诊断入口，新项目默认 `upm make`。
 
 ## 风险与边界
 
