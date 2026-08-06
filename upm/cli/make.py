@@ -165,7 +165,7 @@ def run_make(args: Any) -> int:
     write_quality_artifact(project, "make-summary.json", report)
 
     summary = {
-        "slides": report["summary"]["slides"],
+        "slides": compile_summary["pages"],
         "backend": report["exportBackend"],
         "gates": report["gates"],
         "warnings": [issue["message"] for issue in rubric_findings if issue["severity"] == "warning"][:8],
