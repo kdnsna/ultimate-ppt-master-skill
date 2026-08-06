@@ -46,7 +46,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 const bridgeUrl = "http://127.0.0.1:43188";
 const sessionStorageKey = "ultimate-ppt-master-deck-session-v6";
 const legacyLocalStorageKey = sessionStorageKey;
-const appVersion = "6.3.9";
+const appVersion = "7.0.0";
 const brandAssetUrl = `${import.meta.env.BASE_URL}brand.svg`;
 const pptlintProofAssetUrl = `${import.meta.env.BASE_URL}pptlint-before-after-hero.png`;
 const maxSourceCount = 24;

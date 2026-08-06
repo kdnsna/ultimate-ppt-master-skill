@@ -22,7 +22,6 @@ from upm.paths import assert_writable, normalize_relative_path
 from upm.pptd.io import load_project, write_yaml
 from upm.render.svg import render_page_svg
 
-
 EDITOR_HTML = """<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>UPM PPTD 视觉精修</title>

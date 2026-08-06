@@ -6,7 +6,7 @@ Ultimate PPT Master is intentionally not a single-path product. The public direc
 
 | Choose this | When | Tradeoff |
 |---|---|---|
-| **Web Experience** | You want a quick public trial, a shareable front door, a live Web Deck preview, or a guided way to assemble a deck brief and Agent handoff kit. | Fastest start; it generates a useful preview and handoff kit, but final decks still come from the Skill route in MVP. |
+| **Web Experience** | You want a quick public trial, a shareable front door, a live Web Deck preview, or a guided way to assemble a deck brief and Agent handoff kit. | Fastest start; it generates a useful preview and handoff kit; final decks are produced locally by the `upm` pipeline (Agent Skill or CLI). |
 | **Web Experience + Bridge** | You want to drag in PDF/Word/PPTX/Excel/URL sources and keep them local. | Requires one local command, but it creates a real handoff folder and local parse status. |
 | **Agent Skill** | You want the best current output quality and are comfortable with Codex, Claude Code, Hermes, OpenClaw, Cursor, Cline, Roo, or Windsurf-style tools. | More powerful, but requires an agent that can read files and run commands. |
 | **Web Experience + Bridge + Agent Skill** | You want a polished intake flow and production-grade local generation. | Recommended path: simple web front door, local parsing, deep agent production loop. |
@@ -43,7 +43,7 @@ Use it when the user needs a normal public first touch:
 - clear choices for source, scenario, output, style, language, agent, and model preference;
 - pasted notes, URL intake, and file drop area;
 - generated outline and readiness check;
-- dual-engine route cards for Hugo He / ppt-master PPTX and op7418 / Guizang Web Deck production;
+- route cards for the three v7 paths: `preserve-edit`, `editable-deck`, `web-deck`;
 - live `preview-web-deck.html` iframe and HTML download;
 - copy-ready Agent prompt, `source.md`, `extracted-source.md`, and `manifest.json`;
 - downloadable `handoff-kit.zip` with `attachments/`, `engine-plan.md`, and `quality-checklist.md`;

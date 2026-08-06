@@ -12,7 +12,6 @@ from pathlib import PurePosixPath
 
 from .errors import PathSafetyError
 
-
 _DRIVE_RE = re.compile(r"^[A-Za-z]:/")
 _WRITABLE_SUFFIXES = {".pptd", ".page"}
 

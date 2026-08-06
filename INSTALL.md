@@ -12,6 +12,8 @@
 
 | 你想… | 推荐方式 |
 |---|---|
+| 统一 CLI 生成/修改/精修 | 克隆后 `bash scripts/bootstrap.sh --profile core` → `bin/upm doctor` → `bin/upm make "主题"` |
+| Python 安装 `upm` 命令 | 仓库内 `.venv/bin/pip install .`，或在任意目录 `pip install .`（暴露 `upm` 命令） |
 | 桌面拖拽改 PPT | 克隆后 `npm run setup` → `npm run desktop`（`setup` 会下载约 150MB Chromium；只改 PPT 可用 `--profile pptx`） |
 | 一句话让 Agent 改 | `npx skills add kdnsna/ultimate-ppt-master-skill --skill ultimate-ppt-master` |
 | 接任意 MCP 客户端 | `python3 scripts/ppt_preserve_mcp.py` |
@@ -44,7 +46,22 @@ bash scripts/run-desktop.sh                # 桌面端（需要 Node/npm 与 Pyt
 
 ```bash
 npm run doctor
+bin/upm doctor --profile core   # v7 统一 CLI 环境检查（只报告，不安装）
 ```
+
+## 0. v7 统一 CLI（推荐）
+
+v7 之后，普通用户只需五条命令：
+
+```bash
+bin/upm make <source-or-topic>     # 生成可编辑 PPTX（DeckIR → PPTD → 导出 → 视觉 QA）
+bin/upm edit <file.pptx> "修改要求" # 保真局部修改
+bin/upm open <project>             # PPTD 视觉精修（127.0.0.1）
+bin/upm review <project>           # 重新审计
+bin/upm doctor [--profile ...]     # 环境检查
+```
+
+也可用 pip 安装：`pip install .` 会把 `upm` 命令安装到当前 Python 环境（仓库内推荐 `.venv/bin/pip install .`，避免污染全局环境）。
 
 `npm run setup` 会创建 `.venv`、按 profile 安装 Python 依赖、安装桌面端 npm 依赖，并生成 `~/.ppt-master/.env` 模板。它不会自动安装 Rust 这类系统依赖；缺什么可以用 `npm run doctor` 看清楚（Rust 缺失只会告警——桌面端会降级为浏览器 UI，不会阻断保真编辑）。
 

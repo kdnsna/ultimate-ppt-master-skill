@@ -1,6 +1,6 @@
 # Visual defaults aligned with DESIGN.md and SKILL.md.
 schemaVersion: visual-defaults-v1
-version: "6.3.9"
+version: "7.0.0"
 
 surfaces:
   paper: "#F6F3ED"

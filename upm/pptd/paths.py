@@ -15,7 +15,6 @@ from pathlib import Path, PurePosixPath
 from upm.errors import PathSafetyError
 from upm.paths import basename, normalize_relative_path
 
-
 _REMOTE_SRC_RE = re.compile(r"^(https?|data|blob):", re.IGNORECASE)
 
 
@@ -53,7 +52,7 @@ def validate_element_src(src: str) -> str:
 def media_basename(source: str, fallback: str = "asset") -> str:
     """Derive a safe media filename from an arbitrary source path/URL."""
     import uuid
-    from urllib.parse import unquote, urlparse
+    from urllib.parse import urlparse
 
     candidate = ""
     if "://" in source:

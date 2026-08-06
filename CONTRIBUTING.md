@@ -14,10 +14,13 @@ Thanks for helping improve Ultimate PPT Master. This project is a local-first AI
 Run the checks that match your change:
 
 ```bash
+npm run check:contracts
 npm run audit:presets
 npm run test:node
 npm run test:worker
 npm run build:web
+bin/upm doctor --profile core
+.venv/bin/ruff check upm tests/test_pptd_core.py tests/test_compiler.py tests/test_qa.py tests/test_adapter_kimi.py tests/test_upm_cli.py
 git diff --check
 ```
 
@@ -25,6 +28,13 @@ For desktop or packaging changes, also run:
 
 ```bash
 npm run build:desktop
+```
+
+For changes to the UPM deck-generation pipeline (PPTD / compiler / QA / CLI), also run:
+
+```bash
+.venv/bin/python -m unittest tests.test_pptd_core tests.test_compiler tests.test_qa tests.test_adapter_kimi tests.test_upm_cli
+bin/upm make "冒烟主题：数据平台建设，覆盖数据治理、实时计算与安全合规。" --title "Smoke" --out /tmp/upm-smoke --pages 4 --mode quick
 ```
 
 ## Privacy Rules

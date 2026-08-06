@@ -20,7 +20,7 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square&color=171714"></a>&ensp;
   <a href="./LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-171714?style=flat-square"></a>&ensp;
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="v6.3.9" src="https://img.shields.io/badge/GitHub_Release-v6.3.9-1D4ED8?style=flat-square"></a>&ensp;
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15"><img alt="v7.0.0" src="https://img.shields.io/badge/GitHub_Release-v7.0.0-1D4ED8?style=flat-square"></a>&ensp;
   <img alt="local-first" src="https://img.shields.io/badge/local--first-yes-73866C?style=flat-square">&ensp;
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-1D4ED8?style=flat-square">
 </p>
@@ -357,7 +357,7 @@ scripts/preserve_edit_pptx.py        保真引擎（标准库，CLI + apply_edit
 | **接入** | [MCP Server](./docs/zh-CN/guides/mcp-server.md)&ensp;·&ensp;[Agent Bridge](./docs/zh-CN/guides/agent-connect-bridge.md)&ensp;·&ensp;[Provider 配置](./docs/zh-CN/guides/model-provider-setup.md) |
 | **设计** | [设计系统](./DESIGN.md)&ensp;·&ensp;[视觉合约](./contracts/visual-defaults.yaml) |
 | **故障排查** | [troubleshooting](./docs/zh-CN/guides/troubleshooting.md) |
-| **版本** | [v6.3.9 发布说明](./docs/zh-CN/release/release-notes-v6.3.9.md) |
+| **版本** | [v7.0.0 发布说明](./docs/zh-CN/release/release-notes-v7.0.0.md) |
 | **中文文档索引** | [docs/zh-CN](./docs/zh-CN/README.md) |
 
 <br>

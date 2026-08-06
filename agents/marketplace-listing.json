@@ -2,9 +2,9 @@
   "id": "ultimate-ppt-master",
   "name": "Ultimate PPT Master",
   "displayName": "Ultimate PPT Master",
-  "version": "6.3.9",
-  "releaseStatus": "github-released",
-  "releaseEvidence": "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9",
+  "version": "7.0.0",
+  "releaseStatus": "unreleased",
+  "releaseEvidence": "https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15",
   "marketplaceStatus": "independent-not-attested",
   "invocation": "$ultimate-ppt-master",
   "category": [

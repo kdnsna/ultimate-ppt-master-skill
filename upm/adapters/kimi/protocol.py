@@ -4,28 +4,23 @@ from __future__ import annotations
 
 import base64
 import json
-import mimetypes
 import os
 import re
 import shutil
 import subprocess
-import sys
-import tempfile
 import threading
 import time
 import uuid
 import zipfile
+from collections.abc import Callable, Iterable, Sequence
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Callable, Iterable, Sequence
+from typing import Any
 
 import yaml
 
 from upm.errors import AdapterProtocolError, AdapterUnavailableError, ExportError
-from upm.pptd.io import find_manifest, read_yaml
-from upm.pptd.paths import validate_element_src
 from upm.paths import normalize_relative_path
-
 
 MANIFEST = json.loads((Path(__file__).with_name("manifest.json")).read_text(encoding="utf-8"))
 EDITOR_ORIGIN = MANIFEST["editor"]["origin"]
@@ -133,7 +128,7 @@ def ensure_agent_browser() -> str:
     if version < MIN_AGENT_BROWSER:
         raise AdapterUnavailableError(
             f"agent-browser 版本过低（{'.'.join(str(v) for v in version)} < {minimum}）。",
-            hint=f"升级：npm install -g agent-browser@latest，然后运行 upm doctor --profile kimi。",
+            hint="升级：npm install -g agent-browser@latest，然后运行 upm doctor --profile kimi。",
         )
     return executable
 

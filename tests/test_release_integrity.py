@@ -7,10 +7,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "6.3.9"
+VERSION = "7.0.0"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
-RELEASE_STATUS = "github-released"
-RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"
+RELEASE_STATUS = "unreleased"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15"
 MARKETPLACE_STATUS = "independent-not-attested"
 
 
@@ -80,7 +80,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         for path in ("README.md", "README.en.md", "README.zh-CN.md"):
             self.assertIn(f"v{version}", (ROOT / path).read_text(encoding="utf-8"), path)
         self.assertIn(f'appVersion = "{version}"', (ROOT / "apps/web/src/V6Workspace.tsx").read_text(encoding="utf-8"))
-        self.assertIn(f"v{version} 正式版本", (ROOT / "apps/web/public/benchmark/index.html").read_text(encoding="utf-8"))
+        self.assertIn(f"v{version} 候选版本", (ROOT / "apps/web/public/benchmark/index.html").read_text(encoding="utf-8"))
         self.assertIn(f"v{version}", (ROOT / "assets/readme/hero.svg").read_text(encoding="utf-8"))
         for report_path in (
             "examples/executive-business-review-starter/quality-report.json",
@@ -141,7 +141,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         release_zh = (ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md").read_text(encoding="utf-8")
         for marker in (
             "GitHub release contract",
-            "releaseStatus: github-released",
+            "releaseStatus: unreleased",
             "marketplaceStatus: independent-not-attested",
             RELEASE_EVIDENCE,
             "Plain-Language Update Notes",
@@ -150,15 +150,15 @@ class ReleaseIntegrityTest(unittest.TestCase):
             self.assertIn(marker, release_en)
         for marker in (
             "GitHub 发布合同",
-            "releaseStatus: github-released",
+            "releaseStatus: unreleased",
             "marketplaceStatus: independent-not-attested",
             RELEASE_EVIDENCE,
             "白话更新栏",
             "独立回滚边界",
         ):
             self.assertIn(marker, release_zh)
-        self.assertIn("../zh-CN/release/release-notes-v6.3.9.md", release_en)
-        self.assertIn("../../release/release-notes-v6.3.9.md", release_zh)
+        self.assertIn("../zh-CN/release/release-notes-v7.0.0.md", release_en)
+        self.assertIn("../../release/release-notes-v7.0.0.md", release_zh)
 
     def test_core_entry_scripts_exist(self):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
@@ -216,7 +216,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/release/release-notes-v6.3.5.md",
             "docs/release/release-notes-v6.3.7.md",
             "docs/release/release-notes-v6.3.8.md",
-            "docs/release/release-notes-v6.3.9.md",
+            "docs/release/release-notes-v7.0.0.md",
             "docs/release/release-notes-v6.3.6.md",
             "docs/release/release-notes-v5.4.1.md",
             "docs/release/release-notes-v5.3.0.md",
@@ -241,7 +241,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "docs/zh-CN/release/release-notes-v6.3.5.md",
             "docs/zh-CN/release/release-notes-v6.3.7.md",
             "docs/zh-CN/release/release-notes-v6.3.8.md",
-            "docs/zh-CN/release/release-notes-v6.3.9.md",
+            "docs/zh-CN/release/release-notes-v7.0.0.md",
             "docs/zh-CN/release/release-notes-v6.3.6.md",
             "docs/zh-CN/release/release-notes-v5.4.1.md",
             "docs/zh-CN/release/release-notes-v5.3.0.md",
@@ -610,7 +610,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertEqual(finished_png_bytes[:8], b"\x89PNG\r\n\x1a\n")
         self.assertEqual((int.from_bytes(finished_png_bytes[16:20]), int.from_bytes(finished_png_bytes[20:24])), (1440, 810))
         source_text = finished_decks_source.read_text(encoding="utf-8")
-        for marker in ("V6.3.9 正式版本", "226 个原生矢量对象", "AI Web Deck"):
+        for marker in ("V7.0.0 候选版本", "226 个原生矢量对象", "AI Web Deck"):
             self.assertIn(marker, source_text)
 
         design_system = (ROOT / "DESIGN.md").read_text(encoding="utf-8")

@@ -50,10 +50,10 @@ class SkillMarketAuditTest(unittest.TestCase):
 
         self.assertEqual(listing["id"], "ultimate-ppt-master")
         self.assertEqual(listing["invocation"], "$ultimate-ppt-master")
-        self.assertEqual(listing["releaseStatus"], "github-released")
+        self.assertEqual(listing["releaseStatus"], "unreleased")
         self.assertEqual(
             listing["releaseEvidence"],
-            "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9",
+            "https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15",
         )
         self.assertEqual(listing["marketplaceStatus"], "independent-not-attested")
         self.assertIn("quality-checked", listing["shortDescription"])

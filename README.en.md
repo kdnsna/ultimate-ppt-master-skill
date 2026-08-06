@@ -19,7 +19,7 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square&color=171714"></a>&ensp;
   <a href="./LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-171714?style=flat-square"></a>&ensp;
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="v6.3.9" src="https://img.shields.io/badge/GitHub_Release-v6.3.9-1D4ED8?style=flat-square"></a>&ensp;
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15"><img alt="v7.0.0" src="https://img.shields.io/badge/GitHub_Release-v7.0.0-1D4ED8?style=flat-square"></a>&ensp;
   <img alt="local-first" src="https://img.shields.io/badge/local--first-yes-73866C?style=flat-square">&ensp;
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-1D4ED8?style=flat-square">
 </p>
@@ -27,6 +27,22 @@
 <br>
 
 ---
+
+<br>
+
+## v7 Unified Architecture (upm CLI)
+
+Two engines: **Preserve Edit Engine** (byte-stable edits to an existing branded PPTX) and **Deck Generation Engine** (DeckIR → PPTD → export → visual QA). Three user paths: `preserve-edit` / `editable-deck` / `web-deck` (Web Deck is enabled only on an explicit request).
+
+```bash
+bin/upm make <source-or-topic>     # generate an editable PPTX (default)
+bin/upm edit <file.pptx> "change"  # fidelity-preserving local edit
+bin/upm open <project>             # open the PPTD visual editor
+bin/upm review <project>           # re-run visual/delivery audit
+bin/upm doctor                     # environment check (report only)
+```
+
+See [upm-cli.md](docs/guides/upm-cli.md), [upm-v7-unification.md](docs/architecture/upm-v7-unification.md), and [upm-migration.md](docs/guides/upm-migration.md).
 
 <br>
 
@@ -340,7 +356,7 @@ Designed for banking, government, and legal environments.
 | **Integration** | [MCP Server](./docs/guides/mcp-server.md)&ensp;·&ensp;[Agent Bridge](./docs/guides/agent-connect-bridge.md)&ensp;·&ensp;[Providers](./docs/guides/model-provider-setup.md) |
 | **Design** | [Design System](./DESIGN.md)&ensp;·&ensp;[Visual Contract](./contracts/visual-defaults.yaml) |
 | **Troubleshooting** | [troubleshooting](./docs/guides/troubleshooting.md) |
-| **Release** | [v6.3.9 notes](./docs/release/release-notes-v6.3.9.md) |
+| **Release** | [v7.0.0 notes](./docs/release/release-notes-v7.0.0.md) |
 | **English docs index** | [docs/README.md](./docs/README.md) |
 
 <br>

@@ -15,7 +15,6 @@ from typing import Any
 
 from upm.errors import InputError
 
-
 BODY_ROLES = {"context", "evidence", "comparison", "process", "benefit", "risk", "action"}
 RECIPE_INDEX = Path(__file__).resolve().parents[2] / "templates" / "page-recipes" / "index.json"
 
