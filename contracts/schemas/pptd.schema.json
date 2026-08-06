@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ultimate-ppt-master.dev/schemas/pptd.schema.json",
+  "title": "UPM PPTD v2 project schema",
+  "description": "Machine-checkable contract for .pptd manifests and .page files. The runtime validator in upm/pptd/schema.py enforces the same rules with precise file/field locations.",
+  "type": "object",
+  "required": ["version", "size", "pages"],
+  "properties": {
+    "version": {"const": "v2"},
+    "title": {"type": "string"},
+    "size": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"type": "number", "exclusiveMinimum": 0},
+      "description": "[width, height] in px/pt; recommended 16:9 [960, 540]"
+    },
+    "theme": {"$ref": "#/$defs/theme"},
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^pages/[^/]+\\.page$",
+        "description": "Project-relative page path; absolute paths and .. are rejected"
+      }
+    },
+    "upm": {"$ref": "#/$defs/upmBlock"}
+  },
+  "$defs": {
+    "upmBlock": {
+      "type": "object",
+      "required": ["schemaVersion"],
+      "properties": {
+        "schemaVersion": {"const": "upm-pptd-v1"},
+        "deckir": {"type": "string"},
+        "projectName": {"type": "string"},
+        "qualityMode": {"enum": ["quick", "standard", "audit"]},
+        "exportBackend": {"type": "string"},
+        "directionId": {"type": "string"}
+      }
+    },
+    "theme": {
+      "type": "object",
+      "properties": {
+        "colors": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$"}
+        },
+        "textStyles": {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/textStyle"}
+        },
+        "tableStyles": {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/tableStyle"}
+        }
+      }
+    },
+    "textStyle": {
+      "type": "object",
+      "properties": {
+        "color": {"type": "string"},
+        "fontSize": {"type": "number", "exclusiveMinimum": 0},
+        "fontFamily": {"type": ["string", "object"]},
+        "bold": {"type": "boolean"},
+        "italic": {"type": "boolean"},
+        "lineHeight": {"type": "number", "exclusiveMinimum": 0},
+        "lineHeightPx": {"type": "number", "exclusiveMinimum": 0},
+        "letterSpacing": {"type": "number"},
+        "marginTop": {"type": "number"}
+      }
+    },
+    "cellStyle": {
+      "allOf": [{"$ref": "#/$defs/textStyle"}],
+      "properties": {
+        "fill": {"$ref": "#/$defs/fill"},
+        "border": {"$ref": "#/$defs/borderSpec"},
+        "align": {"$ref": "#/$defs/alignment"}
+      }
+    },
+    "tableStyle": {
+      "type": "object",
+      "properties": {
+        "cellStyle": {"$ref": "#/$defs/cellStyle"},
+        "firstRowStyle": {"$ref": "#/$defs/cellStyle"},
+        "lastRowStyle": {"$ref": "#/$defs/cellStyle"},
+        "firstColumnStyle": {"$ref": "#/$defs/cellStyle"},
+        "lastColumnStyle": {"$ref": "#/$defs/cellStyle"},
+        "bodyStyles": {"type": "array", "items": {"$ref": "#/$defs/cellStyle"}},
+        "rowOverColumn": {"type": "boolean"}
+      }
+    },
+    "color": {"type": "string"},
+    "alignment": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"type": "string"}
+    },
+    "border": {
+      "type": "object",
+      "properties": {
+        "style": {"enum": ["solid", "dash", "dot"]},
+        "width": {"type": "number", "exclusiveMinimum": 0},
+        "color": {"type": "string"}
+      }
+    },
+    "borderSpec": {
+      "oneOf": [
+        {"type": "null"},
+        {"$ref": "#/$defs/border"},
+        {"type": "array", "minItems": 2, "maxItems": 4, "items": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/border"}]}}
+      ]
+    },
+    "shadow": {
+      "type": "object",
+      "required": ["blur", "color"],
+      "properties": {
+        "blur": {"type": "number", "exclusiveMinimum": 0},
+        "color": {"type": "string"},
+        "offset": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}}
+      }
+    },
+    "colorStop": {
+      "type": "object",
+      "required": ["position", "color"],
+      "properties": {
+        "position": {"type": "number", "minimum": 0, "maximum": 1},
+        "color": {"type": "string"}
+      }
+    },
+    "fill": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["type", "color"],
+          "properties": {
+            "type": {"const": "solid"},
+            "color": {"type": "string"}
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "gradientType", "stops"],
+          "properties": {
+            "type": {"const": "gradient"},
+            "gradientType": {"enum": ["linear", "radial"]},
+            "angle": {"type": "number"},
+            "stops": {"type": "array", "minItems": 2, "items": {"$ref": "#/$defs/colorStop"}}
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "src"],
+          "properties": {
+            "type": {"const": "image"},
+            "src": {"type": "string"},
+            "fit": {"$ref": "#/$defs/imageFit"},
+            "crop": {"$ref": "#/$defs/imageCrop"},
+            "opacity": {"type": "number", "minimum": 0, "maximum": 1}
+          }
+        }
+      ]
+    },
+    "imageFit": {
+      "type": "object",
+      "properties": {
+        "mode": {"enum": ["fill", "contain", "cover"]}
+      }
+    },
+    "imageCrop": {
+      "type": "object",
+      "properties": {
+        "left": {"type": "number"},
+        "top": {"type": "number"},
+        "right": {"type": "number"},
+        "bottom": {"type": "number"}
+      }
+    },
+    "bounds": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {"type": "number"},
+      "description": "[x, y, width, height] in px/pt"
+    },
+    "elementBase": {
+      "type": "object",
+      "required": ["elementId", "elementType", "bounds"],
+      "properties": {
+        "elementId": {"type": "string", "minLength": 1},
+        "elementType": {"enum": ["text", "shape", "line", "image", "icon", "table", "chart"]},
+        "bounds": {"$ref": "#/$defs/bounds"},
+        "rotation": {"type": "number"},
+        "opacity": {"type": "number", "minimum": 0, "maximum": 1},
+        "flip": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "boolean"}}
+      }
+    },
+    "textContent": {
+      "type": "object",
+      "required": ["text"],
+      "properties": {
+        "text": {"type": "string"},
+        "style": {"type": "string", "pattern": "^\\$"},
+        "color": {"type": "string"},
+        "fontSize": {"type": "number", "exclusiveMinimum": 0},
+        "fontFamily": {"type": ["string", "object"]},
+        "bold": {"type": "boolean"},
+        "italic": {"type": "boolean"},
+        "lineHeight": {"type": "number", "exclusiveMinimum": 0},
+        "lineHeightPx": {"type": "number", "exclusiveMinimum": 0},
+        "letterSpacing": {"type": "number"},
+        "marginTop": {"type": "number"},
+        "textDirection": {"enum": ["horizontal", "vertical"]},
+        "wrap": {"type": "boolean"},
+        "align": {"$ref": "#/$defs/alignment"}
+      }
+    },
+    "element": {
+      "oneOf": [
+        {
+          "allOf": [
+            {"$ref": "#/$defs/elementBase"},
+            {
+              "required": ["content"],
+              "properties": {
+                "elementType": {"const": "text"},
+                "content": {"$ref": "#/$defs/textContent"}
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/elementBase"},
+            {
+              "required": ["shapeName"],
+              "properties": {
+                "elementType": {"const": "shape"},
+                "shapeName": {"type": "string"},
+                "adjustments": {"type": "array", "items": {"type": "number"}},
+                "viewBox": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+                "path": {"type": "string"},
+                "fill": {"$ref": "#/$defs/fill"},
+                "border": {"$ref": "#/$defs/border"},
+                "shadow": {"$ref": "#/$defs/shadow"}
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/elementBase"},
+            {
+              "required": ["viewBox", "points"],
+              "properties": {
+                "elementType": {"const": "line"},
+                "viewBox": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+                "points": {"type": "string"},
+                "curve": {"enum": ["sharp", "round", "smooth"]},
+                "arrow": {"type": "array", "minItems": 2, "maxItems": 2},
+                "border": {"$ref": "#/$defs/border"},
+                "shadow": {"$ref": "#/$defs/shadow"}
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/elementBase"},
+            {
+              "required": ["src"],
+              "properties": {
+                "elementType": {"const": "image"},
+                "src": {"type": "string"},
+                "fit": {"$ref": "#/$defs/imageFit"},
+                "crop": {"$ref": "#/$defs/imageCrop"},
+                "cropShape": {"type": "object"},
+                "border": {"$ref": "#/$defs/border"},
+                "shadow": {"$ref": "#/$defs/shadow"}
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/elementBase"},
+            {
+              "required": ["iconName"],
+              "properties": {
+                "elementType": {"const": "icon"},
+                "iconName": {"type": "string", "pattern": "^(fas|far|fab):"}
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/elementBase"},
+            {
+              "required": ["columnWidths", "rowHeights", "rows"],
+              "properties": {
+                "elementType": {"const": "table"},
+                "columnWidths": {"type": "array", "minItems": 1, "items": {"type": "number"}},
+                "rowHeights": {"type": "array", "minItems": 1, "items": {"type": "number"}},
+                "rows": {"type": "array", "minItems": 1},
+                "style": {"type": ["string", "object"]}
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {"$ref": "#/$defs/elementBase"},
+            {
+              "required": ["data", "series"],
+              "properties": {
+                "elementType": {"const": "chart"},
+                "data": {"type": "object"},
+                "series": {"type": "array", "minItems": 1},
+                "title": {"type": ["string", "object"]},
+                "legend": {"type": ["boolean", "object"]},
+                "xAxis": {"type": ["object", "array"]},
+                "yAxis": {"type": ["object", "array"]},
+                "spokeAxis": {"type": "object"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "page": {
+      "type": "object",
+      "required": ["elements"],
+      "properties": {
+        "pageType": {"type": "string"},
+        "background": {"$ref": "#/$defs/fill"},
+        "notes": {"type": "string"},
+        "elements": {"type": "array", "items": {"$ref": "#/$defs/element"}},
+        "upm": {"$ref": "#/$defs/upmBlock"}
+      }
+    }
+  }
+}

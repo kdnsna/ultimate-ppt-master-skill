@@ -1,0 +1,5 @@
+version: v2
+title: 损坏示例
+size: [960, 540]
+pages:
+  - pages/01_cover.page
