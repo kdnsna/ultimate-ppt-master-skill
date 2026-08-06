@@ -11,13 +11,14 @@ INSTALL_PLAYWRIGHT_BROWSER=0
 
 usage() {
   cat <<'USAGE'
-Usage: bash scripts/bootstrap.sh [--profile core|pptx|web|visual-review|desktop|all]
+Usage: bash scripts/bootstrap.sh [--profile core|pptx|web|visual-review|kimi|desktop|all]
 
 Profiles:
   core           Light Python venv (preserve-edit needs almost nothing)
   pptx           Light Python deps for editable PPTX conversion
   web            Core Python + Web Experience / Bridge npm deps
   visual-review  Full Python deps + Playwright Chromium (~150MB download)
+  kimi           Core Python + websocket-client for the optional Kimi adapter
   desktop        Core Python + Web + desktop npm deps (Rust still separate)
   all            Current full setup (default; includes the Chromium download)
 USAGE
@@ -46,7 +47,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 case "$PROFILE" in
-  core|pptx|web|visual-review|desktop|all) ;;
+  core|pptx|web|visual-review|kimi|desktop|all) ;;
   *)
     echo "Unsupported profile: $PROFILE" >&2
     usage >&2
@@ -99,12 +100,14 @@ need_python=0
 need_web=0
 need_desktop=0
 need_visual=0
+need_kimi=0
 case "$PROFILE" in
   core|pptx) need_python=1 ;;
   web) need_python=1; need_web=1 ;;
   visual-review) need_python=1; need_visual=1 ;;
+  kimi) need_python=1; need_kimi=1 ;;
   desktop) need_python=1; need_web=1; need_desktop=1 ;;
-  all) need_python=1; need_web=1; need_desktop=1; need_visual=1 ;;
+  all) need_python=1; need_web=1; need_desktop=1; need_visual=1; need_kimi=1 ;;
 esac
 
 info "Root: $ROOT_DIR"
@@ -138,6 +141,10 @@ if [[ "$need_python" -eq 1 ]]; then
     "$ROOT_DIR/.venv/bin/python" -m pip install 'playwright>=1.40.0'
     "$ROOT_DIR/.venv/bin/python" -m playwright install chromium
     INSTALL_PLAYWRIGHT_BROWSER=1
+  fi
+  if [[ "$need_kimi" -eq 1 ]]; then
+    info "Installing Kimi adapter Python dependency (websocket-client)"
+    "$ROOT_DIR/.venv/bin/python" -m pip install -r "$ROOT_DIR/requirements-kimi.txt"
   fi
 fi
 
@@ -195,4 +202,7 @@ if [[ "$need_desktop" -eq 1 ]]; then
 fi
 if [[ "$INSTALL_PLAYWRIGHT_BROWSER" -eq 1 ]]; then
   printf "  python3 scripts/visual_review.py <project_path>  # auto-starts temporary preview when needed\n"
+fi
+if [[ "$need_kimi" -eq 1 ]]; then
+  printf "  bin/upm doctor --profile kimi                    # check the optional Kimi adapter\n"
 fi

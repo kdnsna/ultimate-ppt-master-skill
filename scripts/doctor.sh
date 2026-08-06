@@ -10,13 +10,14 @@ PROFILE="all"
 
 usage() {
   cat <<'USAGE'
-Usage: bash scripts/doctor.sh [--profile core|pptx|web|visual-review|desktop|all]
+Usage: bash scripts/doctor.sh [--profile core|pptx|web|visual-review|kimi|desktop|all]
 
 Profiles:
   core           Python + skill scripts only
   pptx           core + python-pptx / Office conversion deps
   web            Node tooling for Web Experience / Bridge
   visual-review  Playwright / Chromium / preview rendering
+  kimi           core + websocket-client + agent-browser version check (optional adapter)
   desktop        Desktop app packaging dependencies
   all            Everything (default)
 USAGE
@@ -45,7 +46,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 case "$PROFILE" in
-  core|pptx|web|visual-review|desktop|all) ;;
+  core|pptx|web|visual-review|kimi|desktop|all) ;;
   *)
     echo "Unsupported profile: $PROFILE" >&2
     usage >&2
@@ -58,13 +59,15 @@ need_pptx=0
 need_web=0
 need_visual=0
 need_desktop=0
+need_kimi=0
 case "$PROFILE" in
   core) need_core=1 ;;
   pptx) need_core=1; need_pptx=1 ;;
   web) need_core=1; need_web=1 ;;
   visual-review) need_core=1; need_visual=1 ;;
+  kimi) need_core=1; need_kimi=1 ;;
   desktop) need_core=1; need_web=1; need_desktop=1 ;;
-  all) need_core=1; need_pptx=1; need_web=1; need_visual=1; need_desktop=1 ;;
+  all) need_core=1; need_pptx=1; need_web=1; need_visual=1; need_desktop=1; need_kimi=1 ;;
 esac
 
 ok() {
@@ -196,6 +199,30 @@ if [[ "$need_visual" -eq 1 ]]; then
     ok "flask is importable for temporary preview server"
   else
     warn "flask is not importable; visual_review auto-start preview may fail"
+  fi
+fi
+
+if [[ "$need_kimi" -eq 1 ]]; then
+  if [[ -n "${VENV_PY:-}" ]] && loadable_python_module "$VENV_PY" websocket; then
+    ok "websocket-client is importable"
+  else
+    warn "websocket-client is not importable. Run: bash scripts/bootstrap.sh --profile kimi"
+  fi
+  if has_cmd agent-browser; then
+    AGENT_VERSION="$("$VENV_PY" - <<'PY' 2>/dev/null || true
+import re, subprocess
+out = subprocess.run(["agent-browser", "--version"], capture_output=True, text=True).stdout
+m = re.search(r"(\d+)\.(\d+)\.(\d+)", out)
+print(".".join(m.groups()) if m else "unknown")
+PY
+)"
+    if [[ -n "$AGENT_VERSION" ]]; then
+      ok "agent-browser: $AGENT_VERSION"
+    else
+      warn "agent-browser version could not be parsed"
+    fi
+  else
+    warn "agent-browser is missing. Kimi adapter unavailable; local backend is unaffected. Install with: npm install -g agent-browser@latest"
   fi
 fi
 

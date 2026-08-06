@@ -20,6 +20,7 @@ apps/desktop/src-tauri/icons/android/
 apps/desktop/src-tauri/icons/ios/
 *.egg-info/
 projects/
+.upm/
 exports/
 *.pptx
 !examples/executive-business-review-starter/executive-business-review-editable.pptx

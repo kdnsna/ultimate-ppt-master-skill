@@ -15,6 +15,11 @@
 -r requirements-core.txt
 
 # ─────────────────────────────────────────────────────────────
+# Kimi adapter (optional browser-side export/QA backend)
+# ─────────────────────────────────────────────────────────────
+-r requirements-kimi.txt
+
+# ─────────────────────────────────────────────────────────────
 # SVG to PPTX tool / SVG 转 PPTX 工具 (skills/ppt-master/scripts/svg_to_pptx.py)
 # ─────────────────────────────────────────────────────────────
 # Batch-convert SVG files to PowerPoint presentations.
@@ -124,4 +129,3 @@ PyYAML>=6.0.0
 # 用于 scripts/visual_review.py 的浏览器渲染预览；核心解析/导出不强制。
 # playwright>=1.40.0
 # Then: python -m playwright install chromium
-

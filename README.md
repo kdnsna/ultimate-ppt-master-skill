@@ -31,6 +31,22 @@
 
 <br>
 
+## v7 统一架构（upm CLI）
+
+两个内核：**Preserve Edit Engine**（已有 PPTX 保真修改）与 **Deck Generation Engine**（DeckIR → PPTD → 导出 → 视觉 QA）。三条用户路径：`preserve-edit` / `editable-deck` / `web-deck`（仅在明确要求网页时启用）。
+
+```bash
+bin/upm make <source-or-topic>     # 生成可编辑 PPTX（默认）
+bin/upm edit <file.pptx> "修改要求" # 保真局部修改
+bin/upm open <project>             # PPTD 视觉精修
+bin/upm review <project>           # 重新审计
+bin/upm doctor                     # 环境检查（只报告）
+```
+
+详见 [upm-cli.md](docs/guides/upm-cli.md)、[upm-v7-unification.md](docs/architecture/upm-v7-unification.md) 与 [upm-migration.md](docs/guides/upm-migration.md)。
+
+<br>
+
 ## 能力一览
 
 - **保真改 PPT** — 对已有品牌 PPTX 指哪改哪，母版 / logo / 链接字节级不动。
