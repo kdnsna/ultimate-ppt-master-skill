@@ -166,6 +166,29 @@ function fastProjectBrief(extra = {}) {
   };
 }
 
+async function waitForArtifactPayload(baseUrl, projectPath, predicate, timeoutMs = 8000) {
+  const deadline = Date.now() + timeoutMs;
+  let payload;
+  while (Date.now() < deadline) {
+    const response = await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`);
+    payload = await response.json();
+    if (predicate(payload)) return payload;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+  }
+  return payload;
+}
+
+async function waitForArtifactVerification(baseUrl, projectPath, relativePath, expected, timeoutMs = 8000) {
+  const payload = await waitForArtifactPayload(
+    baseUrl,
+    projectPath,
+    (candidate) => candidate.artifacts?.find((artifact) => artifact.relativePath === relativePath)?.verification === expected,
+    timeoutMs
+  );
+  const actual = payload.artifacts?.find((artifact) => artifact.relativePath === relativePath)?.verification;
+  assert.equal(actual, expected, `artifact ${relativePath} did not reach ${expected}`);
+}
+
 test("health reports provider status without leaking keys", async () => {
   await withServer(
     {
@@ -1259,9 +1282,11 @@ test("artifact endpoints list and download only allowlisted handoff outputs", as
       await writeFile(outsideFile, "OUTSIDE");
       await symlink(outsideFile, join(projectPath, "exports", "leak.pptx"));
 
-      const listResponse = await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`);
-      assert.equal(listResponse.status, 200);
-      const listed = await listResponse.json();
+      const listed = await waitForArtifactPayload(
+        baseUrl,
+        projectPath,
+        (payload) => payload.artifacts?.some((artifact) => artifact.relativePath === "exports/final.pptx")
+      );
       assert.deepEqual(
         listed.artifacts.map((artifact) => artifact.relativePath),
         [
@@ -1412,14 +1437,12 @@ test("a passed quality report verifies only the exact artifact path and sha256",
       };
       await writeFile(reportPath, JSON.stringify(report));
 
-      let listed = await (await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`)).json();
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/final.pptx")?.verification, "passed");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/final.pptx", "passed");
 
       await writeFile(artifactPath, "VERSION-TWO");
       await writeFile(join(projectPath, "exports", "new-file.pptx"), "NEW-FILE");
-      listed = await (await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`)).json();
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/final.pptx")?.verification, "pending");
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/new-file.pptx")?.verification, "pending");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/final.pptx", "pending");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/new-file.pptx", "pending");
 
       report.artifact = {
         relativePath: "exports/final.pptx",
@@ -1427,9 +1450,8 @@ test("a passed quality report verifies only the exact artifact path and sha256",
         size: Buffer.byteLength("VERSION-TWO")
       };
       await writeFile(reportPath, JSON.stringify(report));
-      listed = await (await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`)).json();
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/final.pptx")?.verification, "passed");
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/new-file.pptx")?.verification, "pending");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/final.pptx", "passed");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/new-file.pptx", "pending");
     });
   } finally {
     await rm(outputDir, { recursive: true, force: true });
@@ -1462,9 +1484,11 @@ test("artifact verification stays blocked when a passed report has no production
       report.status = "passed";
       await writeFile(join(projectPath, "quality-report.json"), JSON.stringify(report));
 
-      const response = await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`);
-      assert.equal(response.status, 200);
-      const payload = await response.json();
+      const payload = await waitForArtifactPayload(
+        baseUrl,
+        projectPath,
+        (candidate) => candidate.artifacts?.some((artifact) => artifact.relativePath === "exports/unsupported.pptx")
+      );
       const pptx = payload.artifacts.find((artifact) => artifact.relativePath === "exports/unsupported.pptx");
       assert.equal(pptx?.verification, "blocked");
       assert.ok(payload.artifacts.every((artifact) => artifact.verification === "blocked"));
@@ -2176,9 +2200,11 @@ test("concurrent Bridge instances share one private signing key and validate pro
       const healthText = await (await fetch(`${baseUrl}/health`)).text();
       assert.equal(healthText.includes(keyBeforeRestart), false);
       for (const project of projects.slice(0, 2)) {
-        const response = await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(project.projectPath)}`);
-        assert.equal(response.status, 200);
-        const payload = await response.json();
+        const payload = await waitForArtifactPayload(
+          baseUrl,
+          project.projectPath,
+          (candidate) => candidate.artifacts?.some((artifact) => artifact.kind === "pptx")
+        );
         assert.equal(payload.artifacts.some((artifact) => artifact.name === ".bridge-manifest.key"), false);
         assert.equal(payload.artifacts.some((artifact) => artifact.kind === "pptx"), true);
       }
