@@ -10,13 +10,10 @@ from __future__ import annotations
 import importlib.util
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 from typing import Any
 
-from upm.pptd.io import load_project
 from upm.qa.contact_sheet import stitch_overview
-from upm.render.svg import render_page_svg
 
 
 def _render_svgs(project: Path) -> list[Path]:

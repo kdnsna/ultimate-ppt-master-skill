@@ -15,7 +15,6 @@ from typing import Any
 
 from upm.render.charts import render_chart
 
-
 FONT_STACK = "'Microsoft YaHei', 'PingFang SC', 'Arial', sans-serif"
 
 

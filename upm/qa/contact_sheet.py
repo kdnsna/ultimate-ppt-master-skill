@@ -8,7 +8,6 @@ from typing import Any
 
 from upm.errors import AdapterUnavailableError
 
-
 OVERVIEW_COLUMNS = 3
 OVERVIEW_THUMB_WIDTH = 640
 OVERVIEW_LABEL_HEIGHT = 32

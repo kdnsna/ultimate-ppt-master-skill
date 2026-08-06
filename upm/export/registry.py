@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from upm.errors import AdapterUnavailableError, ConfigError
+from upm.errors import ConfigError
 from upm.export.base import ExportResult
 from upm.export.local import export_local, local_healthcheck
 

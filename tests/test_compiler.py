@@ -3,7 +3,6 @@ import tempfile
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
@@ -11,7 +10,6 @@ from upm.compiler.compiler import compile_deck  # noqa: E402
 from upm.compiler.deckir import build_deckir, source_claims  # noqa: E402
 from upm.compiler.tokens import build_theme  # noqa: E402
 from upm.pptd.schema import validate_pptd_project  # noqa: E402
-
 
 SOURCE = """2024 年公司营业收入达到 96.3 亿元，同比增长 16.7%。
 净利润 15.8 亿元，毛利率提升至 41%。

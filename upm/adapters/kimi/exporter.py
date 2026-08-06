@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from upm.adapters.kimi.healthcheck import kimi_healthcheck
 from upm.adapters.kimi.protocol import (
     HOST_HTML,
     BrowserSession,
@@ -21,9 +22,8 @@ from upm.adapters.kimi.protocol import (
     verify_output,
     wait_for_export_dialog,
 )
-from upm.adapters.kimi.healthcheck import kimi_healthcheck
-from upm.errors import AdapterUnavailableError, ExportError
-from upm.export.base import ExportResult, healthcheck_shape
+from upm.errors import ExportError
+from upm.export.base import ExportResult
 
 
 def export_kimi(

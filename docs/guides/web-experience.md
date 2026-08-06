@@ -1,6 +1,6 @@
 # Web Experience
 
-The Web Experience is the primary public entry point for Ultimate PPT Master. The v6.3.9 source metadata marks this Chinese-first, static React/Vite task workspace as `github-released`. The authoritative publication evidence is the [`v6.3.9` tag and GitHub Release page](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9); source or Pages visibility alone is not proof. Pages receives only a matching CI-passing `main` commit, while marketplace publication remains a separate operation. The Classic console is frozen and remains available only through `?classic=1` during the v6.3 compatibility window.
+The Web Experience is the primary public entry point for Ultimate PPT Master. The v7.0.0 source metadata marks this Chinese-first, static React/Vite task workspace as `unreleased`; until the versioned tag is published, the reviewable evidence is [PR #15](https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15). Source or Pages visibility alone is not proof of a release. Pages receives only a matching CI-passing `main` commit, while marketplace publication remains a separate operation. The Classic console is frozen and remains available only through `?classic=1` during the v6.3 compatibility window.
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/

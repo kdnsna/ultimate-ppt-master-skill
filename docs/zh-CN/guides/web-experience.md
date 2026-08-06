@@ -1,6 +1,6 @@
 # Web Experience
 
-Web Experience 是 **保真改 PPT**（Ultimate PPT Master）的中文主入口。v6.3.9 源码元数据将这个静态 React/Vite 任务型工作台标记为 `github-released`。是否真正发布，只以 [`v6.3.9` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9) 为准。Classic 控制台已冻结，仅 `?classic=1` 兼容保留。
+Web Experience 是 **保真改 PPT**（Ultimate PPT Master）的中文主入口。v7.0.0 源码元数据将这个静态 React/Vite 任务型工作台标记为 `unreleased`；在版本 tag 发布前，可审查证据以 [PR #15](https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15) 为准。Classic 控制台已冻结，仅 `?classic=1` 兼容保留。
 
 ```text
 https://kdnsna.github.io/ultimate-ppt-master-skill/

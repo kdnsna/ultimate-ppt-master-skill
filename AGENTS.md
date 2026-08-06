@@ -8,7 +8,7 @@ Use this repository as a portable presentation-generation skill package for agen
 2. Resolve this repository root as `SKILL_DIR`.
 3. Follow `SKILL.md` before generating any presentation files.
 4. Use `assets/`, `references/`, `templates/`, `workflows/`, and `scripts/` only when the selected workflow needs them.
-5. Keep both public entry points discoverable: the v6 task-first workspace / Agent Bridge for guided local handoff, and the Agent Skill for production workflow use. The v5.4.1 console remains a one-cycle Classic fallback only.
+5. Keep both public entry points discoverable: the task-first workspace / Agent Bridge for guided local handoff, and the Agent Skill / `upm` CLI for production workflow use. The Classic console remains a frozen one-cycle fallback only.
 
 ## v6 Session Contract
 
@@ -89,7 +89,7 @@ Semantic assertions:
 
 Use this skill when the user asks to create, rewrite, convert, or polish a PPT, PowerPoint, deck, slide deck, presentation, 演示文稿, or 幻灯片.
 
-Follow the generated workflow policy above and `SKILL.md` for production details. Prefer auto-routing over forced mode selection. Formal/editable signals produce editable PPTX; explicit web/magazine/demo-day signals produce Web Deck; extreme-thin topic-only prompts use the light Style A editorial fallback.
+Follow the generated workflow policy above and `SKILL.md` for production details. Prefer auto-routing over forced mode selection. Formal/editable signals produce editable PPTX; explicit web/magazine/demo-day signals produce Web Deck; extreme-thin topic-only prompts default to the editable-deck fallback (light cover), and Web Deck is enabled only on an explicit request.
 
 ## Runtime
 

@@ -97,7 +97,7 @@ def _render_bar(chart: dict[str, Any], cols: list[str], rows: list[list[Any]], s
                 continue
             value = _num(row[y_index])
             bar_h = max(0.0, plot_h * (value - low) / (high - low))
-            x = pad_center = (category_index + 0.5) * slot - (bar_width * len(series)) / 2 + series_index * bar_width
+            x = (category_index + 0.5) * slot - (bar_width * len(series)) / 2 + series_index * bar_width
             out.append(
                 f'<rect x="{x:.1f}" y="{plot_h - bar_h:.1f}" width="{bar_width:.1f}" height="{bar_h:.1f}" fill="{fill}"/>'
             )

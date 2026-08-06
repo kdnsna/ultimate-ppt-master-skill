@@ -5,8 +5,6 @@ from __future__ import annotations
 import importlib.util
 import shutil
 import subprocess
-import sys
-from pathlib import Path
 from typing import Any
 
 from upm.cli.common import ROOT, resolve_python

@@ -3,13 +3,11 @@
 from __future__ import annotations
 
 import io
-import json
 import re
 from pathlib import Path
 from typing import Any
 
 from upm.pptd.io import load_project
-
 
 ALL_BG_THRESHOLD = 0.9995
 MIN_SAMPLE_COLORS = 8

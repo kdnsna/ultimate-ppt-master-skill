@@ -1,6 +1,6 @@
 {
   "schemaVersion": "workflow-policy-v1",
-  "version": "6.3.9",
+  "version": "7.0.0",
   "sourceOfTruth": {
     "skill": "SKILL.md",
     "design": "DESIGN.md",

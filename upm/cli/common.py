@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import re
 import shutil
 import subprocess
@@ -10,8 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from upm.errors import InputError, ProjectError
-
+from upm.errors import ProjectError
 
 ROOT = Path(__file__).resolve().parents[2]
 

@@ -3,17 +3,17 @@
 from .model import (
     MANIFEST_VERSION,
     UPM_SCHEMA_VERSION,
+    chart_element,
     create_manifest,
     create_page,
-    text_element,
-    shape_element,
     image_element,
+    shape_element,
     table_element,
-    chart_element,
+    text_element,
 )
 from .paths import (
-    assert_page_path,
     assert_media_path,
+    assert_page_path,
     page_path_from_index,
     validate_element_src,
 )

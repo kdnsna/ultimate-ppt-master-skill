@@ -65,6 +65,7 @@ Suggested one-line listing:
 
 Include the GitHub Pages demo, the latest actually published release link, and
 the public proof wall when the target list format allows it. Never present an
-unreleased candidate as a tagged release, GitHub Release, or marketplace publication merely because its source or Pages build is public. For v6.3.9, the
-versioned tag and GitHub Release page are the publication authority; that GitHub
-record does not automatically publish or attest to a marketplace listing.
+unreleased candidate as a tagged release, GitHub Release, or marketplace publication merely because its source or Pages build is public. For v7.0.0
+(unreleased), the reviewable authority is PR #15 until the versioned tag and
+GitHub Release page exist; that GitHub record does not automatically publish
+or attest to a marketplace listing.

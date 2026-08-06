@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ultimate-ppt-master"
+version = "7.0.0"
+description = "Local-first AI presentation workbench: fidelity-preserving PPTX edits and DeckIR -> PPTD -> PPTX generation with visual QA."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "kdnsna" }]
+keywords = ["ppt", "pptx", "presentation", "pptd", "deck", "slides"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Office/Business :: Office Suites",
+]
+dependencies = [
+  "PyYAML>=6.0.0",
+  "Pillow>=9.0.0",
+]
+
+[project.optional-dependencies]
+pptx = ["python-pptx>=0.6.21"]
+kimi = ["websocket-client>=1.8.0"]
+visual-review = ["playwright>=1.40.0"]
+all = [
+  "python-pptx>=0.6.21",
+  "websocket-client>=1.8.0",
+  "playwright>=1.40.0",
+]
+
+[project.scripts]
+upm = "upm.cli:main"
+
+[tool.setuptools]
+packages = ["upm", "upm.pptd", "upm.compiler", "upm.render", "upm.export", "upm.adapters", "upm.adapters.kimi", "upm.qa", "upm.cli"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP"]
+
+[tool.coverage.run]
+source = ["upm"]
+omit = ["upm/adapters/kimi/*"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if __name__ == .__main__.:"]

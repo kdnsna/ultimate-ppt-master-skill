@@ -1,8 +1,8 @@
 {
   "version": "2.5.0",
-  "releaseVersion": "6.3.9",
-  "releaseStatus": "github-released",
-  "releaseEvidence": "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9",
+  "releaseVersion": "7.0.0",
+  "releaseStatus": "unreleased",
+  "releaseEvidence": "https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15",
   "marketplaceStatus": "independent-not-attested",
   "presetId": "product_pitch",
   "status": "passed",

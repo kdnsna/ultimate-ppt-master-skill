@@ -11,10 +11,10 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "6.3.9"
+VERSION = "7.0.0"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
-RELEASE_STATUS = "github-released"
-RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"
+RELEASE_STATUS = "unreleased"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15"
 MARKETPLACE_STATUS = "independent-not-attested"
 README_BANNED_PHRASES = (
     "Best Results Prompt",
@@ -139,7 +139,7 @@ def audit_version_markers(errors: list[str]) -> None:
     require(listing.get("releaseEvidence") == RELEASE_EVIDENCE, "marketplace listing must link the authoritative GitHub Release", errors)
     require(listing.get("marketplaceStatus") == MARKETPLACE_STATUS, "marketplace listing must keep marketplace publication independent", errors)
     require(f'appVersion = "{VERSION}"' in app, f"apps/web/src/V6Workspace.tsx appVersion is not v{VERSION}", errors)
-    require(f"v{VERSION} 正式版本" in benchmark, f"benchmark page is missing the v{VERSION} formal-release marker", errors)
+    require(f"v{VERSION} 候选版本" in benchmark, f"benchmark page is missing the v{VERSION} formal-release marker", errors)
 
     for report in proof_reports:
         require(report.get("releaseVersion") == VERSION, f"public proof releaseVersion is not v{VERSION}", errors)
@@ -154,9 +154,9 @@ def audit_version_markers(errors: list[str]) -> None:
     require((ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md").is_file(), "missing Chinese current release notes", errors)
     release_en = read(ROOT / f"docs/release/release-notes-v{VERSION}.md")
     release_zh = read(ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md")
-    for marker in ("GitHub release contract", "releaseStatus: github-released", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE, "Plain-Language Update Notes", "Independent Rollback Boundary"):
+    for marker in ("GitHub release contract", "releaseStatus: unreleased", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE, "Plain-Language Update Notes", "Independent Rollback Boundary"):
         require(marker in release_en, f"v{VERSION} English release notes missing release-contract marker: {marker}", errors)
-    for marker in ("GitHub 发布合同", "releaseStatus: github-released", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE, "白话更新栏", "独立回滚边界"):
+    for marker in ("GitHub 发布合同", "releaseStatus: unreleased", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE, "白话更新栏", "独立回滚边界"):
         require(marker in release_zh, f"v{VERSION} Chinese release notes missing release-contract marker: {marker}", errors)
     # Stable canonical-homepage marker: the Chinese docs index link, not the
     # marketing tagline (the 2026-07-31 repositioning intentionally changed it).

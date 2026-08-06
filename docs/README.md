@@ -1,6 +1,6 @@
 # Documentation Map
 
-Ultimate PPT Master v6 uses a categorized documentation structure. Start with the route that matches the work you are doing.
+Ultimate PPT Master v7 uses a categorized documentation structure. Start with the route that matches the work you are doing.
 
 The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`README.en.md`](../README.en.md) for the complete English product overview.
 
@@ -8,11 +8,14 @@ The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`
 
 | Need | Read |
 |---|---|
+| Run the unified CLI (make / edit / open / review / doctor) | [UPM CLI](./guides/upm-cli.md) |
+| Understand the two engines and three user paths | [Architecture](./architecture/upm-v7-unification.md) |
+| Migrate from v6 routes or old projects | [Migration](./guides/upm-migration.md) |
 | Understand the web front door | [Web Experience](./guides/web-experience.md) |
 | Connect the web page to local files and Agents | [Agent Connect Bridge](./guides/agent-connect-bridge.md) |
 | Expose preserve-edit to any MCP-capable agent | [MCP Server](./guides/mcp-server.md) |
 | Install and invoke the Skill | [Agent Setup](./guides/agent-setup.md) |
-| Choose PPTX, Web Deck, dual delivery, or desktop preview | [Choosing a Workflow](./guides/choosing-a-workflow.md) |
+| Choose the product entry (Web / Bridge / Skill / CLI) | [Choosing a Workflow](./guides/choosing-a-workflow.md) |
 | Configure provider keys locally | [Model and Provider Setup](./guides/model-provider-setup.md) |
 | Copyable prompts for preserve-edit tasks | [Preserve-Edit Prompts](./guides/preserve-edit-prompts.md) |
 | Use the desktop preview path | [Quickstart Desktop](./guides/quickstart-desktop.md) |
@@ -34,7 +37,7 @@ The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`
 
 | Need | Read |
 |---|---|
-| Review the current GitHub release | [Release Notes - v6.3.9](./release/release-notes-v6.3.9.md) |
+| Review the v7.0.0 candidate notes (unreleased) | [Candidate Notes - v7.0.0](./release/release-notes-v7.0.0.md) |
 | Review the previous formal release | [Release Notes - v6.3.8](./release/release-notes-v6.3.8.md) |
 | Review the v6.3.5 refinement and runtime slice | [Candidate Notes - v6.3.5](./release/release-notes-v6.3.5.md) |
 | Review the v6.3.4 session and delivery slice | [Candidate Notes - v6.3.4](./release/release-notes-v6.3.4.md) |
@@ -79,4 +82,3 @@ The canonical GitHub homepage is the Chinese [`README.md`](../README.md). Use [`
 ## Active consolidation
 
 - [v6.3.8 consolidation working note](./strategy/v6-3-8-consolidation.md)
-

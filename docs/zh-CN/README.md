@@ -1,6 +1,6 @@
 # 中文文档索引
 
-Ultimate PPT Master v6 采用分类文档结构。先按你当前要做的事情选择入口。
+Ultimate PPT Master v7 采用分类文档结构。先按你当前要做的事情选择入口。
 
 GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像保留在 [`README.en.md`](../../README.en.md)。
 
@@ -8,11 +8,14 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 
 | 需求 | 阅读 |
 |---|---|
+| 统一 CLI（make / edit / open / review / doctor） | [UPM CLI](../guides/upm-cli.md) |
+| 理解两个内核与三条用户路径 | [架构说明](../architecture/upm-v7-unification.md) |
+| v6 路由/旧项目迁移 | [迁移说明](../guides/upm-migration.md) |
 | 理解网页入口（主路径：改稿 / 次要：生成） | [Web Experience](./guides/web-experience.md) |
 | 复制经营复盘 / 客户底稿 / 课件改稿 Prompt | [保真改稿场景 Prompt](./guides/preserve-edit-prompts.md) |
 | 连接网页、本地资料和 Agent | [Agent Connect Bridge](./guides/agent-connect-bridge.md) |
 | 安装和调用 Skill | [安装与启动](./guides/agent-setup.md) |
-| 选择 PPTX、Web Deck、双版本或已有 PPTX 修复 | [选择交付路线](./guides/choosing-a-workflow.md) |
+| 选择产品入口（Web / Bridge / Skill / CLI） | [选择交付路线](./guides/choosing-a-workflow.md) |
 | 本地配置 Provider key | [模型与 Provider 配置](./guides/model-provider-setup.md) |
 | 使用桌面预览路径 | [选择交付路线](./guides/choosing-a-workflow.md) |
 | 排查安装、解析、输出、Provider 或 Agent 问题 | [故障排查](./guides/troubleshooting.md) |
@@ -34,8 +37,8 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 
 | 需求 | 阅读 |
 |---|---|
-| 查看当前 GitHub 正式版本 | [发布说明 - v6.3.9](./release/release-notes-v6.3.9.md) |
-| 查看上一正式版本 | [发布说明 - v6.3.8](./release/release-notes-v6.3.8.md) |
+| 查看当前 GitHub 候选版本 | [发布说明 - v7.0.0](./release/release-notes-v7.0.0.md) |
+| 查看上一候选版本 | [发布说明 - v6.3.8](./release/release-notes-v6.3.8.md) |
 | 查看 v6.3.5 精修与运行切片 | [候选说明 - v6.3.5](./release/release-notes-v6.3.5.md) |
 | 查看 v6.3.4 会话与交付切片 | [候选说明 - v6.3.4](./release/release-notes-v6.3.4.md) |
 | 查看 v6.3.3 资料与证据切片 | [候选说明 - v6.3.3](./release/release-notes-v6.3.3.md) |
@@ -75,9 +78,8 @@ GitHub 默认产品首页是 [`README.md`](../../README.md)；英文完整镜像
 打开 Web Experience → 选「从资料生成」→ 加入真实资料 → 故事板 → 本地项目 → Agent → 质量门禁后交付
 ```
 
-v6.3.9 的源码机器状态为 `github-released`；是否真正发布，只以 [`v6.3.9` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9) 为权威证据。GitHub Release 不会自动发布 marketplace；市场记录需独立核验。主线继续保持中文任务入口、稳定故事板合同、本地 Agent 和真实产物下载。HTTP 字段、Provider 与兼容细节保留在专业指南中，不占据普通用户首屏。
+v7.0.0 的源码机器状态为 `unreleased`；是否真正发布，只以 [`v7.0.0` tag 与 GitHub Release 页面](https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15) 为权威证据。GitHub Release 不会自动发布 marketplace；市场记录需独立核验。主线继续保持中文任务入口、稳定故事板合同、本地 Agent 和真实产物下载。HTTP 字段、Provider 与兼容细节保留在专业指南中，不占据普通用户首屏。
 
 ## 当前收敛工作
 
 - [v6.3.8 收敛工作说明](../strategy/v6-3-8-consolidation.md)
-

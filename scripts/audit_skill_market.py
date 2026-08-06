@@ -10,8 +10,8 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RELEASE_STATUS = "github-released"
-RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"
+RELEASE_STATUS = "unreleased"
+RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/pull/15"
 MARKETPLACE_STATUS = "independent-not-attested"
 
 PROOF_CASES = (
@@ -166,7 +166,7 @@ def audit_readme_surfaces(errors: list[str]) -> None:
         "Finished Work & Proof",
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
         "Known limits",
-        "./docs/release/release-notes-v6.3.9.md",
+        "./docs/release/release-notes-v7.0.0.md",
     ):
         require(needle in readme_en, f"README.en.md missing marketplace surface: {needle}", errors)
 
@@ -177,7 +177,7 @@ def audit_readme_surfaces(errors: list[str]) -> None:
         "成品与 Proof",
         "https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/",
         "已知限制",
-        "./docs/zh-CN/release/release-notes-v6.3.9.md",
+        "./docs/zh-CN/release/release-notes-v7.0.0.md",
     ):
         require(needle in readme_zh, f"README.md missing Chinese marketplace surface: {needle}", errors)
 
@@ -195,7 +195,7 @@ def audit_benchmark_wall(errors: list[str]) -> None:
     require('<html lang="zh-CN">' in text, "proof page must default to Chinese", errors)
     require("先看成品" in text and "再看交付证据" in text, "proof page missing Chinese-first title", errors)
     require("输入、策划、输出与质量复核" in text, "proof page missing delivery chain", errors)
-    require("v6.3.9 正式版本" in text and RELEASE_EVIDENCE in text, "proof page missing formal-version or release-evidence marker", errors)
+    require("v7.0.0 候选版本" in text and RELEASE_EVIDENCE in text, "proof page missing formal-version or release-evidence marker", errors)
     require("Proof Pack 分数为<strong>内部质量合同</strong>" in text, "proof page missing internal-contract disclosure", errors)
     require("不是第三方 benchmark" in text, "proof page must reject third-party benchmark framing", errors)
     require("脱敏 source" in text, "proof page missing sanitized input link", errors)
@@ -241,7 +241,7 @@ def audit_distribution_docs(errors: list[str]) -> None:
     for text, label in ((market, "English market doc"), (market_zh, "Chinese market doc")):
         for needle in ("agents/openai.yaml", "agents/marketplace-listing.json", "assets/skill-market", "npm run audit:market", "benchmark"):
             require(needle in text, f"{label} missing {needle}", errors)
-        for needle in ("releaseStatus: github-released", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE):
+        for needle in ("releaseStatus: unreleased", "marketplaceStatus: independent-not-attested", RELEASE_EVIDENCE):
             require(needle in text, f"{label} missing independent release/marketplace marker: {needle}", errors)
 
     require("npm run audit:docs" in release, "release maintenance missing audit:docs", errors)
