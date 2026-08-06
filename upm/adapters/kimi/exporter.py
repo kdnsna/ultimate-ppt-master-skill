@@ -2,28 +2,35 @@
 
 from __future__ import annotations
 
+import base64
 import shutil
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
+from upm.adapters.kimi.healthcheck import kimi_healthcheck
 from upm.adapters.kimi.protocol import (
     HOST_HTML,
     BrowserSession,
     build_payload,
+    click_iframe_button,
+    configure_downloads,
     ensure_agent_browser,
-    find_download,
-    find_manifest,
+    install_host_save_picker_stub,
+    install_save_picker_stub,
     patch_transitions,
     ref_by_name,
+    retrieve_host_saved_file,
+    retrieve_saved_file,
     serve,
     switch_state,
     verify_output,
     wait_for_export_dialog,
 )
-from upm.adapters.kimi.healthcheck import kimi_healthcheck
-from upm.errors import AdapterUnavailableError, ExportError
-from upm.export.base import ExportResult, healthcheck_shape
+from upm.pptd.io import find_manifest
+from upm.errors import ExportError
+from upm.export.base import ExportResult
 
 
 def export_kimi(
@@ -63,6 +70,7 @@ def export_kimi(
             browser.open(url)
             browser.run(["wait", "--fn", 'document.documentElement.dataset.deckStatus === "ready"'], timeout=120)
             browser.run(["set", "viewport", "1280", "720"])
+            configure_downloads(browser, download_dir)
             snapshot = browser.snapshot()
             export_ref = ref_by_name(snapshot, "导出", "button")
             browser.run(["click", f"@{export_ref}"])
@@ -76,17 +84,48 @@ def export_kimi(
                     browser.run(["click", f"@{switch_ref}"])
                     dialog = wait_for_export_dialog(browser)
             download_ref = ref_by_name(dialog, "下载", "button")
-            result = browser.run(
-                ["download", f"@{download_ref}", str(temp_dir / "browser-output.pptx")],
-                timeout=180,
-                check=False,
-            )
-            if result.returncode != 0:
-                pass  # fall through to download scanning
-            downloaded = find_download((download_dir, temp_dir), timeout=120)
-            shutil.copy2(downloaded, output)
+            install_save_picker_stub(browser)
+            install_host_save_picker_stub(browser)
+            if not click_iframe_button(browser, "下载"):
+                browser.run(["click", f"@{download_ref}"], timeout=60)
+            # Kimi delivers the PPTX through showSaveFilePicker (File System
+            # Access API). Our injected stub captures the bytes; fall back to
+            # scanning the CDP download directory.
+            payload_bytes = None
+            downloaded = None
+            deadline = time.monotonic() + 600
+            while time.monotonic() < deadline:
+                saved = retrieve_saved_file(browser)
+                if not saved or saved.startswith("{"):
+                    saved = retrieve_host_saved_file(browser)
+                if saved and not saved.startswith("{"):
+                    try:
+                        decoded = base64.b64decode(saved)
+                        if decoded[:2] == b"PK":
+                            payload_bytes = decoded
+                            break
+                    except (ValueError, TypeError):
+                        # Invalid base64 from the page probe; keep polling.
+                        continue
+                candidates = [
+                    p for p in list(download_dir.rglob("*.pptx")) + list(temp_dir.glob("*.pptx"))
+                    if p.name.endswith(".pptx") and not p.name.endswith(".crdownload")
+                ]
+                if candidates:
+                    downloaded = max(candidates, key=lambda p: p.stat().st_mtime)
+                    break
+                time.sleep(3)
+            if payload_bytes is not None:
+                output.write_bytes(payload_bytes)
+            elif downloaded is not None:
+                shutil.copy2(downloaded, output)
+            else:
+                raise ExportError("Kimi 导出完成但未获得 PPTX 文件（保存通道捕获失败）。")
             if keep_download:
-                shutil.copy2(downloaded, output.with_name(f"{output.stem}.browser-raw.pptx"))
+                if payload_bytes is not None:
+                    output.with_name(f"{output.stem}.browser-raw.pptx").write_bytes(payload_bytes)
+                elif downloaded is not None:
+                    shutil.copy2(downloaded, output.with_name(f"{output.stem}.browser-raw.pptx"))
         finally:
             browser.close()
             server.shutdown()

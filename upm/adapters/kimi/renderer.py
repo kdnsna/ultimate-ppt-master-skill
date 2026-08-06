@@ -20,14 +20,15 @@ from upm.adapters.kimi.protocol import (
     BrowserSession,
     OOPIF_URL_HINT,
     build_payload,
+    configure_downloads,
     ensure_agent_browser,
     find_download,
-    find_manifest,
     is_image_zip,
     ref_by_name,
     serve,
     wait_for_export_dialog,
 )
+from upm.pptd.io import find_manifest
 from upm.errors import AdapterProtocolError, AdapterUnavailableError, ExportError
 from upm.qa.contact_sheet import stitch_overview
 
@@ -190,6 +191,7 @@ def export_kimi_images(
             browser.open(url)
             browser.run(["wait", "--fn", 'document.documentElement.dataset.deckStatus === "ready"'], timeout=120)
             browser.run(["set", "viewport", "1280", "720"])
+            configure_downloads(browser, download_dir)
             snapshot = browser.snapshot()
             export_ref = ref_by_name(snapshot, "导出", "button")
             browser.run(["click", f"@{export_ref}"])
@@ -197,13 +199,7 @@ def export_kimi_images(
             _select_image_format(browser)
             dialog = wait_for_export_dialog(browser)
             download_ref = ref_by_name(dialog, "下载", "button")
-            result = browser.run(
-                ["download", f"@{download_ref}", str(temp_dir / "browser-output.zip")],
-                timeout=300,
-                check=False,
-            )
-            if result.returncode != 0:
-                pass
+            browser.run(["click", f"@{download_ref}"], timeout=60)
             downloaded = find_download((download_dir, temp_dir), timeout=240, accept=is_image_zip)
         finally:
             browser.close()

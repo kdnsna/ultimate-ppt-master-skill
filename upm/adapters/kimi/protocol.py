@@ -4,28 +4,23 @@ from __future__ import annotations
 
 import base64
 import json
-import mimetypes
 import os
 import re
 import shutil
 import subprocess
-import sys
-import tempfile
 import threading
 import time
 import uuid
 import zipfile
+from collections.abc import Callable, Iterable, Sequence
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Callable, Iterable, Sequence
+from typing import Any
 
 import yaml
 
 from upm.errors import AdapterProtocolError, AdapterUnavailableError, ExportError
-from upm.pptd.io import find_manifest, read_yaml
-from upm.pptd.paths import validate_element_src
 from upm.paths import normalize_relative_path
-
 
 MANIFEST = json.loads((Path(__file__).with_name("manifest.json")).read_text(encoding="utf-8"))
 EDITOR_ORIGIN = MANIFEST["editor"]["origin"]
@@ -82,7 +77,7 @@ try {
       const connection = connect({ messenger, methods: {
         close(){}, reenter(){}, toggleFullScreen(v){ return v; }, showFeedback(){}, sendPrompt(){},
         showMessage(){}, hideMessage(){},
-        onSave(savePayload){ return { fileContent: savePayload?.fileContent, lastModifiedTime: Date.now() }; },
+        onSave(savePayload){ window.upmSavedPayload = savePayload || null; return { fileContent: savePayload?.fileContent, lastModifiedTime: Date.now() }; },
         getImages(imagePayload = {}) {
           const paths = Array.isArray(imagePayload.filePath) ? imagePayload.filePath : [];
           return paths.map((p) => resolveImage(p, payload.imageMap || {}));
@@ -125,6 +120,7 @@ def ensure_agent_browser() -> str:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         timeout=30,
+        check=False,
     )
     if process.returncode != 0:
         raise AdapterUnavailableError(f"agent-browser --version 失败：\n{process.stdout[-1000:]}")
@@ -133,7 +129,7 @@ def ensure_agent_browser() -> str:
     if version < MIN_AGENT_BROWSER:
         raise AdapterUnavailableError(
             f"agent-browser 版本过低（{'.'.join(str(v) for v in version)} < {minimum}）。",
-            hint=f"升级：npm install -g agent-browser@latest，然后运行 upm doctor --profile kimi。",
+            hint="升级：npm install -g agent-browser@latest，然后运行 upm doctor --profile kimi。",
         )
     return executable
 
@@ -191,7 +187,7 @@ class QuietHandler(SimpleHTTPRequestHandler):
 
 
 def serve(directory: Path) -> tuple[ThreadingHTTPServer, threading.Thread, str]:
-    handler = lambda *args, **kwargs: QuietHandler(*args, directory=str(directory), **kwargs)  # noqa: E731
+    handler = lambda *args, **kwargs: QuietHandler(*args, directory=str(directory), **kwargs)
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -218,6 +214,7 @@ class BrowserSession:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             timeout=timeout,
+            check=False,
         )
         if check and process.returncode != 0:
             raise AdapterProtocolError(
@@ -287,6 +284,236 @@ def switch_state(snapshot: dict[str, Any]) -> tuple[str, bool, bool] | None:
         return None
     attrs = match.group("attrs")
     return match.group("ref"), "checked=true" in attrs, "disabled" in attrs
+
+
+def configure_downloads(browser: BrowserSession, download_dir: Path) -> None:
+    """Configure the browser to auto-download into ``download_dir`` via CDP.
+
+    agent-browser's ``download`` command can fail with a daemon read error when
+    the target site starts the download asynchronously (Kimi generates the
+    PPTX first). Setting the CDP download behavior and polling the directory is
+    more robust and works for both PPTX and image ZIP flows.
+    """
+    try:
+        import websocket
+    except ImportError as exc:
+        raise AdapterUnavailableError(
+            "配置浏览器下载目录需要 websocket-client。",
+            hint="显式安装：bash scripts/bootstrap.sh --profile kimi。",
+        ) from exc
+    process = browser.run(["get", "cdp-url"], timeout=30)
+    match = re.search(r"ws://\S+", process.stdout)
+    if not match:
+        raise AdapterProtocolError(f"无法获取 CDP URL：\n{process.stdout[-500:]}")
+    cdp_url = match.group(0)
+    proxy_env = ("http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY", "all_proxy", "ALL_PROXY")
+    saved_proxy = {name: os.environ.pop(name) for name in proxy_env if name in os.environ}
+    try:
+        socket = websocket.create_connection(cdp_url, timeout=30, suppress_origin=True)
+    finally:
+        os.environ.update(saved_proxy)
+    try:
+        request_id = 1
+        socket.send(
+            json.dumps(
+                {
+                    "id": request_id,
+                    "method": "Browser.setDownloadBehavior",
+                    "params": {"behavior": "allow", "downloadPath": str(download_dir), "eventsEnabled": True},
+                }
+            )
+        )
+        while True:
+            message = json.loads(socket.recv())
+            if message.get("id") != request_id:
+                continue
+            if "error" in message:
+                raise AdapterProtocolError(f"Browser.setDownloadBehavior 失败：{message['error']}")
+            break
+            return
+    finally:
+        socket.close()
+
+
+def evaluate_in_iframe(browser: BrowserSession, expression: str, await_promise: bool = False) -> Any:
+    """Evaluate JavaScript inside the cross-origin Kimi editor iframe via CDP."""
+    try:
+        import websocket
+    except ImportError as exc:
+        raise AdapterUnavailableError(
+            "Kimi iframe 自动化需要 websocket-client。",
+            hint="显式安装：bash scripts/bootstrap.sh --profile kimi。",
+        ) from exc
+    process = browser.run(["get", "cdp-url"], timeout=30)
+    match = re.search(r"ws://\S+", process.stdout)
+    if not match:
+        raise AdapterProtocolError(f"无法获取 CDP URL：\n{process.stdout[-500:]}")
+    cdp_url = match.group(0)
+    proxy_env = ("http_proxy", "https_proxy", "HTTP_PROXY", "HTTPS_PROXY", "all_proxy", "ALL_PROXY")
+    saved_proxy = {name: os.environ.pop(name) for name in proxy_env if name in os.environ}
+    try:
+        socket = websocket.create_connection(cdp_url, timeout=30, suppress_origin=True)
+    finally:
+        os.environ.update(saved_proxy)
+    try:
+        def call(sock: Any, request_id: int, method: str, params: dict[str, Any]) -> dict[str, Any]:
+            sock.send(json.dumps({"id": request_id, "method": method, "params": params}))
+            while True:
+                message = json.loads(sock.recv())
+                if message.get("id") != request_id:
+                    continue
+                if "error" in message:
+                    raise AdapterProtocolError(f"CDP {method} 失败：{message['error']}")
+                return message.get("result", {})
+
+        targets = call(socket, 1, "Target.getTargets", {}).get("targetInfos", [])
+        target = next((item for item in targets if OOPIF_URL_HINT in str(item.get("url", ""))), None)
+        if target is None:
+            visible = ", ".join(f"{item.get('type')}:{str(item.get('url', ''))[:80]}" for item in targets)
+            raise AdapterProtocolError(f"没有匹配 {OOPIF_URL_HINT!r} 的浏览器目标；观察到：{visible}")
+        attached = call(socket, 2, "Target.attachToTarget", {"targetId": target["targetId"], "flatten": True})
+        session_id = attached["sessionId"]
+        socket.send(
+            json.dumps(
+                {
+                    "id": 3,
+                    "sessionId": session_id,
+                    "method": "Runtime.evaluate",
+                    "params": {"expression": expression, "returnByValue": True, "awaitPromise": await_promise},
+                }
+            )
+        )
+        while True:
+            message = json.loads(socket.recv())
+            if message.get("id") != 3:
+                continue
+            if "error" in message:
+                raise AdapterProtocolError(f"iframe Runtime.evaluate 失败：{message['error']}")
+            result = message.get("result", {})
+            if result.get("exceptionDetails"):
+                raise AdapterProtocolError(f"iframe 脚本失败：{result['exceptionDetails'].get('text')}")
+            return result.get("result", {}).get("value")
+    finally:
+        socket.close()
+
+
+def click_iframe_button(browser: BrowserSession, label: str) -> bool:
+    """Click a button by exact text inside the Kimi iframe. Returns False if absent."""
+    value = evaluate_in_iframe(
+        browser,
+        f"(() => {{ const b=[...document.querySelectorAll('button')].find(x => (x.textContent||'').trim()==={json.dumps(label)}); if(!b) return null; b.click(); return 'clicked'; }})()",
+    )
+    return value == "clicked"
+
+
+SAVE_PICKER_STUB_JS = r"""
+(() => {
+  window.__upmSaveChunks = [];
+  window.__upmSaveChunkTypes = [];
+  window.__upmSaveReady = false;
+  window.__upmSaveError = null;
+  window.showSaveFilePicker = async () => ({
+    name: 'deck.pptx',
+    queryPermission: async () => ({ state: 'granted' }),
+    requestPermission: async () => ({ state: 'granted' }),
+    isSameEntry: async () => true,
+    getFile: async () => new File([], 'deck.pptx'),
+    createWritable: async () => ({
+      async write(chunk) {
+        try {
+          window.__upmSaveChunks.push(chunk);
+          window.__upmSaveChunkTypes.push(chunk && chunk.constructor ? chunk.constructor.name : typeof chunk);
+          window.__upmSaveReady = true;
+        } catch (error) { window.__upmSaveError = String(error && error.stack || error); }
+      },
+      async close() { window.__upmSaveReady = true; },
+      async abort() { window.__upmSaveError = 'aborted'; }
+    })
+  });
+  // Capture PPTX bytes produced by the editor before download.
+  window.__upmBlobs = [];
+  const OrigBlob = window.Blob;
+  window.Blob = function (parts, options) {
+    const blob = new OrigBlob(parts, options);
+    try {
+      if (blob.size > 10240) window.__upmBlobs.push(blob);
+    } catch (error) { window.__upmSaveError = String(error && error.stack || error); }
+    return blob;
+  };
+  window.Blob.prototype = OrigBlob.prototype;
+  window.Blob.__proto__ = OrigBlob.__proto__;
+  return 'installed';
+})()
+""".strip()
+
+
+def install_save_picker_stub(browser: BrowserSession) -> bool:
+    value = evaluate_in_iframe(browser, SAVE_PICKER_STUB_JS)
+    return value == "installed"
+
+
+def install_host_save_picker_stub(browser: BrowserSession) -> bool:
+    process = browser.run(["eval", SAVE_PICKER_STUB_JS], timeout=30, check=False)
+    return process.returncode == 0 and "installed" in process.stdout
+
+
+SAVE_RETRIEVE_JS = r"""
+(async () => {
+  const blobs = window.__upmBlobs || [];
+  if (blobs.length) {
+    const blob = blobs[blobs.length - 1];
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary);
+  }
+  const chunks = window.__upmSaveChunks || [];
+  if (!chunks.length) return null;
+  const last = chunks[chunks.length - 1];
+  let bytes;
+  if (typeof last === 'string') {
+    bytes = new TextEncoder().encode(last);
+  } else if (last instanceof Blob) {
+    bytes = new Uint8Array(await last.arrayBuffer());
+  } else if (last instanceof ReadableStream) {
+    const reader = last.getReader();
+    const parts = [];
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      parts.push(value);
+    }
+    const total = parts.reduce((sum, part) => sum + part.byteLength, 0);
+    bytes = new Uint8Array(total);
+    let offset = 0;
+    for (const part of parts) { bytes.set(part, offset); offset += part.byteLength; }
+  } else if (last && last.buffer instanceof ArrayBuffer) {
+    bytes = new Uint8Array(last.buffer);
+  } else {
+    return JSON.stringify({kind: 'unknown', type: last && last.constructor ? last.constructor.name : typeof last});
+  }
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 1) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
+})()
+""".strip()
+
+
+def retrieve_saved_file(browser: BrowserSession) -> str | None:
+    return evaluate_in_iframe(browser, SAVE_RETRIEVE_JS, await_promise=True)
+
+
+def retrieve_host_saved_file(browser: BrowserSession) -> str | None:
+    process = browser.run(["eval", SAVE_RETRIEVE_JS], timeout=120, check=False)
+    if process.returncode != 0:
+        return None
+    value = process.stdout.strip()
+    if value.startswith('"') and value.endswith('"'):
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return None
+    return value if value and not value.startswith("{") else None
 
 
 def find_download(search_roots: Iterable[Path], timeout: float = 150.0, accept: Callable[[Path], bool] | None = None) -> Path:
