@@ -17,9 +17,9 @@ import importlib.util
 import io
 import json
 import os
-import shlex
 import platform
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -343,14 +343,18 @@ def env_or_file_value(key: str, file_values: dict[str, str]) -> str:
 
 
 def cairo_available() -> bool:
-    if command_exists("pkg-config"):
-        result = subprocess.run(
-            ["pkg-config", "--exists", "cairo"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=False,
-        )
-        if result.returncode == 0:
+    pkg_config = shutil.which("pkg-config")
+    if pkg_config:
+        try:
+            result = subprocess.run(
+                [pkg_config, "--exists", "cairo"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                check=False,
+            )
+        except OSError:
+            result = None
+        if result is not None and result.returncode == 0:
             return True
     return command_exists("cairo-trace")
 
@@ -1041,7 +1045,7 @@ def generate_pptx(outline: list[dict[str, Any]], project_path: Path, style: str)
             add_text_box(slide, 6.72, 2.34, 2.8, 0.34, "升级后 / After", 15, accent2, True)
             for bullet_idx, bullet in enumerate(bullets[:3]):
                 add_text_box(slide, 1.08, 3.02 + bullet_idx * 0.72, 4.1, 0.42, bullet, 14, ink)
-            for bullet_idx, bullet in enumerate((bullets[3:6] or bullets[:3])):
+            for bullet_idx, bullet in enumerate(bullets[3:6] or bullets[:3]):
                 add_text_box(slide, 6.72, 3.02 + bullet_idx * 0.72, 4.1, 0.42, bullet, 14, ink)
         elif recipe == "risk_callout.qa_stack":
             add_filled_rect(slide, 0.78, 2.02, 10.9, 0.56, soft)

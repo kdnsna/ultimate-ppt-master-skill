@@ -23,9 +23,9 @@ class CompositorTest(unittest.TestCase):
 
             self.assertTrue(ppt_render.compose_side_by_side(b, a, out))
 
-            img = Image.open(out)
-            # pad*2 + bw + gap + aw , header + h + pad + caption_h(16 when no caption)
-            self.assertEqual(img.size, (24 * 2 + 200 + 28 + 200, 56 + 150 + 24 + 16))
+            with Image.open(out) as img:
+                # pad*2 + bw + gap + aw , header + h + pad + caption_h(16 when no caption)
+                self.assertEqual(img.size, (24 * 2 + 200 + 28 + 200, 56 + 150 + 24 + 16))
 
     def test_side_by_side_with_caption_increases_height(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -35,7 +35,8 @@ class CompositorTest(unittest.TestCase):
             _png(b, 200, 150, (10, 10, 10))
             _png(a, 200, 150, (20, 20, 20))
             self.assertTrue(ppt_render.compose_side_by_side(b, a, out, caption="80/81 byte-identical"))
-            self.assertEqual(Image.open(out).size[1], 56 + 150 + 24 + 40)
+            with Image.open(out) as img:
+                self.assertEqual(img.size[1], 56 + 150 + 24 + 40)
 
 
 class GracefulDegradationTest(unittest.TestCase):
