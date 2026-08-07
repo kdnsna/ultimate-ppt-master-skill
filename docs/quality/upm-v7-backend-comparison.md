@@ -1,10 +1,10 @@
 # UPM v7 双后端对比（local vs Kimi）
 
-> 候选 SHA：`cf9c9dbb00f89105fbbd67f8d466df09cd52fb46`
+> 候选 SHA：`8b92dc137ddf291f6e28b7568d7cbd5cf3fa2df3`（最终 PR Head 仅可能再差验收文档提交）
 
 ## 状态
 
-**未完成**。local 后端 6 个代表样本已生成（A01/A05/A06/A09/A10/A12-精简），Kimi 后端因文件捕获阻塞（K1）无法产出成品，同源 A/B 不能成立。
+**未完成（K1 已重分类为 EXTERNAL-BLOCKED，A/B 不再作为主线合并阻塞）**。local 后端 6 个代表样本已生成（A01/A05/A06/A09/A10/A12-精简），Kimi 后端因上游导出交付失效（K1，独立 Issue #17）无法产出成品，同源 A/B 不能成立。K1 触发重新验证条件：upstream 修复/前端版本变化/官方稳定导出接口。
 
 ## local 后端结果（Round 3 数据）
 
@@ -29,3 +29,5 @@
 ## 失败隔离（已具备基础，待 Kimi 修复后执行）
 
 计划覆盖：断网、DNS 失败、Kimi 页面变化模拟、agent-browser 版本不足（已在 0.26.0 实测：明确 adapter-unavailable 错误且 local 不受影响）、下载超时。要求：本地工程不损坏、local 后端可继续、无僵尸进程。
+
+已满足的隔离/声明条件（合并门槛）：local 为默认正式后端；Kimi 仅显式 opt-in；doctor 准确报告适配器不可用；失败不损坏 PPTD 工程或 local 输出；无僵尸进程/端口/临时文件泄漏；README/SKILL/CLI/架构文档声明 compatibility risk；不将 Kimi 描述为可靠的原生表格/图表方案；保留代码、healthcheck、失败隔离测试与未来恢复入口。

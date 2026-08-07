@@ -1,6 +1,6 @@
 # UPM v7 RC 已知问题
 
-> 候选 SHA：`cf9c9dbb00f89105fbbd67f8d466df09cd52fb46`
+> 候选 SHA：`8b92dc137ddf291f6e28b7568d7cbd5cf3fa2df3`（最终 PR Head 仅可能再差验收文档提交）
 
 | ID | 级别 | 状态 | 描述 |
 |---|---|---|---|
@@ -13,7 +13,7 @@
 | K7 | P2 | FIXED | MCP stdio 测试在 Python ≥3.11 下 communicate 于 stdin.close 后抛错；改为 EOF 读取。 |
 | K8 | P2 | FIXED | bridge artifact 测试约 1/3 概率时序抖动；改为轮询期望状态。 |
 | K9 | P1 | 部分 CLOSED / 部分待人工 | LibreOffice 5 样本 PASS；WPS 打开+放映 PASS（12.1.26035，截图证据），编辑/另存/重开因 macOS 自动化缺陷（AppleEvent -10000）待人工签字；Microsoft PowerPoint 未安装，需真实机器完成 A01/A06/A11 验收。 |
-| K10 | P3 | OPEN | 候选分支无 ruff 配置，`ruff check upm` 报告 67 项（多为 import 排序/未用变量）；oss-readiness 分支已配置 lint，合并前应同步。 |
+| K10 | P3 | FIXED | `pyproject.toml` 已配置 ruff（line-length 120 / py310 / E4,E7,E9,F,I,UP）；`ruff check upm tests` 全 clean（修复 46 项，含 6 个死变量）；ruff 0.16.1 固定版本并加入 CI。 |
 | K11 | P3 | CLOSED | A12（40 页、26MB PPTX、8 图）峰值 RSS ≈ 158 MB（165,642,240 字节，`/usr/bin/time -l` 实测）；基线已写入 `upm-v7-rc-validation.md` Round 9。 |
 | K12 | P2 | FIXED | 失败的编辑操作（如未匹配图形几何）曾残留部分输出文件；现在失败时不产出输出并新增回归测试。 |
 | K13 | P3 | 设计决策 | 未匹配的 set_shape_geometry 返回硬错误（exit 2、无输出）而非静默 NOOP，确保不伪装成功。 |
@@ -21,7 +21,9 @@
 | K15 | P2 | FIXED | `/api/page` 与 `/api/svg` 未防符号链接逃逸；现统一 resolve 后校验工程目录内包含。 |
 | K16 | P2 | 已解释 | local 导出重复性：相同输入产出部件级哈希一致的 PPTX，仅 ZIP 条目时间戳随运行变化（可解释）。 |
 | K17 | P3 | OPEN | Kimi 宿主/上游宿主方法面一致（diff 为空），进一步排除适配器差异；K1 定性为 Kimi 前端/SDK 兼容失效。 |
+| K18 | P2 | FIXED | Windows CI：`bin/upm` 与 `upm.cli.common.resolve_python` 只认 Unix venv 路径，Windows 找不到 Python；现支持 `.venv/Scripts/python.exe` 与 `python` 回退（回归测试覆盖）。 |
+| K19 | P2 | FIXED | Windows CI：cp1252 控制台无法输出中文导致 `upm doctor` 崩溃；CLI 入口强制 PYTHONUTF8/PYTHONIOENCODING 并 reconfigure stdout/stderr（回归测试覆盖）。 |
 
 严重等级约定：P0=数据损坏/安全问题/无法生成；P1=无法打开/页面丢失/主要功能失败；P2=视觉明显不佳/偶发失败；P3=文档/提示/轻微问题。
 
-合并门槛：P0=0、P1=0（K1/K9 必须解决）、P2 全部修复或有明确接受理由、P3 进 Issue 不阻塞主旅程。
+合并门槛：P0=0、P1=0（K9 必须完成人工验收）、P2 全部修复或有明确接受理由、P3 进 Issue 不阻塞主旅程。K1 为 EXTERNAL-BLOCKED（独立 Issue #17，触发条件明确），满足隔离/声明条件后不阻塞主线。

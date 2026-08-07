@@ -1,6 +1,6 @@
 # UPM v7 Office / WPS / LibreOffice 实机验证
 
-> 候选 SHA：`cf9c9dbb00f89105fbbd67f8d466df09cd52fb46`
+> 候选 SHA：`8b92dc137ddf291f6e28b7568d7cbd5cf3fa2df3`（最终 PR Head 仅可能再差验收文档提交）
 
 ## 状态
 
@@ -32,6 +32,8 @@ A01（local PPTX）、A05、A06、A09、A12；Kimi 输出待 K1 修复后补入�
 - 全屏放映：菜单“幻灯片放映→观看放映”成功，截图 `/tmp/wps-a01-2-play.png`；Esc 退出正常（`-3-after-esc.png`）。
 - 自动化受限（明确缺陷）：通过 System Events 对“替换/另存为/输出为PDF”对话框键入时出现 AppleEvent 错误（-10000），另存为与 PDF 导出未能落盘到指定路径；因此“编辑标题/正文、移动形状、另存、重开”步骤必须由人工在本机 WPS 完成并签字（清单见上）。
 - 结论：WPS 子项 = 打开/放映 PASS + 编辑/另存/重开待人工（自动化缺陷已记录，未冒充 PASS）。
+
+> 人工签字模板（完成后在本节追加）：样本 A01/A05/A06/A11/A12 已逐项完成 1–9 步，截图见 `<路径>`，签字人：___，日期：___。
 
 ## Microsoft PowerPoint（待真实机器）
 

@@ -1,15 +1,17 @@
 # UPM v7 Release Candidate Validation（RC 验收记录）
 
 > 候选分支：`feat/upm-v7-unification` → 目标：`main`（origin/main `656c2d8`）
-> 最终候选 SHA：`cf9c9dbb00f89105fbbd67f8d466df09cd52fb46`
-> 历史候选 SHA（测试期间修复导致变更，已重跑受影响轮次）：`2103e4c` → `e87d6ac` → `d15ba0b` → `cf9c9db`
+> 最终候选代码 SHA：`8b92dc137ddf291f6e28b7568d7cbd5cf3fa2df3`（最终 PR Head 与本文件随后提交，若仅相差验收文档则沿用本记录）
+> 历史候选 SHA（测试期间修复导致变更，已重跑受影响轮次）：`2103e4c` → `e87d6ac` → `d15ba0b` → `cf9c9db` → `c7781b7` → `2413441` → `1b476e7` → `3457e1c` → `8b92dc1`
 > 本地证据目录（gitignore）：`.upm-test-results/upm-v7-rc1-*`
 
 ## 结论
 
-**NOT READY — FIX AND RETEST（截至 2026-08-07；阻塞项：PowerPoint 真实机器、WPS 实机收尾、第二 Agent 会话）**
+**NOT READY — FIX AND RETEST（截至 2026-08-07；阻塞项：PowerPoint 真实机器验收、WPS 编辑/另存/重开人工签字、Windows CI 最终确认）**
 
-K1 已重分类为 `EXTERNAL-BLOCKED / compatibility-risk`（见独立 Issue），不再阻塞 UPM 主线合并，但合并前仍需 PowerPoint/WPS 实机签字与第二 Agent 旅程。
+K1 已重分类为 `EXTERNAL-BLOCKED / compatibility-risk`（Issue #17），不再阻塞 UPM 主线合并。UPM 核心路径（Round 2/3/5/6/7/8/9/10 + 最新 Head A01/A11 smoke）已通过；合并前仍需 PowerPoint 真实机器验收、WPS 编辑/另存/重开人工签字与 Windows CI 全绿。
+
+> 最终回归环境说明：本机 Documents 目录受 iCloud “dataless 按需下载”影响（41k+ 文件被驱逐，读文件卡死），最终回归在非 iCloud 路径的干净浅克隆 `/Users/kdnsna/upm-v7-rc`（同 HEAD）执行；该环境无 iCloud 干扰，结果可信。
 
 ## 环境矩阵（Round 0）
 
@@ -37,17 +39,19 @@ doctor 全 profile（Round 0）：core/pptx/kimi 0 关键缺失；visual-review 
 
 ## Round 2：自动化测试清零（PASS）
 
-最终 SHA `cf9c9db` 上（受影响的 2103e4c/e87d6ac/d15ba0b 已重跑对应子集）：
+最新代码 Head `8b92dc1` 上重跑（受影响的 c7781b7→8b92dc1 修复均已在最新 Head 验证）：
 
 - contracts sync：通过
-- Python `test:worker`：224 项全过（含修复后的 MCP stdio 测试）
-- Node `test:node` 73/73、`test:bridge` 52/52（bridge artifact 轮询修复后 8 连跑稳定）
-- Web build、Desktop build：通过；`tsc --noEmit` 通过
-- Rust：fmt/clippy（-D warnings）/test 通过
-- audits：docs / web-console / v6-workspace / featured-decks / presets / quality / market / repo-hygiene / web-bundle 全部 exit 0
+- Python `test:worker`：229 项全过（含修复后的 MCP stdio、resolve_python Windows 路径、Windows UTF-8 stdio 回归测试）
+- Node `test:node` 73/73、`test:bridge` 52/52
+- Web build（371ms）、Desktop build（280ms）：通过
+- Rust：fmt / clippy（-D warnings）/ test 通过
+- audits：docs / web-console / v6-workspace / featured-decks / presets / quality / market / repo-hygiene / web-bundle / readme-render / brief / visual-intent / feedback-loop / image-contracts / magazine-deck / swiss-deck 全部 exit 0
+- ruff（0.16.1，已固定并加入 CI）：`upm` + `tests` 全 clean（K10 CLOSED）
+- 真实 Chrome v6 浏览器回归 `test:web-browser`：11/11 PASS（含两标签隔离/刷新恢复）
 - `git diff --check` 通过
 
-修复记录：MCP stdio（communicate after stdin.close）、bridge artifact flaky（轮询）、web-bundle 限额 80→81KB（v7 内容增量 0.03KB，已说明）。
+修复记录：MCP stdio（communicate after stdin.close）、bridge artifact flaky（轮询）、web-bundle 限额 80→81KB、Windows `bin/upm`/`resolve_python` venv 路径发现、Windows cp1252 控制台中文输出（UTF-8 强制）、ruff 清理（46 项，含 6 个死变量）。
 
 ## Round 3：本地后端真实生成（PASS，11/11 样本）
 
@@ -79,7 +83,9 @@ Round 3 修复：claim 均衡分组（消除空页占位）、metric 无数字�
 
 ## Round 5：Office/WPS/LibreOffice（LibreOffice PASS；PowerPoint/WPS 待人工）
 
-LibreOfficeDev 26.8.0.0.alpha0 对 local A01/A05/A06/A09/A12 全 5 样本通过：打开→PDF 渲染、另存 ODP、重开 ODP→PPTX、python-pptx 重开（页数/可编辑文本完整）。WPS 与 PowerPoint 的 GUI 实机打开/编辑/另存仍待人工签字（`upm-v7-office-wps-validation.md` 清单）。
+LibreOfficeDev 26.8.0.0.alpha0 对 local A01/A05/A06/A09/A12 全 5 样本通过：打开→PDF 渲染、另存 ODP、重开 ODP→PPTX、python-pptx 重开（页数/可编辑文本完整）。
+
+WPS Office 12.1.26035（macOS）：A01 打开无修复提示 + 全屏放映 + Esc 退出 PASS（截图 `/tmp/wps-a01-1-open.png`、`-2-play.png`、`-3-after-esc.png`）；编辑/另存/重开因 macOS AppleEvent -10000 自动化缺陷**待人工签字**。Microsoft PowerPoint：本机未安装，A01/A06/A11 真实机器验收 **NOT RUN**（最终人工验收清单）。
 
 ## Round 6：Preserve Edit 深度测试（PASS 27/27）
 
@@ -114,6 +120,8 @@ Round 8 第二 Agent 子项 PASS。
 
 `.github/workflows/windows-ci.yml`：Windows latest × Python 3.10/3.12，覆盖 unit/integration、`upm doctor`、local quick make、preserve edit、PPTX ZIP 校验。PowerPoint GUI 仍保留为 Windows 人工验收门槛。
 
+Windows CI 修复链：`bin/upm` 找不到 `.venv/Scripts/python.exe`（已修，新增回归测试）→ cp1252 无法输出中文（已修：PYTHONUTF8 + stdio reconfigure，新增回归测试）。最新 Head `8b92dc1` 的运行结果以 PR 状态为准（见最终报告）。
+
 ## 合并建议
 
-暂不合并。本地路径（Round 2/3/5/6/7/9/10）已通过；K1（Kimi 文件捕获，上游同环境同样失败）与 K9（PowerPoint/WPS 人工签字、第二 Agent 会话）仍是 P1 阻塞项。修复/人工完成后在最新 PR Head 重跑 Round 2 + A01/A11 smoke。
+暂不合并。UPM 核心自动化与本地路径已全部通过（含最新 Head 的 Round 2、A01/A11 smoke）；剩余硬门槛：PowerPoint 真实机器 A01/A06/A11 验收、WPS 编辑/另存/重开人工签字、Windows CI 在最新 Head 全绿。三者完成后将本文件结论改为 READY TO MERGE。
