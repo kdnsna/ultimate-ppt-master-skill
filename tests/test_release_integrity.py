@@ -6,7 +6,10 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# Last formal GitHub Release / apps / marketplace contract.
 VERSION = "6.3.9"
+# Root monorepo package on main during the v7 technical preview.
+ROOT_PACKAGE_VERSION = "7.0.0-beta.1"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
 RELEASE_STATUS = "github-released"
 RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"
@@ -49,7 +52,7 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertIn("Default to `--copy`", skill)
 
     def test_public_version_markers_are_aligned(self):
-        version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
+        package_version = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))["version"]
         web_version = json.loads((ROOT / "apps/web/package.json").read_text(encoding="utf-8"))["version"]
         web_lock = json.loads((ROOT / "apps/web/package-lock.json").read_text(encoding="utf-8"))
         desktop = json.loads((ROOT / "apps/desktop/package.json").read_text(encoding="utf-8"))
@@ -59,28 +62,33 @@ class ReleaseIntegrityTest(unittest.TestCase):
         cargo_lock = (ROOT / "apps/desktop/src-tauri/Cargo.lock").read_text(encoding="utf-8")
         listing = json.loads((ROOT / "agents/marketplace-listing.json").read_text(encoding="utf-8"))
 
-        self.assertEqual(version, VERSION)
-        self.assertEqual(web_version, version)
-        self.assertEqual(web_lock["version"], version)
-        self.assertEqual(web_lock["packages"][""]["version"], version)
-        self.assertEqual(desktop["version"], version)
-        self.assertEqual(desktop_lock["version"], version)
-        self.assertEqual(desktop_lock["packages"][""]["version"], version)
-        self.assertEqual(tauri["version"], version)
-        self.assertIn(f'version = "{version}"', cargo_toml)
+        # Root monorepo may advertise the in-tree v7 preview while apps/marketplace
+        # remain pinned to the last formal GitHub Release.
+        self.assertEqual(package_version, ROOT_PACKAGE_VERSION)
+        self.assertEqual(web_version, VERSION)
+        self.assertEqual(web_lock["version"], VERSION)
+        self.assertEqual(web_lock["packages"][""]["version"], VERSION)
+        self.assertEqual(desktop["version"], VERSION)
+        self.assertEqual(desktop_lock["version"], VERSION)
+        self.assertEqual(desktop_lock["packages"][""]["version"], VERSION)
+        self.assertEqual(tauri["version"], VERSION)
+        self.assertIn(f'version = "{VERSION}"', cargo_toml)
         self.assertRegex(
             cargo_lock,
-            rf'(?s)\[\[package\]\]\s+name = "ultimate-ppt-master-desktop"\s+version = "{re.escape(version)}"',
+            rf'(?s)\[\[package\]\]\s+name = "ultimate-ppt-master-desktop"\s+version = "{re.escape(VERSION)}"',
         )
-        self.assertEqual(listing["version"], version)
+        self.assertEqual(listing["version"], VERSION)
         self.assertEqual(listing["releaseStatus"], RELEASE_STATUS)
         self.assertEqual(listing["releaseEvidence"], RELEASE_EVIDENCE)
         self.assertEqual(listing["marketplaceStatus"], MARKETPLACE_STATUS)
         for path in ("README.md", "README.en.md", "README.zh-CN.md"):
-            self.assertIn(f"v{version}", (ROOT / path).read_text(encoding="utf-8"), path)
-        self.assertIn(f'appVersion = "{version}"', (ROOT / "apps/web/src/V6Workspace.tsx").read_text(encoding="utf-8"))
-        self.assertIn(f"v{version} 正式版本", (ROOT / "apps/web/public/benchmark/index.html").read_text(encoding="utf-8"))
-        self.assertIn(f"v{version}", (ROOT / "assets/readme/hero.svg").read_text(encoding="utf-8"))
+            text = (ROOT / path).read_text(encoding="utf-8")
+            self.assertIn(f"v{VERSION}", text, path)
+        self.assertIn(ROOT_PACKAGE_VERSION, (ROOT / "README.md").read_text(encoding="utf-8"))
+        self.assertIn(ROOT_PACKAGE_VERSION, (ROOT / "README.en.md").read_text(encoding="utf-8"))
+        self.assertIn(f'appVersion = "{VERSION}"', (ROOT / "apps/web/src/V6Workspace.tsx").read_text(encoding="utf-8"))
+        self.assertIn(f"v{VERSION} 正式版本", (ROOT / "apps/web/public/benchmark/index.html").read_text(encoding="utf-8"))
+        self.assertIn(f"v{VERSION}", (ROOT / "assets/readme/hero.svg").read_text(encoding="utf-8"))
         for report_path in (
             "examples/executive-business-review-starter/quality-report.json",
             "examples/consulting-proposal-starter/quality-report.json",
@@ -92,22 +100,22 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "apps/web/public/examples/tech-trend-web-deck-starter/quality-report.json",
         ):
             report = json.loads((ROOT / report_path).read_text(encoding="utf-8"))
-            self.assertEqual(report["releaseVersion"], version, report_path)
+            self.assertEqual(report["releaseVersion"], VERSION, report_path)
             self.assertEqual(report["releaseStatus"], RELEASE_STATUS, report_path)
             self.assertEqual(report["releaseEvidence"], RELEASE_EVIDENCE, report_path)
             self.assertEqual(report["marketplaceStatus"], MARKETPLACE_STATUS, report_path)
-        self.assertTrue((ROOT / f"docs/release/release-notes-v{version}.md").is_file())
-        self.assertTrue((ROOT / f"docs/zh-CN/release/release-notes-v{version}.md").is_file())
+        self.assertTrue((ROOT / f"docs/release/release-notes-v{VERSION}.md").is_file())
+        self.assertTrue((ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md").is_file())
         self.assertIn(
             "Plain-Language Update Notes",
-            (ROOT / f"docs/release/release-notes-v{version}.md").read_text(encoding="utf-8"),
+            (ROOT / f"docs/release/release-notes-v{VERSION}.md").read_text(encoding="utf-8"),
         )
         self.assertIn(
             "白话更新栏",
-            (ROOT / f"docs/zh-CN/release/release-notes-v{version}.md").read_text(encoding="utf-8"),
+            (ROOT / f"docs/zh-CN/release/release-notes-v{VERSION}.md").read_text(encoding="utf-8"),
         )
-        self.assertIn(f"release/release-notes-v{version}.md", (ROOT / "docs/README.md").read_text(encoding="utf-8"))
-        self.assertIn(f"release/release-notes-v{version}.md", (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8"))
+        self.assertIn(f"release/release-notes-v{VERSION}.md", (ROOT / "docs/README.md").read_text(encoding="utf-8"))
+        self.assertIn(f"release/release-notes-v{VERSION}.md", (ROOT / "docs/zh-CN/README.md").read_text(encoding="utf-8"))
 
     def test_v632_to_v635_candidate_notes_and_current_release_contract_are_truthful(self):
         docs_en = (ROOT / "docs/README.md").read_text(encoding="utf-8")
@@ -505,14 +513,11 @@ class ReleaseIntegrityTest(unittest.TestCase):
             "preserve-edit",
             "editable-deck",
             "web-deck",
-            "explicit-edit-signal",
             "enabled only on explicit request",
             "bin/upm",
-            "deck.pptd",
             "quality-report.json",
-            "export-record.json",
-            "upm/adapters/kimi",
-            "contracts/schemas/pptd.schema.json",
+            "scripts/preserve_edit_pptx.py",
+            "v7.0.0-beta.1",
             "node \"${SKILL_DIR}/scripts/validate-magazine-deck.mjs\"",
             "references/magazine-web/swiss-layout-registry.json",
             "Formal Business Delivery Gate",
