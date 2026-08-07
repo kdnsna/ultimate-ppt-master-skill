@@ -6,6 +6,7 @@ from pathlib import Path
 from unittest import mock
 
 from upm.cli import common
+from upm.cli.doctor import _venv_python_exists
 
 
 class ResolvePythonTest(unittest.TestCase):
@@ -26,6 +27,15 @@ class ResolvePythonTest(unittest.TestCase):
                 common.shutil, "which", return_value=str(fake)
             ):
                 self.assertEqual(common.resolve_python(), fake)
+
+    def test_windows_venv_detected_by_doctor(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name)
+            script = root / ".venv" / "Scripts" / "python.exe"
+            script.parent.mkdir(parents=True)
+            script.write_text("", encoding="utf-8")
+            with mock.patch("upm.cli.doctor.ROOT", root):
+                self.assertTrue(_venv_python_exists())
 
 
 if __name__ == "__main__":

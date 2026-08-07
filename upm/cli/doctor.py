@@ -10,6 +10,17 @@ from typing import Any
 from upm.cli.common import ROOT, resolve_python
 
 
+def _venv_python_exists() -> bool:
+    return any(
+        candidate.is_file()
+        for candidate in (
+            ROOT / ".venv" / "bin" / "python",
+            ROOT / ".venv" / "Scripts" / "python.exe",
+            ROOT / ".venv" / "Scripts" / "python",
+        )
+    )
+
+
 def _check_python() -> tuple[bool, str]:
     python = resolve_python()
     process = subprocess.run([str(python), "--version"], capture_output=True, text=True, timeout=30)
@@ -40,7 +51,7 @@ def run_doctor(args: Any) -> int:
     checks: list[tuple[str, bool, str]] = []
     ok, message = _check_python()
     checks.append(("Python 3.10+", ok, message))
-    checks.append(("仓库本地 .venv", (ROOT / ".venv" / "bin" / "python").is_file(), str(ROOT / ".venv")))
+    checks.append(("仓库本地 .venv", _venv_python_exists(), str(ROOT / ".venv")))
     checks.append(("PyYAML", _module_ok("yaml"), "PPTD 读写需要"))
     checks.append(("Pillow", _module_ok("PIL"), "联系表/空白页检测需要"))
     if args.profile in {"pptx", "all"}:
