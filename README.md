@@ -6,9 +6,9 @@
 
 <p align="center">
   <strong>编辑的克制，生成的锋利。</strong><br>
-  把真实资料变成可继续修改的原生 PowerPoint。<br>
-  一套本地优先的演示文稿工作台：对已有 PPTX 做外科手术级保真编辑，<br>
-  或从原始素材生成具有编辑智性的可编辑幻灯片与杂志风 Web Deck。
+  把真实资料变成可继续修改的 PowerPoint。<br>
+  一套本地优先的演示文稿工作台：对已有 PPTX 做保真局部编辑，<br>
+  或从原始素材生成可编辑幻灯片（Editable Deck · Beta）。
 </p>
 
 <br>
@@ -23,6 +23,11 @@
   <img alt="v7.0.0-beta.1" src="https://img.shields.io/badge/version-7.0.0--beta.1-1D4ED8?style=flat-square">&ensp;
   <img alt="local-first" src="https://img.shields.io/badge/local--first-yes-73866C?style=flat-square">&ensp;
   <img alt="shape-editable PPTX" src="https://img.shields.io/badge/output-shape--editable_PPTX-1D4ED8?style=flat-square">
+</p>
+
+<p align="center">
+  <!-- Community try-it surface (Socialistic): optional, not a substitute for local CLI quality gates -->
+  <a href="https://socialistic.ai/zh/skill/ultimate-ppt-master-skill-99fe3d?utm_source=github&utm_medium=readme&utm_campaign=try-badge"><img alt="Try on Socialistic" src="https://socialistic.ai/api/embed/ultimate-ppt-master-skill-99fe3d"></a>
 </p>
 
 <br>
@@ -55,7 +60,16 @@ bin/upm review <project>              # 重新审计（失败非 0）
 bin/upm doctor                        # 环境检查（只报告）
 ```
 
-详见 [upm-cli.md](docs/guides/upm-cli.md)、[upm-v7-unification.md](docs/architecture/upm-v7-unification.md) 与 [upm-migration.md](docs/guides/upm-migration.md)。
+详见 [upm-cli.md](docs/guides/upm-cli.md)、[HTTP API 说明](docs/guides/http-api.md)、[upm-v7-unification.md](docs/architecture/upm-v7-unification.md) 与 [upm-migration.md](docs/guides/upm-migration.md)。
+
+### HTTP API？
+
+**没有**公网多租户「一键生成 PPTX」HTTP 服务。服务器批处理请直接跑 `bin/upm make`。本机可选 [Agent Connect Bridge](docs/guides/agent-connect-bridge.md)（`127.0.0.1` 编排 handoff，不单独制造最终 PPTX）。完整说明：[docs/guides/http-api.md](docs/guides/http-api.md)。
+
+### 社区与生态
+
+- **Socialistic 徽章**（上方）：可选在线试用入口，便于留下使用 trace；**不替代**本地 `upm` 质量门与正式交付。
+- **Open Design 等插件生态**：欢迎社区以 MIT 方式封装工作流插件；**本仓库当前不内置官方 Open Design 插件包**。有具体 manifest PR 可再开讨论。
 
 <br>
 

@@ -87,3 +87,9 @@ bin/upm doctor --profile kimi   # environment-ready ≠ end-to-end PPTX 交付
 ```
 
 只报告缺失项与修复命令，不自动安装。
+
+## HTTP / 服务器
+
+本 CLI **本身不是** HTTP 服务。服务器批处理直接调用 `bin/upm make` 即可。
+
+若需要 Web 工作台配套的本机 HTTP 编排，见 [http-api.md](./http-api.md) 与 [agent-connect-bridge.md](./agent-connect-bridge.md)：Bridge 创建 handoff，**不**在 `POST /handoff` 内直接生成最终 PPTX。

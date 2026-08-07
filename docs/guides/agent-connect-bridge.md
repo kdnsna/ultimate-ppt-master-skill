@@ -1,6 +1,10 @@
 # Agent Connect Bridge
 
-Agent Connect Bridge is the v6.3.9 companion for the static Web Experience. It lets the GitHub Pages app talk to a service on `127.0.0.1`, stage real source files, preserve the user-approved `DeckSession` as the production storyboard, hand the project to Codex, and expose only finished artifacts that pass the local path boundary. The v6.3.9 source uses machine status `github-released`; the authoritative publication evidence is the [`v6.3.9` tag and GitHub Release page](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9), not this source sentence. Marketplace publication and the currently deployed Pages SHA remain independent states.
+Agent Connect Bridge is the local companion for the static Web Experience (v7 still ships this path). It lets the GitHub Pages app talk to a service on `127.0.0.1`, stage real source files, preserve the user-approved `DeckSession` as the production storyboard, hand the project to Codex, and expose only finished artifacts that pass the local path boundary.
+
+**Not a multi-tenant generation API.** For plain “call something and get a PPTX”, use `bin/upm make` (see [http-api.md](./http-api.md)). Bridge `POST /handoff` creates a local handoff contract; it does **not** manufacture the final PPTX by itself.
+
+Historical publication tags such as [`v6.3.9`](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9) remain independent of the current `VERSION` / v7.0.0-beta line. Marketplace publication and the currently deployed Pages SHA remain independent states.
 
 ## Quick Start
 
