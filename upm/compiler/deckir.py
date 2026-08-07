@@ -181,6 +181,16 @@ def _fallback_recipe(role: str, used: list[str]) -> tuple[str, str, str]:
         recipe = index.get(recipe_id)
         if recipe and recipe_id not in used:
             return recipe_id, str(recipe.get("layoutFamily") or "generic"), str(recipe.get("visualLayer") or "none")
+    # 同 role 候选全部用尽：从整个 recipe 库中挑一个尚未使用的，保持布局多样性。
+    for recipe_id, recipe in index.items():
+        if recipe and recipe_id not in used:
+            return recipe_id, str(recipe.get("layoutFamily") or "generic"), str(recipe.get("visualLayer") or "none")
+    # 全部 recipe 都已使用：至少打破与上一页的 layoutFamily 连续重复（不允许三连）。
+    last_used = used[-1] if used else None
+    last_family = index.get(last_used, {}).get("layoutFamily") if last_used else None
+    for recipe_id, recipe in index.items():
+        if recipe and recipe.get("layoutFamily") != last_family:
+            return recipe_id, str(recipe.get("layoutFamily") or "generic"), str(recipe.get("visualLayer") or "none")
     recipe_id = candidates[0]
     recipe = index.get(recipe_id, {})
     return recipe_id, str(recipe.get("layoutFamily") or "generic"), str(recipe.get("visualLayer") or "none")

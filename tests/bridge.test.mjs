@@ -634,7 +634,7 @@ test("fallback DeckIR deterministically breaks three repeated evidence recipes",
       assert.equal(response.status, 200);
       const payload = await response.json();
       const storyboard = JSON.parse(await readFile(join(payload.projectPath, "storyboard.json"), "utf8"));
-      assert.equal(storyboard.planningMode, "fallback-rule-planner");
+      assert.equal(storyboard.planningMode, "deterministic-source-planner");
       assertNoThreeConsecutiveContracts(storyboard.slides);
       assert.ok(new Set(storyboard.slides.filter((slide) => slide.role === "evidence").map((slide) => slide.layoutFamily)).size > 1);
     });
@@ -1255,7 +1255,7 @@ test("handoff writes formal business quality gate and workflow state", async () 
     assert.match(command, /apply_review_plan\.py/);
 
     const storyboard = JSON.parse(await readFile(join(payload.projectPath, "storyboard.json"), "utf8"));
-    assert.equal(storyboard.deckIRVersion, "1.0");
+    assert.equal(storyboard.deckIRVersion, "upm-v7");
     assert.equal(storyboard.schemaVersion, "v5.2-brief-v1");
     assert.ok(storyboard.sourceConfidence);
     assert.ok(storyboard.deliveryScorecard);
