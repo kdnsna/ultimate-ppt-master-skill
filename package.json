@@ -1,12 +1,12 @@
 {
   "name": "ultimate-ppt-master",
   "private": true,
-  "version": "6.3.9",
+  "version": "7.0.0-beta.1",
   "type": "module",
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
   },
-  "description": "Preservation-first PPT editing: change only the slides you name on an existing branded deck (byte-stable masters/logo), plus secondary source-to-editable PPTX/Web Deck generation.",
+  "description": "v7.0.0-beta local-first PPT workbench: Preserve Edit (RC) + Editable Deck (Beta) + experimental Web/Kimi paths. Shape-editable DrawingML, not production-grade unified GA.",
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
     "update": "git pull --ff-only && npm run setup",

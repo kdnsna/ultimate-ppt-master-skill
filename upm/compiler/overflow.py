@@ -84,16 +84,18 @@ def check_element_overflow(
         estimated = lines * font_size * effective_line_height + 6
     usable_height = max(1.0, height - 6)
     if estimated > usable_height:
-        shrink = font_size * math.sqrt(usable_height / estimated)
-        shrink = max(min_font_size, math.floor(shrink * 10) / 10)
+        # Compute the theoretical needed size BEFORE clamping so the error
+        # branch is reachable when text cannot fit even at min_font_size.
+        needed = font_size * math.sqrt(usable_height / estimated)
+        suggested = math.floor(needed * 10) / 10
         element_id = str(element.get("elementId") or "?")
-        if shrink >= min_font_size:
+        if needed < min_font_size:
             findings.append(
                 OverflowFinding(
                     page,
                     element_id,
-                    f"文本可能溢出：估算 {estimated:.0f}px，可用 {usable_height:.0f}px；建议字号 ≤{shrink:.1f}",
-                    "warning",
+                    f"文本溢出严重：估算 {estimated:.0f}px，可用 {usable_height:.0f}px，理论字号 {suggested:.1f} 低于安全下限 {min_font_size}",
+                    "error",
                 )
             )
         else:
@@ -101,8 +103,8 @@ def check_element_overflow(
                 OverflowFinding(
                     page,
                     element_id,
-                    f"文本溢出严重：估算 {estimated:.0f}px，可用 {usable_height:.0f}px，字号低于安全下限 {min_font_size}",
-                    "error",
+                    f"文本可能溢出：估算 {estimated:.0f}px，可用 {usable_height:.0f}px；建议字号 ≤{suggested:.1f}",
+                    "warning",
                 )
             )
     return findings

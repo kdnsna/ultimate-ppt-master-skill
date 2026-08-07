@@ -63,8 +63,20 @@ def run_doctor(args: Any) -> int:
         from upm.adapters.kimi.healthcheck import kimi_healthcheck
 
         kimi = kimi_healthcheck()
-        checks.append(("Kimi 适配器", kimi["available"], kimi["reason"]))
+        # available means environment-ready only, not export-verified.
+        checks.append(
+            (
+                "Kimi 适配器（environment-ready）",
+                bool(kimi.get("environmentReady", kimi.get("available"))),
+                str(kimi.get("reason") or ""),
+            )
+        )
         checks.append(("websocket-client", _module_ok("websocket"), "Kimi 图片导出对话框自动化"))
+        print(
+            "[note]    Kimi 导出（end-to-end-verified）: false — "
+            "依赖就绪不等于可交付 PPTX；正式交付请用 local 后端",
+            flush=True,
+        )
     if args.profile in {"core", "pptx", "visual-review", "kimi", "all"}:
         checks.append(("契约同步", *_contracts_sync()))
 

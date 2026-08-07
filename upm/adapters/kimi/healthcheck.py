@@ -31,9 +31,20 @@ def kimi_healthcheck() -> dict[str, Any]:
     reason = browser_reason
     if not websocket_ok:
         reason += "；websocket-client 缺失（图片导出对话框需要，可 pip install websocket-client）"
-    return healthcheck_shape(
+    # Dependency readiness ≠ end-to-end export verification. Upstream Kimi
+    # editor export is currently external-blocked; never claim delivery works.
+    if browser_ok:
+        reason = (
+            f"{browser_reason} · 依赖就绪（environment-ready）。"
+            " 端到端 PPTX 导出尚未验证（end-to-end-verified=false）；"
+            "正式交付请使用 --export-backend local。"
+        )
+    result = healthcheck_shape(
         "kimi",
         browser_ok,
         reason,
         required=["agent-browser>=0.33.2 (npm)", "websocket-client (pip)"],
     )
+    result["endToEndVerified"] = False
+    result["environmentReady"] = browser_ok
+    return result

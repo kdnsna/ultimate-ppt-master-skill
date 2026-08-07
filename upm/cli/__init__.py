@@ -43,10 +43,20 @@ def main(argv: list[str] | None = None) -> int:
     make_parser.add_argument("--deckir", default=None, help="使用现有 DeckIR JSON（跳过自动规划）")
     make_parser.add_argument("--image", action="append", default=[], metavar="P01=path.png", help="指定 slideId 的图片")
     make_parser.add_argument("--no-qa", action="store_true", help="跳过视觉 QA（仅结构校验）")
+    make_parser.add_argument(
+        "--allow-quality-fail",
+        action="store_true",
+        help="质量门失败时仍以 0 退出（产物非正式交付，仅调试用）",
+    )
 
     edit_parser = sub.add_parser("edit", help="对已有 PPTX 做保真局部修改")
     edit_parser.add_argument("pptx", help="源 .pptx")
-    edit_parser.add_argument("instruction", help='修改要求，例如 "把第 2 页的 Q2 改成 Q3"')
+    edit_parser.add_argument(
+        "instruction",
+        nargs="?",
+        default=None,
+        help='修改要求，例如 "把第 2 页的 Q2 改成 Q3"（提供 --edits 时可省略）',
+    )
     edit_parser.add_argument("--output", default=None, help="输出路径（默认同目录 *_edited.pptx）")
     edit_parser.add_argument("--edits", default=None, help="使用 edits JSON 文件（跳过自然语言解析）")
     edit_parser.add_argument("--preview", action="store_true", help="生成修改前后渲染对比")
@@ -60,9 +70,53 @@ def main(argv: list[str] | None = None) -> int:
     review_parser.add_argument("project", help="PPTD 项目目录")
     review_parser.add_argument("--mode", default="standard", choices=["quick", "standard", "audit"])
     review_parser.add_argument("--render-backend", default="auto", choices=["auto", "local", "kimi"])
+    review_parser.add_argument(
+        "--allow-quality-fail",
+        action="store_true",
+        help="质量门失败时仍以 0 退出",
+    )
 
     doctor_parser = sub.add_parser("doctor", help="检查当前任务所需环境（只报告，不安装）")
     doctor_parser.add_argument("--profile", default="core", choices=["core", "pptx", "visual-review", "kimi", "all"])
+
+    plan_parser = sub.add_parser("plan", help="输出规范 DeckIR JSON（Bridge/Desktop 共用核心规划器）")
+    plan_parser.add_argument("input", help="主题文字或本地源文件路径")
+    plan_parser.add_argument("--title", default=None, help="演示文稿标题")
+    plan_parser.add_argument("--pages", type=int, default=None, help="目标页数")
+    plan_parser.add_argument(
+        "--direction",
+        default="formal-finance",
+        choices=[
+            "formal-finance",
+            "consulting-evidence",
+            "brand-launch",
+            "training-narrative",
+            "editorial-narrative",
+            "swiss-information",
+            "custom",
+        ],
+    )
+    plan_parser.add_argument("--mode", default="standard", choices=["quick", "standard", "audit"])
+    plan_parser.add_argument(
+        "--format",
+        dest="deck_format",
+        default="editable-deck",
+        choices=["editable-deck", "web-deck"],
+        help="交付类型（写入 delivery.outputMode）",
+    )
+    plan_parser.add_argument(
+        "--emit",
+        dest="format",
+        default="deckir",
+        choices=["deckir", "bridge"],
+        help="输出形态：deckir（默认）或 bridge（storyboard/sourceMap/planningReport）",
+    )
+    plan_parser.add_argument("--output", "-o", default=None, help="写入文件（默认 stdout）")
+    plan_parser.add_argument(
+        "--planner",
+        default="deterministic-draft-planner",
+        help="规划器名称（当前仅 deterministic-draft-planner）",
+    )
 
     args = parser.parse_args(argv)
     try:
@@ -86,6 +140,10 @@ def main(argv: list[str] | None = None) -> int:
             from upm.cli.doctor import run_doctor
 
             return run_doctor(args)
+        if args.command == "plan":
+            from upm.cli.plan import run_plan
+
+            return run_plan(args)
     except UpmError as exc:
         print(exc.render(), file=sys.stderr)
         return exc.exit_code

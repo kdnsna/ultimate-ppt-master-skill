@@ -2,7 +2,7 @@
 
 Use this guide when you want Ultimate PPT Master to run as a portable agent skill.
 
-The current GitHub release is v6.3.9. Verify publication from the versioned [`v6.3.9` tag and GitHub Release page](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9), not from source metadata alone. Installing from GitHub does not publish or attest to any marketplace listing.
+The active development line is **v7.0.0-beta.1** (see repository root `VERSION` and `pyproject.toml`). Older GitHub Releases such as [`v6.3.9`](https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9) remain historical publication points; verify which tag you install. Installing from GitHub does not publish or attest to any marketplace listing.
 
 For the lowest-friction public entry, start from the [Web Experience](./web-experience.md). Its Configuration page can install or update the Skill for Codex / generic local agents through Bridge; if Bridge is offline, it copies the same terminal commands shown below. Download the generated `handoff-kit.zip` when you want to continue production from a local project folder.
 

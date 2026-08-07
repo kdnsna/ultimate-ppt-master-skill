@@ -7,7 +7,7 @@
 
 ## 结论
 
-**已合并（2026-08-07，squash `bd437e6`，PR #15）**：本报告撰写时点（eccd780）的结论为 NOT READY；维护者随后决定按现有验收状态合并，合并后 main 上 A01/A11/doctor/contracts smoke 与 Windows/Desktop CI 全部通过。PowerPoint 真实机器验收与 WPS 编辑/另存/重开人工签字仍未完成，作为后续验收项跟踪（见 `upm-v7-office-wps-validation.md`）。
+**NOT READY — FIX AND RETEST（截至 2026-08-07；阻塞项：PowerPoint 真实机器验收、WPS 编辑/另存/重开人工签字、Windows CI 最终确认）**
 
 K1 已重分类为 `EXTERNAL-BLOCKED / compatibility-risk`（Issue #17），不再阻塞 UPM 主线合并。UPM 核心路径（Round 2/3/5/6/7/8/9/10 + 最新 Head A01/A11 smoke）已通过；合并前仍需 PowerPoint 真实机器验收、WPS 编辑/另存/重开人工签字与 Windows CI 全绿。
 

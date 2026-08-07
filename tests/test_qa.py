@@ -9,6 +9,7 @@ sys.path.insert(0, str(ROOT))
 from upm.compiler.compiler import compile_deck  # noqa: E402
 from upm.compiler.deckir import build_deckir  # noqa: E402
 from upm.qa.contact_sheet import stitch_overview  # noqa: E402
+from upm.qa.policy import load_policy  # noqa: E402
 from upm.qa.repair import RepairState, plan_repairs  # noqa: E402
 from upm.qa.report import build_quality_report  # noqa: E402
 from upm.qa.rubric import run_rubric  # noqa: E402
@@ -46,9 +47,30 @@ class RubricTest(unittest.TestCase):
         temp = tempfile.mkdtemp()
         project = Path(temp) / "qa"
         compile_deck(deckir, project)
-        findings = run_rubric(project, [], deckir=deckir)
+        findings = run_rubric(project, [], deckir=deckir, quality_mode="quick")
         ids = {f["id"] for f in findings}
         self.assertIn("missing-evidence", ids)
+
+    def test_rubric_blocks_placeholders_in_standard(self):
+        deckir = build_deckir("无来源", "", page_count=4)
+        temp = tempfile.mkdtemp()
+        project = Path(temp) / "qa"
+        compile_deck(deckir, project)
+        findings = run_rubric(project, [], deckir=deckir, policy=load_policy("standard"))
+        ids = {f["id"] for f in findings}
+        self.assertTrue({"placeholder-content", "no-source-claims"} & ids)
+        self.assertTrue(any(f["severity"] == "error" for f in findings if f["id"] in ids))
+
+    def test_no_renderer_prefix_is_warning_in_quick(self):
+        deckir = build_deckir("渲染", "有一句完整资料用于生成正文。", page_count=4)
+        temp = tempfile.mkdtemp()
+        project = Path(temp) / "qa"
+        compile_deck(deckir, project)
+        records = [{"page": "01", "ok": False, "error": "no-renderer: 缺少 playwright"}]
+        findings = run_rubric(project, records, deckir=deckir, quality_mode="quick")
+        render_findings = [f for f in findings if f["id"] == "render-failed"]
+        self.assertTrue(render_findings)
+        self.assertEqual(render_findings[0]["severity"], "warning")
 
     def test_rubric_finds_overflow(self):
         deckir = build_deckir("溢出质检测试", "长文本" * 300, page_count=4)
@@ -98,6 +120,44 @@ class RubricTest(unittest.TestCase):
         )
         self.assertEqual(report["gates"]["structure"], "pass")
         self.assertEqual(report["gates"]["export"], "pass")
+        self.assertEqual(report["gates"]["visual"], "pass")
+        self.assertEqual(report["overall"], "pass")
+
+    def test_quality_report_empty_render_not_pass(self):
+        report = build_quality_report(
+            Path(tempfile.mkdtemp()),
+            structure_errors=[],
+            structure_warnings=[],
+            overflow_findings=[],
+            render_records=[],
+            rubric_findings=[],
+            export_result={"verified": True, "slides": 1},
+            rounds_used=0,
+            unresolved=[],
+            quality_mode="standard",
+            backend="local",
+        )
+        self.assertEqual(report["gates"]["visual"], "not-run")
+        self.assertEqual(report["overall"], "fail")
+        self.assertEqual(report["gates"]["formalDelivery"], "fail")
+
+    def test_quality_report_quick_allows_visual_not_run(self):
+        report = build_quality_report(
+            Path(tempfile.mkdtemp()),
+            structure_errors=[],
+            structure_warnings=[],
+            overflow_findings=[],
+            render_records=[],
+            rubric_findings=[],
+            export_result={"verified": True, "slides": 1},
+            rounds_used=0,
+            unresolved=[],
+            quality_mode="quick",
+            backend="local",
+            qa_skipped=True,
+        )
+        self.assertEqual(report["gates"]["visual"], "not-run")
+        self.assertEqual(report["overall"], "pass")
         self.assertEqual(report["summary"]["renderFailed"], 0)
 
 

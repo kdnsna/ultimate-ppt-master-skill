@@ -1,13 +1,16 @@
 """`upm open`: localhost PPTD visual editor (binds 127.0.0.1 only).
 
 The editor browses the project, previews pages as deterministic SVG, edits
-``.pptd``/``.page`` YAML, re-validates before saving, re-exports PPTX and
-shows QA results. Path writes are restricted to project-relative .pptd/.page.
+``.pptd``/``.page`` YAML, re-validates with PptdValidator before atomic save,
+re-exports PPTX and shows QA results. Mutating APIs require a session token
+issued at open time (CSRF protection for local POST endpoints).
 """
 
 from __future__ import annotations
 
 import json
+import secrets
+import tempfile
 import threading
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -20,6 +23,7 @@ import yaml
 from upm.errors import PathSafetyError
 from upm.paths import assert_writable, normalize_relative_path
 from upm.pptd.io import load_project, write_yaml
+from upm.pptd.schema import PptdValidator, ValidationIssue, validate_pptd_project
 from upm.render.svg import render_page_svg
 
 MAX_REQUEST_BYTES = 8 * 1024 * 1024
@@ -55,12 +59,15 @@ button.secondary{background:#232832;color:#C9CED6;border:1px solid #333A45;paddi
 </main>
 <script>
 let current = "";
+let sessionToken = "";
 const pagesNav = document.querySelector("#pages");
 const editor = document.querySelector("#editor");
 const preview = document.querySelector("#preview");
 const statusEl = document.querySelector("#status");
 const qaEl = document.querySelector("#qa");
 async function api(url, options) {
+  options = options || {};
+  options.headers = Object.assign({"Content-Type": "application/json", "X-UPM-Session": sessionToken}, options.headers || {});
   const res = await fetch(url, options);
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || ("HTTP " + res.status));
@@ -68,6 +75,7 @@ async function api(url, options) {
 }
 async function load() {
   const project = await api("/api/project");
+  sessionToken = project.sessionToken || "";
   document.querySelector("#project-name").textContent = project.title;
   pagesNav.replaceChildren();
   for (const page of project.pages) {
@@ -92,7 +100,7 @@ async function openPage(path) {
 }
 async function save() {
   try {
-    await api("/api/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ path: current, content: editor.value }) });
+    await api("/api/save", { method: "POST", body: JSON.stringify({ path: current, content: editor.value, sessionToken }) });
     statusEl.textContent = "已保存 " + current;
     preview.src = "/api/svg?path=" + encodeURIComponent(current) + "&_=" + Date.now();
   } catch (error) { statusEl.textContent = "保存失败：" + error.message; }
@@ -100,7 +108,7 @@ async function save() {
 async function exportPptx() {
   statusEl.textContent = "正在导出（本地引擎）…";
   try {
-    const data = await api("/api/export", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+    const data = await api("/api/export", { method: "POST", body: JSON.stringify({ sessionToken }) });
     statusEl.textContent = "导出完成：" + data.output;
     await showQa();
   } catch (error) { statusEl.textContent = "导出失败：" + error.message; }
@@ -118,6 +126,56 @@ document.querySelector("#refresh").onclick = () => { preview.src = "/api/svg?pat
 load();
 </script></body></html>
 """
+
+
+def validate_page_document(relative: str, data: dict[str, Any], project: Path) -> list[ValidationIssue]:
+    """Validate a single deck.pptd or .page document with PptdValidator."""
+    validator = PptdValidator()
+    if relative == "deck.pptd" or relative.endswith("deck.pptd"):
+        return validator.validate_manifest(data, location=relative)
+    return validator.validate_page(data, location=relative)
+
+
+def save_validated_yaml(project: Path, relative: str, content: str) -> dict[str, Any]:
+    """Parse, schema-validate, then atomic-write a page/manifest. Raises ValueError on failure."""
+    normalized = assert_writable(relative)
+    try:
+        parsed_yaml = yaml.safe_load(content)
+    except yaml.YAMLError as exc:
+        raise ValueError(f"YAML 解析失败：{exc}") from exc
+    if not isinstance(parsed_yaml, dict):
+        raise ValueError("YAML 顶层必须是映射对象")
+    issues = validate_page_document(normalized, parsed_yaml, project)
+    errors = [issue for issue in issues if issue.severity == "error"]
+    if errors:
+        raise ValueError("; ".join(issue.render() for issue in errors[:8]))
+    target = (project / normalized).resolve()
+    if not target.is_relative_to(project.resolve()):
+        raise PathSafetyError("路径越界")
+    import os
+
+    # Atomic write via temp in same directory.
+    target.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp_name = tempfile.mkstemp(prefix=".upm-save-", suffix=".tmp", dir=str(target.parent))
+    os.close(fd)
+    tmp_path = Path(tmp_name)
+    try:
+        write_yaml(tmp_path, parsed_yaml)
+        tmp_path.replace(target)
+    except Exception:
+        if tmp_path.exists():
+            try:
+                tmp_path.unlink()
+            except OSError:
+                pass
+        raise
+    # Full project re-check for references (best-effort warnings attached).
+    project_errors = [i for i in validate_pptd_project(project) if i.severity == "error"]
+    return {
+        "ok": True,
+        "path": normalized,
+        "projectErrors": [i.render() for i in project_errors[:12]],
+    }
 
 
 class EditorHandler(BaseHTTPRequestHandler):
@@ -142,6 +200,14 @@ class EditorHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
+
+    def _check_session(self, payload: dict[str, Any] | None = None) -> bool:
+        expected = getattr(self.server, "session_token", "")
+        header = self.headers.get("X-UPM-Session") or ""
+        body_token = ""
+        if isinstance(payload, dict):
+            body_token = str(payload.get("sessionToken") or "")
+        return bool(expected) and secrets.compare_digest(expected, header or body_token)
 
     def _safe_resolve(self, relative: str) -> Path:
         normalized = normalize_relative_path(relative)
@@ -247,22 +313,20 @@ class EditorHandler(BaseHTTPRequestHandler):
         except json.JSONDecodeError:
             self._json(400, {"error": "请求体不是 JSON"})
             return
+        if not self._check_session(payload if isinstance(payload, dict) else None):
+            self._json(403, {"error": "缺少或无效的 session token（禁止跨站无凭证写入）"})
+            return
         if parsed.path == "/api/save":
             path = str(payload.get("path") or "")
             content = str(payload.get("content") or "")
             try:
-                normalized = assert_writable(path)
-                parsed_yaml = yaml.safe_load(content)
-                if not isinstance(parsed_yaml, dict):
-                    self._json(400, {"error": "YAML 顶层必须是映射对象"})
-                    return
-                target = self.server.project / normalized  # type: ignore[attr-defined]
-                if not target.resolve().is_relative_to(self.server.project.resolve()):  # type: ignore[attr-defined]
-                    self._json(403, {"error": "路径越界"})
-                    return
-                write_yaml(target, parsed_yaml)
-                self._json(200, {"ok": True, "path": normalized})
-            except (PathSafetyError, Exception) as exc:  # noqa: BLE001
+                result = save_validated_yaml(self.server.project, path, content)  # type: ignore[attr-defined]
+                self._json(200, result)
+            except PathSafetyError as exc:
+                self._json(403, {"error": str(exc)})
+            except ValueError as exc:
+                self._json(400, {"error": str(exc)})
+            except Exception as exc:  # noqa: BLE001
                 self._json(400, {"error": str(exc)})
             return
         if parsed.path == "/api/export":
@@ -283,13 +347,22 @@ class EditorServer(ThreadingHTTPServer):
     def __init__(self, address: tuple[str, int], project: Path) -> None:
         super().__init__(address, EditorHandler)
         self.project = project.resolve()
+        self.session_token = secrets.token_urlsafe(32)
 
     def project_payload(self) -> dict[str, Any]:
         root, manifest, pages = load_project(self.project)
         return {
             "title": str(manifest.get("title") or root.name),
             "size": manifest.get("size"),
-            "pages": [{"path": relative, "pageType": page.get("pageType"), "role": (page.get("upm") or {}).get("role")} for relative, page in pages],
+            "sessionToken": self.session_token,
+            "pages": [
+                {
+                    "path": relative,
+                    "pageType": page.get("pageType"),
+                    "role": (page.get("upm") or {}).get("role"),
+                }
+                for relative, page in pages
+            ],
         }
 
 

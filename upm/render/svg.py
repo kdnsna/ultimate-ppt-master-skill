@@ -18,22 +18,43 @@ from upm.render.charts import render_chart
 FONT_STACK = "'Microsoft YaHei', 'PingFang SC', 'Arial', sans-serif"
 
 
-def _hex(color: str, fallback: str = "#171714") -> str:
-    if not isinstance(color, str):
+def resolve_color(
+    value: Any,
+    colors: dict[str, str] | None = None,
+    fallback: str = "#171714",
+) -> str:
+    """Resolve a PPTD color value: ``$token`` → theme hex, or normalize ``#RRGGBB``.
+
+    Unresolved ``$token`` values must not silently collapse to ink/black — that
+    turns light themes into dark unreadable pages. Prefer the provided fallback
+    only after looking up the theme map.
+    """
+    palette = colors or {}
+    token: Any = value
+    if isinstance(token, str) and token.startswith("$"):
+        resolved = palette.get(token[1:])
+        token = resolved if resolved is not None else fallback
+        # One level of indirection (e.g. custom aliases).
+        if isinstance(token, str) and token.startswith("$"):
+            token = palette.get(token[1:], fallback)
+    if not isinstance(token, str) or not token:
         return fallback
-    if color.startswith("$"):
-        return fallback
-    if re.fullmatch(r"#[0-9A-Fa-f]{8}", color):
-        return f"#{color[1:7]}"
-    if re.fullmatch(r"#[0-9A-Fa-f]{6}", color):
-        return color
+    if re.fullmatch(r"#[0-9A-Fa-f]{8}", token):
+        return f"#{token[1:7]}"
+    if re.fullmatch(r"#[0-9A-Fa-f]{6}", token):
+        return token
     return fallback
+
+
+def _hex(color: str, fallback: str = "#171714") -> str:
+    """Backward-compatible hex normalizer (no theme lookup). Prefer resolve_color."""
+    return resolve_color(color, None, fallback)
 
 
 def resolve_theme(theme: dict[str, Any]) -> tuple[dict[str, str], dict[str, dict[str, Any]]]:
     colors: dict[str, str] = {}
     for key, value in (theme.get("colors") or {}).items():
-        colors[key] = _hex(str(value))
+        colors[key] = resolve_color(str(value), None, "#171714")
     text_styles = {str(key): value for key, value in (theme.get("textStyles") or {}).items()}
     return colors, text_styles
 
@@ -110,7 +131,7 @@ def _render_text_element(element: dict[str, Any], colors: dict[str, str], text_s
     content = element.get("content") or {}
     style = _text_style(content.get("style"), content, text_styles)
     font_size = float(style.get("fontSize") or 18)
-    color = _hex(str(style.get("color") or "#171714"), colors.get("ink", "#171714"))
+    color = resolve_color(style.get("color") or "$ink", colors, colors.get("ink", "#171714"))
     line_height = float(style.get("lineHeight") or 1.5)
     align = content.get("align") or ["left", "top"]
     horizontal = align[0] if isinstance(align, list) and align else "left"
@@ -143,7 +164,7 @@ def _render_text_element(element: dict[str, Any], colors: dict[str, str], text_s
     text_anchor = {"left": "start", "center": "middle", "right": "end"}.get(horizontal, "start")
     for paragraph in paragraphs:
         inline = "".join(
-            f'<tspan x="{x:.1f}" dy="0" fill="{_hex(str(seg["style"].get("color") or color), color)}" font-size="{float(seg["style"].get("fontSize") or font_size):.1f}" font-weight="{weight if seg["style"].get("bold") else "400"}" font-style="{italic if seg["style"].get("italic") else "normal"}">{html.escape(seg["text"])}</tspan>'
+            f'<tspan x="{x:.1f}" dy="0" fill="{resolve_color(seg["style"].get("color") or color, colors, color)}" font-size="{float(seg["style"].get("fontSize") or font_size):.1f}" font-weight="{weight if seg["style"].get("bold") else "400"}" font-style="{italic if seg["style"].get("italic") else "normal"}">{html.escape(seg["text"])}</tspan>'
             for seg in paragraph
         )
         anchor = text_anchor
@@ -176,7 +197,10 @@ def _render_shape_element(
     border = element.get("border")
     stroke = ""
     if isinstance(border, dict):
-        stroke = f' stroke="{_hex(str(border.get("color") or "#000000"), "#000000")}" stroke-width="{float(border.get("width") or 1):.1f}"'
+        stroke = (
+            f' stroke="{resolve_color(border.get("color") or "#000000", colors, "#000000")}"'
+            f' stroke-width="{float(border.get("width") or 1):.1f}"'
+        )
     adjustments = element.get("adjustments") or []
     if shape in {"rect", "roundRect", "ellipse", "triangle", "diamond", "chevron", "rightArrow", "donut", "star5", "homePlate"}:
         if shape == "rect":
@@ -245,7 +269,7 @@ def _fill_parts(
         return "#000000"
     fill_type = fill.get("type")
     if fill_type == "solid":
-        return _hex(str(fill.get("color") or "#000000"), "#000000")
+        return resolve_color(fill.get("color") or "#000000", colors, "#000000")
     if fill_type == "gradient":
         stops = fill.get("stops") or []
         if len(stops) < 2:
@@ -253,7 +277,7 @@ def _fill_parts(
         gradient_id = f"g{abs(hash(str(stops))) % 100000}"
         angle = float(fill.get("angle") or 0)
         stops_xml = "".join(
-            f'<stop offset="{float(stop.get("position") or 0) * 100:.1f}%" stop-color="{_hex(str(stop.get("color")), "#000000")}"/>'
+            f'<stop offset="{float(stop.get("position") or 0) * 100:.1f}%" stop-color="{resolve_color(stop.get("color"), colors, "#000000")}"/>'
             for stop in stops
         )
         if fill.get("gradientType") == "radial":
@@ -363,7 +387,7 @@ def _render_line_element(element: dict[str, Any], colors: dict[str, str]) -> str
     if not points:
         return ""
     border = element.get("border") or {}
-    stroke = _hex(str(border.get("color") or "#171714"), colors.get("ink", "#171714"))
+    stroke = resolve_color(border.get("color") or "$ink", colors, colors.get("ink", "#171714"))
     stroke_width = float(border.get("width") or 1)
     sx, sy = width / float(view_box[0]), height / float(view_box[1])
     coords = points.replace(",", " ").split()

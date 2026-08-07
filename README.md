@@ -20,9 +20,9 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square&color=171714"></a>&ensp;
   <a href="./LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-171714?style=flat-square"></a>&ensp;
-  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="v6.3.9" src="https://img.shields.io/badge/GitHub_Release-v6.3.9-1D4ED8?style=flat-square"></a>&ensp;
+  <img alt="v7.0.0-beta.1" src="https://img.shields.io/badge/version-7.0.0--beta.1-1D4ED8?style=flat-square">&ensp;
   <img alt="local-first" src="https://img.shields.io/badge/local--first-yes-73866C?style=flat-square">&ensp;
-  <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-1D4ED8?style=flat-square">
+  <img alt="shape-editable PPTX" src="https://img.shields.io/badge/output-shape--editable_PPTX-1D4ED8?style=flat-square">
 </p>
 
 <br>
@@ -31,18 +31,28 @@
 
 <br>
 
-## v7 统一架构（upm CLI）
+## v7 统一架构（upm CLI）· Beta
 
-两个内核：**Preserve Edit Engine**（已有 PPTX 保真修改）与 **Deck Generation Engine**（DeckIR → PPTD → 导出 → 视觉 QA）。三条用户路径：`preserve-edit` / `editable-deck` / `web-deck`（仅在明确要求网页时启用）。
+当前 main / v7 内核定位为 **`v7.0.0-beta` 技术预览**：架构方向正确，但质量门与多入口尚未完全收敛。CLI 返回 0 才表示该模式下的 required gate 已通过；失败产物会移至 `exports/draft/`。
 
-导出后端：`local`（默认，离线，表格/图表为可编辑 DrawingML 形状而非原生数据对象）与 `kimi`（实验性外部兼容能力，当前上游环境存在导出交付失效，不构成正式交付保证；仅显式 opt-in）。
+| 能力 | 状态 | 说明 |
+|------|------|------|
+| Preserve Edit | **RC** | 包级保真编辑；真实 PowerPoint 矩阵仍待签字 |
+| Editable Deck | **Beta** | DeckIR→PPTD→本地 **shape-editable** DrawingML PPTX（非原生 `a:tbl`/chart 数据对象）；正式模式禁止占位交付 |
+| Web Deck | **Experimental** | `upm make --format web-deck` 现为 **SVG HTML Preview**，不是杂志风/Swiss 成品 Web Deck |
+| Kimi Adapter | **Experimental / 非正式交付** | 依赖就绪 ≠ 导出已验证；正式交付只用 `--export-backend local` |
+
+**谁做什么：** 纯 CLI 可完成 plan→compile→export→quality gates；Agent/LLM 仅在需要 brief 增强时介入。ZIP/`python-pptx` 打开 ≠ 真实 PowerPoint 排版签字。自动修复 = **溢出有限缩字号 + 修复计划**，不是通用两轮执行器。
+
+**规范规划核心：** Python `upm plan` / `upm.compiler.planner`（deterministic-draft-planner）是 DeckIR 的 source of truth。Bridge/Desktop 默认 shell 到该核心；JS/独立大纲规划器仅为 legacy fallback。
 
 ```bash
-bin/upm make <source-or-topic>     # 生成可编辑 PPTX（默认）
-bin/upm edit <file.pptx> "修改要求" # 保真局部修改
-bin/upm open <project>             # PPTD 视觉精修
-bin/upm review <project>           # 重新审计
-bin/upm doctor                     # 环境检查（只报告）
+bin/upm plan <source> --emit bridge   # 规范 DeckIR（Bridge/Desktop 共用）
+bin/upm make <source-or-topic>        # 生成可编辑 PPTX（默认）
+bin/upm edit <file.pptx> "修改要求"    # 保真局部修改；或 --edits edits.json
+bin/upm open <project>                # PPTD 视觉精修
+bin/upm review <project>              # 重新审计（失败非 0）
+bin/upm doctor                        # 环境检查（只报告）
 ```
 
 详见 [upm-cli.md](docs/guides/upm-cli.md)、[upm-v7-unification.md](docs/architecture/upm-v7-unification.md) 与 [upm-migration.md](docs/guides/upm-migration.md)。

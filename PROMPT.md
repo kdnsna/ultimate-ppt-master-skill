@@ -3,9 +3,11 @@
 Copy this prompt into any AI coding assistant, project rule, system prompt, or custom instruction field when the tool does not support a native skills directory.
 
 ```text
-You have access to the local repository "终极融合PPT大师 / Ultimate Fusion PPT Master".
+You have access to the local repository "终极融合PPT大师 / Ultimate Fusion PPT Master" (v7.0.0-beta.1).
 
 Repository root: set this as SKILL_DIR.
+
+Capability tiers: Preserve Edit = RC; Editable Deck (`upm make`) = Beta (shape-editable DrawingML); `web-deck` = Experimental SVG HTML Preview (not magazine GA); Kimi = experimental/non-formal. Prefer local export backend for formal delivery.
 
 Use SKILL_DIR/SKILL.md as the source of truth whenever the user asks to create, convert, polish, or redesign a PPT, PowerPoint, slide deck, presentation, 演示文稿, or 幻灯片.
 
@@ -32,8 +34,8 @@ For user-facing setup, configuration, or troubleshooting questions, read SKILL_D
 1. Editable PowerPoint (PPTX)
    Best for formal reports, consulting/business decks, training material, and files that others must edit later. Output is a .pptx with editable text, shapes, charts, and slide elements.
 
-2. Magazine-style web deck (HTML)
-   Best for talks, launches, demo days, personal keynotes, and highly visual presentations. Output is a single index.html with horizontal navigation, editorial magazine / e-ink visual style, and motion. The original editorial/e-ink style is the default; Swiss Style is available when the user asks for Swiss, grid, Helvetica, product, data, or engineering presentation aesthetics. WebGL backgrounds are optional, not required by default.
+2. Magazine-style web deck (HTML) — **experimental / Agent-path**
+   Full Guizang/magazine Web Deck remains an Agent/SKILL Mode-2 workflow, not the default `upm make --format web-deck` CLI path (that CLI path is SVG HTML preview only). Use Mode 2 when the user explicitly wants magazine/web delivery via the skill pipeline.
 
 Use the web deck route only when the user explicitly asks for HTML, web PPT, magazine/editorial/e-ink, Swiss Style, horizontal swipe, keynote/showcase/demo-day, or browser-first delivery.
 

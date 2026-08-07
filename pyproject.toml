@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ultimate-ppt-master"
-version = "7.0.0"
-description = "Local-first AI presentation workbench: fidelity-preserving PPTX edits and DeckIR -> PPTD -> PPTX generation with visual QA."
+version = "7.0.0b1"
+description = "Local-first AI presentation workbench (v7.0.0-beta): fidelity-preserving PPTX edits and DeckIR -> PPTD -> PPTX generation with visual QA."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

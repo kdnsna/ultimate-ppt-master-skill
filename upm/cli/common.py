@@ -16,12 +16,22 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def project_title(input_text: str, override: str | None) -> str:
     if override:
-        return override.strip()
+        return override.strip()[:80] or "未命名演示文稿"
     candidate = input_text.strip()
-    candidate = re.sub(r"^[「『【\[]|[」』】\]]+$", "", candidate)
-    candidate = re.sub(r"\.(?:pdf|docx?|xlsx?|pptx?|md|txt)$", "", candidate, flags=re.IGNORECASE)
-    candidate = re.sub(r"^https?://[^\s]+", "", candidate).strip()
-    return candidate[:24] or "未命名演示文稿"
+    path = Path(candidate).expanduser()
+    if path.is_file():
+        candidate = path.stem
+    else:
+        candidate = re.sub(r"^[「『【\[]|[」』】\]]+$", "", candidate)
+        candidate = re.sub(r"^https?://[^\s]+", "", candidate).strip()
+        # Prefer first ATX markdown heading when the input is inline markdown.
+        heading = re.search(r"^#{1,6}\s+(.+)$", candidate, re.MULTILINE)
+        if heading:
+            candidate = heading.group(1).strip()
+        candidate = re.sub(r"\.(?:pdf|docx?|xlsx?|pptx?|md|txt)$", "", candidate, flags=re.IGNORECASE)
+    candidate = re.sub(r"^#{1,6}\s+", "", candidate).strip()
+    candidate = re.sub(r"\s+", " ", candidate)
+    return candidate[:40] or "未命名演示文稿"
 
 
 def slugify(name: str) -> str:
@@ -154,7 +164,12 @@ def extract_markdown_tables(text: str) -> list[dict[str, Any]]:
 
 
 def attach_tables_to_deckir(deckir: dict[str, Any], tables: list[dict[str, Any]]) -> None:
-    """Assign extracted tables to evidence/chart/benefit slides deterministically."""
+    """Assign extracted tables to evidence/chart/benefit slides deterministically.
+
+    When a table has numeric columns and lands on a benefit/chart slide, mark
+    ``visual.type=chart`` so the compiler prefers the chart branch over the
+    table-only early return (avoids mutual shadowing).
+    """
     if not tables:
         return
     slides = deckir.get("slides") or []
@@ -172,11 +187,16 @@ def attach_tables_to_deckir(deckir: dict[str, Any], tables: list[dict[str, Any]]
             break
         slide = candidates[index]
         slide["table"] = table
-        if slide in chart_candidates and len(table["rows"]) >= 2:
+        prefer_chart = slide in chart_candidates and len(table["rows"]) >= 2
+        if prefer_chart:
             cols = table["headers"]
             numeric_cols = []
-            for col_index, col in enumerate(cols):
-                if all(re.fullmatch(r"-?\d[\d,.]*%?", str(row[col_index])) for row in table["rows"] if col_index < len(row)):
+            for col_index, _col in enumerate(cols):
+                if all(
+                    re.fullmatch(r"-?\d[\d,.]*%?", str(row[col_index]))
+                    for row in table["rows"]
+                    if col_index < len(row)
+                ):
                     numeric_cols.append(col_index)
             if numeric_cols:
                 first = numeric_cols[0]
@@ -196,6 +216,11 @@ def attach_tables_to_deckir(deckir: dict[str, Any], tables: list[dict[str, Any]]
                         }
                     ],
                 }
+                # Recipe + visual preference drive compiler layout (chart wins).
+                slide["visual"] = {"type": "chart", "sourceTableId": f"t{index + 1:03d}"}
+                if not str(slide.get("recipeId") or "").startswith("native_chart"):
+                    slide["recipeId"] = "native_chart.direct_label"
+                    slide["layoutFamily"] = "chart"
 
 
 def print_delivery(project: Path, title: str, summary: dict[str, Any]) -> None:

@@ -19,13 +19,17 @@ def _num(value: Any) -> float:
         return 0.0
 
 
-def _hex_color(color: str, fallback: str = "#1D4ED8") -> str:
-    if color.startswith("$"):
+def _hex_color(color: str, fallback: str = "#1D4ED8", colors: dict[str, str] | None = None) -> str:
+    palette = colors or {}
+    token = color
+    if isinstance(token, str) and token.startswith("$"):
+        token = palette.get(token[1:], fallback)
+    if not isinstance(token, str):
         return fallback
-    if re.fullmatch(r"#[0-9A-Fa-f]{8}", color):
-        return f"#{color[1:7]}"
-    if re.fullmatch(r"#[0-9A-Fa-f]{6}", color):
-        return color
+    if re.fullmatch(r"#[0-9A-Fa-f]{8}", token):
+        return f"#{token[1:7]}"
+    if re.fullmatch(r"#[0-9A-Fa-f]{6}", token):
+        return token
     return fallback
 
 

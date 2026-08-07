@@ -2,7 +2,7 @@
 import { createServer } from "node:http";
 import { spawn, spawnSync } from "node:child_process";
 import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
-import { constants as fsConstants, createReadStream, existsSync, readFileSync } from "node:fs";
+import { constants as fsConstants, createReadStream, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { chmod, link, lstat, mkdir, open, opendir, readFile, readlink, realpath, rename, symlink, unlink, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -1477,7 +1477,9 @@ async function writeHandoffProject(payload, { repoRoot, outputDir, attachmentLim
     sourceText: evidence.text,
     outputMode: payload?.form?.outputMode || projectBrief.outputMode || "both",
     qualityGate,
-    deckSession
+    deckSession,
+    repoRoot,
+    pageCount: payload?.form?.pageCount || projectBrief.pageCount || undefined
   });
   decorateDeckIRV52(deckIRPayload, { referenceStyle, sourceConfidence, deliveryScorecard, imageAcceptance });
   await writeProjectFile("storyboard.json", JSON.stringify(deckIRPayload.storyboard, null, 2));
@@ -2225,7 +2227,86 @@ function evidenceRefsForSlide(claims, slide, index) {
   return matches.length ? matches : [claims[index % claims.length].id];
 }
 
-function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }) {
+/**
+ * Resolve Python for the shared upm kernel (venv preferred).
+ */
+function resolveUpmPython(repoRoot) {
+  const venvUnix = join(repoRoot, ".venv", "bin", "python");
+  const venvWin = join(repoRoot, ".venv", "Scripts", "python.exe");
+  if (existsSync(venvUnix)) return venvUnix;
+  if (existsSync(venvWin)) return venvWin;
+  return "python3";
+}
+
+/**
+ * Canonical DeckIR planner: shell out to Python `upm plan --emit bridge`.
+ * JS-only planner is legacy fallback only (UPM_ALLOW_LEGACY_PLANNER=1 or core unavailable).
+ */
+function buildDeckIRViaPythonCore({ repoRoot, title, sourceText, outputMode, qualityGate, pageCount }) {
+  const root = repoRoot || process.cwd();
+  const python = resolveUpmPython(root);
+  const modeMap = {
+    "formal-business": "standard",
+    "formal-audit": "audit",
+    audit: "audit",
+    standard: "standard",
+    quick: "quick"
+  };
+  const qualityMode = modeMap[String(qualityGate?.level || qualityGate || "standard")] || "standard";
+  // Write source to a temp file so long materials do not hit ARG_MAX.
+  const tmpDir = join(root, ".upm-cache");
+  try {
+    mkdirSync(tmpDir, { recursive: true });
+  } catch {
+    /* ignore */
+  }
+  const sourcePath = join(tmpDir, `bridge-plan-source-${Date.now()}.md`);
+  writeFileSync(sourcePath, String(sourceText || title || ""), "utf8");
+  try {
+    const args = [
+      "-m",
+      "upm",
+      "plan",
+      sourcePath,
+      "--title",
+      String(title || "未命名演示文稿"),
+      "--mode",
+      qualityMode,
+      "--format",
+      outputMode === "web" || outputMode === "web-deck" ? "web-deck" : "editable-deck",
+      "--emit",
+      "bridge"
+    ];
+    if (pageCount && Number(pageCount) > 0) {
+      args.push("--pages", String(pageCount));
+    }
+    const result = spawnSync(python, args, {
+      cwd: root,
+      encoding: "utf8",
+      timeout: 60000,
+      env: { ...process.env, PYTHONPATH: root }
+    });
+    if (result.status !== 0) {
+      const detail = (result.stderr || result.stdout || "").slice(0, 800);
+      throw new Error(`upm plan failed (status=${result.status}): ${detail}`);
+    }
+    const payload = parseJsonMaybe(result.stdout);
+    if (!payload?.storyboard?.slides || !payload?.sourceMap) {
+      throw new Error("upm plan did not return bridge-shaped DeckIR payload");
+    }
+    payload.storyboard.canonicalSource = "upm.compiler.planner";
+    payload.storyboard.bridgeAdapter = "python-upm-plan";
+    return payload;
+  } finally {
+    try {
+      unlinkSync(sourcePath);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function buildDeckIRLegacyJs({ title, sourceText, outputMode, qualityGate, deckSession }) {
   const claims = buildSourceClaims(sourceText);
   const session = validateDeckSession(deckSession);
   let slides;
@@ -2261,7 +2342,7 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }
       };
     });
   } else {
-    planningMode = "fallback-rule-planner";
+    planningMode = "legacy-js-fallback-planner";
     const planningClaims = claims.length ? claims : [{ id: "", sourceLine: 1, text: title }];
     const target = Math.max(4, Math.min(8, planningClaims.length + 2));
     const chunks = chunkClaims(planningClaims, target);
@@ -2287,12 +2368,14 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }
       });
     });
   }
-  assertNoTripleLayoutOrRecipe(slides, session ? "DeckSession" : "Bridge fallback planner");
+  assertNoTripleLayoutOrRecipe(slides, session ? "DeckSession" : "Bridge legacy JS planner");
   const createdAt = new Date().toISOString();
   const storyboard = {
     deckIRVersion: "1.0",
     createdAt,
     planningMode,
+    canonicalSource: "legacy-js-fallback",
+    bridgeAdapter: "legacy-js",
     delivery: {
       outputMode,
       qualityGate: qualityGate?.level || "formal-business"
@@ -2328,7 +2411,7 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }
       mode: planningMode,
       fallbackReason: session
         ? "Bridge merged the user-confirmed DeckSession with deterministic evidence and production contracts."
-        : "Bridge handoff wrote deterministic DeckIR without requiring model credentials."
+        : "Legacy JS planner (non-canonical); set UPM_ALLOW_LEGACY_PLANNER only when Python core is unavailable."
     },
     summary: {
       slides: slides.length,
@@ -2338,6 +2421,35 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }
     }
   };
   return { storyboard, sourceMap, planningReport };
+}
+
+function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession, repoRoot, pageCount }) {
+  const session = validateDeckSession(deckSession);
+  // DeckSession merge still uses JS (user-confirmed session). Pure planning goes through Python core.
+  if (session) {
+    return buildDeckIRLegacyJs({ title, sourceText, outputMode, qualityGate, deckSession });
+  }
+  const allowLegacy = String(process.env.UPM_ALLOW_LEGACY_PLANNER || "") === "1";
+  try {
+    return buildDeckIRViaPythonCore({
+      repoRoot: repoRoot || process.cwd(),
+      title,
+      sourceText,
+      outputMode,
+      qualityGate,
+      pageCount
+    });
+  } catch (error) {
+    if (!allowLegacy) {
+      // Still fall back so handoff is not hard-broken, but mark non-canonical loudly.
+      const payload = buildDeckIRLegacyJs({ title, sourceText, outputMode, qualityGate, deckSession });
+      payload.storyboard.planningMode = "legacy-js-fallback-after-core-error";
+      payload.storyboard.coreError = String(error?.message || error).slice(0, 400);
+      payload.planningReport.provider.fallbackReason = `Python upm plan unavailable: ${String(error?.message || error).slice(0, 200)}`;
+      return payload;
+    }
+    return buildDeckIRLegacyJs({ title, sourceText, outputMode, qualityGate, deckSession });
+  }
 }
 
 function slideTaskQuestion(role) {
