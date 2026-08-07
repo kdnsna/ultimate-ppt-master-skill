@@ -110,10 +110,11 @@ class OpenSaveSecurityTest(unittest.TestCase):
                 save_validated_yaml(project, page.relative_to(project).as_posix(), "just a string")
 
     def test_session_token_required_on_post(self):
+        from http.client import HTTPConnection
+
         from upm.cli.open_server import EditorServer
         from upm.compiler.compiler import compile_deck
         from upm.compiler.planner import plan_deckir
-        from http.client import HTTPConnection
 
         with tempfile.TemporaryDirectory() as name:
             project = Path(name) / "proj"
