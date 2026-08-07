@@ -113,10 +113,14 @@ def _import_url(url: str, project: Path) -> tuple[str, str]:
 
 
 def resolve_python() -> Path:
-    venv = ROOT / ".venv" / "bin" / "python"
-    if venv.is_file():
-        return venv
-    for name in ("python3.13", "python3.12", "python3.11", "python3.10"):
+    for venv in (
+        ROOT / ".venv" / "bin" / "python",
+        ROOT / ".venv" / "Scripts" / "python.exe",
+        ROOT / ".venv" / "Scripts" / "python",
+    ):
+        if venv.is_file():
+            return venv
+    for name in ("python3.13", "python3.12", "python3.11", "python3.10", "python"):
         candidate = shutil.which(name)
         if candidate:
             return Path(candidate)
