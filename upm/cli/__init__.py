@@ -3,12 +3,27 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 
 from upm.errors import UpmError
 
 
+def _configure_windows_stdio() -> None:
+    """Windows consoles default to a legacy charmap; force UTF-8 for output and child processes."""
+    if sys.platform != "win32":
+        return
+    os.environ.setdefault("PYTHONUTF8", "1")
+    os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError, OSError):
+            pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    _configure_windows_stdio()
     parser = argparse.ArgumentParser(
         prog="upm",
         description="Ultimate PPT Master 统一命令行：make / edit / open / review / doctor",

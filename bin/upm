@@ -3,6 +3,9 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+export PYTHONUTF8=1
+export PYTHONIOENCODING=utf-8
+
 PYTHON=""
 for candidate in \
   "$ROOT_DIR/.venv/bin/python" \
