@@ -52,10 +52,11 @@ def build_theme(direction_id: str = "formal-finance") -> dict[str, Any]:
             "muted": colors.get("muted", "#687078"),
             "white": "#FFFFFF",
             "surface": colors.get("surface", "#FFFFFF"),
+            "cardBorder": colors.get("cardBorder", "#E5E1D8"),
         },
         "textStyles": {
             "coverTitle": {
-                "fontSize": 60,
+                "fontSize": float(typography.get("coverTitleSize") or 60),
                 "color": "$ink",
                 "bold": True,
                 "fontFamily": body_font,

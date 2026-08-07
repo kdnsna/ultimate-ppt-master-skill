@@ -130,6 +130,10 @@ def _measure_text_width(text: str, font_size: float) -> float:
     return cjk * font_size + latin * font_size * 0.55
 
 
+# 中文禁则：这些字符不允许出现在行首（换行时挤入上一行）。
+NO_BREAK_START = set("。，、；：！？）》」』”’】%‰℃…—…‥")
+
+
 def _wrap_paragraph(paragraph: list[dict[str, Any]], max_width: float, default_font_size: float) -> list[list[dict[str, Any]]]:
     """Greedy char-level wrap of one paragraph to max_width.
 
@@ -148,7 +152,9 @@ def _wrap_paragraph(paragraph: list[dict[str, Any]], max_width: float, default_f
     current_w = 0.0
     for ch, seg, seg_size in units:
         ch_w = _measure_text_width(ch, seg_size)
-        if current and current_w + ch_w > max_width:
+        # 禁则处理：行首禁止出现的标点不触发换行，挤入上一行
+        # （中文排版规范：句号/逗号/顿号/分号/冒号/叹问号/后引号等不能作为行首）
+        if current and current_w + ch_w > max_width and ch not in NO_BREAK_START:
             lines.append(current)
             current = []
             current_w = 0.0
@@ -238,11 +244,20 @@ def _render_text_element(element: dict[str, Any], colors: dict[str, str], text_s
             tx = x + width
         tspans = []
         for line_index, line in enumerate(lines):
-            inline = "".join(
-                f'<tspan x="{tx:.1f}" dy="{0 if line_index == 0 else effective_line:.1f}" fill="{resolve_color(seg["style"].get("color") or color, colors, color)}" font-size="{float(seg["style"].get("fontSize") or font_size):.1f}" font-weight="{weight if seg["style"].get("bold") else "400"}" font-style="{italic if seg["style"].get("italic") else "normal"}">{html.escape(seg["text"])}</tspan>'
+            # One positional outer <tspan> per visual line (x + dy), with
+            # style-carrying runs as NESTED tspans. The SVG->DrawingML
+            # paragraph classifier requires exactly one direct-child tspan
+            # per line with dy=0 (first) / dy=line-height (later); inline
+            # style differences inside a line must not become extra direct
+            # children or the classifier rejects the block and the text
+            # falls back to wrap="none".
+            inner = "".join(
+                f'<tspan fill="{resolve_color(seg["style"].get("color") or color, colors, color)}" font-size="{float(seg["style"].get("fontSize") or font_size):.1f}" font-weight="{weight if seg["style"].get("bold") else "400"}" font-style="{italic if seg["style"].get("italic") else "normal"}">{html.escape(seg["text"])}</tspan>'
                 for seg in _merge_line_segments(line)
             )
-            tspans.append(inline)
+            tspans.append(
+                f'<tspan x="{tx:.1f}" dy="{0 if line_index == 0 else effective_line:.1f}">{inner}</tspan>'
+            )
         para_attrs = f' data-paragraph-line-height="{effective_line:.1f}"' if len(lines) > 1 else ""
         out.append(
             f'<text x="{tx:.1f}" y="{cursor + font_size:.1f}" text-anchor="{anchor}" font-family="{FONT_STACK}" font-size="{font_size:.1f}" fill="{color}"{para_attrs}>'

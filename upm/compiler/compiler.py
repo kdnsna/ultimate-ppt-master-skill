@@ -76,7 +76,7 @@ def _card(x: float, y: float, width: float, height: float, fill: str = "$surface
         "roundRect",
         adjustments=[radius],
         fill=solid_fill(fill),
-        border={"style": "solid", "width": 1, "color": "#E5E1D8"},
+        border={"style": "solid", "width": 1, "color": "$cardBorder"},
     )
 
 
