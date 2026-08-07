@@ -29,17 +29,47 @@ def _clean_line(raw: str) -> str:
     return line
 
 
+def sanitize_claim_text(text: str) -> str:
+    """Strip markdown syntax so claims are safe for on-slide display.
+
+    Only removes structural markdown (ATX headings, emphasis markers, links,
+    list bullets). Inline ``#`` that is not an ATX heading (e.g. ``议题 #3``)
+    is preserved.
+    """
+    if not text:
+        return ""
+    line = text.replace("\r\n", "\n").replace("\r", "\n")
+    cleaned_lines: list[str] = []
+    for raw in line.split("\n"):
+        piece = raw.strip()
+        if not piece:
+            continue
+        piece = re.sub(r"^#{1,6}\s+", "", piece)
+        piece = re.sub(r"^[-*+]\s+", "", piece)
+        piece = re.sub(r"^\d+[.)]\s+", "", piece)
+        piece = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", piece)
+        piece = re.sub(r"`([^`]+)`", r"\1", piece)
+        piece = re.sub(r"\*\*([^*]+)\*\*", r"\1", piece)
+        piece = re.sub(r"__([^_]+)__", r"\1", piece)
+        piece = re.sub(r"(?<!\w)\*([^*]+)\*(?!\w)", r"\1", piece)
+        piece = re.sub(r"(?<!\w)_([^_]+)_(?!\w)", r"\1", piece)
+        piece = re.sub(r"\s+", " ", piece).strip()
+        if piece:
+            cleaned_lines.append(piece)
+    return " ".join(cleaned_lines).strip()
+
+
 def source_claims(text: str) -> list[dict[str, str]]:
     """Split source text into stable, claim-sized chunks.
 
-    Each claim carries an id, sourceLine, and text. Lines that look like
-    headers, list markers, or formulas are preserved as-is; long paragraphs
-    are split at sentence boundaries up to a target length.
+    Each claim carries an id, sourceLine, and sanitized text suitable for
+    slide body/title rendering. Long paragraphs are split at sentence
+    boundaries up to a target length.
     """
     claims: list[dict[str, str]] = []
     lines = [line for line in text.splitlines() if line.strip()]
     for line_index, raw in enumerate(lines, start=1):
-        line = _clean_line(raw)
+        line = sanitize_claim_text(_clean_line(raw))
         if not line:
             continue
         if line.count("|") >= 2 and re.match(r"^\|", line):
@@ -53,7 +83,9 @@ def source_claims(text: str) -> list[dict[str, str]]:
         ]
         if len(sentences) > 1:
             for sentence in sentences:
-                claims.append({"id": f"c{len(claims) + 1:03d}", "sourceLine": str(line_index), "text": sentence})
+                cleaned = sanitize_claim_text(sentence)
+                if cleaned:
+                    claims.append({"id": f"c{len(claims) + 1:03d}", "sourceLine": str(line_index), "text": cleaned})
             continue
         sentences = re.split(r"(?<=[，,：:])\s*", line)
         sentences = [sentence.strip() for sentence in sentences if sentence.strip()]
@@ -63,10 +95,14 @@ def source_claims(text: str) -> list[dict[str, str]]:
                 buffer = f"{buffer}{sentence}".strip()
                 continue
             if buffer:
-                claims.append({"id": f"c{len(claims) + 1:03d}", "sourceLine": str(line_index), "text": buffer})
+                cleaned = sanitize_claim_text(buffer)
+                if cleaned:
+                    claims.append({"id": f"c{len(claims) + 1:03d}", "sourceLine": str(line_index), "text": cleaned})
             buffer = sentence
         if buffer:
-            claims.append({"id": f"c{len(claims) + 1:03d}", "sourceLine": str(line_index), "text": buffer})
+            cleaned = sanitize_claim_text(buffer)
+            if cleaned:
+                claims.append({"id": f"c{len(claims) + 1:03d}", "sourceLine": str(line_index), "text": cleaned})
     return claims
 
 
@@ -239,12 +275,21 @@ def build_deckir(
 
 def _slide_title(role: str, claim_text: str, deck_title: str, index: int, total: int) -> str:
     if role == "anchor":
-        return deck_title
+        return sanitize_claim_text(deck_title) or deck_title
     if role == "section":
         return f"第 {index} 部分"
     if role == "closing":
         return "总结与下一步"
-    text = claim_text[:44]
+    text = sanitize_claim_text(claim_text)
+    if len(text) > 44:
+        # Prefer a clean cut at Chinese punctuation when possible.
+        cut = text[:44]
+        for sep in ("。", "；", "，", "、", " ", "：", ":"):
+            pos = cut.rfind(sep)
+            if pos >= 12:
+                cut = cut[:pos]
+                break
+        text = cut.rstrip("，,；;：:、 ")
     return text or f"第 {index + 1} 页"
 
 

@@ -66,6 +66,44 @@ class UpmMakeTest(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("DeckIR 没有任何页面", result.stderr)
 
+    def test_make_markdown_input_is_clean(self):
+        with tempfile.TemporaryDirectory() as name:
+            source = Path(name) / "source.md"
+            source.write_text(
+                "# 个人养老金制度简介（2026 年版）\n\n"
+                "## 一、制度定位\n\n"
+                "个人养老金是政府政策支持、个人自愿参加的补充养老保险制度。\n\n"
+                "## 二、参与条件\n\n"
+                "年满 16 周岁的中国公民均可参加个人养老金。\n\n"
+                "## 三、缴费与税收\n\n"
+                "每年缴费上限 12000 元，享受税前扣除优惠。\n",
+                encoding="utf-8",
+            )
+            out = Path(name) / "out"
+            result = run_upm(
+                "make",
+                str(source),
+                "--title",
+                "个人养老金制度简介",
+                "--out",
+                str(out),
+                "--pages",
+                "6",
+                "--mode",
+                "quick",
+            )
+            self.assertEqual(result.returncode, 0, result.stderr[-2000:] + result.stdout[-2000:])
+            project = next(p for p in out.iterdir() if p.is_dir())
+            for page in (project / "pages").glob("*.page"):
+                body = page.read_text(encoding="utf-8")
+                self.assertNotIn("source.md", body)
+                self.assertNotRegex(body, r"text:\s*[\"']?#[^\"']")
+            # Light theme paper color should appear in intermediate SVG after export
+            svgs = list((project / ".upm" / "intermediate" / "svg").glob("*.svg"))
+            self.assertTrue(svgs)
+            svg_text = svgs[0].read_text(encoding="utf-8")
+            self.assertIn("#F7F5F0", svg_text)
+
 
 class UpmEditTest(unittest.TestCase):
     def test_edit_roundtrip_with_fidelity_report(self):

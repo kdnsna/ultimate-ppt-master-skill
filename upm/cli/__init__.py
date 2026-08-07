@@ -43,6 +43,11 @@ def main(argv: list[str] | None = None) -> int:
     make_parser.add_argument("--deckir", default=None, help="使用现有 DeckIR JSON（跳过自动规划）")
     make_parser.add_argument("--image", action="append", default=[], metavar="P01=path.png", help="指定 slideId 的图片")
     make_parser.add_argument("--no-qa", action="store_true", help="跳过视觉 QA（仅结构校验）")
+    make_parser.add_argument(
+        "--allow-quality-fail",
+        action="store_true",
+        help="质量门失败时仍以 0 退出（产物非正式交付，仅调试用）",
+    )
 
     edit_parser = sub.add_parser("edit", help="对已有 PPTX 做保真局部修改")
     edit_parser.add_argument("pptx", help="源 .pptx")
@@ -60,6 +65,11 @@ def main(argv: list[str] | None = None) -> int:
     review_parser.add_argument("project", help="PPTD 项目目录")
     review_parser.add_argument("--mode", default="standard", choices=["quick", "standard", "audit"])
     review_parser.add_argument("--render-backend", default="auto", choices=["auto", "local", "kimi"])
+    review_parser.add_argument(
+        "--allow-quality-fail",
+        action="store_true",
+        help="质量门失败时仍以 0 退出",
+    )
 
     doctor_parser = sub.add_parser("doctor", help="检查当前任务所需环境（只报告，不安装）")
     doctor_parser.add_argument("--profile", default="core", choices=["core", "pptx", "visual-review", "kimi", "all"])

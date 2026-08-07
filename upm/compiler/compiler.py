@@ -103,16 +103,27 @@ def _header(title: str, eyebrow: str, page_index: int, total: int) -> list[dict[
 
 
 def _source_note(slide: dict[str, Any], claim_by_id: dict[str, dict[str, Any]]) -> str:
+    """Footer caption for evidence. Never leaks local paths like ``source.md``.
+
+    Evidence line numbers and claim text live in speaker notes (``_notes_text``).
+    On-slide footers stay empty unless a claim carries an explicit human
+    ``citation`` / ``sourceLabel`` that does not look like a filesystem path.
+    """
     refs = slide.get("evidenceRefs") or []
     if not refs:
         return ""
     labels: list[str] = []
+    path_leak = re.compile(r"(?i)(source\.md|sources/|\\\\|/[\w.-]+\.(md|txt|docx?))")
     for ref in refs[:3]:
         claim = claim_by_id.get(str(ref))
-        if claim:
-            line = claim.get("sourceLine")
-            labels.append(f"来源：source.md L{line}")
-    return " · ".join(labels) if labels else "来源：见演讲者备注"
+        if not claim:
+            continue
+        citation = str(claim.get("citation") or claim.get("sourceLabel") or "").strip()
+        if citation and not path_leak.search(citation):
+            labels.append(citation)
+    if not labels:
+        return ""
+    return " · ".join(labels)
 
 
 def _notes_text(slide: dict[str, Any], claim_by_id: dict[str, dict[str, Any]]) -> str:
@@ -200,8 +211,9 @@ def _layout(
         elements = [
             _text("closing-title", MARGIN, 190, 848, 80, title, style="$coverTitle", font_size=44),
             _text("closing-body", MARGIN, 300, 800, 120, body or "决策与行动建议见演讲者备注。", style="$lead"),
-            _text("closing-source", MARGIN, FOOTER_Y, 700, 22, source, style="$note"),
         ]
+        if source:
+            elements.append(_text("closing-source", MARGIN, FOOTER_Y, 700, 22, source, style="$note"))
         return elements, "", notes
 
     elements = _header(title, str(slide.get("intent") or ""), page_index, total)
@@ -217,17 +229,18 @@ def _layout(
                 [[str(cell) for cell in row] for row in table["rows"]],
             )
         )
-        elements.append(
-            _text(
-                "evidence-source",
-                MARGIN,
-                FOOTER_Y - 22,
-                700,
-                22,
-                source or "表格数据来源见备注。",
-                style="$note",
+        if source:
+            elements.append(
+                _text(
+                    "evidence-source",
+                    MARGIN,
+                    FOOTER_Y - 22,
+                    700,
+                    22,
+                    source,
+                    style="$note",
+                )
             )
-        )
         return elements, "", notes
 
     image = images.get(str(slide.get("slideId") or slide.get("page") or ""))
@@ -238,12 +251,14 @@ def _layout(
             elements.append(_text("story-body", MARGIN, y + 10, 400, 300, body, style="$body"))
         else:
             elements.append(_text("body", MARGIN, y, 848, 300, body or "内容待补充（占位）。", style="$body"))
-        elements.append(_text("story-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
+        if source:
+            elements.append(_text("story-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
 
     if recipe.startswith("evidence_board") or role == "evidence":
         elements.append(_text("evidence-body", MARGIN, y, 848, 300, body or "证据内容待补充（占位）。", style="$body"))
-        elements.append(_text("evidence-source", MARGIN, FOOTER_Y - 22, 700, 22, source or "占位证据：请补充来源。", style="$note"))
+        if source:
+            elements.append(_text("evidence-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
 
     if recipe.startswith("comparison_matrix"):
@@ -252,7 +267,8 @@ def _layout(
         elements.append(_text("col-a", MARGIN + 20, y + 18, 372, 240, columns[0] if columns else "方案 A", style="$body"))
         elements.append(_card(W - MARGIN - 412, y, 412, 300))
         elements.append(_text("col-b", W - MARGIN - 412 + 20, y + 18, 372, 240, columns[1] if len(columns) > 1 else "方案 B", style="$body"))
-        elements.append(_text("comparison-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
+        if source:
+            elements.append(_text("comparison-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
 
     if recipe.startswith("process_flow"):
@@ -268,7 +284,8 @@ def _layout(
                 _text(f"step-{index}", x + 12, y + 16, 44, 44, f"{index + 1}", style="$statNum", font_size=26, align=["center", "middle"])
             )
             elements.append(_text(f"step-label-{index}", x + 16, y + 76, slot_width - 32, 120, step, style="$body", font_size=16))
-        elements.append(_text("process-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
+        if source:
+            elements.append(_text("process-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
 
     if recipe.startswith("metric_panel") or recipe.startswith("data_hero"):
@@ -277,7 +294,8 @@ def _layout(
             elements.append(_text("metric-value", MARGIN, y + 10, 500, 120, value, style="$statNum", font_size=64))
             elements.append(_text("metric-label", MARGIN, y + 150, 700, 60, label or title, style="$statLabel", font_size=18))
             elements.append(_text("metric-definition", MARGIN, y + 220, 848, 100, body, style="$body"))
-            elements.append(_text("metric-source", MARGIN, FOOTER_Y - 22, 700, 22, source or "口径与来源见备注。", style="$note"))
+            if source:
+                elements.append(_text("metric-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
             return elements, "", notes
         # No metric value found: fall back to the standard statement layout
         # instead of rendering a fake "待补充" number.
@@ -289,7 +307,8 @@ def _layout(
             ry = y + index * row_height
             elements.append(_rule(MARGIN, ry + 6, 8, color="$accent", height=34))
             elements.append(_text(f"risk-{index}", MARGIN + 24, ry, 820, row_height - 8, row, style="$body", font_size=16))
-        elements.append(_text("risk-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
+        if source:
+            elements.append(_text("risk-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
 
     if recipe.startswith("action_roadmap"):
@@ -299,7 +318,8 @@ def _layout(
             ry = y + index * row_height
             elements.append(_rule(MARGIN, ry + 10, 848, color="#D9D5CC"))
             elements.append(_text(f"action-{index}", MARGIN + 16, ry + 8, 820, row_height - 16, f"□ {row}", style="$body", font_size=16))
-        elements.append(_text("action-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
+        if source:
+            elements.append(_text("action-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
 
     if recipe.startswith("native_chart"):
@@ -319,20 +339,23 @@ def _layout(
             elements.append(_text("chart-takeaway", MARGIN + 716, y + 40, 150, 220, body or title, style="$note", font_size=13))
         else:
             elements.append(_text("body", MARGIN, y, 848, 300, body or "图表数据待补充（占位）。", style="$body"))
-        elements.append(_text("chart-source", MARGIN, FOOTER_Y - 22, 700, 22, source or "数据口径见备注。", style="$note"))
+        if source:
+            elements.append(_text("chart-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
 
     if recipe.startswith("editorial_quote"):
         elements.append(_text("quote", MARGIN + 40, y + 20, 768, 160, f"“{title}”", style="$lead", font_size=30, line_height=1.5))
         elements.append(_text("quote-body", MARGIN + 40, y + 210, 700, 120, body, style="$body"))
-        elements.append(_text("quote-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
+        if source:
+            elements.append(_text("quote-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
 
     # default: statement + evidence
     elements.append(_rule(MARGIN, y - 14, 8, color="$primary", height=64))
     elements.append(_text("statement", MARGIN + 28, y - 20, 620, 120, str(slide.get("takeaway") or title), style="$lead"))
     elements.append(_text("body", MARGIN + 28, y + 110, 820, 220, body, style="$body"))
-    elements.append(_text("source", MARGIN, FOOTER_Y - 22, 700, 22, source or "（本页无独立证据，请补充来源）", style="$note"))
+    if source:
+        elements.append(_text("source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
     return elements, "", notes
 
 

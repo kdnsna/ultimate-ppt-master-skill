@@ -16,12 +16,22 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def project_title(input_text: str, override: str | None) -> str:
     if override:
-        return override.strip()
+        return override.strip()[:80] or "未命名演示文稿"
     candidate = input_text.strip()
-    candidate = re.sub(r"^[「『【\[]|[」』】\]]+$", "", candidate)
-    candidate = re.sub(r"\.(?:pdf|docx?|xlsx?|pptx?|md|txt)$", "", candidate, flags=re.IGNORECASE)
-    candidate = re.sub(r"^https?://[^\s]+", "", candidate).strip()
-    return candidate[:24] or "未命名演示文稿"
+    path = Path(candidate).expanduser()
+    if path.is_file():
+        candidate = path.stem
+    else:
+        candidate = re.sub(r"^[「『【\[]|[」』】\]]+$", "", candidate)
+        candidate = re.sub(r"^https?://[^\s]+", "", candidate).strip()
+        # Prefer first ATX markdown heading when the input is inline markdown.
+        heading = re.search(r"^#{1,6}\s+(.+)$", candidate, re.MULTILINE)
+        if heading:
+            candidate = heading.group(1).strip()
+        candidate = re.sub(r"\.(?:pdf|docx?|xlsx?|pptx?|md|txt)$", "", candidate, flags=re.IGNORECASE)
+    candidate = re.sub(r"^#{1,6}\s+", "", candidate).strip()
+    candidate = re.sub(r"\s+", " ", candidate)
+    return candidate[:40] or "未命名演示文稿"
 
 
 def slugify(name: str) -> str:

@@ -98,6 +98,44 @@ class RubricTest(unittest.TestCase):
         )
         self.assertEqual(report["gates"]["structure"], "pass")
         self.assertEqual(report["gates"]["export"], "pass")
+        self.assertEqual(report["gates"]["visual"], "pass")
+        self.assertEqual(report["overall"], "pass")
+
+    def test_quality_report_empty_render_not_pass(self):
+        report = build_quality_report(
+            Path(tempfile.mkdtemp()),
+            structure_errors=[],
+            structure_warnings=[],
+            overflow_findings=[],
+            render_records=[],
+            rubric_findings=[],
+            export_result={"verified": True, "slides": 1},
+            rounds_used=0,
+            unresolved=[],
+            quality_mode="standard",
+            backend="local",
+        )
+        self.assertEqual(report["gates"]["visual"], "not-run")
+        self.assertEqual(report["overall"], "fail")
+        self.assertEqual(report["gates"]["formalDelivery"], "fail")
+
+    def test_quality_report_quick_allows_visual_not_run(self):
+        report = build_quality_report(
+            Path(tempfile.mkdtemp()),
+            structure_errors=[],
+            structure_warnings=[],
+            overflow_findings=[],
+            render_records=[],
+            rubric_findings=[],
+            export_result={"verified": True, "slides": 1},
+            rounds_used=0,
+            unresolved=[],
+            quality_mode="quick",
+            backend="local",
+            qa_skipped=True,
+        )
+        self.assertEqual(report["gates"]["visual"], "not-run")
+        self.assertEqual(report["overall"], "pass")
         self.assertEqual(report["summary"]["renderFailed"], 0)
 
 

@@ -68,4 +68,9 @@ def run_review(args: Any) -> int:
         print(f"[{finding['severity']}] {finding.get('page')}: {finding['message']}")
     print(f"\n联系表：{project / 'preview' / 'overview.jpg'}")
     print(f"质量报告：{project / '.upm' / 'quality-report.json'}")
+    allow_fail = bool(getattr(args, "allow_quality_fail", False))
+    overall = str(report.get("overall") or "fail")
+    if overall != "pass" and not allow_fail:
+        print(f"[quality] 审计未通过（overall={overall}）。使用 --allow-quality-fail 强制 exit 0。", flush=True)
+        return 2
     return 0

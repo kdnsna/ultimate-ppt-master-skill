@@ -146,6 +146,7 @@ def run_make(args: Any) -> int:
         }
         print(f"Web Deck 导出完成：{web_path}")
 
+    qa_skipped = bool(args.no_qa) or args.mode == "quick"
     report = build_quality_report(
         project,
         structure_errors=structure_errors,
@@ -158,6 +159,7 @@ def run_make(args: Any) -> int:
         unresolved=unresolved,
         quality_mode=args.mode,
         backend=args.export_backend if args.deck_format == "editable-deck" else "web-deck",
+        qa_skipped=qa_skipped,
     )
     write_quality_artifact(project, "make-summary.json", report)
 
@@ -165,9 +167,23 @@ def run_make(args: Any) -> int:
         "slides": compile_summary["pages"],
         "backend": report["exportBackend"],
         "gates": report["gates"],
+        "overall": report.get("overall"),
         "warnings": [issue["message"] for issue in rubric_findings if issue["severity"] == "warning"][:8],
         "pptx": str(export_result.get("output") or ""),
         "overview": str(project / "preview" / "overview.jpg"),
     }
     print_delivery(project, title, summary)
+
+    allow_fail = bool(getattr(args, "allow_quality_fail", False))
+    overall = str(report.get("overall") or "fail")
+    if overall != "pass" and not allow_fail:
+        print(
+            f"\n[quality] 质量门未通过（overall={overall}）。"
+            f" gates={report['gates']}。"
+            f" 使用 --allow-quality-fail 可强制以 0 退出（非正式交付）。",
+            flush=True,
+        )
+        return 2
+    if overall != "pass" and allow_fail:
+        print(f"\n[quality] 质量门未通过但已 --allow-quality-fail（overall={overall}）。", flush=True)
     return 0

@@ -52,8 +52,15 @@ def is_all_background(png_bytes: bytes) -> bool:
 
 def _resolve_color(value: str, colors: dict[str, str], fallback: str) -> str:
     if isinstance(value, str) and value.startswith("$"):
-        return colors.get(value[1:], fallback)
+        resolved = colors.get(value[1:], fallback)
+        if isinstance(resolved, str) and resolved.startswith("$"):
+            return colors.get(resolved[1:], fallback)
+        return resolved or fallback
     return value or fallback
+
+
+_MD_HEADING = re.compile(r"(?:^|\n)\s*#{1,6}\s+\S")
+_SOURCE_PATH = re.compile(r"(?i)\bsource\.md\b|\bsources/")
 
 
 def _background_color(page: dict[str, Any], colors: dict[str, str]) -> str:
@@ -188,4 +195,35 @@ def run_rubric(
                     "page": str(slide.get("page") or "?"),
                 }
             )
+
+    # 7. content hygiene: markdown / source-path leakage into visible page text
+    for relative, page in pages:
+        for element in page.get("elements", []):
+            if element.get("elementType") != "text":
+                continue
+            content = element.get("content") or {}
+            text = str(content.get("text") or "")
+            if not text.strip():
+                continue
+            element_id = str(element.get("elementId") or "?")
+            if _MD_HEADING.search(text) or re.search(r"(?:^|\n)\s*#{1,6}\s", text):
+                findings.append(
+                    {
+                        "id": "content-leak-markdown",
+                        "severity": "error",
+                        "message": "页面文本含未清洗的 Markdown 标题符号（#/##）",
+                        "page": relative,
+                        "elementId": element_id,
+                    }
+                )
+            if _SOURCE_PATH.search(text):
+                findings.append(
+                    {
+                        "id": "content-leak-source-path",
+                        "severity": "error",
+                        "message": "页面文本泄漏本地源路径（source.md / sources/）",
+                        "page": relative,
+                        "elementId": element_id,
+                    }
+                )
     return findings
