@@ -79,7 +79,7 @@ bin/upm doctor                        # 环境检查（只报告）
 - **保真改 PPT** — 对已有品牌 PPTX 指哪改哪，母版 / logo / 链接字节级不动。
 - **一分钟安装** — 复制粘贴一条命令，本机即用；无需登录，无 API 依赖。
 - **正式办公 PPTX** — 从素材生成可编辑的 PowerPoint，母版、链接、对象字节级保真。
-- **AI Web Deck** — 杂志风网页演示，发布会 / 路演 / Demo Day 首选。
+- **Web Deck（实验）** — 网页版演示预览（SVG HTML Preview）；杂志风/Swiss 成品仍在收敛，见上方 v7 状态表。
 - **成品与 Proof** — 每个案例附改前改后渲染、质量报告与 Release 证据。
 - **已知限制** — 诚实边界见 [FAQ](#faq) 与 [已知边界](#已知边界)，不做夸大承诺。
 
@@ -122,7 +122,7 @@ Ultimate PPT Master 把 `.pptx` 当作 zip 包：**没点名的 part 原样拷�
 PDF、Word、Excel、网页、粘贴文字——先确认故事板和证据链，再选择视觉方向，逐页生成，最终交付：
 
 - **可编辑 PPTX** — 正式汇报、咨询方案、政务材料
-- **杂志风 Web Deck** — 发布会、路演、Demo Day
+- **Web Deck（实验）** — 网页预览；正式杂志风成品暂未开放
 
 每一页都经过 brief 增强、证据定级、视觉审查，不是模板填空。
 
@@ -354,7 +354,7 @@ scripts/preserve_edit_pptx.py        保真引擎（标准库，CLI + apply_edit
 | 样例 | 查看 |
 |:---|:---|
 | 正式可编辑 PPTX · 脱敏经营复盘 | [下载 PPTX](./examples/executive-business-review-starter/executive-business-review-editable.pptx)&ensp;·&ensp;[关键页预览](https://kdnsna.github.io/ultimate-ppt-master-skill/examples/executive-business-review-starter/web-demo.html) |
-| 杂志风 Web Deck · 编辑美学 | [完整演示](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) |
+| 杂志风 Web Deck · 编辑美学（预览） | [完整演示](https://kdnsna.github.io/ultimate-ppt-master-skill/benchmark/) |
 
 <br>
 
