@@ -1,6 +1,6 @@
 # UPM v7 双后端对比（local vs Kimi）
 
-> 候选 SHA：`993c42df5d19803d50a935a66edbdaf97620eddf`（最终 PR Head 仅可能再差验收文档提交）
+> 候选 SHA：`58aa9f58c5c9635c4bc97f1c5f9596831f941b56`（最终 PR Head 仅可能再差验收文档提交）
 
 ## 状态
 
