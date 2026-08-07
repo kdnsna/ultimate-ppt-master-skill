@@ -1,6 +1,6 @@
 # UPM v7 RC 已知问题
 
-> 候选 SHA：`58aa9f58c5c9635c4bc97f1c5f9596831f941b56`（最终 PR Head 仅可能再差验收文档提交）
+> 候选 SHA：`2a47720d05b26503424e9de7db82343393753609`（最终 PR Head 仅可能再差验收文档提交）
 
 | ID | 级别 | 状态 | 描述 |
 |---|---|---|---|
@@ -29,6 +29,7 @@
 | K23 | P2 | FIXED | Windows Python 测试套件（第二批）：`audit_visual_recipes.py` 用 `str(item).endswith("assets/...")` 匹配正斜杠路径，Windows 反斜杠永不命中；`test_desktop_worker`/`test_visual_review_contract` 同样问题；`int.from_bytes` 未传 byteorder（3.12.10 无默认值）；均改为 posix 匹配/显式 `"big"`。 |
 | K24 | P2 | FIXED | Windows Node 测试：agent-job 状态写入用 temp+rename，Windows 上并发 status 读取正打开目标文件时 rename 抛 EPERM/EBUSY，completed 状态无法落盘；`renameWithRetry` 有界重试修复；测试对 Windows 不存在的 Unix 权限位（key 0o600）断言按平台区分。 |
 | K25 | P2 | FIXED | Ubuntu CI `test:web-browser` 偶发 `Missing v6-generate-flow`：`Page.reload` 后旧文档仍满足断言条件，新文档挂载前 evaluate 落空；测试在 reload 前设置 `window.__upmPreReloadMark`，等待新文档出现后再断言恢复状态（本地 Chrome 连跑 3 次 PASS）。 |
+| K26 | P3 | FIXED | npm audit：postcss ≤8.5.22 高危（GHSA-r28c-9q8g-f849 / GHSA-fxqj-rqcc-2cmp）；web/desktop 锁文件升级 postcss 8.5.26，audit 0 漏洞。 |
 
 严重等级约定：P0=数据损坏/安全问题/无法生成；P1=无法打开/页面丢失/主要功能失败；P2=视觉明显不佳/偶发失败；P3=文档/提示/轻微问题。
 

@@ -1,8 +1,8 @@
 # UPM v7 Release Candidate Validation（RC 验收记录）
 
 > 候选分支：`feat/upm-v7-unification` → 目标：`main`（origin/main `656c2d8`）
-> 最终候选代码 SHA：`58aa9f58c5c9635c4bc97f1c5f9596831f941b56`（最终 PR Head 与本文件随后提交，若仅相差验收文档则沿用本记录）
-> 历史候选 SHA（测试期间修复导致变更，已重跑受影响轮次）：`2103e4c` → `e87d6ac` → `d15ba0b` → `cf9c9db` → `c7781b7` → `2413441` → `1b476e7` → `3457e1c` → `8b92dc1` → `9c7c2ac` → `02a4a66` → `2fd5a76` → `93ef4e9` → `615f842` → `5b204e1` → `78b43a0` → `7abfd13` → `7749f62` → `993c42d` → `55c0d12` → `58aa9f5`
+> 最终候选代码 SHA：`2a47720d05b26503424e9de7db82343393753609`（最终 PR Head 与本文件随后提交，若仅相差验收文档则沿用本记录）
+> 历史候选 SHA（测试期间修复导致变更，已重跑受影响轮次）：`2103e4c` → `e87d6ac` → `d15ba0b` → `cf9c9db` → `c7781b7` → `2413441` → `1b476e7` → `3457e1c` → `8b92dc1` → `9c7c2ac` → `02a4a66` → `2fd5a76` → `93ef4e9` → `615f842` → `5b204e1` → `78b43a0` → `7abfd13` → `7749f62` → `993c42d` → `55c0d12` → `58aa9f5` → `62b0c61` → `2a47720`
 > 本地证据目录（gitignore）：`.upm-test-results/upm-v7-rc1-*`
 
 ## 结论
@@ -39,7 +39,7 @@ doctor 全 profile（Round 0）：core/pptx/kimi 0 关键缺失；visual-review 
 
 ## Round 2：自动化测试清零（PASS）
 
-最新代码 Head `58aa9f5` 上重跑（受影响的 c7781b7→58aa9f5 修复均已在最新 Head 验证）：
+最新代码 Head `2a47720` 上重跑（受影响的 c7781b7→2a47720 修复均已在最新 Head 验证）：
 
 - contracts sync：通过
 - Python `test:worker`：230 项全过（含修复后的 MCP stdio、resolve_python Windows 路径、Windows UTF-8 stdio、doctor Windows venv 检测回归测试）
@@ -120,7 +120,7 @@ Round 8 第二 Agent 子项 PASS。
 
 `.github/workflows/windows-ci.yml`：Windows latest × Python 3.10/3.12，覆盖 unit/integration、`upm doctor`、local quick make、preserve edit、PPTX ZIP 校验。PowerPoint GUI 仍保留为 Windows 人工验收门槛。
 
-Windows CI 修复链：`bin/upm` 找不到 `.venv/Scripts/python.exe`（已修）→ cp1252 无法输出中文（已修）→ doctor `.venv` 检查只认 Unix 路径（已修）→ Python 测试套件 Windows 兼容（UTF-8 环境变量、cairo 探测 OSError 防护、PIL 句柄关闭、worker 打包副本同步、audit/tests 的 posix 路径匹配、int.from_bytes 显式 byteorder）→ Node 测试 Windows 兼容（agent-job rename EBUSY/EPERM 有界重试、key 权限位断言按平台区分）。Windows 3.10/3.12 在 `55c0d12` 已全绿；浏览器回归竞态（`Missing v6-generate-flow`）已根因修复（pre-reload 标记），最新 Head `58aa9f5` 的 Desktop CI 以 PR 状态为准。
+Windows CI 修复链：`bin/upm` 找不到 `.venv/Scripts/python.exe`（已修）→ cp1252 无法输出中文（已修）→ doctor `.venv` 检查只认 Unix 路径（已修）→ Python 测试套件 Windows 兼容（UTF-8 环境变量、cairo 探测 OSError 防护、PIL 句柄关闭、worker 打包副本同步、audit/tests 的 posix 路径匹配、int.from_bytes 显式 byteorder）→ Node 测试 Windows 兼容（agent-job rename EBUSY/EPERM 有界重试、key 权限位断言按平台区分）。Windows 3.10/3.12 已全绿；浏览器回归竞态已根因修复（pre-reload 标记）；postcss 高危 advisory 已升 8.5.26（web/desktop 锁文件）。最新 Head `2a47720` 的 CI 以 PR 状态为准。
 
 ## 合并建议
 

@@ -1,6 +1,6 @@
 # UPM v7 Office / WPS / LibreOffice 实机验证
 
-> 候选 SHA：`58aa9f58c5c9635c4bc97f1c5f9596831f941b56`（最终 PR Head 仅可能再差验收文档提交）
+> 候选 SHA：`2a47720d05b26503424e9de7db82343393753609`（最终 PR Head 仅可能再差验收文档提交）
 
 ## 状态
 
