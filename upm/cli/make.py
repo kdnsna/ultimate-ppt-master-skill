@@ -177,6 +177,15 @@ def run_make(args: Any) -> int:
             quality_mode=policy.mode,
         )
 
+    backend = args.export_backend if args.deck_format == "editable-deck" else "web-deck"
+    if backend == "kimi" and not policy.allow_kimi_export:
+        raise InputError(
+            f"质量模式 {policy.mode} 不允许 Kimi 导出（非正式交付后端）。",
+            hint="使用 --export-backend local，或改用 --mode quick 做实验（仍不保证 Kimi e2e）。",
+        )
+    if backend == "kimi":
+        print("[warn] Kimi 导出为实验后端：依赖就绪 ≠ 端到端可交付 PPTX。", flush=True)
+
     export_result = None
     if args.deck_format == "editable-deck":
         result = export_pptx(
@@ -201,6 +210,17 @@ def run_make(args: Any) -> int:
         }
         print(f"Web Deck 导出完成：{web_path}")
 
+    office_render: dict[str, Any] = {"status": "not-run"}
+    if args.deck_format == "editable-deck" and export_result and export_result.get("output"):
+        from upm.qa.office_render import probe_pptx_office_render
+
+        office_render = probe_pptx_office_render(export_result["output"])
+        print(
+            f"Office 渲染探针：{office_render.get('status')}"
+            + (f" · {office_render.get('message') or office_render.get('error') or ''}" if office_render.get("status") != "ok" else ""),
+            flush=True,
+        )
+
     # Provisional report to decide formal vs draft delivery.
     provisional = build_quality_report(
         project,
@@ -213,11 +233,12 @@ def run_make(args: Any) -> int:
         rounds_used=rounds_used,
         unresolved=unresolved,
         quality_mode=policy.mode,
-        backend=args.export_backend if args.deck_format == "editable-deck" else "web-deck",
+        backend=backend,
         qa_skipped=qa_skipped,
         policy=policy,
         deckir=deckir,
         delivery_path="formal",
+        office_render=office_render,
     )
 
     allow_fail = bool(getattr(args, "allow_quality_fail", False))
@@ -240,11 +261,12 @@ def run_make(args: Any) -> int:
         rounds_used=rounds_used,
         unresolved=unresolved,
         quality_mode=policy.mode,
-        backend=args.export_backend if args.deck_format == "editable-deck" else "web-deck",
+        backend=backend,
         qa_skipped=qa_skipped,
         policy=policy,
         deckir=deckir,
         delivery_path=delivery_path,
+        office_render=office_render,
     )
     # Keep overall based on gates, not on draft path (draft is a consequence).
     report["overall"] = overall

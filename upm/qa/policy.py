@@ -22,6 +22,9 @@ class QualityPolicy:
     require_export_verified: bool
     exit_on_gate_fail: bool
     visual_not_run_fails: bool
+    # When True and soffice exists, officeRender=fail blocks formal delivery.
+    require_office_render_when_available: bool
+    allow_kimi_export: bool
 
     @property
     def label(self) -> str:
@@ -38,6 +41,8 @@ _POLICIES: dict[str, QualityPolicy] = {
         require_export_verified=True,
         exit_on_gate_fail=True,
         visual_not_run_fails=False,
+        require_office_render_when_available=False,
+        allow_kimi_export=True,  # still experimental; doctor/registry warn
     ),
     "standard": QualityPolicy(
         mode="standard",
@@ -48,6 +53,8 @@ _POLICIES: dict[str, QualityPolicy] = {
         require_export_verified=True,
         exit_on_gate_fail=True,
         visual_not_run_fails=True,
+        require_office_render_when_available=False,
+        allow_kimi_export=False,  # formal path defaults local
     ),
     "audit": QualityPolicy(
         mode="audit",
@@ -58,6 +65,8 @@ _POLICIES: dict[str, QualityPolicy] = {
         require_export_verified=True,
         exit_on_gate_fail=True,
         visual_not_run_fails=True,
+        require_office_render_when_available=True,
+        allow_kimi_export=False,
     ),
 }
 

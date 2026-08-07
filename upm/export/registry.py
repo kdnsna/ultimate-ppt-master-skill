@@ -40,8 +40,18 @@ def export_pptx(
     if backend == "local":
         result = export_local(project, output, transition=transition, mode=mode, force=force)
     elif backend == "kimi":
+        # Experimental: environment-ready ≠ end-to-end verified formal delivery.
+        if str(mode) in {"standard", "audit"} and not options.get("allow_kimi_formal"):
+            raise ConfigError(
+                "Kimi 导出不能作为 standard/audit 正式交付后端（实验插件，e2e 未验证）。",
+                hint="使用 --export-backend local，或仅在 quick 实验路径显式尝试 kimi。",
+            )
         export_kimi, _ = _load_kimi()
         result = export_kimi(project, output, transition=transition, mode=mode, force=force, **options)
+        if result.warnings is not None:
+            result.warnings.append(
+                "Kimi backend is experimental: dependency readiness does not imply PPTX delivery works."
+            )
     else:
         raise ConfigError(f"未知导出后端：{backend}（可用：{', '.join(list_backends())}）")
     record = result.to_record(project)

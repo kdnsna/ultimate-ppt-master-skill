@@ -163,18 +163,86 @@ def build_payload(manifest_path: Path) -> dict[str, Any]:
     }
 
 
+def collect_referenced_media_paths(root: Path) -> set[str]:
+    """Return project-relative media paths actually referenced by deck.pptd / pages."""
+    import re
+
+    import yaml
+
+    referenced: set[str] = set()
+    root = root.resolve()
+
+    def _walk(value: Any) -> None:
+        if isinstance(value, dict):
+            for key, item in value.items():
+                if key in {"src", "href", "path", "image", "media"} and isinstance(item, str):
+                    cleaned = item.split("?", 1)[0].lstrip("./")
+                    if cleaned and not cleaned.startswith(("http://", "https://", "data:", "blob:")):
+                        referenced.add(cleaned.replace("\\", "/"))
+                else:
+                    _walk(item)
+        elif isinstance(value, list):
+            for item in value:
+                _walk(item)
+
+    for relative in ("deck.pptd",):
+        path = root / relative
+        if path.is_file():
+            try:
+                _walk(yaml.safe_load(path.read_text(encoding="utf-8")))
+            except Exception:  # noqa: BLE001
+                pass
+    pages_dir = root / "pages"
+    if pages_dir.is_dir():
+        for page in pages_dir.glob("*.page"):
+            try:
+                _walk(yaml.safe_load(page.read_text(encoding="utf-8")))
+            except Exception:  # noqa: BLE001
+                continue
+    # Also scan raw text for media/… references
+    media_re = re.compile(r"(?:media|assets)/[A-Za-z0-9_./\-]+\.(?:png|jpe?g|gif|webp|svg)", re.I)
+    scan_paths: list[Path] = [root / "deck.pptd"]
+    if (root / "pages").is_dir():
+        scan_paths.extend(sorted((root / "pages").glob("*.page")))
+    for path in scan_paths:
+        if path.is_file():
+            for match in media_re.findall(path.read_text(encoding="utf-8", errors="replace")):
+                referenced.add(match.replace("\\", "/"))
+    return referenced
+
+
 def build_image_map(root: Path) -> dict[str, str]:
+    """Embed only media files referenced by the PPTD project (privacy + size).
+
+    Does **not** recursively dump the whole project tree. Unreferenced images
+    under media/ or elsewhere are ignored.
+    """
     image_map: dict[str, str] = {}
     total = 0
-    for path in sorted(root.rglob("*")):
-        if not path.is_file() or path.suffix.lower() not in IMAGE_MIME:
+    root = root.resolve()
+    referenced = collect_referenced_media_paths(root)
+    candidates: list[Path] = []
+    for rel in sorted(referenced):
+        path = (root / rel).resolve()
+        try:
+            if not path.is_file() or not path.is_relative_to(root):
+                continue
+        except (OSError, ValueError):
             continue
+        if path.suffix.lower() not in IMAGE_MIME:
+            continue
+        candidates.append(path)
+    # Fallback: if pages reference nothing, only include media/ files that are
+    # named in any page element via load_project-style walk already empty —
+    # do not rglob the whole tree.
+    for path in candidates:
         size = path.stat().st_size
         if size > MAX_IMAGE_BYTES:
             continue
         if total + size > MAX_EMBEDDED_MEDIA_BYTES:
-            raise ExportError("本地图片总大小超过 200 MiB，请压缩 media/ 后重试。")
-        image_map[path.relative_to(root).as_posix()] = (
+            raise ExportError("引用图片总大小超过 200 MiB，请压缩后重试。")
+        rel = path.relative_to(root).as_posix()
+        image_map[rel] = (
             f"data:{IMAGE_MIME[path.suffix.lower()]};base64,{base64.b64encode(path.read_bytes()).decode('ascii')}"
         )
         total += size

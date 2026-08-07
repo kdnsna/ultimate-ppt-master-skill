@@ -311,11 +311,74 @@ def patch_slide_xml(
     return patch_parts(source, output, {target: edit_fn})
 
 
-def replace_text(replacements: dict[str, str]) -> EditFn:
-    """Build an edit_fn that replaces text inside ``<a:t>`` runs of one slide.
+def _paragraph_text_nodes(paragraph) -> list:
+    return [node for node in paragraph.iter(_TEXT_TAG)]
 
-    Replacement happens on the run text only; the surrounding shape structure,
-    formatting and every other run on the slide are left intact.
+
+def _replace_across_text_nodes(nodes: list, old: str, new: str) -> bool:
+    """Replace ``old`` with ``new`` across contiguous ``<a:t>`` nodes in order.
+
+    When ``old`` spans multiple runs, the first node receives the replacement
+    text and subsequent nodes that contributed to the match are cleared.
+    Returns True when at least one replacement occurred.
+    """
+    if not old or not nodes:
+        return False
+    changed = False
+    # First: single-node replacements (fast path).
+    for node in nodes:
+        if node.text and old in node.text:
+            node.text = node.text.replace(old, new)
+            changed = True
+    # Then: multi-run contiguous match on the concatenated paragraph text.
+    texts = [node.text or "" for node in nodes]
+    joined = "".join(texts)
+    if old not in joined:
+        return changed
+    # Rebuild joined string with all occurrences replaced, then redistribute
+    # into original run boundaries (extra length stays in the first changed run).
+    while old in joined:
+        start = joined.find(old)
+        end = start + len(old)
+        # Map char indices to nodes.
+        pos = 0
+        spans: list[tuple[int, int, int]] = []  # node_idx, local_start, local_end
+        for index, text in enumerate(texts):
+            node_start, node_end = pos, pos + len(text)
+            if node_end <= start or node_start >= end:
+                pos = node_end
+                continue
+            local_start = max(0, start - node_start)
+            local_end = min(len(text), end - node_start)
+            spans.append((index, local_start, local_end))
+            pos = node_end
+        if not spans:
+            break
+        first_idx, first_local_start, _ = spans[0]
+        last_idx, _, last_local_end = spans[-1]
+        prefix = texts[first_idx][:first_local_start]
+        suffix = texts[last_idx][last_local_end:]
+        if first_idx == last_idx:
+            texts[first_idx] = prefix + new + suffix
+        else:
+            texts[first_idx] = prefix + new
+            for mid in range(first_idx + 1, last_idx):
+                texts[mid] = ""
+            texts[last_idx] = suffix
+        joined = "".join(texts)
+        changed = True
+    if changed:
+        for index, node in enumerate(nodes):
+            node.text = texts[index]
+    return changed
+
+
+def replace_text(replacements: dict[str, str]) -> EditFn:
+    """Build an edit_fn that replaces text inside slide paragraphs.
+
+    Supports targets that span multiple ``<a:t>`` runs within a paragraph.
+    Surrounding shape structure and runs that are not part of the match are
+    left intact.
     """
     if not replacements:
         raise ValueError("replacements must not be empty")
@@ -323,14 +386,14 @@ def replace_text(replacements: dict[str, str]) -> EditFn:
     def _edit(xml_text: str) -> str:
         root = ET.fromstring(xml_text)
         changed = False
-        for elem in root.iter(_TEXT_TAG):
-            if elem.text:
-                for old, new in replacements.items():
-                    if old in elem.text:
-                        elem.text = elem.text.replace(old, new)
-                        changed = True
-        # Idempotent safety: if nothing matched, leave the named slide
-        # byte-identical too — we only touch what we actually change.
+        # Prefer paragraph-level multi-run replace.
+        for paragraph in root.iter(f"{{{_A_NS}}}p"):
+            nodes = _paragraph_text_nodes(paragraph)
+            if not nodes:
+                continue
+            for old, new in replacements.items():
+                if _replace_across_text_nodes(nodes, old, new):
+                    changed = True
         if not changed:
             return xml_text
         return ET.tostring(root, encoding="unicode", xml_declaration=False)
@@ -421,9 +484,10 @@ def _set_color(rpr, color: str) -> None:
 def _op_replace_text(root, op: dict) -> None:
     old = str(op["old"])
     new = str(op.get("new", ""))
-    for elem in root.iter(_TEXT_TAG):
-        if elem.text and old in elem.text:
-            elem.text = elem.text.replace(old, new)
+    for paragraph in root.iter(f"{{{_A_NS}}}p"):
+        nodes = _paragraph_text_nodes(paragraph)
+        if nodes:
+            _replace_across_text_nodes(nodes, old, new)
 
 
 def _op_style_text(root, op: dict) -> None:
@@ -1049,14 +1113,7 @@ def apply_edits(
             part_edits = build_part_edits(current, slide, operations)
             intended_parts.update(part_edits.keys())
             slide_parts_map.setdefault(slide, []).extend(part_edits.keys())
-            try:
-                patch_parts(current, target, part_edits)
-            except Exception:
-                # Never leave a partial or misleading output file behind when an
-                # edit fails (e.g. an unmatched geometry op). The previous
-                # intermediates are cleaned up by the finally block.
-                target.unlink(missing_ok=True)
-                raise
+            patch_parts(current, target, part_edits)
             current = target
     finally:
         for temp in intermediates:

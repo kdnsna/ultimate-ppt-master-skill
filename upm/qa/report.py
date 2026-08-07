@@ -53,6 +53,7 @@ def build_quality_report(
     policy: QualityPolicy | None = None,
     deckir: dict[str, Any] | None = None,
     delivery_path: str = "formal",
+    office_render: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     root = Path(project).expanduser().resolve()
     policy = policy or load_policy(quality_mode)
@@ -82,6 +83,14 @@ def build_quality_report(
     else:
         export_gate = "not-run"
 
+    office = dict(office_render or {})
+    office_status = str(office.get("status") or "not-run")
+    office_blocks = (
+        policy.require_office_render_when_available
+        and office_status == "fail"
+        and office.get("tool")  # only when soffice was present and failed
+    )
+
     visual_blocks = visual_gate in {"fail", "not-run"} and policy.visual_not_run_fails
     formal_fail = (
         not structure_passed
@@ -90,6 +99,7 @@ def build_quality_report(
         or (policy.require_export_verified and not export_passed)
         or bool(errors)
         or bool(unresolved)
+        or bool(office_blocks)
     )
 
     gates = {
@@ -97,12 +107,23 @@ def build_quality_report(
         "overflow": _gate_status(overflow_gate),
         "visual": _gate_status(visual_gate),
         "export": _gate_status(export_gate),
+        "officeRender": _gate_status(
+            "pass" if office_status == "ok" else "fail" if office_status == "fail" else "not-run"
+        ),
         "formalDelivery": _gate_status("fail" if formal_fail else "pass"),
     }
-    overall = overall_from_gates(gates, policy=policy)
+    # officeRender not-run must not fail overall unless policy requires available tool.
+    overall = overall_from_gates(
+        {k: v for k, v in gates.items() if k != "officeRender" or v != "not-run" or office_blocks},
+        policy=policy,
+    )
+    if office_blocks:
+        overall = "fail"
     export_meta = dict(export_result or {})
     export_meta["formal"] = overall == "pass" and delivery_path == "formal"
     export_meta["deliveryPath"] = delivery_path
+    export_meta["officeRender"] = office_status
+    export_meta["officeRenderDetail"] = office
     report = {
         "version": "upm-quality-report-v1",
         "createdAt": _now_iso(),
@@ -128,12 +149,14 @@ def build_quality_report(
             "unresolved": len(unresolved),
             "qaSkipped": qa_skipped,
             "deliveryPath": delivery_path,
+            "officeRender": office_status,
         },
         "evidence": {
             "overview": str(root / "preview" / "overview.jpg"),
             "renderBackend": "playwright/agent-browser" if rendered else "none",
             "renderRecords": render_records,
             "export": export_meta,
+            "officeRender": office,
         },
         "unresolved": unresolved,
     }
