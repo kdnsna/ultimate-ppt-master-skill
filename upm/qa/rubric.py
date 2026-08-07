@@ -8,9 +8,16 @@ from pathlib import Path
 from typing import Any
 
 from upm.pptd.io import load_project
+from upm.qa.policy import QualityPolicy, load_policy
 
 ALL_BG_THRESHOLD = 0.9995
 MIN_SAMPLE_COLORS = 8
+
+_PLACEHOLDER = re.compile(
+    r"(内容待补充|待补充（占位）|证据内容待补充|图表数据待补充|第\s*\d+\s*页内容待补充|请提供事实、数据或来源)"
+)
+_MD_HEADING = re.compile(r"(?:^|\n)\s*#{1,6}\s+\S")
+_SOURCE_PATH = re.compile(r"(?i)\bsource\.md\b|\bsources/")
 
 
 def _hex_to_rgb(value: str) -> tuple[int, int, int] | None:
@@ -59,15 +66,15 @@ def _resolve_color(value: str, colors: dict[str, str], fallback: str) -> str:
     return value or fallback
 
 
-_MD_HEADING = re.compile(r"(?:^|\n)\s*#{1,6}\s+\S")
-_SOURCE_PATH = re.compile(r"(?i)\bsource\.md\b|\bsources/")
-
-
 def _background_color(page: dict[str, Any], colors: dict[str, str]) -> str:
     background = page.get("background")
     if isinstance(background, dict) and background.get("type") == "solid":
         return _resolve_color(str(background.get("color")), colors, "#FFFFFF")
     return colors.get("paper", "#FFFFFF")
+
+
+def _is_no_renderer(error: Any) -> bool:
+    return str(error or "").startswith("no-renderer")
 
 
 def run_rubric(
@@ -76,10 +83,13 @@ def run_rubric(
     *,
     deckir: dict[str, Any] | None = None,
     structure_errors: list[str] | None = None,
+    policy: QualityPolicy | None = None,
+    quality_mode: str = "standard",
 ) -> list[dict[str, Any]]:
     """Run deterministic checks and return normalized findings."""
     root = Path(project).expanduser().resolve()
     findings: list[dict[str, Any]] = []
+    policy = policy or load_policy(quality_mode)
     _, manifest, pages = load_project(root)
     colors = {str(k): str(v) for k, v in (manifest.get("theme") or {}).get("colors", {}).items()}
     text_styles = (manifest.get("theme") or {}).get("textStyles", {})
@@ -94,10 +104,16 @@ def run_rubric(
     for rec in render_records:
         page = str(rec.get("page") or "?")
         if not rec.get("ok"):
+            no_renderer = _is_no_renderer(rec.get("error"))
+            # Missing renderer: warning in quick, error when visual is required.
+            if no_renderer:
+                severity = "error" if policy.require_visual else "warning"
+            else:
+                severity = "error"
             findings.append(
                 {
                     "id": "render-failed",
-                    "severity": "error" if rec.get("error") != "no-renderer" else "warning",
+                    "severity": severity,
                     "message": f"页面渲染失败：{rec.get('error')}",
                     "page": page,
                 }
@@ -105,8 +121,15 @@ def run_rubric(
             continue
         path = Path(rec["path"])
         if path.is_file() and is_all_background(path.read_bytes()):
+            if policy.blank_page_severity == "ignore":
+                continue
             findings.append(
-                {"id": "blank-page", "severity": "warning", "message": "页面接近纯背景，疑似空白页", "page": page}
+                {
+                    "id": "blank-page",
+                    "severity": policy.blank_page_severity,
+                    "message": "页面接近纯背景，疑似空白页",
+                    "page": page,
+                }
             )
 
     # 3. text overflow (re-check pages)
@@ -187,10 +210,11 @@ def run_rubric(
     for slide in slides:
         role = str(slide.get("role") or "")
         if role in body_roles and not slide.get("evidenceRefs"):
+            severity = "error" if policy.block_placeholders else "warning"
             findings.append(
                 {
                     "id": "missing-evidence",
-                    "severity": "warning",
+                    "severity": severity,
                     "message": "正式正文页没有证据引用；请不要虚构数据",
                     "page": str(slide.get("page") or "?"),
                 }
@@ -224,6 +248,40 @@ def run_rubric(
                         "message": "页面文本泄漏本地源路径（source.md / sources/）",
                         "page": relative,
                         "elementId": element_id,
+                    }
+                )
+            if _PLACEHOLDER.search(text):
+                severity = "error" if policy.block_placeholders else "warning"
+                findings.append(
+                    {
+                        "id": "placeholder-content",
+                        "severity": severity,
+                        "message": "页面含占位正文，正式模式禁止交付",
+                        "page": relative,
+                        "elementId": element_id,
+                    }
+                )
+
+    # 8. DeckIR-level missing evidence states under formal policy
+    if policy.block_placeholders:
+        claims = ((deckir.get("sourceMap") or {}).get("claims")) or []
+        if not claims:
+            findings.append(
+                {
+                    "id": "no-source-claims",
+                    "severity": "error",
+                    "message": "无来源 claims：确定性草稿规划器产物，正式模式禁止交付",
+                    "page": "",
+                }
+            )
+        for slide in slides:
+            if str(slide.get("evidenceState") or "") == "missing" and str(slide.get("role") or "") in body_roles:
+                findings.append(
+                    {
+                        "id": "evidence-state-missing",
+                        "severity": "error",
+                        "message": "正文页 evidenceState=missing",
+                        "page": str(slide.get("page") or "?"),
                     }
                 )
     return findings

@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from upm.qa.policy import QualityPolicy, load_policy, planning_source_of
 from upm.qa.repair import MAX_REPAIR_ROUNDS
 
 
@@ -18,20 +19,16 @@ def _gate_status(value: str) -> str:
     return value if value in allowed else "fail"
 
 
-def overall_from_gates(gates: dict[str, str], *, quality_mode: str) -> str:
-    """Compute overall status. ``not-run`` / ``unverified`` fail for standard/audit.
-
-    In ``quick`` mode, visual QA is intentionally skipped, so ``visual=not-run``
-    is treated as expected rather than a delivery failure.
-    """
+def overall_from_gates(gates: dict[str, str], *, policy: QualityPolicy) -> str:
+    """Compute overall status from gate map and quality policy."""
     effective = dict(gates)
-    if quality_mode == "quick" and effective.get("visual") in {"not-run", "unverified"}:
+    if not policy.visual_not_run_fails and effective.get("visual") in {"not-run", "unverified"}:
         effective["visual"] = "pass"
     values = list(effective.values())
     if any(v == "fail" for v in values):
         return "fail"
     if any(v in {"not-run", "unverified"} for v in values):
-        return "fail" if quality_mode in {"standard", "audit"} else "unverified"
+        return "fail" if policy.visual_not_run_fails else "unverified"
     if any(v == "warning" for v in values):
         return "pass"
     if all(v == "pass" for v in values):
@@ -53,8 +50,13 @@ def build_quality_report(
     quality_mode: str = "standard",
     backend: str = "local",
     qa_skipped: bool = False,
+    policy: QualityPolicy | None = None,
+    deckir: dict[str, Any] | None = None,
+    delivery_path: str = "formal",
 ) -> dict[str, Any]:
     root = Path(project).expanduser().resolve()
+    policy = policy or load_policy(quality_mode)
+    quality_mode = policy.mode
     rendered = sum(1 for rec in render_records if rec.get("ok"))
     render_failed = sum(1 for rec in render_records if not rec.get("ok"))
     errors = [issue for issue in rubric_findings if issue.get("severity") == "error"]
@@ -63,10 +65,9 @@ def build_quality_report(
     overflow_errors = [f for f in overflow_findings if f.get("severity") == "error"]
     overflow_gate = "fail" if overflow_errors else "pass"
 
-    if qa_skipped or quality_mode == "quick":
+    if qa_skipped or not policy.require_visual:
         visual_gate = "not-run"
     elif not render_records:
-        # No evidence of rendering → never claim visual pass.
         visual_gate = "not-run"
     elif render_failed > 0:
         visual_gate = "fail"
@@ -74,31 +75,34 @@ def build_quality_report(
         visual_gate = "pass"
 
     export_passed = bool(export_result and export_result.get("verified"))
+    if policy.require_export_verified and not export_passed:
+        export_gate = "fail"
+    elif export_passed:
+        export_gate = "pass"
+    else:
+        export_gate = "not-run"
+
+    visual_blocks = visual_gate in {"fail", "not-run"} and policy.visual_not_run_fails
     formal_fail = (
         not structure_passed
-        or overflow_errors
-        or visual_gate in {"fail", "not-run"} and quality_mode in {"standard", "audit"}
-        or not export_passed
+        or bool(overflow_errors)
+        or visual_blocks
+        or (policy.require_export_verified and not export_passed)
         or bool(errors)
         or bool(unresolved)
     )
-    # quick mode: visual not-run is expected; do not fail formal on that alone
-    if quality_mode == "quick":
-        formal_fail = (
-            not structure_passed
-            or bool(overflow_errors)
-            or not export_passed
-            or bool(errors)
-        )
 
     gates = {
         "structure": _gate_status("pass" if structure_passed else "fail"),
         "overflow": _gate_status(overflow_gate),
         "visual": _gate_status(visual_gate),
-        "export": _gate_status("pass" if export_passed else "fail"),
+        "export": _gate_status(export_gate),
         "formalDelivery": _gate_status("fail" if formal_fail else "pass"),
     }
-    overall = overall_from_gates(gates, quality_mode=quality_mode)
+    overall = overall_from_gates(gates, policy=policy)
+    export_meta = dict(export_result or {})
+    export_meta["formal"] = overall == "pass" and delivery_path == "formal"
+    export_meta["deliveryPath"] = delivery_path
     report = {
         "version": "upm-quality-report-v1",
         "createdAt": _now_iso(),
@@ -106,6 +110,7 @@ def build_quality_report(
         "qualityMode": quality_mode,
         "exportBackend": backend,
         "overall": overall,
+        "planningSource": planning_source_of(deckir),
         "gates": gates,
         "summary": {
             "slides": len(render_records),
@@ -122,12 +127,13 @@ def build_quality_report(
             "repairRoundsMax": MAX_REPAIR_ROUNDS,
             "unresolved": len(unresolved),
             "qaSkipped": qa_skipped,
+            "deliveryPath": delivery_path,
         },
         "evidence": {
             "overview": str(root / "preview" / "overview.jpg"),
             "renderBackend": "playwright/agent-browser" if rendered else "none",
             "renderRecords": render_records,
-            "export": export_result or {},
+            "export": export_meta,
         },
         "unresolved": unresolved,
     }

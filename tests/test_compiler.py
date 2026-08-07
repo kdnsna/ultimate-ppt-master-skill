@@ -126,6 +126,10 @@ class CompilerTest(unittest.TestCase):
                 sizes.extend(el["content"].get("fontSize") for el in page["elements"] if el.get("elementType") == "text")
             self.assertTrue(any(size is not None and size < 18 for size in sizes))
             self.assertTrue(any(finding["severity"] in {"warning", "error"} for finding in summary["overflowFindings"]))
+            # Hard residual (below min font) is error; mild residual may stay warning.
+            hard = [f for f in summary["overflowFindings"] if "仍溢出" in f["message"]]
+            for finding in hard:
+                self.assertEqual(finding["severity"], "error")
 
     def test_compiler_no_source_path_in_page_body(self):
         md = """# 个人养老金制度简介

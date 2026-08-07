@@ -31,17 +31,24 @@
 
 <br>
 
-## v7 统一架构（upm CLI）
+## v7 统一架构（upm CLI）· Beta
 
-两个内核：**Preserve Edit Engine**（已有 PPTX 保真修改）与 **Deck Generation Engine**（DeckIR → PPTD → 导出 → 视觉 QA）。三条用户路径：`preserve-edit` / `editable-deck` / `web-deck`（仅在明确要求网页时启用）。
+当前 main / v7 内核定位为 **`v7.0.0-beta` 技术预览**：架构方向正确，但质量门与多入口尚未完全收敛。CLI 返回 0 才表示该模式下的 required gate 已通过；失败产物会移至 `exports/draft/`。
 
-导出后端：`local`（默认，离线，表格/图表为可编辑 DrawingML 形状而非原生数据对象）与 `kimi`（实验性外部兼容能力，当前上游环境存在导出交付失效，不构成正式交付保证；仅显式 opt-in）。
+| 能力 | 状态 | 说明 |
+|------|------|------|
+| Preserve Edit | **RC** | 包级保真编辑；真实 PowerPoint 矩阵仍待签字 |
+| Editable Deck | **Beta** | DeckIR→PPTD→本地 DrawingML PPTX；正式模式禁止占位交付 |
+| Web Deck | **Experimental** | 现为 SVG HTML 预览，非杂志风 Web Deck 成品 |
+| Kimi Adapter | **Experimental** | 依赖就绪 ≠ 导出已验证；正式交付请用 local |
+
+两个内核：**Preserve Edit Engine** 与 **Deck Generation Engine**。默认导出 `local`（表格/图表为 **shape-editable** DrawingML，非原生 `a:tbl`/chart 数据对象）。自动修复当前支持**文本溢出有限缩字号** + 修复计划，不是通用两轮修复执行器。无资料时的规则规划器是 **deterministic-fallback 草稿规划器**，standard/audit 不会将其当作成品交付。
 
 ```bash
 bin/upm make <source-or-topic>     # 生成可编辑 PPTX（默认）
-bin/upm edit <file.pptx> "修改要求" # 保真局部修改
+bin/upm edit <file.pptx> "修改要求" # 保真局部修改；或 --edits edits.json
 bin/upm open <project>             # PPTD 视觉精修
-bin/upm review <project>           # 重新审计
+bin/upm review <project>           # 重新审计（失败非 0）
 bin/upm doctor                     # 环境检查（只报告）
 ```
 

@@ -360,11 +360,40 @@ def _layout(
 
 
 def _apply_auto_fix(theme: dict[str, Any], page: dict[str, Any], page_name: str) -> list[OverflowFinding]:
+    """Check overflow, shrink fonts, then re-check.
+
+    Residual findings keep the re-check severity: theoretical size below
+    ``min_font_size`` is error; mild residual remains warning. Fully fixed
+    overflows become audit-trail warnings only.
+    """
     findings: list[OverflowFinding] = []
     text_styles = theme.get("textStyles", {})
     for element in page.get("elements", []):
-        findings.extend(check_element_overflow(element, page=page_name, theme_text_styles=text_styles))
-        auto_fix_font_size(element, text_styles)
+        before = check_element_overflow(element, page=page_name, theme_text_styles=text_styles)
+        changed = auto_fix_font_size(element, text_styles)
+        after = check_element_overflow(element, page=page_name, theme_text_styles=text_styles)
+        if after:
+            for finding in after:
+                message = finding.message
+                if changed and finding.severity == "error":
+                    message = f"{finding.message}（自动缩字后仍溢出）"
+                elif changed:
+                    message = f"{finding.message}（自动缩字后仍偏紧）"
+                findings.append(
+                    OverflowFinding(finding.page, finding.element_id, message, finding.severity)
+                )
+        elif before and not changed:
+            findings.extend(before)
+        elif before and changed:
+            for finding in before:
+                findings.append(
+                    OverflowFinding(
+                        finding.page,
+                        finding.element_id,
+                        f"{finding.message}（已自动缩字）",
+                        "warning",
+                    )
+                )
     return findings
 
 

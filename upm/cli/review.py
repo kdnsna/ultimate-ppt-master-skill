@@ -9,6 +9,7 @@ from typing import Any
 from upm.errors import ProjectError
 from upm.pptd.io import require_valid_project
 from upm.pptd.schema import issues_by_severity, validate_pptd_project
+from upm.qa.policy import load_policy
 from upm.qa.render import render_pages_local
 from upm.qa.repair import RepairState, plan_repairs, write_repair_plan
 from upm.qa.report import build_quality_report
@@ -16,6 +17,7 @@ from upm.qa.rubric import run_rubric
 
 
 def run_review(args: Any) -> int:
+    policy = load_policy(args.mode)
     project = Path(args.project).expanduser().resolve()
     if not (project / "deck.pptd").is_file():
         raise ProjectError(f"不是 PPTD 项目：{project}")
@@ -41,7 +43,14 @@ def run_review(args: Any) -> int:
         ]
     else:
         render_records = render_pages_local(project)
-    findings = run_rubric(project, render_records, deckir=deckir, structure_errors=[issue.render() for issue in structure_errors])
+    findings = run_rubric(
+        project,
+        render_records,
+        deckir=deckir,
+        structure_errors=[issue.render() for issue in structure_errors],
+        policy=policy,
+        quality_mode=policy.mode,
+    )
     plan = plan_repairs(findings, RepairState())
     write_repair_plan(project, plan)
     export_record = {}
@@ -58,8 +67,10 @@ def run_review(args: Any) -> int:
         export_result=export_record,
         rounds_used=0,
         unresolved=[f for f in findings if f["severity"] == "error"],
-        quality_mode=args.mode,
+        quality_mode=policy.mode,
         backend=str(export_record.get("backend") or "local"),
+        policy=policy,
+        deckir=deckir,
     )
     print("\n=== 审计结果 ===")
     print(json.dumps(report["gates"], ensure_ascii=False, indent=2))

@@ -17,13 +17,18 @@ def _default_output(source: Path) -> Path:
     return source.with_name(f"{source.stem}_edited{source.suffix}")
 
 
-def _build_edits(instruction: str, edits_file: str | None) -> list[dict[str, Any]]:
+def _build_edits(instruction: str | None, edits_file: str | None) -> list[dict[str, Any]]:
     if edits_file:
         path = Path(edits_file)
         if not path.is_file():
             raise InputError(f"edits 文件不存在：{path}")
         data = json.loads(path.read_text(encoding="utf-8"))
         return data.get("edits") if isinstance(data, dict) and "edits" in data else data
+    if not instruction or not str(instruction).strip():
+        raise InputError(
+            "需要提供修改要求，或使用 --edits edits.json。",
+            hint='示例：upm edit deck.pptx "把第 2 页的 Q2 改成 Q3"  或  upm edit deck.pptx --edits edits.json',
+        )
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
     try:
         from preserve_edit_pptx import parse_nl_edit_plan

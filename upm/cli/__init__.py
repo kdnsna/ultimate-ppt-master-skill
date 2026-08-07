@@ -51,7 +51,12 @@ def main(argv: list[str] | None = None) -> int:
 
     edit_parser = sub.add_parser("edit", help="对已有 PPTX 做保真局部修改")
     edit_parser.add_argument("pptx", help="源 .pptx")
-    edit_parser.add_argument("instruction", help='修改要求，例如 "把第 2 页的 Q2 改成 Q3"')
+    edit_parser.add_argument(
+        "instruction",
+        nargs="?",
+        default=None,
+        help='修改要求，例如 "把第 2 页的 Q2 改成 Q3"（提供 --edits 时可省略）',
+    )
     edit_parser.add_argument("--output", default=None, help="输出路径（默认同目录 *_edited.pptx）")
     edit_parser.add_argument("--edits", default=None, help="使用 edits JSON 文件（跳过自然语言解析）")
     edit_parser.add_argument("--preview", action="store_true", help="生成修改前后渲染对比")

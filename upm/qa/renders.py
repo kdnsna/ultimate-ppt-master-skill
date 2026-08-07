@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from upm.qa.policy import QualityPolicy, load_policy
 from upm.qa.render import render_pages_local
 from upm.qa.repair import MAX_REPAIR_ROUNDS
 from upm.qa.rubric import run_rubric
@@ -17,8 +18,10 @@ def render_and_review(
     structure_errors: list[str],
     render_backend: str = "auto",
     mode: str = "standard",
+    policy: QualityPolicy | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int, list[dict[str, Any]]]:
     root = Path(project).expanduser().resolve()
+    policy = policy or load_policy(mode)
     rounds = 0
     unresolved: list[dict[str, Any]] = []
     render_records: list[dict[str, Any]] = []
@@ -34,7 +37,14 @@ def render_and_review(
             ]
         else:
             render_records = render_pages_local(root)
-        rubric_findings = run_rubric(root, render_records, deckir=deckir, structure_errors=structure_errors)
+        rubric_findings = run_rubric(
+            root,
+            render_records,
+            deckir=deckir,
+            structure_errors=structure_errors,
+            policy=policy,
+            quality_mode=policy.mode,
+        )
         errors = [f for f in rubric_findings if f["severity"] == "error"]
         render_failed = [rec for rec in render_records if not rec.get("ok")]
         if not errors and not render_failed:
