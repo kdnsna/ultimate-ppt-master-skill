@@ -1,8 +1,8 @@
 # UPM v7 Release Candidate Validation（RC 验收记录）
 
 > 候选分支：`feat/upm-v7-unification` → 目标：`main`（origin/main `656c2d8`）
-> 最终候选代码 SHA：`02a4a66227be68c83d72239fbe33a782b9e5a30c`（最终 PR Head 与本文件随后提交，若仅相差验收文档则沿用本记录）
-> 历史候选 SHA（测试期间修复导致变更，已重跑受影响轮次）：`2103e4c` → `e87d6ac` → `d15ba0b` → `cf9c9db` → `c7781b7` → `2413441` → `1b476e7` → `3457e1c` → `8b92dc1` → `9c7c2ac` → `02a4a66`
+> 最终候选代码 SHA：`93ef4e9fa5c8545bff6fb9b8f94526be036543e7`（最终 PR Head 与本文件随后提交，若仅相差验收文档则沿用本记录）
+> 历史候选 SHA（测试期间修复导致变更，已重跑受影响轮次）：`2103e4c` → `e87d6ac` → `d15ba0b` → `cf9c9db` → `c7781b7` → `2413441` → `1b476e7` → `3457e1c` → `8b92dc1` → `9c7c2ac` → `02a4a66` → `2fd5a76` → `93ef4e9`
 > 本地证据目录（gitignore）：`.upm-test-results/upm-v7-rc1-*`
 
 ## 结论
@@ -39,11 +39,11 @@ doctor 全 profile（Round 0）：core/pptx/kimi 0 关键缺失；visual-review 
 
 ## Round 2：自动化测试清零（PASS）
 
-最新代码 Head `02a4a66` 上重跑（受影响的 c7781b7→02a4a66 修复均已在最新 Head 验证）：
+最新代码 Head `93ef4e9` 上重跑（受影响的 c7781b7→93ef4e9 修复均已在最新 Head 验证）：
 
 - contracts sync：通过
 - Python `test:worker`：230 项全过（含修复后的 MCP stdio、resolve_python Windows 路径、Windows UTF-8 stdio、doctor Windows venv 检测回归测试）
-- Node `test:node` 73/73、`test:bridge` 52/52
+- Node `test:node` 74/74、`test:bridge` 53/53（新增 artifactStable 亚毫秒 mtime 回归测试；连跑 3 次稳定）
 - Web build（371ms）、Desktop build（280ms）：通过
 - Rust：fmt / clippy（-D warnings）/ test 通过
 - audits：docs / web-console / v6-workspace / featured-decks / presets / quality / market / repo-hygiene / web-bundle / readme-render / brief / visual-intent / feedback-loop / image-contracts / magazine-deck / swiss-deck 全部 exit 0
@@ -51,7 +51,7 @@ doctor 全 profile（Round 0）：core/pptx/kimi 0 关键缺失；visual-review 
 - 真实 Chrome v6 浏览器回归 `test:web-browser`：11/11 PASS（含两标签隔离/刷新恢复）
 - `git diff --check` 通过
 
-修复记录：MCP stdio（communicate after stdin.close）、bridge artifact flaky（轮询）、web-bundle 限额 80→81KB、Windows `bin/upm`/`resolve_python` venv 路径发现、Windows cp1252 控制台中文输出（UTF-8 强制）、ruff 清理（46 项，含 6 个死变量）。
+修复记录：MCP stdio（communicate after stdin.close）、bridge artifact flaky（轮询）、web-bundle 限额 80→81KB、Windows `bin/upm`/`resolve_python`/doctor venv 路径发现、Windows cp1252 控制台中文输出（UTF-8 强制）、ruff 清理（46 项，含 6 个死变量）、bridge artifact 亚毫秒 mtime 误判“未来时间戳”（floor 后比较，回归测试）。
 
 ## Round 3：本地后端真实生成（PASS，11/11 样本）
 
