@@ -30,6 +30,24 @@
 
 <br>
 
+## v7 Unified Architecture (upm CLI)
+
+Two engines: **Preserve Edit Engine** (byte-stable edits to an existing branded PPTX) and **Deck Generation Engine** (DeckIR → PPTD → export → visual QA). Three user paths: `preserve-edit` / `editable-deck` / `web-deck` (Web Deck is enabled only on an explicit request).
+
+Export backends: `local` (default, offline; tables/charts become editable DrawingML shapes, not native data objects) and `kimi` (experimental external compatibility adapter; its delivery channel is currently broken against the upstream editor and is not a delivery guarantee; opt-in only).
+
+```bash
+bin/upm make <source-or-topic>     # generate an editable PPTX (default)
+bin/upm edit <file.pptx> "change"  # fidelity-preserving local edit
+bin/upm open <project>             # open the PPTD visual editor
+bin/upm review <project>           # re-run visual/delivery audit
+bin/upm doctor                     # environment check (report only)
+```
+
+See [upm-cli.md](docs/guides/upm-cli.md), [upm-v7-unification.md](docs/architecture/upm-v7-unification.md), and [upm-migration.md](docs/guides/upm-migration.md).
+
+<br>
+
 ## Capability Matrix
 
 - **Preserve-Edit** — edit existing branded PPTX in place; masters, logos, and links stay byte-identical.

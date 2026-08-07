@@ -1,0 +1,12 @@
+pageType: content
+elements:
+  - elementId: dup
+    elementType: text
+    bounds: [0, 0, 2000, 100]
+    content:
+      text: 越界且元素类型错误
+  - elementId: dup
+    elementType: text
+    bounds: [80, 60, 800, 64]
+    content:
+      text: 重复 ID

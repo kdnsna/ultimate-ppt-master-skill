@@ -8,9 +8,28 @@ export const generatedPolicy = {
     "maxUserFacingQuestions": 3,
     "rules": [
       {
+        "id": "explicit-edit-signal",
+        "priority": 5,
+        "route": "preserve-edit",
+        "qualityMode": "standard",
+        "signals": [
+          "改PPT",
+          "修改PPT",
+          "修PPT",
+          "保真修改",
+          "改这份PPT",
+          "edit this pptx",
+          "revise this deck",
+          "fix my slides",
+          "repair the pptx",
+          "调整这几页",
+          "只改第"
+        ]
+      },
+      {
         "id": "explicit-formal-signal",
         "priority": 10,
-        "route": "formal-editable-pptx",
+        "route": "editable-deck",
         "qualityMode": "standard",
         "signals": [
           ".pptx",
@@ -37,7 +56,7 @@ export const generatedPolicy = {
       {
         "id": "explicit-web-signal",
         "priority": 20,
-        "route": "magazine-web-deck",
+        "route": "web-deck",
         "qualityMode": "standard",
         "signals": [
           "HTML",
@@ -58,7 +77,7 @@ export const generatedPolicy = {
       {
         "id": "extreme-thin-fallback",
         "priority": 90,
-        "route": "guizang-web-fixed-style",
+        "route": "editable-deck",
         "qualityMode": "standard",
         "when": {
           "promptQuality": "extreme-thin",
@@ -66,19 +85,17 @@ export const generatedPolicy = {
           "noWebSignal": true
         },
         "defaults": {
-          "mode": "Mode 2: Magazine Web Deck",
-          "style": "Style A · 电子杂志 × 电子墨水",
-          "pages": 8,
+          "mode": "Editable Deck",
+          "style": "正式商务 PPTX / 微软雅黑 / 可编辑正文",
+          "pages": 6,
           "coverSurface": "light-or-warm-paper",
           "pageRhythm": [
             "light or warm-paper cover with one strong title, minimal subtitle, and one soft-edged visual/evidence panel",
-            "light context page for problem, trend, or setting",
-            "image/text or restrained signal spread for tension or opportunity",
-            "light structure page with a three-part framework, path, or method",
-            "large-statement section divider",
-            "evidence / scene / case page",
-            "point-of-view page with final judgment or question; use dark only when the user, reference, or chosen direction calls for it",
-            "light closing page with action, takeaway, or ending line"
+            "context page for problem, trend, or setting",
+            "evidence / data page with source-bound claims",
+            "comparison or process page",
+            "risk or action page",
+            "light closing page with takeaway and next step"
           ]
         }
       }
@@ -261,12 +278,9 @@ export const generatedPolicy = {
     "schemaVersion": "route-policy-v1",
     "version": "6.3.9",
     "classifierRoutes": [
-      "formal-editable-pptx",
-      "magazine-web-deck",
-      "guizang-web-fixed-style",
-      "staged-questions",
-      "source-first",
-      "dual-delivery"
+      "preserve-edit",
+      "editable-deck",
+      "web-deck"
     ],
     "formalSignals": [
       ".pptx",
@@ -326,32 +340,36 @@ export const generatedPolicy = {
       }
     },
     "decisions": {
+      "explicit-edit-signal": {
+        "route": "preserve-edit",
+        "qualityMode": "standard"
+      },
       "explicit-formal-signal": {
-        "route": "formal-editable-pptx",
+        "route": "editable-deck",
         "qualityMode": "standard"
       },
       "explicit-web-signal": {
-        "route": "magazine-web-deck",
+        "route": "web-deck",
         "qualityMode": "standard"
       },
       "extreme-thin-fallback": {
-        "route": "guizang-web-fixed-style",
+        "route": "editable-deck",
         "qualityMode": "standard",
         "coverSurface": "light-or-warm-paper"
       },
       "thin-guided-intake": {
-        "route": "staged-questions",
+        "route": "editable-deck",
         "qualityMode": "standard"
       },
       "complete-source-first": {
-        "route": "source-first",
+        "route": "editable-deck",
         "qualityMode": "standard"
       }
     },
     "semanticAssertions": {
       "defaultCoverSurface": "light",
       "extremeThinAutoRoutes": true,
-      "extremeThinDefaultFormat": "web-deck",
+      "extremeThinDefaultFormat": "editable-deck",
       "formalSignalDefaultFormat": "editable-pptx",
       "mustAskBeforeGenerate": false,
       "askOnlyWhenMateriallyAmbiguous": true,
@@ -364,7 +382,8 @@ export const generatedPolicy = {
       ],
       "failOnMissingVisualEvidenceModes": [
         "audit"
-      ]
+      ],
+      "webDeckOnlyWhenExplicit": true
     }
   },
   "visual": {

@@ -4,7 +4,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -28,7 +27,7 @@ class ContractsGenerationTest(unittest.TestCase):
         for text in (agents, claude, prompt, skill):
             self.assertIn("Best-Effect Brief Enhancer", text)
             self.assertIn("Extreme Thin Prompt Fallback", text)
-            self.assertIn("Style A Editorial Fixed Rhythm", text)
+            self.assertIn("editable-deck fallback", text)
             self.assertIn("light-or-warm-paper", text)
             self.assertNotIn("dark cover, light context, dark tension/opportunity", text)
             self.assertIn("unmapped", text)
@@ -42,8 +41,8 @@ class ContractsGenerationTest(unittest.TestCase):
         assertions = route["semanticAssertions"]
         self.assertEqual(assertions["defaultCoverSurface"], "light")
         self.assertTrue(assertions["extremeThinAutoRoutes"])
+        self.assertEqual(assertions["extremeThinDefaultFormat"], "editable-deck")
         self.assertFalse(assertions["mustAskBeforeGenerate"])
-        self.assertEqual(assertions["extremeThinDefaultFormat"], "web-deck")
 
     def test_quality_modes_define_audit_fail_gates(self):
         modes = json.loads((ROOT / "contracts/generated/quality-modes.json").read_text(encoding="utf-8"))

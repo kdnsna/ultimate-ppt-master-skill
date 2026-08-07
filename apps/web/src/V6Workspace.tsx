@@ -981,7 +981,7 @@ function IntakePhase({
   const outputs: Array<{ id: OutputPurpose; title: string; text: string; icon: typeof FileText }> = [
     { id: "editable-pptx", title: t.outputPptx, text: language === "zh" ? "正式汇报、可继续修改" : "Formal delivery, fully editable", icon: FileText },
     { id: "web-deck", title: t.outputWeb, text: language === "zh" ? "演讲、发布与分享" : "Present, publish, and share", icon: MonitorPlay },
-    { id: "dual-delivery", title: t.outputBoth, text: language === "zh" ? "一份资料，两条交付路线" : "One source, two delivery routes", icon: LayoutPanelLeft }
+    { id: "dual-delivery", title: t.outputBoth, text: language === "zh" ? "PPTX + Web 双交付（可选交付配置，非独立路线）" : "PPTX + Web dual delivery (optional delivery config, not a route)", icon: LayoutPanelLeft }
   ];
   return (
     <div className="intake-layout">

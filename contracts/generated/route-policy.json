@@ -2,12 +2,9 @@
   "schemaVersion": "route-policy-v1",
   "version": "6.3.9",
   "classifierRoutes": [
-    "formal-editable-pptx",
-    "magazine-web-deck",
-    "guizang-web-fixed-style",
-    "staged-questions",
-    "source-first",
-    "dual-delivery"
+    "preserve-edit",
+    "editable-deck",
+    "web-deck"
   ],
   "formalSignals": [
     ".pptx",
@@ -67,32 +64,36 @@
     }
   },
   "decisions": {
+    "explicit-edit-signal": {
+      "route": "preserve-edit",
+      "qualityMode": "standard"
+    },
     "explicit-formal-signal": {
-      "route": "formal-editable-pptx",
+      "route": "editable-deck",
       "qualityMode": "standard"
     },
     "explicit-web-signal": {
-      "route": "magazine-web-deck",
+      "route": "web-deck",
       "qualityMode": "standard"
     },
     "extreme-thin-fallback": {
-      "route": "guizang-web-fixed-style",
+      "route": "editable-deck",
       "qualityMode": "standard",
       "coverSurface": "light-or-warm-paper"
     },
     "thin-guided-intake": {
-      "route": "staged-questions",
+      "route": "editable-deck",
       "qualityMode": "standard"
     },
     "complete-source-first": {
-      "route": "source-first",
+      "route": "editable-deck",
       "qualityMode": "standard"
     }
   },
   "semanticAssertions": {
     "defaultCoverSurface": "light",
     "extremeThinAutoRoutes": true,
-    "extremeThinDefaultFormat": "web-deck",
+    "extremeThinDefaultFormat": "editable-deck",
     "formalSignalDefaultFormat": "editable-pptx",
     "mustAskBeforeGenerate": false,
     "askOnlyWhenMateriallyAmbiguous": true,
@@ -105,6 +106,7 @@
     ],
     "failOnMissingVisualEvidenceModes": [
       "audit"
-    ]
+    ],
+    "webDeckOnlyWhenExplicit": true
   }
 }

@@ -1,0 +1,3 @@
+# Kimi adapter optional dependencies (browser-side export/QA backend).
+# Installed only via: bash scripts/bootstrap.sh --profile kimi
+websocket-client>=1.8.0

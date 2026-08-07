@@ -4,8 +4,8 @@ import { EventEmitter } from "node:events";
 import { access, lstat, mkdir, mkdtemp, readFile, readdir, readlink, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { test } from "node:test";
-import { createBridgeServer } from "../apps/bridge/server.mjs";
+import { mock, test } from "node:test";
+import { artifactStable, createBridgeServer, renameWithRetry } from "../apps/bridge/server.mjs";
 
 async function withServer(options, fn) {
   const server = createBridgeServer({ artifactStableAgeMs: 0, ...options });
@@ -18,6 +18,40 @@ async function withServer(options, fn) {
     await new Promise((resolve) => server.close(resolve));
   }
 }
+
+test("artifact stability accepts same-millisecond writes and rejects fresh files under a positive stable age", () => {
+  const now = Date.now();
+  // Sub-millisecond APFS-style timestamp inside the current integer millisecond
+  // must not be treated as "in the future" (regression for flaky empty listings).
+  const subMillisecond = { mtimeMs: now + 0.5, ctimeMs: now + 0.5 };
+  assert.equal(artifactStable(subMillisecond, 0), true);
+
+  const oldEnough = { mtimeMs: now - 1_000, ctimeMs: now - 1_000 };
+  assert.equal(artifactStable(oldEnough, 500), true);
+
+  const stillFresh = { mtimeMs: now - 100, ctimeMs: now - 100 };
+  assert.equal(artifactStable(stillFresh, 500), false);
+});
+
+test("renameWithRetry retries Windows-style EBUSY/EPERM and gives up after the attempt budget", async () => {
+  const renameFn = mock.fn(async () => {
+    throw Object.assign(new Error("busy"), { code: "EBUSY" });
+  });
+  await assert.rejects(
+    renameWithRetry("src", "dst", { attempts: 3, delayMs: 1, renameFn }),
+    /busy/
+  );
+  assert.equal(renameFn.mock.callCount(), 3);
+
+  let flakyCalls = 0;
+  const flaky = mock.fn(async () => {
+    flakyCalls += 1;
+    if (flakyCalls < 3) throw Object.assign(new Error("busy"), { code: "EBUSY" });
+    return undefined;
+  });
+  await renameWithRetry("src", "dst", { attempts: 5, delayMs: 1, renameFn: flaky });
+  assert.equal(flakyCalls, 3);
+});
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -158,12 +192,35 @@ function fastProjectBrief(extra = {}) {
   return {
     bestEffectBrief: {
       promptQuality: "complete",
-      recommendedRoute: "formal-editable-pptx",
+      recommendedRoute: "editable-deck",
       decisionReason: "test-fixture",
       source: "user"
     },
     ...extra
   };
+}
+
+async function waitForArtifactPayload(baseUrl, projectPath, predicate, timeoutMs = 8000) {
+  const deadline = Date.now() + timeoutMs;
+  let payload;
+  while (Date.now() < deadline) {
+    const response = await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`);
+    payload = await response.json();
+    if (predicate(payload)) return payload;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+  }
+  return payload;
+}
+
+async function waitForArtifactVerification(baseUrl, projectPath, relativePath, expected, timeoutMs = 8000) {
+  const payload = await waitForArtifactPayload(
+    baseUrl,
+    projectPath,
+    (candidate) => candidate.artifacts?.find((artifact) => artifact.relativePath === relativePath)?.verification === expected,
+    timeoutMs
+  );
+  const actual = payload.artifacts?.find((artifact) => artifact.relativePath === relativePath)?.verification;
+  assert.equal(actual, expected, `artifact ${relativePath} did not reach ${expected}`);
 }
 
 test("health reports provider status without leaking keys", async () => {
@@ -304,7 +361,7 @@ test("handoff merges 4, 10, and 24 page DeckSessions without rewriting user stor
         assert.ok(storyboard.slides.every((slide) => slide.evidenceRefs.every((id) => claimIds.has(id))));
         assert.ok(!sourceMap.claims.some((claim) => claim.text.includes("不应当作来源证据")));
         assert.equal(brief.bestEffectBrief.promptQuality, "complete");
-        assert.equal(brief.bestEffectBrief.recommendedRoute, "formal-editable-pptx");
+        assert.equal(brief.bestEffectBrief.recommendedRoute, "editable-deck");
         assert.match(brief.bestEffectBrief.decisionReason, /output-mode=pptx/);
         assert.equal(brief.bestEffectBrief.source, "auto");
       }
@@ -1259,9 +1316,11 @@ test("artifact endpoints list and download only allowlisted handoff outputs", as
       await writeFile(outsideFile, "OUTSIDE");
       await symlink(outsideFile, join(projectPath, "exports", "leak.pptx"));
 
-      const listResponse = await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`);
-      assert.equal(listResponse.status, 200);
-      const listed = await listResponse.json();
+      const listed = await waitForArtifactPayload(
+        baseUrl,
+        projectPath,
+        (payload) => payload.artifacts?.some((artifact) => artifact.relativePath === "exports/final.pptx")
+      );
       assert.deepEqual(
         listed.artifacts.map((artifact) => artifact.relativePath),
         [
@@ -1412,14 +1471,12 @@ test("a passed quality report verifies only the exact artifact path and sha256",
       };
       await writeFile(reportPath, JSON.stringify(report));
 
-      let listed = await (await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`)).json();
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/final.pptx")?.verification, "passed");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/final.pptx", "passed");
 
       await writeFile(artifactPath, "VERSION-TWO");
       await writeFile(join(projectPath, "exports", "new-file.pptx"), "NEW-FILE");
-      listed = await (await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`)).json();
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/final.pptx")?.verification, "pending");
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/new-file.pptx")?.verification, "pending");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/final.pptx", "pending");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/new-file.pptx", "pending");
 
       report.artifact = {
         relativePath: "exports/final.pptx",
@@ -1427,9 +1484,8 @@ test("a passed quality report verifies only the exact artifact path and sha256",
         size: Buffer.byteLength("VERSION-TWO")
       };
       await writeFile(reportPath, JSON.stringify(report));
-      listed = await (await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`)).json();
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/final.pptx")?.verification, "passed");
-      assert.equal(listed.artifacts.find((artifact) => artifact.relativePath === "exports/new-file.pptx")?.verification, "pending");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/final.pptx", "passed");
+      await waitForArtifactVerification(baseUrl, projectPath, "exports/new-file.pptx", "pending");
     });
   } finally {
     await rm(outputDir, { recursive: true, force: true });
@@ -1462,9 +1518,11 @@ test("artifact verification stays blocked when a passed report has no production
       report.status = "passed";
       await writeFile(join(projectPath, "quality-report.json"), JSON.stringify(report));
 
-      const response = await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(projectPath)}`);
-      assert.equal(response.status, 200);
-      const payload = await response.json();
+      const payload = await waitForArtifactPayload(
+        baseUrl,
+        projectPath,
+        (candidate) => candidate.artifacts?.some((artifact) => artifact.relativePath === "exports/unsupported.pptx")
+      );
       const pptx = payload.artifacts.find((artifact) => artifact.relativePath === "exports/unsupported.pptx");
       assert.equal(pptx?.verification, "blocked");
       assert.ok(payload.artifacts.every((artifact) => artifact.verification === "blocked"));
@@ -2157,7 +2215,11 @@ test("concurrent Bridge instances share one private signing key and validate pro
     const keyStats = await lstat(keyPath);
     assert.equal(keyStats.isFile(), true);
     assert.equal(keyStats.isSymbolicLink(), false);
-    assert.equal(keyStats.mode & 0o777, 0o600);
+    if (process.platform !== "win32") {
+      // Windows stat() does not reflect Unix permission bits (ACL-based); the
+      // server still creates the key with mode 0o600 as best effort there.
+      assert.equal(keyStats.mode & 0o777, 0o600);
+    }
     assert.match(keyBeforeRestart, /^[0-9a-f]{64}$/i);
     assert.deepEqual(
       (await readdir(outputDir)).filter((name) => name.startsWith(".bridge-manifest.key")),
@@ -2176,9 +2238,11 @@ test("concurrent Bridge instances share one private signing key and validate pro
       const healthText = await (await fetch(`${baseUrl}/health`)).text();
       assert.equal(healthText.includes(keyBeforeRestart), false);
       for (const project of projects.slice(0, 2)) {
-        const response = await fetch(`${baseUrl}/projects/artifacts?projectPath=${encodeURIComponent(project.projectPath)}`);
-        assert.equal(response.status, 200);
-        const payload = await response.json();
+        const payload = await waitForArtifactPayload(
+          baseUrl,
+          project.projectPath,
+          (candidate) => candidate.artifacts?.some((artifact) => artifact.kind === "pptx")
+        );
         assert.equal(payload.artifacts.some((artifact) => artifact.name === ".bridge-manifest.key"), false);
         assert.equal(payload.artifacts.some((artifact) => artifact.kind === "pptx"), true);
       }

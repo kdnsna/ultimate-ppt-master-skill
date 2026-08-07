@@ -1,0 +1,19 @@
+pageType: cover
+background:
+  type: solid
+  color: "$paper"
+notes: 封面说明
+elements:
+  - elementId: title
+    elementType: text
+    bounds: [80, 160, 800, 96]
+    content:
+      style: "$coverTitle"
+      align: [left, middle]
+      text: 最小示例封面
+  - elementId: subtitle
+    elementType: text
+    bounds: [80, 280, 700, 48]
+    content:
+      style: "$body"
+      text: 用于 PPTD Core 测试的确定性页面

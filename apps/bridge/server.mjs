@@ -1620,15 +1620,18 @@ export function fallbackBestEffectRoute(text) {
     /(\u6838\u5fc3|\u7ed3\u8bba|\u4e3b\u5f20|takeaway|message|objective|goal|\u76ee\u6807|\u5fc5\u987b\u5305\u542b)/i
   ].filter((pattern) => pattern.test(value)).length;
   const promptQuality = compact.length <= 25 && signals === 0 ? "extreme-thin" : /\u6839\u636e|\u57fa\u4e8e|\u9644\u4ef6|\u6587\u4ef6|pdf|excel|\u6570\u636e|source|attached|attachment|dataset|transcript/i.test(value) && signals >= 3 ? "complete" : signals ? "thin" : "extreme-thin";
+  if (/(\u6539\s*pptx|\u4fee\u6539\s*ppt|(?:\u6539|\u4fee\u6539)\s*\u8fd9\s*\u4efd\s*ppt|\u6539\s*ppt|\u4fee\s*ppt|\u4fdd\u771f\u4fee\u6539|edit\s+(?:this\s+)?pptx|revise\s+(?:this\s+)?deck|fix\s+my\s+slides|repair\s+the\s+pptx|\u8c03\u6574\u8fd9\u51e0\u9875|\u53ea\u6539\u7b2c)/i.test(value)) {
+    return { prompt_quality: promptQuality, route: "preserve-edit", decision: "explicit-edit-signal" };
+  }
   if (/(\.pptx\b|pptx\b|powerpoint|\u53ef\u7f16\u8f91|\u6c47\u62a5|\u62a5\u544a|\u653f\u5e9c|\u91d1\u878d|\u57f9\u8bad|\u5ba1\u8ba1|\u54a8\u8be2|consulting|business report|quarterly business review|qbr|board deck|editable|revise|stakeholder|training|government|finance|audit)/i.test(value)) {
-    return { prompt_quality: promptQuality, route: "formal-editable-pptx", decision: "explicit-formal-signal" };
+    return { prompt_quality: promptQuality, route: "editable-deck", decision: "explicit-formal-signal" };
   }
   if (/(\u7f51\u9875\s*ppt|web\s*(deck|ppt|slides?)|html|\u6a2a\u6ed1|\u6d4f\u89c8\u5668|browser|magazine|\u6742\u5fd7|editorial|e-?ink|\u7535\u5b50\u58a8\u6c34|swiss|\u745e\u58eb|keynote|showcase|demo[- ]?day)/i.test(value)) {
-    return { prompt_quality: promptQuality, route: "magazine-web-deck", decision: "explicit-web-signal" };
+    return { prompt_quality: promptQuality, route: "web-deck", decision: "explicit-web-signal" };
   }
-  if (promptQuality === "extreme-thin") return { prompt_quality: promptQuality, route: "guizang-web-fixed-style", decision: "extreme-thin-fallback" };
-  if (promptQuality === "thin") return { prompt_quality: promptQuality, route: "staged-questions", decision: "thin-guided-intake" };
-  return { prompt_quality: promptQuality, route: "source-first", decision: "complete-source-first" };
+  if (promptQuality === "extreme-thin") return { prompt_quality: promptQuality, route: "editable-deck", decision: "extreme-thin-fallback" };
+  if (promptQuality === "thin") return { prompt_quality: promptQuality, route: "editable-deck", decision: "thin-guided-intake" };
+  return { prompt_quality: promptQuality, route: "editable-deck", decision: "complete-source-first" };
 }
 
 function runBestEffectRouter({ repoRoot, requestText }) {
@@ -1662,19 +1665,15 @@ function resolveBestEffectBrief({ payload, projectBrief, repoRoot, title }) {
   ).trim();
   const routed = runBestEffectRouter({ repoRoot, requestText });
   const outputMode = String(payload?.form?.outputMode || projectBrief?.outputMode || "");
-  const recommendedRoute = outputMode === "both"
-    ? "dual-delivery"
-    : outputMode === "web"
-      ? "guizang-web-fixed-style"
-      : outputMode === "pptx"
-        ? "formal-editable-pptx"
-        : routed.route === "formal-editable-pptx"
-          ? "formal-editable-pptx"
-          : "guizang-web-fixed-style";
+  const recommendedRoute = outputMode === "web"
+    ? "web-deck"
+    : routed.route === "preserve-edit"
+      ? "preserve-edit"
+      : "editable-deck";
   const strategy = routed.prompt_quality === "complete"
     ? "source-confirmed"
-    : routed.prompt_quality === "extreme-thin" && recommendedRoute === "guizang-web-fixed-style"
-      ? "best-effect-fixed-style"
+    : routed.prompt_quality === "extreme-thin"
+      ? "best-effect-expanded-editable"
       : "best-effect-expanded";
   return {
     version: "v5.3-best-effect-v1",
@@ -1684,7 +1683,7 @@ function resolveBestEffectBrief({ payload, projectBrief, repoRoot, title }) {
     recommendedRoute,
     decisionReason: `${routed.decision}${outputMode ? `; output-mode=${outputMode}` : ""}`,
     source: "auto",
-    defaultStyle: recommendedRoute === "guizang-web-fixed-style" ? "Style A · 电子杂志 × 电子墨水" : "正式商务 PPTX / 微软雅黑 / 可编辑正文",
+    defaultStyle: recommendedRoute === "web-deck" ? "杂志式 Web Deck（明确要求时启用）" : "正式商务 PPTX / 微软雅黑 / 可编辑正文",
     autoExpandedBrief: [
       `主题：${title}`,
       `推荐路线：${recommendedRoute}`,
@@ -3269,11 +3268,39 @@ async function sha256FileHandle(fileHandle, size) {
   return { sha256: digest.digest("hex"), bytesRead: position };
 }
 
+// On Windows, rename() over an existing file fails with EPERM/EBUSY while the
+// destination is open by another process (e.g. a concurrent status read).
+// Retry with a small backoff instead of letting a legitimate concurrent reader
+// permanently break the agent-job persistence chain.
+export async function renameWithRetry(source, destination, { attempts = 20, delayMs = 25, renameFn = rename } = {}) {
+  let lastError;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      await renameFn(source, destination);
+      return;
+    } catch (error) {
+      lastError = error;
+      if (!["EPERM", "EBUSY", "EACCES"].includes(error?.code) || attempt === attempts - 1) throw error;
+      await new Promise((resolveWait) => setTimeout(resolveWait, delayMs));
+    }
+  }
+  throw lastError;
+}
+
+// APFS timestamps carry sub-millisecond precision: a file written in the current
+// integer-millisecond window can look like its mtime is "in the future" when
+// compared with Date.now(). Floor the timestamp so same-millisecond writes are
+// treated as stable when the configured stable age is 0.
+export function artifactStable(stats, stableAgeMs) {
+  const writtenAtMs = Math.floor(Math.max(stats.mtimeMs, stats.ctimeMs));
+  return Date.now() - writtenAtMs >= stableAgeMs;
+}
+
 async function inspectStableArtifact(projectPath, absolutePath, relativePath, limits, artifactHashCache) {
   try {
     const first = await lstat(absolutePath);
     if (first.isSymbolicLink() || !first.isFile() || first.size <= 0) return null;
-    if (Date.now() - Math.max(first.mtimeMs, first.ctimeMs) < limits.artifactStableAgeMs) return null;
+    if (!artifactStable(first, limits.artifactStableAgeMs)) return null;
     const fileReal = await realpath(absolutePath);
     if (!isNestedPath(projectPath, fileReal)) return null;
     const cacheKey = `${fileReal}\0${first.dev}:${first.ino}:${first.size}:${first.mtimeMs}:${first.ctimeMs}`;
@@ -3422,7 +3449,7 @@ async function resolveProjectArtifact({
     if (
       !before.isFile()
       || before.size <= 0
-      || Date.now() - Math.max(before.mtimeMs, before.ctimeMs) < artifactLimits.artifactStableAgeMs
+      || !artifactStable(before, artifactLimits.artifactStableAgeMs)
     ) {
       throw requestError("artifact is empty, temporary, or still being written.", 409);
     }
@@ -3724,7 +3751,7 @@ async function writeAgentJob(projectPath, job, { createOnly = false } = {}) {
       if (current.isSymbolicLink() || !current.isFile()) {
         throw requestError("agent-job.json must remain a regular project file.", 409);
       }
-      await rename(temporaryPath, jobPath);
+      await renameWithRetry(temporaryPath, jobPath);
     }
   } finally {
     await unlink(temporaryPath).catch(() => {});

@@ -1049,7 +1049,14 @@ def apply_edits(
             part_edits = build_part_edits(current, slide, operations)
             intended_parts.update(part_edits.keys())
             slide_parts_map.setdefault(slide, []).extend(part_edits.keys())
-            patch_parts(current, target, part_edits)
+            try:
+                patch_parts(current, target, part_edits)
+            except Exception:
+                # Never leave a partial or misleading output file behind when an
+                # edit fails (e.g. an unmatched geometry op). The previous
+                # intermediates are cleaned up by the finally block.
+                target.unlink(missing_ok=True)
+                raise
             current = target
     finally:
         for temp in intermediates:

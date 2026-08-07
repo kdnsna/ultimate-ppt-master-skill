@@ -3,7 +3,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
@@ -30,15 +29,21 @@ class BestEffectRoutingTest(unittest.TestCase):
     def test_formal_keywords_win_before_extreme_thin(self):
         result = classify_request("帮我做一份 Q3 销售汇报 PPT")
 
-        self.assertEqual(result["route"], "formal-editable-pptx")
+        self.assertEqual(result["route"], "editable-deck")
         self.assertEqual(result["prompt_quality"], "extreme-thin")
         self.assertEqual(result["decision"], "explicit-formal-signal")
 
-    def test_generic_topic_only_ppt_uses_fixed_web_style(self):
+    def test_generic_topic_only_ppt_uses_editable_deck(self):
         result = classify_request("做一个关于 AI 的 PPT")
 
-        self.assertEqual(result["route"], "guizang-web-fixed-style")
+        self.assertEqual(result["route"], "editable-deck")
         self.assertEqual(result["prompt_quality"], "extreme-thin")
+
+    def test_edit_signals_route_to_preserve_edit(self):
+        result = classify_request("帮我改这份 PPT，把第 2 页的 Q2 改成 Q3")
+
+        self.assertEqual(result["route"], "preserve-edit")
+        self.assertEqual(result["decision"], "explicit-edit-signal")
 
 
 if __name__ == "__main__":

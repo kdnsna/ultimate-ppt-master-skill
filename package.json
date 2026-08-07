@@ -10,6 +10,7 @@
   "scripts": {
     "setup": "bash scripts/bootstrap.sh",
     "update": "git pull --ff-only && npm run setup",
+    "upm": "bash bin/upm",
     "desktop": "bash scripts/run-desktop.sh",
     "doctor": "bash scripts/doctor.sh",
     "bridge": "node apps/bridge/server.mjs",
@@ -46,5 +47,8 @@
     "check:contracts": "python3 scripts/generate_contracts.py --check",
     "sync:desktop-worker": "python3 scripts/sync_desktop_worker.py",
     "check:desktop-worker": "python3 scripts/sync_desktop_worker.py --check"
+  },
+  "bin": {
+    "upm": "bin/upm"
   }
 }

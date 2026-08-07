@@ -114,7 +114,14 @@ class McpStdioTransportTest(unittest.TestCase):
             proc.stdin.flush()
             proc.stdin.close()
 
-            out, _err = proc.communicate(timeout=30)
+            # communicate() after an explicit stdin.close() raises ValueError on
+            # Python >=3.11 (it tries to flush a closed pipe). Read stdout until
+            # EOF instead; the MCP stdio server exits once stdin reaches EOF.
+            out = proc.stdout.read()
+            _err = proc.stderr.read()
+            proc.wait(timeout=30)
+            proc.stdout.close()
+            proc.stderr.close()
 
         responses = [json.loads(line) for line in out.splitlines() if line.strip()]
         self.assertEqual([response["id"] for response in responses], [1, 2, 3])

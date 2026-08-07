@@ -5,7 +5,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "6.3.9"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
@@ -483,13 +482,14 @@ class ReleaseIntegrityTest(unittest.TestCase):
         for text in (prompt, agents):
             self.assertIn("Best-Effect Brief Enhancer", text)
             self.assertIn("Extreme Thin Prompt Fallback", text)
-            self.assertIn("Style A Editorial Fixed Rhythm", text)
+            self.assertIn("editable-deck fallback", text)
             self.assertNotIn("Guizang-like Magazine Web Deck fixed style", text)
             self.assertIn("bestEffectBrief", text)
 
         self.assertIn("Best-Effect Brief Enhancer", skill)
         self.assertIn("Extreme Thin Prompt Fallback", skill)
-        self.assertIn("guizang-web-fixed-style", skill)
+        self.assertIn("editable-deck", skill)
+        self.assertIn("preserve-edit", skill)
         self.assertIn("bestEffectBrief", skill)
 
         self.assertEqual(listing["defaultPrompt"], openai_yaml.split('default_prompt: "')[1].split('"')[0] if 'default_prompt: "' in openai_yaml else listing["defaultPrompt"])
@@ -502,22 +502,20 @@ class ReleaseIntegrityTest(unittest.TestCase):
         package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
 
         for expected in (
-            "Route Decision Order",
-            "explicit-formal-signal",
-            "formal/editable keywords outrank prompt thinness",
-            "python3 ${SKILL_DIR}/scripts/best_effect_router.py",
-            "scripts/build_asset_plan.py",
-            "asset_plan.json",
-            "python3 ${SKILL_DIR}/scripts/image_gen.py --asset-plan",
-            "current_generation_evidence",
-            "pipeline-state.json",
-            "scripts/spec_lock_slice.py",
-            "scripts/execution_budget.py",
-            "spec_lock.md line budget",
-            "resume-execute",
+            "preserve-edit",
+            "editable-deck",
+            "web-deck",
+            "explicit-edit-signal",
+            "enabled only on explicit request",
+            "bin/upm",
+            "deck.pptd",
+            "quality-report.json",
+            "export-record.json",
+            "upm/adapters/kimi",
+            "contracts/schemas/pptd.schema.json",
             "node \"${SKILL_DIR}/scripts/validate-magazine-deck.mjs\"",
             "references/magazine-web/swiss-layout-registry.json",
-            "Needs-Manual image rows block Step 6",
+            "Formal Business Delivery Gate",
         ):
             self.assertIn(expected, skill)
 
@@ -609,7 +607,10 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertTrue(finished_decks_png.is_file())
         finished_png_bytes = finished_decks_png.read_bytes()
         self.assertEqual(finished_png_bytes[:8], b"\x89PNG\r\n\x1a\n")
-        self.assertEqual((int.from_bytes(finished_png_bytes[16:20]), int.from_bytes(finished_png_bytes[20:24])), (1440, 810))
+        self.assertEqual(
+            (int.from_bytes(finished_png_bytes[16:20], "big"), int.from_bytes(finished_png_bytes[20:24], "big")),
+            (1440, 810),
+        )
         source_text = finished_decks_source.read_text(encoding="utf-8")
         for marker in ("V6.3.9 正式版本", "226 个原生矢量对象", "AI Web Deck"):
             self.assertIn(marker, source_text)

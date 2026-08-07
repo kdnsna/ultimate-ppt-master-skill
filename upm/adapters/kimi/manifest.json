@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "upm-kimi-adapter-v1",
+  "adapterName": "kimi-public-editor",
+  "status": "compatibility-risk",
+  "minAgentBrowser": "0.33.2",
+  "editor": {
+    "origin": "https://www.kimi.com",
+    "path": "/neo-ppt/",
+    "sdkMode": "ppt-editor",
+    "penpalModule": "https://statics.moonshot.cn/neo-design/assets/penpal-C4NjirZE.js",
+    "rpcMethods": ["setSlideConfig", "setPPTD", "setEditable", "getSlideStatus"],
+    "functionalFlags": {
+      "fullscreen": false,
+      "present": false,
+      "export": true,
+      "close": false,
+      "annotation": false,
+      "feedback": false,
+      "share": false,
+      "versionHistory": false
+    }
+  },
+  "exportDialog": {
+    "openButtonName": "导出",
+    "downloadButtonName": "下载",
+    "imageFormatLabel": "图片",
+    "radioItemClass": "radio-group-item",
+    "activeRadioClass": "radio-group-item.active",
+    "oopifUrlHint": "kimi.com/neo-ppt"
+  },
+  "host": {
+    "bindHost": "127.0.0.1",
+    "exportPage": "export_host.html",
+    "payloadFile": "payload.json"
+  },
+  "notes": "Unofficial reverse-engineered public frontend; may break without notice. Local backend remains the default."
+}

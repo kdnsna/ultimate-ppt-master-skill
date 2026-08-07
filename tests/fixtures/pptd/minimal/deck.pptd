@@ -1,0 +1,31 @@
+version: v2
+title: 最小示例
+size: [960, 540]
+upm:
+  schemaVersion: upm-pptd-v1
+  projectName: minimal
+theme:
+  colors:
+    primary: "#1D4ED8"
+    paper: "#F6F3ED"
+    ink: "#171714"
+  textStyles:
+    coverTitle:
+      fontSize: 64
+      color: "$ink"
+      bold: true
+    body:
+      fontSize: 18
+      color: "$ink"
+      lineHeight: 1.6
+  tableStyles:
+    default:
+      firstRowStyle:
+        fill: {type: solid, color: "$primary"}
+        color: "#FFFFFF"
+        bold: true
+      bodyStyles:
+        - {fill: {type: solid, color: "#FFFFFF"}}
+pages:
+  - pages/01_cover.page
+  - pages/02_content.page

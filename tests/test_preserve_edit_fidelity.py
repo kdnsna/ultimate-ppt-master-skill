@@ -7,12 +7,14 @@ from scripts.preserve_edit_pptx import (
     apply_edits,
     build_trust_card_svg,
     fidelity_report,
-    main as preserve_main,
     member_hashes,
     patch_slide_xml,
     replace_text,
     slide_part_name,
     write_trust_preview,
+)
+from scripts.preserve_edit_pptx import (
+    main as preserve_main,
 )
 
 REPO_ROOT = Path(__file__).resolve().parents[1]

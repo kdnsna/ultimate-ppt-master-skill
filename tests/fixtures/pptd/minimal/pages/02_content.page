@@ -1,0 +1,35 @@
+pageType: content
+background:
+  type: solid
+  color: "#FFFFFF"
+elements:
+  - elementId: heading
+    elementType: text
+    bounds: [80, 60, 800, 64]
+    content:
+      fontSize: 34
+      color: "$ink"
+      bold: true
+      text: 内容页
+  - elementId: table-1
+    elementType: table
+    bounds: [80, 160, 800, 280]
+    columnWidths: [0.3, 0.35, 0.35]
+    rowHeights: [0.2, 0.2, 0.2, 0.2, 0.2]
+    style: "$default"
+    rows:
+      - - text: 指标
+        - text: 2024
+        - text: 2025
+      - - text: 收入（亿元）
+        - text: "82.5"
+        - text: "96.3"
+      - - text: 净利润（亿元）
+        - text: "12.1"
+        - text: "15.8"
+      - - text: 毛利率
+        - text: "38%"
+        - text: "41%"
+      - - text: 研发投入（亿元）
+        - text: "9.2"
+        - text: "11.4"

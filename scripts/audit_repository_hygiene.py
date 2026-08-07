@@ -20,6 +20,7 @@ IGNORED_DIRS = {
     "target",
     ".turbo",
     "__pycache__",
+    ".upm-test-results",
 }
 
 FINDER_DUPLICATE_RE = re.compile(r" \d+(?=\.)")

@@ -1,10 +1,10 @@
-import unittest
 import sys
+import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-from scripts.pptx_template_import import build_reference_style_from_manifest
+from scripts.pptx_template_import import build_reference_style_from_manifest  # noqa: E402
 
 
 class ReferenceStyleImportTest(unittest.TestCase):

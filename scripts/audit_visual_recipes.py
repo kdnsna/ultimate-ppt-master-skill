@@ -9,7 +9,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-
 REQUIRED_SECTIONS = {"page_roles", "page_recipes", "visual_layers", "raster_policy"}
 SKIP_DIRS = {"node_modules", ".git", ".venv", "dist", "build", "__pycache__"}
 TERMINAL_LAYER_STATUSES = {"Generated", "Needs-Manual", "Inserted", "Pending"}
@@ -53,9 +52,9 @@ def find_files(root: Path) -> dict[str, list[Path]]:
         lower = item.name.lower()
         if lower == "spec_lock.md":
             files["spec_lock"].append(item)
-        elif str(item).endswith("templates/page-recipes/index.json"):
+        elif item.as_posix().endswith("templates/page-recipes/index.json"):
             files["recipe_index"].append(item)
-        elif str(item).endswith("assets/generated/page-visuals/manifest.json"):
+        elif item.as_posix().endswith("assets/generated/page-visuals/manifest.json"):
             files["layer_manifest"].append(item)
         elif item.suffix.lower() == ".pptx":
             files["pptx"].append(item)
@@ -191,4 +190,3 @@ def main(argv: list[str]) -> int:
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
-

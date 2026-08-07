@@ -14,6 +14,11 @@ FORMAL_RE = re.compile(
     r"quarterly business review|qbr|board deck|editable|revise|stakeholder|training|government|finance|audit)",
     re.IGNORECASE,
 )
+EDIT_RE = re.compile(
+    r"(改\s*pptx|修改\s*ppt|(?:改|修改)\s*这\s*份\s*ppt|改\s*ppt|修\s*ppt|保真修改|edit\s+(?:this\s+)?pptx|"
+    r"revise\s+(?:this\s+)?deck|fix\s+my\s+slides|repair\s+the\s+pptx|调整这几页|只改第)",
+    re.IGNORECASE,
+)
 WEB_RE = re.compile(
     r"(网页\s*ppt|web\s*(deck|ppt|slides?)|html|横滑|浏览器|browser|magazine|杂志|editorial|"
     r"e-?ink|电子墨水|swiss|瑞士|keynote|showcase|demo[- ]?day)",
@@ -60,33 +65,39 @@ def prompt_quality(text: str) -> str:
 def classify_request(text: str) -> dict[str, Any]:
     quality = prompt_quality(text)
 
+    if EDIT_RE.search(text):
+        return {
+            "prompt_quality": quality,
+            "route": "preserve-edit",
+            "decision": "explicit-edit-signal",
+        }
     if FORMAL_RE.search(text):
         return {
             "prompt_quality": quality,
-            "route": "formal-editable-pptx",
+            "route": "editable-deck",
             "decision": "explicit-formal-signal",
         }
     if WEB_RE.search(text):
         return {
             "prompt_quality": quality,
-            "route": "magazine-web-deck",
+            "route": "web-deck",
             "decision": "explicit-web-signal",
         }
     if quality == "extreme-thin":
         return {
             "prompt_quality": quality,
-            "route": "guizang-web-fixed-style",
+            "route": "editable-deck",
             "decision": "extreme-thin-fallback",
         }
     if quality == "thin":
         return {
             "prompt_quality": quality,
-            "route": "staged-questions",
+            "route": "editable-deck",
             "decision": "thin-guided-intake",
         }
     return {
         "prompt_quality": quality,
-        "route": "source-first",
+        "route": "editable-deck",
         "decision": "complete-source-first",
     }
 

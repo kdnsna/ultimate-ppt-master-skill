@@ -1,7 +1,6 @@
+import importlib.util
 import unittest
 from pathlib import Path
-import importlib.util
-
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,7 +39,7 @@ class VisualReviewContractTest(unittest.TestCase):
         self.assertTrue(hasattr(module, "maybe_start_preview_server"))
         self.assertTrue(hasattr(module, "stop_preview_server"))
         script = module._preview_server_script()
-        self.assertTrue(str(script).endswith("scripts/svg_editor/server.py"))
+        self.assertTrue(str(script).replace("\\", "/").endswith("scripts/svg_editor/server.py"))
         self.assertNotIn("skills/ppt-master", str(script))
 
 

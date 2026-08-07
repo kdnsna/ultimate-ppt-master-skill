@@ -3,8 +3,8 @@ export type OutputPurpose = "editable-pptx" | "web-deck" | "dual-delivery";
 export type EvidenceState = "unmapped" | "candidate" | "grounded" | "conflicted" | "missing";
 export type SlideStatus = "draft" | "ready" | "needs-review" | "approved";
 export type PromptQuality = "complete" | "thin" | "extreme-thin";
-export type RecommendedRoute = "formal-editable-pptx" | "guizang-web-fixed-style" | "dual-delivery";
-export type ClassifierRoute = RecommendedRoute | "magazine-web-deck" | "staged-questions" | "source-first";
+export type RecommendedRoute = "preserve-edit" | "editable-deck" | "web-deck";
+export type ClassifierRoute = RecommendedRoute;
 
 export interface BestEffectRouteDecision {
   promptQuality: PromptQuality;
@@ -187,6 +187,7 @@ export const phaseLabels = {
 } as const;
 
 const FORMAL_RE = /(\.pptx\b|pptx\b|powerpoint|可编辑|汇报|报告|政府|金融|培训|审计|咨询|consulting|business report|quarterly business review|qbr|board deck|editable|revise|stakeholder|training|government|finance|audit)/i;
+const EDIT_RE = /(改\s*pptx|修改\s*ppt|(?:改|修改)\s*这\s*份\s*ppt|改\s*ppt|修\s*ppt|保真修改|edit\s+(?:this\s+)?pptx|revise\s+(?:this\s+)?deck|fix\s+my\s+slides|repair\s+the\s+pptx|调整这几页|只改第)/i;
 const WEB_RE = /(网页\s*ppt|web\s*(deck|ppt|slides?)|html|横滑|浏览器|browser|magazine|杂志|editorial|e-?ink|电子墨水|swiss|瑞士|keynote|showcase|demo[- ]?day)/i;
 const TOPIC_WRAPPER_RE = /^(帮我|请|please)?\s*(做|制作|生成|make|create|build)?\s*(一个|一份|a|an)?\s*(关于|about)?\s*([\w\u4e00-\u9fff .-]+?)\s*(的)?\s*(ppt|deck|slides?|presentation|幻灯片)?\s*$/i;
 const BEST_EFFECT_SIGNALS = [
@@ -250,40 +251,31 @@ function bestEffectPromptQuality(request: string): PromptQuality {
 
 export function classifyDeckRequest(request: string): Pick<BestEffectRouteDecision, "promptQuality" | "classifierRoute" | "decisionReason"> {
   const promptQuality = bestEffectPromptQuality(request);
+  if (EDIT_RE.test(request)) {
+    return { promptQuality, classifierRoute: "preserve-edit", decisionReason: "explicit-edit-signal" };
+  }
   if (FORMAL_RE.test(request)) {
-    return { promptQuality, classifierRoute: "formal-editable-pptx", decisionReason: "explicit-formal-signal" };
+    return { promptQuality, classifierRoute: "editable-deck", decisionReason: "explicit-formal-signal" };
   }
   if (WEB_RE.test(request)) {
-    return { promptQuality, classifierRoute: "magazine-web-deck", decisionReason: "explicit-web-signal" };
+    return { promptQuality, classifierRoute: "web-deck", decisionReason: "explicit-web-signal" };
   }
   if (promptQuality === "extreme-thin") {
-    return { promptQuality, classifierRoute: "guizang-web-fixed-style", decisionReason: "extreme-thin-fallback" };
+    return { promptQuality, classifierRoute: "editable-deck", decisionReason: "extreme-thin-fallback" };
   }
   if (promptQuality === "thin") {
-    return { promptQuality, classifierRoute: "staged-questions", decisionReason: "thin-guided-intake" };
+    return { promptQuality, classifierRoute: "editable-deck", decisionReason: "thin-guided-intake" };
   }
-  return { promptQuality, classifierRoute: "source-first", decisionReason: "complete-source-first" };
+  return { promptQuality, classifierRoute: "editable-deck", decisionReason: "complete-source-first" };
 }
 
 export function routeDecisionFor(request: string, outputPurpose: OutputPurpose, source: "auto" | "user" = "auto"): BestEffectRouteDecision {
   const classified = classifyDeckRequest(request);
   let recommendedRoute: RecommendedRoute;
   if (source === "user") {
-    recommendedRoute = outputPurpose === "dual-delivery"
-      ? "dual-delivery"
-      : outputPurpose === "web-deck"
-        ? "guizang-web-fixed-style"
-        : "formal-editable-pptx";
-  } else if (classified.classifierRoute === "formal-editable-pptx") {
-    recommendedRoute = "formal-editable-pptx";
-  } else if (classified.classifierRoute === "magazine-web-deck" || classified.classifierRoute === "guizang-web-fixed-style") {
-    recommendedRoute = "guizang-web-fixed-style";
+    recommendedRoute = outputPurpose === "web-deck" ? "web-deck" : "editable-deck";
   } else {
-    recommendedRoute = outputPurpose === "dual-delivery"
-      ? "dual-delivery"
-      : outputPurpose === "web-deck"
-        ? "guizang-web-fixed-style"
-        : "formal-editable-pptx";
+    recommendedRoute = outputPurpose === "web-deck" ? "web-deck" : classified.classifierRoute === "preserve-edit" ? "preserve-edit" : "editable-deck";
   }
   return { ...classified, recommendedRoute, source };
 }

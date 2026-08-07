@@ -15,7 +15,6 @@ from apps.desktop.worker.desktop_worker import (
     validate_job,
 )
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -198,9 +197,9 @@ class DesktopWorkerTest(unittest.TestCase):
             self.assertTrue(any(path.endswith("spec_lock.md") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("asset-plan.md") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("visual-element-kit.md") for path in result["generatedFiles"]))
-            self.assertTrue(any(path.endswith("images/image_prompts.md") for path in result["generatedFiles"]))
-            self.assertTrue(any(path.endswith("images/page_visual_prompts.md") for path in result["generatedFiles"]))
-            self.assertTrue(any(path.endswith("assets/generated/page-visuals/manifest.json") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.replace("\\", "/").endswith("images/image_prompts.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.replace("\\", "/").endswith("images/page_visual_prompts.md") for path in result["generatedFiles"]))
+            self.assertTrue(any(path.replace("\\", "/").endswith("assets/generated/page-visuals/manifest.json") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("storyboard.json") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("source-map.json") for path in result["generatedFiles"]))
             self.assertTrue(any(path.endswith("planning-report.json") for path in result["generatedFiles"]))

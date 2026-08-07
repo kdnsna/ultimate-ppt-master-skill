@@ -5,12 +5,11 @@ from pathlib import Path
 
 from pptx import Presentation
 
-
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from scripts.svg_to_pptx.pptx_builder import (
+from scripts.svg_to_pptx.pptx_builder import (  # noqa: E402
     _clear_personal_core_properties,
     _ensure_notes_master_parts,
 )

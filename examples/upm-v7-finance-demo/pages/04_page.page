@@ -1,0 +1,102 @@
+pageType: benefit
+elements:
+- elementId: eyebrow
+  elementType: text
+  bounds:
+  - 56.0
+  - 48.0
+  - 700
+  - 26
+  content:
+    text: 突出价值与关键指标
+    style: $eyebrow
+- elementId: page-title
+  elementType: text
+  bounds:
+  - 56.0
+  - 82.0
+  - 848
+  - 52
+  content:
+    text: 研发投入 11.4 亿元，占营收比重 11.8%。
+    style: $pageTitle
+- elementId: rule-56-144
+  elementType: shape
+  bounds:
+  - 56.0
+  - 144.0
+  - 96
+  - 3.0
+  shapeName: rect
+  fill:
+    type: solid
+    color: $primary
+- elementId: page-num
+  elementType: text
+  bounds:
+  - 804.0
+  - 502.0
+  - 100
+  - 22
+  content:
+    text: 04 / 07
+    style: $note
+    align:
+    - right
+    - middle
+- elementId: metric-value
+  elementType: text
+  bounds:
+  - 56.0
+  - 158.0
+  - 500
+  - 120
+  content:
+    text: 11.4 亿
+    style: $statNum
+    fontSize: 64
+- elementId: metric-label
+  elementType: text
+  bounds:
+  - 56.0
+  - 298.0
+  - 700
+  - 60
+  content:
+    text: <p>研发投入 元，占营收比重 11.8%。</p>
+    style: $statLabel
+    fontSize: 18
+- elementId: metric-definition
+  elementType: text
+  bounds:
+  - 56.0
+  - 368.0
+  - 848
+  - 100
+  content:
+    text: <p>研发投入 11.4 亿元，占营收比重 11.8%。</p>
+    style: $body
+- elementId: metric-source
+  elementType: text
+  bounds:
+  - 56.0
+  - 480.0
+  - 700
+  - 22
+  content:
+    text: 来源：source.md L1
+    style: $note
+background:
+  type: solid
+  color: $paper
+notes: '核心信息：研发投入 11.4 亿元，占营收比重 11.8%。
+
+  [c003] L1: 研发投入 11.4 亿元，占营收比重 11.8%。'
+upm:
+  schemaVersion: upm-pptd-v1
+  slideId: P04
+  role: benefit
+  recipeId: metric_panel.large_number_strip
+  evidenceRefs:
+  - c003
+  evidenceState: candidate

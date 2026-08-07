@@ -1,0 +1,92 @@
+pageType: action
+elements:
+- elementId: eyebrow
+  elementType: text
+  bounds:
+  - 56.0
+  - 48.0
+  - 700
+  - 26
+  content:
+    text: 把洞察转为下一步行动
+    style: $eyebrow
+- elementId: page-title
+  elementType: text
+  bounds:
+  - 56.0
+  - 82.0
+  - 848
+  - 52
+  content:
+    text: 下一步将推进国际化布局。
+    style: $pageTitle
+- elementId: rule-56-144
+  elementType: shape
+  bounds:
+  - 56.0
+  - 144.0
+  - 96
+  - 3.0
+  shapeName: rect
+  fill:
+    type: solid
+    color: $primary
+- elementId: page-num
+  elementType: text
+  bounds:
+  - 804.0
+  - 502.0
+  - 100
+  - 22
+  content:
+    text: 06 / 07
+    style: $note
+    align:
+    - right
+    - middle
+- elementId: rule-56-158
+  elementType: shape
+  bounds:
+  - 56.0
+  - 158.0
+  - 848
+  - 3.0
+  shapeName: rect
+  fill:
+    type: solid
+    color: '#D9D5CC'
+- elementId: action-0
+  elementType: text
+  bounds:
+  - 72.0
+  - 156.0
+  - 820
+  - 56
+  content:
+    text: □ 下一步将推进国际化布局。；
+    style: $body
+    fontSize: 16
+- elementId: action-source
+  elementType: text
+  bounds:
+  - 56.0
+  - 480.0
+  - 700
+  - 22
+  content:
+    text: 来源：source.md L1
+    style: $note
+background:
+  type: solid
+  color: $paper
+notes: '核心信息：下一步将推进国际化布局。
+
+  [c005] L1: 下一步将推进国际化布局。'
+upm:
+  schemaVersion: upm-pptd-v1
+  slideId: P06
+  role: action
+  recipeId: action_roadmap.owner_timeline
+  evidenceRefs:
+  - c005
+  evidenceState: candidate

@@ -1,0 +1,105 @@
+name: Windows CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  windows:
+    name: Windows (${{ matrix.python-version }})
+    runs-on: windows-latest
+    env:
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Install Python dependencies (local venv)
+        shell: bash
+        run: |
+          python -m venv .venv
+          .venv/Scripts/python -m pip install --upgrade pip
+          .venv/Scripts/python -m pip install -r requirements.txt
+
+      - name: Check generated contracts
+        run: npm run check:contracts
+
+      - name: UPM doctor (report-only)
+        shell: bash
+        run: bash bin/upm doctor --profile core
+
+      - name: Run Python unit/integration tests
+        shell: bash
+        run: .venv/Scripts/python -m unittest discover -s tests
+
+      - name: Run Node integration tests
+        run: npm run test:node
+
+      - name: Run Bridge tests
+        run: npm run test:bridge
+
+      - name: Local quick make smoke
+        shell: bash
+        run: |
+          bash bin/upm make "Windows CI：数据平台治理、实时计算与安全合规。" \
+            --title "Windows CI Smoke" --out "$RUNNER_TEMP/upm-win" --pages 4 --mode quick
+          test -f "$RUNNER_TEMP"/upm-win/*/deck.pptd
+          test -f "$RUNNER_TEMP"/upm-win/*/.upm/quality-report.json
+          test -n "$(ls "$RUNNER_TEMP"/upm-win/*/exports/*.pptx 2>/dev/null | head -1)"
+
+      - name: Preserve edit + PPTX ZIP verification
+        shell: bash
+        run: |
+          .venv/Scripts/python - "$RUNNER_TEMP" <<'PY'
+          import json, subprocess, sys, zipfile
+          from pathlib import Path
+          from pptx import Presentation
+          root = Path(".")
+          temp = Path(sys.argv[1])
+          # build a minimal structural pptx
+          prs = Presentation()
+          slide = prs.slides.add_slide(prs.slide_layouts[6])
+          box = slide.shapes.add_textbox(0, 0, 100000, 100000)
+          box.text_frame.text = "Windows 保真编辑"
+          source = temp / "edit-src.pptx"
+          prs.save(str(source))
+          edits = temp / "edits.json"
+          edits.write_text(json.dumps([{"slide": 1, "replacements": {"保真编辑": "保真修改"}}]), encoding="utf-8")
+          output = temp / "edit-out.pptx"
+          report = temp / "report.json"
+          p = subprocess.run(
+            [str(root / ".venv/Scripts/python.exe"), str(root / "scripts/preserve_edit_pptx.py"),
+             str(source), str(output), "--edits", str(edits), "--report", str(report)],
+            capture_output=True, text=True, timeout=300)
+          assert p.returncode == 0, p.stderr
+          data = json.loads(report.read_text())
+          assert data["safe"] is True, data
+          assert data["changed"] == ["ppt/slides/slide1.xml"], data
+          # ZIP integrity
+          with zipfile.ZipFile(str(output)) as z:
+              assert z.testzip() is None
+              names = z.namelist()
+              assert "ppt/presentation.xml" in names
+              slides = [n for n in names if n.startswith("ppt/slides/slide") and n.endswith(".xml")]
+              assert len(slides) == 1, slides
+          prs2 = Presentation(str(output))
+          assert len(prs2.slides) == 1
+          print("PRESERVE-EDIT + ZIP VERIFY OK")
+          PY
