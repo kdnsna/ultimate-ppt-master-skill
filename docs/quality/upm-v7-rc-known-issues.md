@@ -1,6 +1,6 @@
 # UPM v7 RC 已知问题
 
-> 候选 SHA：`93ef4e9fa5c8545bff6fb9b8f94526be036543e7`（最终 PR Head 仅可能再差验收文档提交）
+> 候选 SHA：`5b204e105ab4964cd01df5ce84a80ae7113c979d`（最终 PR Head 仅可能再差验收文档提交）
 
 | ID | 级别 | 状态 | 描述 |
 |---|---|---|---|
@@ -25,6 +25,7 @@
 | K19 | P2 | FIXED | Windows CI：cp1252 控制台无法输出中文导致 `upm doctor` 崩溃；CLI 入口强制 PYTHONUTF8/PYTHONIOENCODING 并 reconfigure stdout/stderr（回归测试覆盖）。 |
 | K20 | P2 | FIXED | Windows CI：`upm doctor` 的“仓库本地 .venv”检查只认 `.venv/bin/python`；现兼容 `.venv/Scripts/python.exe` 与 `python`（回归测试覆盖）。 |
 | K21 | P2 | FIXED | bridge artifact 发现偶发返回空列表：APFS 亚毫秒 mtime 在同一整数毫秒内被 `Date.now()` 减出负值，文件被误判为“仍在写入”；`artifactStable` 先 floor 再比较，新增确定性回归测试。 |
+| K22 | P2 | FIXED | Windows Python 测试套件：job 未启用 UTF-8 导致子进程中文输出解码/编码崩溃；`cairo_available` 对缺失 pkg-config 未捕获 OSError；PIL 测试未关闭句柄导致临时目录删除失败（WinError 32）；均已修复并同步 desktop worker 打包副本。 |
 
 严重等级约定：P0=数据损坏/安全问题/无法生成；P1=无法打开/页面丢失/主要功能失败；P2=视觉明显不佳/偶发失败；P3=文档/提示/轻微问题。
 
