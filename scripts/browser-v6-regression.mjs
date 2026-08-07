@@ -846,15 +846,17 @@ async function testTabIsolationAndRefresh(client, baseUrl) {
     assert.match(sseA, new RegExp(encodeURIComponent(stateA.sessionId)));
     assert.match(sseB, new RegExp(encodeURIComponent(stateB.sessionId)));
 
+    await evaluate(client, tabA, "window.__upmPreReloadMark = true");
     await client.send("Page.reload", { ignoreCache: true }, tabA.sessionId);
-    await waitForExpression(client, tabA, "document.querySelector('.v6-app')?.dataset.phase === 'review' && document.querySelector('.handoff-ready code')?.textContent.includes('/tmp/mock/project-a')", "tab A refresh restore");
+    await waitForExpression(client, tabA, "window.__upmPreReloadMark === undefined && document.querySelector('.v6-app')?.dataset.phase === 'review' && document.querySelector('.handoff-ready code')?.textContent.includes('/tmp/mock/project-a')", "tab A refresh restore");
     await enterGenerateFlow(client, tabA);
     const restoredA = await evaluate(client, tabA, `JSON.parse(sessionStorage.getItem(${JSON.stringify(storageKey)}))`);
     assert.equal(restoredA.sessionId, stateA.sessionId);
     assert.equal(restoredA.projectPath, stateA.projectPath);
 
+    await evaluate(client, tabB, "window.__upmPreReloadMark = true");
     await client.send("Page.reload", { ignoreCache: true }, tabB.sessionId);
-    await waitForExpression(client, tabB, "document.querySelector('.v6-app')?.dataset.phase === 'intake'", "tab B refresh restore");
+    await waitForExpression(client, tabB, "window.__upmPreReloadMark === undefined && document.querySelector('.v6-app')?.dataset.phase === 'intake'", "tab B refresh restore");
     const restoredB = await evaluate(client, tabB, `JSON.parse(sessionStorage.getItem(${JSON.stringify(storageKey)}))`);
     assert.equal(restoredB.sessionId, stateB.sessionId);
     assert.equal(restoredB.projectPath, undefined);
