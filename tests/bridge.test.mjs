@@ -117,7 +117,8 @@ const currentVisualDirectionContracts = {
   "brand-launch": "cinematic image-first layout",
   "training-narrative": "editorial learning design",
   "editorial-narrative": "literary AI editorial",
-  "swiss-information": "Swiss baseline systems"
+  "swiss-information": "Swiss baseline systems",
+  "premium-launch": "premium deep-navy launch stage"
 };
 
 function deckSessionFixture(count) {

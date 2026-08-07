@@ -1742,6 +1742,12 @@ const visualDirectionReferenceStyleMap = Object.freeze({
     positiveReferences: Object.freeze(["Swiss baseline systems", "IBM Plex information design", "technical publishing"]),
     negativeReferences: Object.freeze(["decorative grid overlays", "oversized red type without meaning", "glass and shadow effects"]),
     styleConstraints: Object.freeze(["4px baseline and 12-column grid", "square information geometry", "direct labels", "one deliberate grid break per page"])
+  }),
+  "premium-launch": Object.freeze({
+    selectedDirection: "premium-launch",
+    positiveReferences: Object.freeze(["premium deep-navy launch stage", "gold-on-navy keynote hierarchy", "single-focus hero typography"]),
+    negativeReferences: Object.freeze(["light corporate minimal", "card wall without a focus", "pastel surfaces"]),
+    styleConstraints: Object.freeze(["deep navy near-black surface", "gold primary on dark ink", "generous whitespace with one hero per page", "large evidence numerals on dark"])
   })
 });
 
