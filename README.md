@@ -20,7 +20,8 @@
 <p align="center">
   <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/kdnsna/ultimate-ppt-master-skill?style=flat-square&color=171714"></a>&ensp;
   <a href="./LICENSE"><img alt="MIT" src="https://img.shields.io/badge/license-MIT-171714?style=flat-square"></a>&ensp;
-  <img alt="v7.0.0-beta.1" src="https://img.shields.io/badge/version-7.0.0--beta.1-1D4ED8?style=flat-square">&ensp;
+  <a href="https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"><img alt="v6.3.9" src="https://img.shields.io/badge/GitHub_Release-v6.3.9-1D4ED8?style=flat-square"></a>&ensp;
+  <img alt="v7.0.0-beta.1" src="https://img.shields.io/badge/main-7.0.0--beta.1-73866C?style=flat-square">&ensp;
   <img alt="local-first" src="https://img.shields.io/badge/local--first-yes-73866C?style=flat-square">&ensp;
   <img alt="shape-editable PPTX" src="https://img.shields.io/badge/output-shape--editable_PPTX-1D4ED8?style=flat-square">
 </p>

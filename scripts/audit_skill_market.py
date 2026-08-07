@@ -10,8 +10,12 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+# Marketplace listing tracks the last formal GitHub Release. Root package.json
+# may advertise an in-tree technical preview (e.g. 7.0.0-beta.1 on main).
 RELEASE_STATUS = "github-released"
 RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"
+FORMAL_VERSION = RELEASE_EVIDENCE.rsplit("/v", 1)[-1]
+ROOT_PACKAGE_VERSION = "7.0.0-beta.1"
 MARKETPLACE_STATUS = "independent-not-attested"
 
 PROOF_CASES = (
@@ -84,7 +88,17 @@ def audit_marketplace_listing(errors: list[str]) -> None:
 
     require(listing.get("id") == "ultimate-ppt-master", "marketplace listing id must be ultimate-ppt-master", errors)
     require(listing.get("invocation") == "$ultimate-ppt-master", "marketplace listing invocation must be $ultimate-ppt-master", errors)
-    require(listing.get("version") == json.loads(read_text(ROOT / "package.json")).get("version"), "marketplace listing version must match package.json", errors)
+    package_version = json.loads(read_text(ROOT / "package.json")).get("version")
+    require(
+        package_version in {FORMAL_VERSION, ROOT_PACKAGE_VERSION},
+        f"package.json version must be formal v{FORMAL_VERSION} or allowed preview v{ROOT_PACKAGE_VERSION}",
+        errors,
+    )
+    require(
+        listing.get("version") == FORMAL_VERSION,
+        f"marketplace listing version must match formal GitHub release v{FORMAL_VERSION}",
+        errors,
+    )
     require(listing.get("releaseStatus") == RELEASE_STATUS, "marketplace listing must use the GitHub release status", errors)
     require(listing.get("releaseEvidence") == RELEASE_EVIDENCE, "marketplace listing must link the authoritative GitHub Release", errors)
     require(listing.get("marketplaceStatus") == MARKETPLACE_STATUS, "marketplace listing must not infer marketplace publication from GitHub Release", errors)

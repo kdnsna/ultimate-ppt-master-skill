@@ -11,7 +11,10 @@ from urllib.parse import unquote
 
 
 ROOT = Path(__file__).resolve().parents[1]
+# Last formal GitHub release / apps / marketplace contract.
 VERSION = "6.3.9"
+# Root monorepo may advertise the in-tree v7 technical preview on main.
+ROOT_PACKAGE_VERSION = "7.0.0-beta.1"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))
 RELEASE_STATUS = "github-released"
 RELEASE_EVIDENCE = "https://github.com/kdnsna/ultimate-ppt-master-skill/releases/tag/v6.3.9"
@@ -120,7 +123,11 @@ def audit_version_markers(errors: list[str]) -> None:
         )
     )
 
-    require(package.get("version") == VERSION, f"package.json version is not v{VERSION}", errors)
+    require(
+        package.get("version") == ROOT_PACKAGE_VERSION,
+        f"package.json version is not v{ROOT_PACKAGE_VERSION}",
+        errors,
+    )
     require(web_package.get("version") == VERSION, f"apps/web/package.json version is not v{VERSION}", errors)
     require(web_lock.get("version") == VERSION, f"apps/web/package-lock.json root version is not v{VERSION}", errors)
     require(web_lock.get("packages", {}).get("", {}).get("version") == VERSION, f"apps/web package-lock package version is not v{VERSION}", errors)
@@ -296,9 +303,9 @@ def audit_readme_truthfulness(errors: list[str]) -> None:
                 require(artifact in corpus, f"{label} claims {artifact} but no SKILL/scripts/tests anchor exists", errors)
 
     for label, text in readmes.items():
-        # Line window widened for the 2026-08-01 editorial README redesign
-        # (two-column design philosophy, visual system table, collapsible install).
-        require(180 <= len(text.splitlines()) <= 420, f"{label} must stay between 180 and 420 lines", errors)
+        # Line window widened for the 2026-08 v7 beta homepage (capability table +
+        # honest HTTP/community notes) while still blocking runaway README growth.
+        require(180 <= len(text.splitlines()) <= 450, f"{label} must stay between 180 and 450 lines", errors)
     require("## 文档" in readmes["README.md"], "README.md missing Chinese documentation entry", errors)
     require("## Documentation" in readmes["README.en.md"], "README.en.md missing documentation entry", errors)
     require(len(compatibility.splitlines()) <= 20, "README.zh-CN.md compatibility entry is too long", errors)
