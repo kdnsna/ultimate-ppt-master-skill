@@ -3,17 +3,21 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then
-  PYTHON="$ROOT_DIR/.venv/bin/python"
-else
-  PYTHON=""
-  for candidate in python3.13 python3.12 python3.11 python3.10; do
-    if command -v "$candidate" >/dev/null 2>&1; then
+PYTHON=""
+for candidate in \
+  "$ROOT_DIR/.venv/bin/python" \
+  "$ROOT_DIR/.venv/Scripts/python.exe" \
+  "$ROOT_DIR/.venv/Scripts/python" \
+  python3.13 python3.12 python3.11 python3.10 python; do
+  if [[ -x "$candidate" ]] || command -v "$candidate" >/dev/null 2>&1; then
+    if [[ "$candidate" == */* ]]; then
+      PYTHON="$candidate"
+    else
       PYTHON="$(command -v "$candidate")"
-      break
     fi
-  done
-fi
+    break
+  fi
+done
 
 if [[ -z "$PYTHON" ]]; then
   echo "[upm] 需要 Python 3.10+。请运行: bash scripts/bootstrap.sh --profile core" >&2
