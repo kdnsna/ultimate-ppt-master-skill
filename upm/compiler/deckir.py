@@ -181,7 +181,11 @@ def _fallback_recipe(role: str, used: list[str]) -> tuple[str, str, str]:
         recipe = index.get(recipe_id)
         if recipe and recipe_id not in used:
             return recipe_id, str(recipe.get("layoutFamily") or "generic"), str(recipe.get("visualLayer") or "none")
-    # 同 role 候选全部用尽：从整个 recipe 库中挑一个尚未使用的，保持布局多样性。
+    # 同 role 候选全部用尽：优先借用同 role 的其他 recipe（保持页面角色语义），
+    # 其次才从整个 recipe 库中挑一个尚未使用的，保证布局多样性。
+    for recipe_id, recipe in index.items():
+        if recipe and recipe.get("role") == role and recipe_id not in used:
+            return recipe_id, str(recipe.get("layoutFamily") or "generic"), str(recipe.get("visualLayer") or "none")
     for recipe_id, recipe in index.items():
         if recipe and recipe_id not in used:
             return recipe_id, str(recipe.get("layoutFamily") or "generic"), str(recipe.get("visualLayer") or "none")

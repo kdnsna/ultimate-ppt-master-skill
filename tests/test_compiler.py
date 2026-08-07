@@ -8,7 +8,14 @@ sys.path.insert(0, str(ROOT))
 
 from upm.cli.common import attach_tables_to_deckir  # noqa: E402
 from upm.compiler.compiler import compile_deck  # noqa: E402
-from upm.compiler.deckir import build_deckir, sanitize_claim_text, source_claims  # noqa: E402
+from upm.compiler.deckir import (  # noqa: E402
+    ROLE_RECIPE_PREFERENCE,
+    _fallback_recipe,
+    _load_recipe_index,
+    build_deckir,
+    sanitize_claim_text,
+    source_claims,
+)
 from upm.compiler.overflow import check_element_overflow  # noqa: E402
 from upm.compiler.planner import plan_deckir, to_bridge_payload  # noqa: E402
 from upm.compiler.tokens import build_theme  # noqa: E402
@@ -75,6 +82,27 @@ class DeckIrTest(unittest.TestCase):
         for slide in deckir["slides"]:
             self.assertFalse(str(slide.get("title") or "").lstrip().startswith("#"))
             self.assertNotIn("source.md", str(slide.get("title") or ""))
+
+    def test_fallback_recipe_breaks_diversity_after_candidates_exhausted(self):
+        # evidence 只有 2 个候选 recipe；用完后再调用必须借用未使用的 recipe，
+        # 而不是直接回退到第一个候选（回归：P04-P07 四连重复 evidence_board）。
+        used = list(ROLE_RECIPE_PREFERENCE["evidence"])
+        recipe_id, family, _ = _fallback_recipe("evidence", used)
+        self.assertNotIn(recipe_id, used)
+        self.assertTrue(family)
+
+    def test_fallback_recipe_prefers_same_role_then_whole_library(self):
+        used = list(ROLE_RECIPE_PREFERENCE["evidence"])
+        # 全部 20 个 recipe 逐个消耗：同 role 的 evidence 应先用尽，
+        # 之后借用其他 role 的 recipe，且始终不与已用项重复。
+        while len(used) < 20:
+            recipe_id, _, _ = _fallback_recipe("evidence", used)
+            self.assertNotIn(recipe_id, used)
+            used.append(recipe_id)
+        # 全库用尽后：返回的 layoutFamily 必须与上一次使用不同（打破连续重复）。
+        _, family, _ = _fallback_recipe("evidence", used)
+        last_family = _load_recipe_index().get(used[-1], {}).get("layoutFamily")
+        self.assertNotEqual(family, last_family)
 
 
 class CompilerTest(unittest.TestCase):
