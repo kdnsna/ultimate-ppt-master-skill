@@ -166,29 +166,72 @@ class KimiMediaFilterTest(unittest.TestCase):
 
 
 class CrossRunReplaceTest(unittest.TestCase):
+    def _slide_xml(self, *run_texts: str) -> str:
+        runs = "".join(f"<a:r><a:t>{text}</a:t></a:r>" for text in run_texts)
+        return (
+            '<?xml version="1.0"?>'
+            '<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+            'xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">'
+            f"<p:cSld><p:spTree><p:sp><p:txBody><a:p>{runs}</a:p></p:txBody></p:sp>"
+            "</p:spTree></p:cSld></p:sld>"
+        )
+
+    def _joined_text(self, xml: str) -> str:
+        return "".join(
+            (node.text or "")
+            for node in ET.fromstring(xml).iter(
+                "{http://schemas.openxmlformats.org/drawingml/2006/main}t"
+            )
+        )
+
     def test_replace_text_spans_multiple_runs(self):
         sys.path.insert(0, str(ROOT / "scripts"))
         from preserve_edit_pptx import replace_text  # type: ignore
 
-        # Synthetic OOXML slide fragment with "HelloWorld" split across two <a:t>
-        xml = (
-            '<?xml version="1.0"?>'
-            '<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
-            'xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">'
-            "<p:cSld><p:spTree>"
-            "<p:sp><p:txBody><a:p>"
-            "<a:r><a:t>Hello</a:t></a:r>"
-            "<a:r><a:t>World</a:t></a:r>"
-            "</a:p></p:txBody></p:sp>"
-            "</p:spTree></p:cSld></p:sld>"
-        )
-        edited = replace_text({"HelloWorld": "HiThere"})(xml)
-        self.assertIn("HiThere", edited)
-        self.assertNotIn("HelloWorld", "".join(ET.fromstring(edited).itertext()))
-        # Second run should be cleared or not reintroduce old pair
-        texts = [t for t in ET.fromstring(edited).iter("{http://schemas.openxmlformats.org/drawingml/2006/main}t")]
-        joined = "".join((t.text or "") for t in texts)
-        self.assertEqual(joined, "HiThere")
+        edited = replace_text({"HelloWorld": "HiThere"})(self._slide_xml("Hello", "World"))
+        self.assertEqual(self._joined_text(edited), "HiThere")
+
+    def test_replace_when_new_contains_old_does_not_hang(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from preserve_edit_pptx import replace_text  # type: ignore
+
+        # Single-run: Hello → Hello! must not loop forever.
+        edited = replace_text({"Hello": "Hello!"})(self._slide_xml("Hello"))
+        self.assertEqual(self._joined_text(edited), "Hello!")
+        # Multi-run: ab|cd → abcdX (new contains old contiguous "abcd")
+        edited2 = replace_text({"abcd": "abcdX"})(self._slide_xml("ab", "cd"))
+        self.assertEqual(self._joined_text(edited2), "abcdX")
+
+    def test_apply_edits_unlinks_partial_output_on_failure(self):
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from preserve_edit_pptx import apply_edits  # type: ignore
+
+        with tempfile.TemporaryDirectory() as name:
+            # Minimal valid pptx zip with one slide part so patch can start.
+            source = Path(name) / "src.pptx"
+            output = Path(name) / "out.pptx"
+            import zipfile
+
+            slide_xml = (
+                '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+                '<p:sld xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" '
+                'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" '
+                'xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main">'
+                "<p:cSld><p:spTree>"
+                '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/>'
+                "</p:spTree></p:cSld></p:sld>"
+            )
+            with zipfile.ZipFile(source, "w") as archive:
+                archive.writestr("[Content_Types].xml", '<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>')
+                archive.writestr("ppt/slides/slide1.xml", slide_xml)
+            # Invalid op should fail build_part_edits / dispatch and not leave output.
+            with self.assertRaises(Exception):
+                apply_edits(
+                    source,
+                    output,
+                    [{"slide": 1, "operations": [{"op": "not_a_real_op", "old": "x", "new": "y"}]}],
+                )
+            self.assertFalse(output.exists(), "failed apply_edits must not leave partial output.pptx")
 
 
 class VersionClaimsTest(unittest.TestCase):

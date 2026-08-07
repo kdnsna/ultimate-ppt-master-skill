@@ -315,62 +315,47 @@ def _paragraph_text_nodes(paragraph) -> list:
     return [node for node in paragraph.iter(_TEXT_TAG)]
 
 
+def _replace_all_non_overlapping(text: str, old: str, new: str) -> str:
+    """str.replace-style non-overlapping replacement (safe when new contains old)."""
+    if not old:
+        return text
+    parts: list[str] = []
+    start = 0
+    while True:
+        index = text.find(old, start)
+        if index < 0:
+            parts.append(text[start:])
+            break
+        parts.append(text[start:index])
+        parts.append(new)
+        start = index + len(old)
+    return "".join(parts)
+
+
 def _replace_across_text_nodes(nodes: list, old: str, new: str) -> bool:
     """Replace ``old`` with ``new`` across contiguous ``<a:t>`` nodes in order.
 
     When ``old`` spans multiple runs, the first node receives the replacement
     text and subsequent nodes that contributed to the match are cleared.
-    Returns True when at least one replacement occurred.
+    Uses non-overlapping index advance so ``new`` containing ``old`` cannot loop.
     """
     if not old or not nodes:
         return False
-    changed = False
-    # First: single-node replacements (fast path).
-    for node in nodes:
-        if node.text and old in node.text:
-            node.text = node.text.replace(old, new)
-            changed = True
-    # Then: multi-run contiguous match on the concatenated paragraph text.
     texts = [node.text or "" for node in nodes]
     joined = "".join(texts)
     if old not in joined:
-        return changed
-    # Rebuild joined string with all occurrences replaced, then redistribute
-    # into original run boundaries (extra length stays in the first changed run).
-    while old in joined:
-        start = joined.find(old)
-        end = start + len(old)
-        # Map char indices to nodes.
-        pos = 0
-        spans: list[tuple[int, int, int]] = []  # node_idx, local_start, local_end
-        for index, text in enumerate(texts):
-            node_start, node_end = pos, pos + len(text)
-            if node_end <= start or node_start >= end:
-                pos = node_end
-                continue
-            local_start = max(0, start - node_start)
-            local_end = min(len(text), end - node_start)
-            spans.append((index, local_start, local_end))
-            pos = node_end
-        if not spans:
-            break
-        first_idx, first_local_start, _ = spans[0]
-        last_idx, _, last_local_end = spans[-1]
-        prefix = texts[first_idx][:first_local_start]
-        suffix = texts[last_idx][last_local_end:]
-        if first_idx == last_idx:
-            texts[first_idx] = prefix + new + suffix
-        else:
-            texts[first_idx] = prefix + new
-            for mid in range(first_idx + 1, last_idx):
-                texts[mid] = ""
-            texts[last_idx] = suffix
-        joined = "".join(texts)
-        changed = True
-    if changed:
-        for index, node in enumerate(nodes):
-            node.text = texts[index]
-    return changed
+        return False
+
+    # Single pass: non-overlapping replacements on the full paragraph string,
+    # then put the entire result in the first text node and clear the rest so
+    # multi-run spans cannot re-match and cannot infinite-loop when new⊃old.
+    replaced = _replace_all_non_overlapping(joined, old, new)
+    if replaced == joined:
+        return False
+    nodes[0].text = replaced
+    for node in nodes[1:]:
+        node.text = ""
+    return True
 
 
 def replace_text(replacements: dict[str, str]) -> EditFn:
@@ -1103,18 +1088,27 @@ def apply_edits(
     intermediates: list[Path] = []
     current = source
     try:
-        for index, edit in enumerate(edits):
-            slide, operations = _operations_from_edit(edit, index)
-            requested.add(slide)
-            last = index == len(edits) - 1
-            target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
-            if not last:
-                intermediates.append(target)
-            part_edits = build_part_edits(current, slide, operations)
-            intended_parts.update(part_edits.keys())
-            slide_parts_map.setdefault(slide, []).extend(part_edits.keys())
-            patch_parts(current, target, part_edits)
-            current = target
+        try:
+            for index, edit in enumerate(edits):
+                slide, operations = _operations_from_edit(edit, index)
+                requested.add(slide)
+                last = index == len(edits) - 1
+                target = output if last else output.with_name(f".{output.stem}.preserve{index}.pptx")
+                if not last:
+                    intermediates.append(target)
+                part_edits = build_part_edits(current, slide, operations)
+                intended_parts.update(part_edits.keys())
+                slide_parts_map.setdefault(slide, []).extend(part_edits.keys())
+                patch_parts(current, target, part_edits)
+                current = target
+        except Exception:
+            # Do not leave a partial/misleading final output when patch fails mid-edit.
+            if output.exists() and output.resolve() != source.resolve():
+                try:
+                    output.unlink()
+                except OSError:
+                    pass
+            raise
     finally:
         for temp in intermediates:
             try:
