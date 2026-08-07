@@ -26,6 +26,7 @@ exports/
 *.pptx
 !examples/executive-business-review-starter/executive-business-review-editable.pptx
 !examples/upm-v7-finance-demo/exports/*.pptx
+!tests/fixtures/rc/*.pptx
 !apps/web/public/examples/executive-business-review-starter/executive-business-review-editable.pptx
 *.pptm
 *.key

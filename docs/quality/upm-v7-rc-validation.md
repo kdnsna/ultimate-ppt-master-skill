@@ -77,11 +77,36 @@ Round 3 修复：claim 均衡分组（消除空页占位）、metric 无数字�
 - Kimi 侧：协议层实测可用（PPTD 加载、导出对话框、生成进度 0→81%+、页面/表格渲染正确）；**文件交付通道全部失败**（agent-browser download → daemon os error 35；CDP 下载目录无文件；sdkSaveMode=external onSave 未回调；save-picker/Blob 桩未命中；Playwright expect_download 超时）。
 - 结论：Kimi 成功导出 = NOT ACHIEVED（阻塞项 K1）。同源 A/B 无法完成；差异报告只能给出 local 结果与 Kimi 部分协议证据。详见 `upm-v7-backend-comparison.md`。
 
-## Round 5–11 状态
+## Round 5：Office/WPS/LibreOffice（LibreOffice PASS；PowerPoint/WPS 待人工）
 
-- Round 5（Office/WPS/LibreOffice）：LibreOffice 可用但未执行 → 待执行/人工签字；PowerPoint、WPS 实机 → 待人工（见 `upm-v7-office-wps-validation.md`）。
-- Round 6（Preserve Edit 25 案例）、Round 7（编辑器安全）、Round 8（Agent 旅程）、Round 9（稳定性/压力）、Round 10（离线异常）、Round 11（回归循环）：PENDING，阻塞于 Kimi 修复与人工机器验证后统一执行。
+LibreOfficeDev 26.8.0.0.alpha0 对 local A01/A05/A06/A09/A12 全 5 样本通过：打开→PDF 渲染、另存 ODP、重开 ODP→PPTX、python-pptx 重开（页数/可编辑文本完整）。WPS 与 PowerPoint 的 GUI 实机打开/编辑/另存仍待人工签字（`upm-v7-office-wps-validation.md` 清单）。
+
+## Round 6：Preserve Edit 深度测试（PASS 27/27）
+
+在 12 页结构型 A11（Logo 图片、母版、表格、合并单元格、原生图表、超链接、分组、连接符、透明对象）上执行 27 个案例：文本 8、样式 5、表格 5、图形 6、图表 3。全部：`safe=true`、仅预期部件变化、0 unexpected/added/removed、NOOP 字节一致；未匹配图形操作返回硬错误且不产出输出文件（K13 设计决策）。修复 K12（失败操作不再残留部分输出），并新增回归测试。
+
+## Round 7：编辑器与安全（PASS 22/22）
+
+功能：页面列表/清单/页面 YAML/SVG 预览/保存刷新/本地导出/质量报告/并发保存/中文路径/大项目。安全：路径穿越（..、绝对路径、Windows 盘符、media/../）全拒、符号链接逃逸修复（K15）、非法 YAML 不覆盖、非 JSON 拒绝、超大请求体 413（K14）、原子保存、仅绑定 127.0.0.1、关闭后端口释放。
+
+## Round 8：Agent 用户旅程（Codex 4/4；第二 Agent 待执行）
+
+Codex 风格 4 任务（PDF→8 页正式稿、改第 3 页标题且 fidelity safe、review 溢出/空白、open 工程改第 5 页）全部完成。第二 Agent：本机已安装 hermes 与 openclaw，本轮未执行其独立会话（记为 NOT RUN，列入人工清单）。
+
+## Round 9：稳定性/重复性/压力（PASS）
+
+- A01 完全相同输入 ×5：DeckIR/PPTD/页面/质量报告一致；PPTX 部件级哈希完全一致（仅 ZIP 条目时间戳差异，符合“差异必须可解释”）。
+- 连续任务：10× make、10× review、10× edit 全部成功，无随机失败。
+- A12 40 页：峰值 RSS ≈ 158 MB（165,642,240 字节），31s 级完成。
+
+## Round 10：离线/异常/恢复（PASS）
+
+离线等价场景（local quick/standard/review）全部成功。异常输入全部被拒绝且不产出成品：损坏 PPTX（exit 1）、空 PDF（1）、空 DeckIR（1，结构门阻断）、>40 页（1，上限阻断）、只读目录（1）、坏 YAML（2，结构错误阻断导出）。
+
+## Windows CI（新增）
+
+`.github/workflows/windows-ci.yml`：Windows latest × Python 3.10/3.12，覆盖 unit/integration、`upm doctor`、local quick make、preserve edit、PPTX ZIP 校验。PowerPoint GUI 仍保留为 Windows 人工验收门槛。
 
 ## 合并建议
 
-暂不合并。先修复 K1（Kimi 文件捕获），再补齐 Round 5/8 人工验证并重跑受影响轮次。
+暂不合并。本地路径（Round 2/3/5/6/7/9/10）已通过；K1（Kimi 文件捕获，上游同环境同样失败）与 K9（PowerPoint/WPS 人工签字、第二 Agent 会话）仍是 P1 阻塞项。修复/人工完成后在最新 PR Head 重跑 Round 2 + A01/A11 smoke。

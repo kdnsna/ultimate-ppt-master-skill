@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
@@ -151,6 +152,46 @@ class WorkerOperationsFlowTest(unittest.TestCase):
             self.assertEqual(result["changed"], ["ppt/slides/slide1.xml"])
             self.assertIn(1, result["slideChanges"])
             self.assertTrue(any("restyled" in line for line in result["slideChanges"][1]))
+
+    def test_unmatched_geometry_op_leaves_no_output_file(self):
+        """K12 regression: a failed op must not leave a partial output file."""
+        import subprocess
+        import sys
+
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "deck.pptx"
+            output = Path(tmp) / "out.pptx"
+            edits = Path(tmp) / "edits.json"
+            with zipfile.ZipFile(source, "w") as package:
+                package.writestr("[Content_Types].xml", "<Types></Types>")
+                package.writestr("ppt/slides/slide1.xml", _slide_with_run("Hello"))
+
+            edits.write_text(
+                json.dumps(
+                    [
+                        {
+                            "slide": 1,
+                            "operations": [
+                                {
+                                    "op": "set_shape_geometry",
+                                    "match": {"text_contains": "不存在的形状"},
+                                    "x": 0.1,
+                                }
+                            ],
+                        }
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            script = Path(__file__).resolve().parents[1] / "scripts" / "preserve_edit_pptx.py"
+            process = subprocess.run(
+                [sys.executable, str(script), str(source), str(output), "--edits", str(edits)],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            self.assertNotEqual(process.returncode, 0)
+            self.assertFalse(output.exists(), "failed edit must not leave an output file")
 
 
 if __name__ == "__main__":

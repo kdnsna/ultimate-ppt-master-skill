@@ -23,6 +23,9 @@ from upm.pptd.io import load_project, write_yaml
 from upm.render.svg import render_page_svg
 
 
+MAX_REQUEST_BYTES = 8 * 1024 * 1024
+
+
 EDITOR_HTML = """<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>UPM PPTD 视觉精修</title>
@@ -141,6 +144,13 @@ class EditorHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _safe_resolve(self, relative: str) -> Path:
+        normalized = normalize_relative_path(relative)
+        target = (self.server.project / normalized).resolve()  # type: ignore[attr-defined]
+        if not target.is_relative_to(self.server.project.resolve()):  # type: ignore[attr-defined]
+            raise PathSafetyError(f"路径越界（符号链接逃逸）：{relative}")
+        return target
+
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path == "/":
@@ -153,9 +163,10 @@ class EditorHandler(BaseHTTPRequestHandler):
             path = parse_qs(parsed.query).get("path", [""])[0]
             try:
                 normalized = normalize_relative_path(path)
-                content = (self.server.project / normalized).read_text(encoding="utf-8")  # type: ignore[attr-defined]
+                target = self._safe_resolve(normalized)
+                content = target.read_text(encoding="utf-8")
                 self._json(200, {"path": normalized, "content": content})
-            except (PathSafetyError, OSError) as exc:
+            except (PathSafetyError, OSError, UnicodeDecodeError) as exc:
                 self._json(404, {"error": str(exc)})
             return
         if parsed.path == "/api/svg":
@@ -167,6 +178,7 @@ class EditorHandler(BaseHTTPRequestHandler):
                 if normalized == "deck.pptd":
                     page_data = pages[0][1] if pages else {"elements": []}
                 else:
+                    self._safe_resolve(normalized)
                     page_data = next((page for rel, page in pages if rel == normalized), None)
                 if page_data is None:
                     self._json(404, {"error": f"页面不存在：{normalized}"})
@@ -222,6 +234,14 @@ class EditorHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
         length = int(self.headers.get("Content-Length") or 0)
+        if length > MAX_REQUEST_BYTES:
+            self.rfile.read(min(length, 1 << 20))
+            self.send_response(413)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", "0")
+            self.send_header("Connection", "close")
+            self.end_headers()
+            return
         raw = self.rfile.read(length) if length else b"{}"
         try:
             payload = json.loads(raw.decode("utf-8"))
@@ -283,9 +303,9 @@ def run_open(args: Any) -> int:
     server = EditorServer(("127.0.0.1", args.port), project)
     host, port = server.server_address
     url = f"http://127.0.0.1:{port}/"
-    print(f"UPM PPTD 视觉精修：{url}")
-    print(f"项目：{project}")
-    print("按 Ctrl+C 停止服务。")
+    print(f"UPM PPTD 视觉精修：{url}", flush=True)
+    print(f"项目：{project}", flush=True)
+    print("按 Ctrl+C 停止服务。", flush=True)
     if not args.no_browser:
         threading.Timer(0.5, lambda: webbrowser.open(url)).start()
     try:

@@ -15,6 +15,12 @@
 | K9 | P1 | OPEN（待人工） | Microsoft PowerPoint（本机未安装）与 Windows 平台实机验证未完成；WPS 实机打开/保存未执行。 |
 | K10 | P3 | OPEN | 候选分支无 ruff 配置，`ruff check upm` 报告 67 项（多为 import 排序/未用变量）；oss-readiness 分支已配置 lint，合并前应同步。 |
 | K11 | P3 | OPEN | A12 峰值内存未记录（未用 /usr/bin/time）；后续补测。 |
+| K12 | P2 | FIXED | 失败的编辑操作（如未匹配图形几何）曾残留部分输出文件；现在失败时不产出输出并新增回归测试。 |
+| K13 | P3 | 设计决策 | 未匹配的 set_shape_geometry 返回硬错误（exit 2、无输出）而非静默 NOOP，确保不伪装成功。 |
+| K14 | P2 | FIXED | `upm open` 无请求体大小上限；现限制 8 MiB 并返回 413（含连接处理）。 |
+| K15 | P2 | FIXED | `/api/page` 与 `/api/svg` 未防符号链接逃逸；现统一 resolve 后校验工程目录内包含。 |
+| K16 | P2 | 已解释 | local 导出重复性：相同输入产出部件级哈希一致的 PPTX，仅 ZIP 条目时间戳随运行变化（可解释）。 |
+| K17 | P3 | OPEN | Kimi 宿主/上游宿主方法面一致（diff 为空），进一步排除适配器差异；K1 定性为 Kimi 前端/SDK 兼容失效。 |
 
 严重等级约定：P0=数据损坏/安全问题/无法生成；P1=无法打开/页面丢失/主要功能失败；P2=视觉明显不佳/偶发失败；P3=文档/提示/轻微问题。
 

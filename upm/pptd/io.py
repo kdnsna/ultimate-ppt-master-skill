@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -45,7 +47,9 @@ def read_yaml(path: Path, *, strict: bool = True) -> Any:
 def write_yaml(path: Path, data: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     text = yaml.safe_dump(data, allow_unicode=True, sort_keys=False, default_flow_style=False)
-    path.write_text(text, encoding="utf-8")
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    temporary.write_text(text, encoding="utf-8")
+    os.replace(temporary, path)
 
 
 def load_project(project_dir: str | Path) -> tuple[Path, dict[str, Any], list[tuple[str, dict[str, Any]]]]:
