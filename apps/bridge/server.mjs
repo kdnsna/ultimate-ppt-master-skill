@@ -3268,6 +3268,25 @@ async function sha256FileHandle(fileHandle, size) {
   return { sha256: digest.digest("hex"), bytesRead: position };
 }
 
+// On Windows, rename() over an existing file fails with EPERM/EBUSY while the
+// destination is open by another process (e.g. a concurrent status read).
+// Retry with a small backoff instead of letting a legitimate concurrent reader
+// permanently break the agent-job persistence chain.
+export async function renameWithRetry(source, destination, { attempts = 20, delayMs = 25, renameFn = rename } = {}) {
+  let lastError;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      await renameFn(source, destination);
+      return;
+    } catch (error) {
+      lastError = error;
+      if (!["EPERM", "EBUSY", "EACCES"].includes(error?.code) || attempt === attempts - 1) throw error;
+      await new Promise((resolveWait) => setTimeout(resolveWait, delayMs));
+    }
+  }
+  throw lastError;
+}
+
 // APFS timestamps carry sub-millisecond precision: a file written in the current
 // integer-millisecond window can look like its mtime is "in the future" when
 // compared with Date.now(). Floor the timestamp so same-millisecond writes are
@@ -3732,7 +3751,7 @@ async function writeAgentJob(projectPath, job, { createOnly = false } = {}) {
       if (current.isSymbolicLink() || !current.isFile()) {
         throw requestError("agent-job.json must remain a regular project file.", 409);
       }
-      await rename(temporaryPath, jobPath);
+      await renameWithRetry(temporaryPath, jobPath);
     }
   } finally {
     await unlink(temporaryPath).catch(() => {});

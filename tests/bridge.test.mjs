@@ -4,8 +4,8 @@ import { EventEmitter } from "node:events";
 import { access, lstat, mkdir, mkdtemp, readFile, readdir, readlink, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { test } from "node:test";
-import { artifactStable, createBridgeServer } from "../apps/bridge/server.mjs";
+import { mock, test } from "node:test";
+import { artifactStable, createBridgeServer, renameWithRetry } from "../apps/bridge/server.mjs";
 
 async function withServer(options, fn) {
   const server = createBridgeServer({ artifactStableAgeMs: 0, ...options });
@@ -31,6 +31,26 @@ test("artifact stability accepts same-millisecond writes and rejects fresh files
 
   const stillFresh = { mtimeMs: now - 100, ctimeMs: now - 100 };
   assert.equal(artifactStable(stillFresh, 500), false);
+});
+
+test("renameWithRetry retries Windows-style EBUSY/EPERM and gives up after the attempt budget", async () => {
+  const renameFn = mock.fn(async () => {
+    throw Object.assign(new Error("busy"), { code: "EBUSY" });
+  });
+  await assert.rejects(
+    renameWithRetry("src", "dst", { attempts: 3, delayMs: 1, renameFn }),
+    /busy/
+  );
+  assert.equal(renameFn.mock.callCount(), 3);
+
+  let flakyCalls = 0;
+  const flaky = mock.fn(async () => {
+    flakyCalls += 1;
+    if (flakyCalls < 3) throw Object.assign(new Error("busy"), { code: "EBUSY" });
+    return undefined;
+  });
+  await renameWithRetry("src", "dst", { attempts: 5, delayMs: 1, renameFn: flaky });
+  assert.equal(flakyCalls, 3);
 });
 
 function sha256(value) {
@@ -2195,7 +2215,11 @@ test("concurrent Bridge instances share one private signing key and validate pro
     const keyStats = await lstat(keyPath);
     assert.equal(keyStats.isFile(), true);
     assert.equal(keyStats.isSymbolicLink(), false);
-    assert.equal(keyStats.mode & 0o777, 0o600);
+    if (process.platform !== "win32") {
+      // Windows stat() does not reflect Unix permission bits (ACL-based); the
+      // server still creates the key with mode 0o600 as best effort there.
+      assert.equal(keyStats.mode & 0o777, 0o600);
+    }
     assert.match(keyBeforeRestart, /^[0-9a-f]{64}$/i);
     assert.deepEqual(
       (await readdir(outputDir)).filter((name) => name.startsWith(".bridge-manifest.key")),
