@@ -51,7 +51,7 @@ def build_theme(direction_id: str = "formal-finance") -> dict[str, Any]:
             "accent": colors.get("accent", "#D9573B"),
             "muted": colors.get("muted", "#687078"),
             "white": "#FFFFFF",
-            "surface": "#FFFFFF",
+            "surface": colors.get("surface", "#FFFFFF"),
         },
         "textStyles": {
             "coverTitle": {

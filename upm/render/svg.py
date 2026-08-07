@@ -123,6 +123,59 @@ def _rich_text_segments(text: str) -> list[dict[str, Any]]:
     return segments
 
 
+def _measure_text_width(text: str, font_size: float) -> float:
+    """Estimate rendered width: CJK glyphs are full-width, Latin ~0.55em."""
+    cjk = sum(1 for ch in text if "\u4e00" <= ch <= "\u9fff" or "\u3000" <= ch <= "\u303f")
+    latin = len(text) - cjk
+    return cjk * font_size + latin * font_size * 0.55
+
+
+def _wrap_paragraph(paragraph: list[dict[str, Any]], max_width: float, default_font_size: float) -> list[list[dict[str, Any]]]:
+    """Greedy char-level wrap of one paragraph to max_width.
+
+    Returns a list of lines, each a list of style-carrying text segments.
+    A line that already fits is returned unchanged (single line).
+    """
+    if not paragraph:
+        return [paragraph]
+    units: list[tuple[str, dict[str, Any], float]] = []
+    for seg in paragraph:
+        seg_size = float(seg["style"].get("fontSize") or default_font_size)
+        for ch in seg["text"]:
+            units.append((ch, seg, seg_size))
+    lines: list[list[dict[str, Any]]] = []
+    current: list[dict[str, Any]] = []
+    current_w = 0.0
+    for ch, seg, seg_size in units:
+        ch_w = _measure_text_width(ch, seg_size)
+        if current and current_w + ch_w > max_width:
+            lines.append(current)
+            current = []
+            current_w = 0.0
+        current.append({"text": ch, "style": seg["style"], "align": seg.get("align") or "left"})
+        current_w += ch_w
+    if current:
+        lines.append(current)
+    return lines
+
+
+def _merge_line_segments(line: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Merge adjacent segments with identical style into one segment.
+
+    The char-level wrapper splits text into per-character segments; the
+    SVG->DrawingML paragraph classifier expects ONE tspan per visual line
+    (first dy=0, later dy=line-height), so same-style runs must be rejoined
+    before emitting tspans.
+    """
+    merged: list[dict[str, Any]] = []
+    for seg in line:
+        if merged and merged[-1]["style"] == seg["style"] and merged[-1].get("align") == seg.get("align"):
+            merged[-1] = {**merged[-1], "text": merged[-1]["text"] + seg["text"]}
+        else:
+            merged.append(dict(seg))
+    return merged
+
+
 def _render_text_element(element: dict[str, Any], colors: dict[str, str], text_styles: dict[str, dict[str, Any]]) -> str:
     bounds = element.get("bounds")
     if not isinstance(bounds, list) or len(bounds) != 4:
@@ -153,7 +206,19 @@ def _render_text_element(element: dict[str, Any], colors: dict[str, str], text_s
         return ""
     line_height_px = float(style.get("lineHeightPx") or 0)
     effective_line = line_height_px if line_height_px else font_size * line_height
-    total_height = len(paragraphs) * effective_line
+    wrap_enabled = bool(content.get("wrap", True))
+    # Compute wrapped lines per paragraph (width-aware soft wrapping). The
+    # SVG->DrawingML exporter switches to wrap="square" paragraph mode only
+    # when the <text> carries data-paragraph-line-height and tspan children;
+    # without it every textbox is exported with wrap="none" and long strings
+    # get clipped on a single line in PowerPoint/WPS.
+    wrapped_paragraphs: list[tuple[list[list[dict[str, Any]]], str]] = []
+    for paragraph in paragraphs:
+        para_align = paragraph[0].get("align") or "left"
+        lines = _wrap_paragraph(paragraph, width - 12, font_size) if wrap_enabled else [paragraph]
+        wrapped_paragraphs.append((lines, para_align))
+    total_lines = sum(len(lines) for lines, _ in wrapped_paragraphs)
+    total_height = total_lines * effective_line
     if vertical == "middle":
         cursor = y + (height - total_height) / 2
     elif vertical == "bottom":
@@ -162,13 +227,8 @@ def _render_text_element(element: dict[str, Any], colors: dict[str, str], text_s
         cursor = y + 2
     out: list[str] = []
     text_anchor = {"left": "start", "center": "middle", "right": "end"}.get(horizontal, "start")
-    for paragraph in paragraphs:
-        inline = "".join(
-            f'<tspan x="{x:.1f}" dy="0" fill="{resolve_color(seg["style"].get("color") or color, colors, color)}" font-size="{float(seg["style"].get("fontSize") or font_size):.1f}" font-weight="{weight if seg["style"].get("bold") else "400"}" font-style="{italic if seg["style"].get("italic") else "normal"}">{html.escape(seg["text"])}</tspan>'
-            for seg in paragraph
-        )
+    for lines, para_align in wrapped_paragraphs:
         anchor = text_anchor
-        para_align = paragraph[0].get("align") or "left"
         if para_align != "left":
             anchor = {"center": "middle", "right": "end"}.get(para_align, "start")
         tx = x
@@ -176,8 +236,20 @@ def _render_text_element(element: dict[str, Any], colors: dict[str, str], text_s
             tx = x + width / 2
         elif anchor == "end":
             tx = x + width
-        out.append(f'<text x="{tx:.1f}" y="{cursor + font_size:.1f}" text-anchor="{anchor}" font-family="{FONT_STACK}" font-size="{font_size:.1f}" fill="{color}">{inline}</text>')
-        cursor += effective_line
+        tspans = []
+        for line_index, line in enumerate(lines):
+            inline = "".join(
+                f'<tspan x="{tx:.1f}" dy="{0 if line_index == 0 else effective_line:.1f}" fill="{resolve_color(seg["style"].get("color") or color, colors, color)}" font-size="{float(seg["style"].get("fontSize") or font_size):.1f}" font-weight="{weight if seg["style"].get("bold") else "400"}" font-style="{italic if seg["style"].get("italic") else "normal"}">{html.escape(seg["text"])}</tspan>'
+                for seg in _merge_line_segments(line)
+            )
+            tspans.append(inline)
+        para_attrs = f' data-paragraph-line-height="{effective_line:.1f}"' if len(lines) > 1 else ""
+        out.append(
+            f'<text x="{tx:.1f}" y="{cursor + font_size:.1f}" text-anchor="{anchor}" font-family="{FONT_STACK}" font-size="{font_size:.1f}" fill="{color}"{para_attrs}>'
+            + "".join(tspans)
+            + "</text>"
+        )
+        cursor += effective_line * len(lines)
     return "".join(out)
 
 

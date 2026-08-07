@@ -35,7 +35,7 @@ def main(argv: list[str] | None = None) -> int:
     make_parser.add_argument("--title", default=None, help="演示文稿标题（默认取输入前 24 字）")
     make_parser.add_argument("--out", default="projects", help="输出根目录（默认 ./projects）")
     make_parser.add_argument("--pages", type=int, default=None, help="目标页数（默认自动）")
-    make_parser.add_argument("--direction", default="formal-finance", choices=["formal-finance", "consulting-evidence", "brand-launch", "training-narrative", "editorial-narrative", "swiss-information", "custom"], help="视觉方向")
+    make_parser.add_argument("--direction", default="formal-finance", choices=["formal-finance", "consulting-evidence", "brand-launch", "training-narrative", "editorial-narrative", "swiss-information", "premium-launch", "custom"], help="视觉方向")
     make_parser.add_argument("--mode", default="standard", choices=["quick", "standard", "audit"], help="质量模式")
     make_parser.add_argument("--format", dest="deck_format", default="editable-deck", choices=["editable-deck", "web-deck"], help="交付类型")
     make_parser.add_argument("--export-backend", default="local", choices=["local", "kimi"], help="PPTX 导出后端（默认 local）")
@@ -93,6 +93,7 @@ def main(argv: list[str] | None = None) -> int:
             "training-narrative",
             "editorial-narrative",
             "swiss-information",
+            "premium-launch",
             "custom",
         ],
     )

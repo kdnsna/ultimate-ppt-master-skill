@@ -311,7 +311,7 @@ def _layout(
             elements.append(
                 _text(f"step-{index}", x + 12, y + 16, 44, 44, f"{index + 1}", style="$statNum", font_size=26, align=["center", "middle"])
             )
-            elements.append(_text(f"step-label-{index}", x + 16, y + 76, slot_width - 32, 120, step, style="$body", font_size=16))
+            elements.append(_text(f"step-label-{index}", x + 16, y + 72, slot_width - 32, 140, step, style="$body", font_size=16))
         if source:
             elements.append(_text("process-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
         return elements, "", notes
