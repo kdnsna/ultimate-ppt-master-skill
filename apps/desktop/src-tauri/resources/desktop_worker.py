@@ -2916,7 +2916,7 @@ def plan_deckir_via_upm_core(
         ]
         if page_count:
             cmd.extend(["--pages", str(page_count)])
-        env = {**dict(**{k: v for k, v in __import__("os").environ.items()}), "PYTHONPATH": str(repo_root)}
+        env = {**dict(__import__("os").environ), "PYTHONPATH": str(repo_root)}
         result = subprocess.run(
             cmd,
             cwd=str(repo_root),
@@ -3027,7 +3027,6 @@ def try_generate_pptx_via_upm_make(
         )
         if result.returncode not in {0, 2}:
             return None
-        # Find generated pptx (formal or draft)
         pptx_paths = list(out_root.glob("*/exports/**/*.pptx")) + list(out_root.glob("*/exports/*.pptx"))
         if not pptx_paths:
             return None
@@ -3035,7 +3034,6 @@ def try_generate_pptx_via_upm_make(
         target = project_path / "exports" / f"{project_path.name}.pptx"
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(pptx_paths[0], target)
-        # Copy deckir if present
         for deckir in out_root.glob("*/.upm/deckir.json"):
             dest = project_path / ".upm" / "deckir.json"
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -3052,7 +3050,7 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     project_path = create_project_dir(valid, repo_root)
     text, source_name, source_extraction = source_to_text(valid, project_path, repo_root)
 
-    # Prefer shared Python DeckIR planner for outline + artifacts (editable-deck path).
+    # Prefer shared Python DeckIR planner (canonical for editable-deck / source-checkout Desktop).
     core_payload = plan_deckir_via_upm_core(
         repo_root,
         source_name or project_path.name,
@@ -3084,7 +3082,6 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     generated_files.extend(str(path) for path in narration_files)
 
     if core_payload:
-        # Already wrote storyboard/source-map from upm core; skip divergent JS/AI storyboard invent.
         deckir_files = [
             project_path / "storyboard.json",
             project_path / "source-map.json",
