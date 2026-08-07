@@ -79,6 +79,45 @@ def main(argv: list[str] | None = None) -> int:
     doctor_parser = sub.add_parser("doctor", help="检查当前任务所需环境（只报告，不安装）")
     doctor_parser.add_argument("--profile", default="core", choices=["core", "pptx", "visual-review", "kimi", "all"])
 
+    plan_parser = sub.add_parser("plan", help="输出规范 DeckIR JSON（Bridge/Desktop 共用核心规划器）")
+    plan_parser.add_argument("input", help="主题文字或本地源文件路径")
+    plan_parser.add_argument("--title", default=None, help="演示文稿标题")
+    plan_parser.add_argument("--pages", type=int, default=None, help="目标页数")
+    plan_parser.add_argument(
+        "--direction",
+        default="formal-finance",
+        choices=[
+            "formal-finance",
+            "consulting-evidence",
+            "brand-launch",
+            "training-narrative",
+            "editorial-narrative",
+            "swiss-information",
+            "custom",
+        ],
+    )
+    plan_parser.add_argument("--mode", default="standard", choices=["quick", "standard", "audit"])
+    plan_parser.add_argument(
+        "--format",
+        dest="deck_format",
+        default="editable-deck",
+        choices=["editable-deck", "web-deck"],
+        help="交付类型（写入 delivery.outputMode）",
+    )
+    plan_parser.add_argument(
+        "--emit",
+        dest="format",
+        default="deckir",
+        choices=["deckir", "bridge"],
+        help="输出形态：deckir（默认）或 bridge（storyboard/sourceMap/planningReport）",
+    )
+    plan_parser.add_argument("--output", "-o", default=None, help="写入文件（默认 stdout）")
+    plan_parser.add_argument(
+        "--planner",
+        default="deterministic-draft-planner",
+        help="规划器名称（当前仅 deterministic-draft-planner）",
+    )
+
     args = parser.parse_args(argv)
     try:
         if args.command == "make":
@@ -101,6 +140,10 @@ def main(argv: list[str] | None = None) -> int:
             from upm.cli.doctor import run_doctor
 
             return run_doctor(args)
+        if args.command == "plan":
+            from upm.cli.plan import run_plan
+
+            return run_plan(args)
     except UpmError as exc:
         print(exc.render(), file=sys.stderr)
         return exc.exit_code

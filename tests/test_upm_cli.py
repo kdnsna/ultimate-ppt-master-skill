@@ -106,6 +106,33 @@ class UpmMakeTest(unittest.TestCase):
             svg_text = svgs[0].read_text(encoding="utf-8")
             self.assertIn("#F7F5F0", svg_text)
 
+    def test_plan_emits_bridge_payload(self):
+        with tempfile.TemporaryDirectory() as name:
+            source = Path(name) / "src.md"
+            source.write_text("一、制度定位\n个人养老金是补充养老保险。\n二、条件\n年满 16 周岁可参加。\n", encoding="utf-8")
+            out = Path(name) / "deckir-bridge.json"
+            result = run_upm(
+                "plan",
+                str(source),
+                "--title",
+                "计划测试",
+                "--pages",
+                "5",
+                "--emit",
+                "bridge",
+                "-o",
+                str(out),
+            )
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            payload = json.loads(out.read_text(encoding="utf-8"))
+            self.assertIn("storyboard", payload)
+            self.assertIn("sourceMap", payload)
+            self.assertEqual(payload["storyboard"]["canonicalSource"], "upm.compiler.planner")
+            self.assertGreaterEqual(len(payload["storyboard"]["slides"]), 4)
+            # Same planner field set as CLI make path
+            self.assertIn("planningMode", payload["storyboard"])
+            self.assertTrue(any(s.get("evidenceRefs") is not None for s in payload["storyboard"]["slides"]))
+
     def test_make_audit_rejects_no_qa(self):
         with tempfile.TemporaryDirectory() as name:
             result = run_upm(

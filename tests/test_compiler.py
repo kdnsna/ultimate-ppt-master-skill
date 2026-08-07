@@ -6,9 +6,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from upm.cli.common import attach_tables_to_deckir  # noqa: E402
 from upm.compiler.compiler import compile_deck  # noqa: E402
 from upm.compiler.deckir import build_deckir, sanitize_claim_text, source_claims  # noqa: E402
 from upm.compiler.overflow import check_element_overflow  # noqa: E402
+from upm.compiler.planner import plan_deckir, to_bridge_payload  # noqa: E402
 from upm.compiler.tokens import build_theme  # noqa: E402
 from upm.pptd.schema import validate_pptd_project  # noqa: E402
 from upm.render.svg import render_page_svg, resolve_color  # noqa: E402
@@ -166,6 +168,42 @@ class CompilerTest(unittest.TestCase):
         findings = check_element_overflow(element, page="p1", theme_text_styles={}, min_font_size=12.0)
         self.assertTrue(findings)
         self.assertEqual(findings[0].severity, "error")
+
+    def test_plan_deckir_is_canonical_and_bridge_shaped(self):
+        deckir = plan_deckir("规划测试", "营业收入 12 亿元，同比增长 18%。风险包括汇率波动。", page_count=5)
+        self.assertEqual(deckir.get("planner"), "deterministic-draft-planner")
+        self.assertIn("slides", deckir)
+        self.assertIn("sourceMap", deckir)
+        bridge = to_bridge_payload(deckir)
+        self.assertEqual(bridge["storyboard"]["canonicalSource"], "upm.compiler.planner")
+        self.assertEqual(len(bridge["storyboard"]["slides"]), len(deckir["slides"]))
+        self.assertEqual(bridge["sourceMap"]["claims"][0]["id"], deckir["sourceMap"]["claims"][0]["id"])
+
+    def test_chart_preferred_over_table_when_visual_chart(self):
+        deckir = build_deckir(
+            "指标汇报",
+            "营收 10 亿。利润 2 亿。费用 1 亿。增长 18%。风险可控。下一步扩张。",
+            page_count=6,
+        )
+        table = {
+            "headers": ["指标", "数值"],
+            "rows": [["营收", "10"], ["利润", "2"], ["费用", "1"]],
+        }
+        attach_tables_to_deckir(deckir, [table])
+        chart_slides = [s for s in deckir["slides"] if s.get("chart")]
+        self.assertTrue(chart_slides, "numeric table should attach chart on benefit/chart slide")
+        self.assertEqual(chart_slides[0].get("visual", {}).get("type"), "chart")
+        with tempfile.TemporaryDirectory() as name:
+            project = Path(name) / "chart"
+            compile_deck(deckir, project)
+            # At least one compiled page should contain a chart element, not only a table.
+            found_chart = False
+            for page_path in (project / "pages").glob("*.page"):
+                page = __import__("yaml").safe_load(page_path.read_text(encoding="utf-8"))
+                for el in page.get("elements") or []:
+                    if el.get("elementType") == "chart":
+                        found_chart = True
+            self.assertTrue(found_chart, "compiler must render chart when visual.type=chart")
 
     def test_svg_resolves_paper_token(self):
         theme = build_theme("formal-finance")

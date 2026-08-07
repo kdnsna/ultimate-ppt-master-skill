@@ -2,7 +2,7 @@
 import { createServer } from "node:http";
 import { spawn, spawnSync } from "node:child_process";
 import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
-import { constants as fsConstants, createReadStream, existsSync, readFileSync } from "node:fs";
+import { constants as fsConstants, createReadStream, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { chmod, link, lstat, mkdir, open, opendir, readFile, readlink, realpath, rename, symlink, unlink, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -1477,7 +1477,9 @@ async function writeHandoffProject(payload, { repoRoot, outputDir, attachmentLim
     sourceText: evidence.text,
     outputMode: payload?.form?.outputMode || projectBrief.outputMode || "both",
     qualityGate,
-    deckSession
+    deckSession,
+    repoRoot,
+    pageCount: payload?.form?.pageCount || projectBrief.pageCount || undefined
   });
   decorateDeckIRV52(deckIRPayload, { referenceStyle, sourceConfidence, deliveryScorecard, imageAcceptance });
   await writeProjectFile("storyboard.json", JSON.stringify(deckIRPayload.storyboard, null, 2));
@@ -1620,18 +1622,15 @@ export function fallbackBestEffectRoute(text) {
     /(\u6838\u5fc3|\u7ed3\u8bba|\u4e3b\u5f20|takeaway|message|objective|goal|\u76ee\u6807|\u5fc5\u987b\u5305\u542b)/i
   ].filter((pattern) => pattern.test(value)).length;
   const promptQuality = compact.length <= 25 && signals === 0 ? "extreme-thin" : /\u6839\u636e|\u57fa\u4e8e|\u9644\u4ef6|\u6587\u4ef6|pdf|excel|\u6570\u636e|source|attached|attachment|dataset|transcript/i.test(value) && signals >= 3 ? "complete" : signals ? "thin" : "extreme-thin";
-  if (/(\u6539\s*pptx|\u4fee\u6539\s*ppt|(?:\u6539|\u4fee\u6539)\s*\u8fd9\s*\u4efd\s*ppt|\u6539\s*ppt|\u4fee\s*ppt|\u4fdd\u771f\u4fee\u6539|edit\s+(?:this\s+)?pptx|revise\s+(?:this\s+)?deck|fix\s+my\s+slides|repair\s+the\s+pptx|\u8c03\u6574\u8fd9\u51e0\u9875|\u53ea\u6539\u7b2c)/i.test(value)) {
-    return { prompt_quality: promptQuality, route: "preserve-edit", decision: "explicit-edit-signal" };
-  }
   if (/(\.pptx\b|pptx\b|powerpoint|\u53ef\u7f16\u8f91|\u6c47\u62a5|\u62a5\u544a|\u653f\u5e9c|\u91d1\u878d|\u57f9\u8bad|\u5ba1\u8ba1|\u54a8\u8be2|consulting|business report|quarterly business review|qbr|board deck|editable|revise|stakeholder|training|government|finance|audit)/i.test(value)) {
-    return { prompt_quality: promptQuality, route: "editable-deck", decision: "explicit-formal-signal" };
+    return { prompt_quality: promptQuality, route: "formal-editable-pptx", decision: "explicit-formal-signal" };
   }
   if (/(\u7f51\u9875\s*ppt|web\s*(deck|ppt|slides?)|html|\u6a2a\u6ed1|\u6d4f\u89c8\u5668|browser|magazine|\u6742\u5fd7|editorial|e-?ink|\u7535\u5b50\u58a8\u6c34|swiss|\u745e\u58eb|keynote|showcase|demo[- ]?day)/i.test(value)) {
-    return { prompt_quality: promptQuality, route: "web-deck", decision: "explicit-web-signal" };
+    return { prompt_quality: promptQuality, route: "magazine-web-deck", decision: "explicit-web-signal" };
   }
-  if (promptQuality === "extreme-thin") return { prompt_quality: promptQuality, route: "editable-deck", decision: "extreme-thin-fallback" };
-  if (promptQuality === "thin") return { prompt_quality: promptQuality, route: "editable-deck", decision: "thin-guided-intake" };
-  return { prompt_quality: promptQuality, route: "editable-deck", decision: "complete-source-first" };
+  if (promptQuality === "extreme-thin") return { prompt_quality: promptQuality, route: "guizang-web-fixed-style", decision: "extreme-thin-fallback" };
+  if (promptQuality === "thin") return { prompt_quality: promptQuality, route: "staged-questions", decision: "thin-guided-intake" };
+  return { prompt_quality: promptQuality, route: "source-first", decision: "complete-source-first" };
 }
 
 function runBestEffectRouter({ repoRoot, requestText }) {
@@ -1665,15 +1664,19 @@ function resolveBestEffectBrief({ payload, projectBrief, repoRoot, title }) {
   ).trim();
   const routed = runBestEffectRouter({ repoRoot, requestText });
   const outputMode = String(payload?.form?.outputMode || projectBrief?.outputMode || "");
-  const recommendedRoute = outputMode === "web"
-    ? "web-deck"
-    : routed.route === "preserve-edit"
-      ? "preserve-edit"
-      : "editable-deck";
+  const recommendedRoute = outputMode === "both"
+    ? "dual-delivery"
+    : outputMode === "web"
+      ? "guizang-web-fixed-style"
+      : outputMode === "pptx"
+        ? "formal-editable-pptx"
+        : routed.route === "formal-editable-pptx"
+          ? "formal-editable-pptx"
+          : "guizang-web-fixed-style";
   const strategy = routed.prompt_quality === "complete"
     ? "source-confirmed"
-    : routed.prompt_quality === "extreme-thin"
-      ? "best-effect-expanded-editable"
+    : routed.prompt_quality === "extreme-thin" && recommendedRoute === "guizang-web-fixed-style"
+      ? "best-effect-fixed-style"
       : "best-effect-expanded";
   return {
     version: "v5.3-best-effect-v1",
@@ -1683,7 +1686,7 @@ function resolveBestEffectBrief({ payload, projectBrief, repoRoot, title }) {
     recommendedRoute,
     decisionReason: `${routed.decision}${outputMode ? `; output-mode=${outputMode}` : ""}`,
     source: "auto",
-    defaultStyle: recommendedRoute === "web-deck" ? "杂志式 Web Deck（明确要求时启用）" : "正式商务 PPTX / 微软雅黑 / 可编辑正文",
+    defaultStyle: recommendedRoute === "guizang-web-fixed-style" ? "Style A · 电子杂志 × 电子墨水" : "正式商务 PPTX / 微软雅黑 / 可编辑正文",
     autoExpandedBrief: [
       `主题：${title}`,
       `推荐路线：${recommendedRoute}`,
@@ -2225,7 +2228,86 @@ function evidenceRefsForSlide(claims, slide, index) {
   return matches.length ? matches : [claims[index % claims.length].id];
 }
 
-function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }) {
+/**
+ * Resolve Python for the shared upm kernel (venv preferred).
+ */
+function resolveUpmPython(repoRoot) {
+  const venvUnix = join(repoRoot, ".venv", "bin", "python");
+  const venvWin = join(repoRoot, ".venv", "Scripts", "python.exe");
+  if (existsSync(venvUnix)) return venvUnix;
+  if (existsSync(venvWin)) return venvWin;
+  return "python3";
+}
+
+/**
+ * Canonical DeckIR planner: shell out to Python `upm plan --emit bridge`.
+ * JS-only planner is legacy fallback only (UPM_ALLOW_LEGACY_PLANNER=1 or core unavailable).
+ */
+function buildDeckIRViaPythonCore({ repoRoot, title, sourceText, outputMode, qualityGate, pageCount }) {
+  const root = repoRoot || process.cwd();
+  const python = resolveUpmPython(root);
+  const modeMap = {
+    "formal-business": "standard",
+    "formal-audit": "audit",
+    audit: "audit",
+    standard: "standard",
+    quick: "quick"
+  };
+  const qualityMode = modeMap[String(qualityGate?.level || qualityGate || "standard")] || "standard";
+  // Write source to a temp file so long materials do not hit ARG_MAX.
+  const tmpDir = join(root, ".upm-cache");
+  try {
+    mkdirSync(tmpDir, { recursive: true });
+  } catch {
+    /* ignore */
+  }
+  const sourcePath = join(tmpDir, `bridge-plan-source-${Date.now()}.md`);
+  writeFileSync(sourcePath, String(sourceText || title || ""), "utf8");
+  try {
+    const args = [
+      "-m",
+      "upm",
+      "plan",
+      sourcePath,
+      "--title",
+      String(title || "未命名演示文稿"),
+      "--mode",
+      qualityMode,
+      "--format",
+      outputMode === "web" || outputMode === "web-deck" ? "web-deck" : "editable-deck",
+      "--emit",
+      "bridge"
+    ];
+    if (pageCount && Number(pageCount) > 0) {
+      args.push("--pages", String(pageCount));
+    }
+    const result = spawnSync(python, args, {
+      cwd: root,
+      encoding: "utf8",
+      timeout: 60000,
+      env: { ...process.env, PYTHONPATH: root }
+    });
+    if (result.status !== 0) {
+      const detail = (result.stderr || result.stdout || "").slice(0, 800);
+      throw new Error(`upm plan failed (status=${result.status}): ${detail}`);
+    }
+    const payload = parseJsonMaybe(result.stdout);
+    if (!payload?.storyboard?.slides || !payload?.sourceMap) {
+      throw new Error("upm plan did not return bridge-shaped DeckIR payload");
+    }
+    payload.storyboard.canonicalSource = "upm.compiler.planner";
+    payload.storyboard.bridgeAdapter = "python-upm-plan";
+    return payload;
+  } finally {
+    try {
+      unlinkSync(sourcePath);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+function buildDeckIRLegacyJs({ title, sourceText, outputMode, qualityGate, deckSession }) {
   const claims = buildSourceClaims(sourceText);
   const session = validateDeckSession(deckSession);
   let slides;
@@ -2261,7 +2343,7 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }
       };
     });
   } else {
-    planningMode = "fallback-rule-planner";
+    planningMode = "legacy-js-fallback-planner";
     const planningClaims = claims.length ? claims : [{ id: "", sourceLine: 1, text: title }];
     const target = Math.max(4, Math.min(8, planningClaims.length + 2));
     const chunks = chunkClaims(planningClaims, target);
@@ -2287,12 +2369,14 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }
       });
     });
   }
-  assertNoTripleLayoutOrRecipe(slides, session ? "DeckSession" : "Bridge fallback planner");
+  assertNoTripleLayoutOrRecipe(slides, session ? "DeckSession" : "Bridge legacy JS planner");
   const createdAt = new Date().toISOString();
   const storyboard = {
     deckIRVersion: "1.0",
     createdAt,
     planningMode,
+    canonicalSource: "legacy-js-fallback",
+    bridgeAdapter: "legacy-js",
     delivery: {
       outputMode,
       qualityGate: qualityGate?.level || "formal-business"
@@ -2328,7 +2412,7 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }
       mode: planningMode,
       fallbackReason: session
         ? "Bridge merged the user-confirmed DeckSession with deterministic evidence and production contracts."
-        : "Bridge handoff wrote deterministic DeckIR without requiring model credentials."
+        : "Legacy JS planner (non-canonical); set UPM_ALLOW_LEGACY_PLANNER only when Python core is unavailable."
     },
     summary: {
       slides: slides.length,
@@ -2338,6 +2422,35 @@ function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession }
     }
   };
   return { storyboard, sourceMap, planningReport };
+}
+
+function buildDeckIR({ title, sourceText, outputMode, qualityGate, deckSession, repoRoot, pageCount }) {
+  const session = validateDeckSession(deckSession);
+  // DeckSession merge still uses JS (user-confirmed session). Pure planning goes through Python core.
+  if (session) {
+    return buildDeckIRLegacyJs({ title, sourceText, outputMode, qualityGate, deckSession });
+  }
+  const allowLegacy = String(process.env.UPM_ALLOW_LEGACY_PLANNER || "") === "1";
+  try {
+    return buildDeckIRViaPythonCore({
+      repoRoot: repoRoot || process.cwd(),
+      title,
+      sourceText,
+      outputMode,
+      qualityGate,
+      pageCount
+    });
+  } catch (error) {
+    if (!allowLegacy) {
+      // Still fall back so handoff is not hard-broken, but mark non-canonical loudly.
+      const payload = buildDeckIRLegacyJs({ title, sourceText, outputMode, qualityGate, deckSession });
+      payload.storyboard.planningMode = "legacy-js-fallback-after-core-error";
+      payload.storyboard.coreError = String(error?.message || error).slice(0, 400);
+      payload.planningReport.provider.fallbackReason = `Python upm plan unavailable: ${String(error?.message || error).slice(0, 200)}`;
+      return payload;
+    }
+    return buildDeckIRLegacyJs({ title, sourceText, outputMode, qualityGate, deckSession });
+  }
 }
 
 function slideTaskQuestion(role) {

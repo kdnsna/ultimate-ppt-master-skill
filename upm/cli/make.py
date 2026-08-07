@@ -15,7 +15,8 @@ from upm.cli.common import (
     project_title,
 )
 from upm.compiler.compiler import compile_deck
-from upm.compiler.deckir import build_deckir, load_deckir
+from upm.compiler.deckir import load_deckir
+from upm.compiler.planner import plan_deckir
 from upm.errors import InputError, StructureGateError
 from upm.export.registry import export_pptx
 from upm.pptd.io import ensure_project_layout, write_quality_artifact
@@ -118,7 +119,7 @@ def run_make(args: Any) -> int:
         deckir = load_deckir(args.deckir)
         deckir["_imported"] = True
     else:
-        deckir = build_deckir(
+        deckir = plan_deckir(
             title,
             source_text,
             page_count=args.pages,

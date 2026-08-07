@@ -2870,18 +2870,211 @@ def list_recent_projects(repo_root: Path, project_dir: str | None = None) -> lis
     return items[:12]
 
 
+def _resolve_upm_python(repo_root: Path) -> Path | None:
+    for candidate in (
+        repo_root / ".venv" / "bin" / "python",
+        repo_root / ".venv" / "Scripts" / "python.exe",
+        repo_root / ".venv" / "Scripts" / "python",
+    ):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def plan_deckir_via_upm_core(
+    repo_root: Path,
+    title: str,
+    source_text: str,
+    *,
+    page_count: int | None = None,
+    output_mode: str = "editable-deck",
+) -> dict[str, Any] | None:
+    """Call canonical Python planner. Returns bridge-shaped payload or None."""
+    import subprocess
+
+    python = _resolve_upm_python(repo_root)
+    if python is None:
+        return None
+    source_path = repo_root / ".upm-cache" / "desktop-plan-source.txt"
+    try:
+        source_path.parent.mkdir(parents=True, exist_ok=True)
+        source_path.write_text(source_text or title, encoding="utf-8")
+        cmd = [
+            str(python),
+            "-m",
+            "upm",
+            "plan",
+            str(source_path),
+            "--title",
+            title,
+            "--emit",
+            "bridge",
+            "--format",
+            "web-deck" if output_mode == "web" else "editable-deck",
+            "--mode",
+            "quick",
+        ]
+        if page_count:
+            cmd.extend(["--pages", str(page_count)])
+        env = {**dict(**{k: v for k, v in __import__("os").environ.items()}), "PYTHONPATH": str(repo_root)}
+        result = subprocess.run(
+            cmd,
+            cwd=str(repo_root),
+            capture_output=True,
+            text=True,
+            timeout=90,
+            env=env,
+        )
+        if result.returncode != 0:
+            return None
+        payload = json.loads(result.stdout)
+        if not isinstance(payload, dict) or "storyboard" not in payload:
+            return None
+        payload.setdefault("storyboard", {})["canonicalSource"] = "upm.compiler.planner"
+        payload["storyboard"]["desktopAdapter"] = "python-upm-plan"
+        return payload
+    except Exception:
+        return None
+
+
+def outline_from_deckir_payload(payload: dict[str, Any], fallback_title: str) -> list[dict[str, Any]]:
+    """Map canonical DeckIR slides to the desktop outline shape."""
+    slides = (payload.get("storyboard") or {}).get("slides") or []
+    outline: list[dict[str, Any]] = []
+    for index, slide in enumerate(slides):
+        if not isinstance(slide, dict):
+            continue
+        title = str(slide.get("title") or fallback_title)
+        takeaway = str(slide.get("takeaway") or slide.get("intent") or "")
+        bullets = [takeaway] if takeaway else [title]
+        outline.append(
+            {
+                "title": title,
+                "eyebrow": f"{index + 1:02d}",
+                "bullets": bullets,
+                "role": slide.get("role"),
+                "recipeId": slide.get("recipeId"),
+                "slideId": slide.get("slideId"),
+                "evidenceRefs": slide.get("evidenceRefs") or [],
+            }
+        )
+    return outline or [{"title": fallback_title, "eyebrow": "01", "bullets": [fallback_title]}]
+
+
+def write_canonical_deckir_artifacts(project_path: Path, payload: dict[str, Any]) -> list[Path]:
+    """Write Bridge-compatible storyboard/source-map from upm core payload."""
+    written: list[Path] = []
+    mapping = {
+        "storyboard.json": payload.get("storyboard"),
+        "source-map.json": payload.get("sourceMap"),
+        "planning-report.json": payload.get("planningReport"),
+    }
+    if payload.get("deckir"):
+        upm_dir = project_path / ".upm"
+        upm_dir.mkdir(parents=True, exist_ok=True)
+        deckir_path = upm_dir / "deckir.json"
+        deckir_path.write_text(json.dumps(payload["deckir"], ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        written.append(deckir_path)
+    for name, data in mapping.items():
+        if data is None:
+            continue
+        path = project_path / name
+        path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        written.append(path)
+    return written
+
+
+def try_generate_pptx_via_upm_make(
+    repo_root: Path,
+    project_path: Path,
+    source_text: str,
+    title: str,
+) -> Path | None:
+    """Prefer full upm make pipeline for editable PPTX when core is available."""
+    import subprocess
+    import shutil
+
+    python = _resolve_upm_python(repo_root)
+    if python is None:
+        return None
+    source_file = project_path / "sources" / "source.md"
+    source_file.parent.mkdir(parents=True, exist_ok=True)
+    if not source_file.is_file():
+        source_file.write_text(source_text or title, encoding="utf-8")
+    out_root = project_path / "upm-core-out"
+    try:
+        result = subprocess.run(
+            [
+                str(python),
+                "-m",
+                "upm",
+                "make",
+                str(source_file),
+                "--title",
+                title,
+                "--out",
+                str(out_root),
+                "--mode",
+                "quick",
+                "--format",
+                "editable-deck",
+            ],
+            cwd=str(repo_root),
+            capture_output=True,
+            text=True,
+            timeout=180,
+            env={**dict(__import__("os").environ), "PYTHONPATH": str(repo_root)},
+        )
+        if result.returncode not in {0, 2}:
+            return None
+        # Find generated pptx (formal or draft)
+        pptx_paths = list(out_root.glob("*/exports/**/*.pptx")) + list(out_root.glob("*/exports/*.pptx"))
+        if not pptx_paths:
+            return None
+        pptx_paths.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+        target = project_path / "exports" / f"{project_path.name}.pptx"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(pptx_paths[0], target)
+        # Copy deckir if present
+        for deckir in out_root.glob("*/.upm/deckir.json"):
+            dest = project_path / ".upm" / "deckir.json"
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(deckir, dest)
+            break
+        return target
+    except Exception:
+        return None
+
+
 def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     valid = validate_job(job)
     env = inspect_environment(repo_root)
     project_path = create_project_dir(valid, repo_root)
     text, source_name, source_extraction = source_to_text(valid, project_path, repo_root)
-    outline = build_outline(text, valid["stylePreset"], valid["outputMode"])
+
+    # Prefer shared Python DeckIR planner for outline + artifacts (editable-deck path).
+    core_payload = plan_deckir_via_upm_core(
+        repo_root,
+        source_name or project_path.name,
+        text,
+        output_mode="web-deck" if valid["outputMode"] == "web" else "editable-deck",
+    )
+    if core_payload:
+        outline = outline_from_deckir_payload(core_payload, source_name or project_path.name)
+        write_canonical_deckir_artifacts(project_path, core_payload)
+    else:
+        outline = build_outline(text, valid["stylePreset"], valid["outputMode"])
+
     preview_svg = write_preview_svg(outline, project_path, valid["stylePreset"])
     generated_files: list[str] = []
     preview_html = ""
 
     if valid["outputMode"] == "pptx":
-        generated_files.append(str(generate_pptx(outline, project_path, valid["stylePreset"])))
+        upm_pptx = try_generate_pptx_via_upm_make(repo_root, project_path, text, source_name or project_path.name)
+        if upm_pptx is not None:
+            generated_files.append(str(upm_pptx))
+        else:
+            generated_files.append(str(generate_pptx(outline, project_path, valid["stylePreset"])))
         generated_files.append(str(project_path / "preview" / "cover.svg"))
     else:
         html_path, preview_html = generate_web_deck(outline, project_path, valid["stylePreset"], repo_root)
@@ -2890,8 +3083,17 @@ def run_job(job: dict[str, Any], repo_root: Path) -> dict[str, Any]:
     narration_files = write_narration_handoff(project_path, outline, valid["providerConfig"])
     generated_files.extend(str(path) for path in narration_files)
 
-    deckir_files = run_ai_storyboard(repo_root, project_path, valid, source_extraction, outline)
-    generated_files.extend(str(path) for path in deckir_files)
+    if core_payload:
+        # Already wrote storyboard/source-map from upm core; skip divergent JS/AI storyboard invent.
+        deckir_files = [
+            project_path / "storyboard.json",
+            project_path / "source-map.json",
+            project_path / "planning-report.json",
+        ]
+        generated_files.extend(str(path) for path in deckir_files if path.is_file())
+    else:
+        deckir_files = run_ai_storyboard(repo_root, project_path, valid, source_extraction, outline)
+        generated_files.extend(str(path) for path in deckir_files)
 
     runbook = write_runbook(project_path, valid, source_name)
     generated_files.append(str(runbook))

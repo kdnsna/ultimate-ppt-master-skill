@@ -219,8 +219,36 @@ def _layout(
     elements = _header(title, str(slide.get("intent") or ""), page_index, total)
     y = BODY_Y
 
+    visual = slide.get("visual") if isinstance(slide.get("visual"), dict) else {}
+    visual_type = str(visual.get("type") or "").lower()
+    prefer_chart = (
+        visual_type == "chart"
+        or recipe.startswith("native_chart")
+        or recipe.startswith("data_hero")
+        or recipe.startswith("metric_panel")
+    )
+    chart = slide.get("chart")
     table = slide.get("table")
-    if isinstance(table, dict) and table.get("headers") and table.get("rows"):
+
+    # Chart preference wins when both table and chart are present (no mutual shadowing).
+    if prefer_chart and isinstance(chart, dict) and chart.get("data") and chart.get("series"):
+        chart_element_dict: dict[str, Any] = {
+            "elementId": "chart-1",
+            "elementType": "chart",
+            "bounds": [MARGIN, y + 20, 700, 300],
+            "data": chart["data"],
+            "series": chart["series"],
+            "legend": {"show": True, "position": "bottom"},
+        }
+        if chart.get("title"):
+            chart_element_dict["title"] = chart["title"]
+        elements.append(chart_element_dict)
+        elements.append(_text("chart-takeaway", MARGIN + 716, y + 40, 150, 220, body or title, style="$note", font_size=13))
+        if source:
+            elements.append(_text("chart-source", MARGIN, FOOTER_Y - 22, 700, 22, source, style="$note"))
+        return elements, "", notes
+
+    if isinstance(table, dict) and table.get("headers") and table.get("rows") and not prefer_chart:
         elements.append(
             table_element(
                 "evidence-table",

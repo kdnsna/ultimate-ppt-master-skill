@@ -38,18 +38,21 @@
 | 能力 | 状态 | 说明 |
 |------|------|------|
 | Preserve Edit | **RC** | 包级保真编辑；真实 PowerPoint 矩阵仍待签字 |
-| Editable Deck | **Beta** | DeckIR→PPTD→本地 DrawingML PPTX；正式模式禁止占位交付 |
-| Web Deck | **Experimental** | 现为 SVG HTML 预览，非杂志风 Web Deck 成品 |
-| Kimi Adapter | **Experimental** | 依赖就绪 ≠ 导出已验证；正式交付请用 local |
+| Editable Deck | **Beta** | DeckIR→PPTD→本地 **shape-editable** DrawingML PPTX（非原生 `a:tbl`/chart 数据对象）；正式模式禁止占位交付 |
+| Web Deck | **Experimental** | `upm make --format web-deck` 现为 **SVG HTML Preview**，不是杂志风/Swiss 成品 Web Deck |
+| Kimi Adapter | **Experimental / 非正式交付** | 依赖就绪 ≠ 导出已验证；正式交付只用 `--export-backend local` |
 
-两个内核：**Preserve Edit Engine** 与 **Deck Generation Engine**。默认导出 `local`（表格/图表为 **shape-editable** DrawingML，非原生 `a:tbl`/chart 数据对象）。自动修复当前支持**文本溢出有限缩字号** + 修复计划，不是通用两轮修复执行器。无资料时的规则规划器是 **deterministic-fallback 草稿规划器**，standard/audit 不会将其当作成品交付。
+**谁做什么：** 纯 CLI 可完成 plan→compile→export→quality gates；Agent/LLM 仅在需要 brief 增强时介入。ZIP/`python-pptx` 打开 ≠ 真实 PowerPoint 排版签字。自动修复 = **溢出有限缩字号 + 修复计划**，不是通用两轮执行器。
+
+**规范规划核心：** Python `upm plan` / `upm.compiler.planner`（deterministic-draft-planner）是 DeckIR 的 source of truth。Bridge/Desktop 默认 shell 到该核心；JS/独立大纲规划器仅为 legacy fallback。
 
 ```bash
-bin/upm make <source-or-topic>     # 生成可编辑 PPTX（默认）
-bin/upm edit <file.pptx> "修改要求" # 保真局部修改；或 --edits edits.json
-bin/upm open <project>             # PPTD 视觉精修
-bin/upm review <project>           # 重新审计（失败非 0）
-bin/upm doctor                     # 环境检查（只报告）
+bin/upm plan <source> --emit bridge   # 规范 DeckIR（Bridge/Desktop 共用）
+bin/upm make <source-or-topic>        # 生成可编辑 PPTX（默认）
+bin/upm edit <file.pptx> "修改要求"    # 保真局部修改；或 --edits edits.json
+bin/upm open <project>                # PPTD 视觉精修
+bin/upm review <project>              # 重新审计（失败非 0）
+bin/upm doctor                        # 环境检查（只报告）
 ```
 
 详见 [upm-cli.md](docs/guides/upm-cli.md)、[upm-v7-unification.md](docs/architecture/upm-v7-unification.md) 与 [upm-migration.md](docs/guides/upm-migration.md)。
