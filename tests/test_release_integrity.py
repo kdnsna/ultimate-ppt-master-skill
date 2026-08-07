@@ -607,7 +607,10 @@ class ReleaseIntegrityTest(unittest.TestCase):
         self.assertTrue(finished_decks_png.is_file())
         finished_png_bytes = finished_decks_png.read_bytes()
         self.assertEqual(finished_png_bytes[:8], b"\x89PNG\r\n\x1a\n")
-        self.assertEqual((int.from_bytes(finished_png_bytes[16:20]), int.from_bytes(finished_png_bytes[20:24])), (1440, 810))
+        self.assertEqual(
+            (int.from_bytes(finished_png_bytes[16:20], "big"), int.from_bytes(finished_png_bytes[20:24], "big")),
+            (1440, 810),
+        )
         source_text = finished_decks_source.read_text(encoding="utf-8")
         for marker in ("V6.3.9 正式版本", "226 个原生矢量对象", "AI Web Deck"):
             self.assertIn(marker, source_text)
