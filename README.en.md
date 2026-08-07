@@ -54,7 +54,7 @@ See [upm-cli.md](docs/guides/upm-cli.md), [upm-v7-unification.md](docs/architect
 - **Preserve-Edit** — edit existing branded PPTX in place; masters, logos, and links stay byte-identical.
 - **One-minute install** — paste one command, run locally; no sign-in, no API dependency.
 - **Formal editable PPTX** — generate editable PowerPoint from source material; masters, links, and native objects stay byte-faithful.
-- **Web Deck (experimental)** — browser preview (SVG HTML Preview); the magazine/Swiss-style finished Web Deck is still converging (see the v7 notes above).
+- **AI Web Deck (experimental)** — browser preview (SVG HTML Preview); the magazine/Swiss-style finished Web Deck is still converging (see the v7 notes above).
 - **Finished Work & Proof** — every case ships with before/after renders, quality reports, and Release evidence.
 - **Known limits** — honest boundaries in [FAQ](#faq) and [Known Boundaries](#known-boundaries); no inflated promises.
 
