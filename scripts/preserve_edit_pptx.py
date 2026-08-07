@@ -332,12 +332,37 @@ def _replace_all_non_overlapping(text: str, old: str, new: str) -> str:
     return "".join(parts)
 
 
+def _redistribute_to_runs(replaced: str, original_lengths: list[int]) -> list[str]:
+    """Split ``replaced`` across runs proportionally to original lengths.
+
+    Keeps run count/styles; hang-safe because it never re-searches ``old``.
+    Extra characters land in the last non-empty original run (or run 0).
+    """
+    if not original_lengths:
+        return [replaced]
+    total = sum(original_lengths) or 1
+    n = len(original_lengths)
+    out = [""] * n
+    cursor = 0
+    for index, length in enumerate(original_lengths):
+        if index == n - 1:
+            out[index] = replaced[cursor:]
+            break
+        take = max(0, round(len(replaced) * (length / total)))
+        # Prefer at least 1 char for originally non-empty middle runs when possible.
+        if length > 0 and take == 0 and cursor < len(replaced):
+            take = 1
+        out[index] = replaced[cursor : cursor + take]
+        cursor += take
+    return out
+
+
 def _replace_across_text_nodes(nodes: list, old: str, new: str) -> bool:
     """Replace ``old`` with ``new`` across contiguous ``<a:t>`` nodes in order.
 
-    When ``old`` spans multiple runs, the first node receives the replacement
-    text and subsequent nodes that contributed to the match are cleared.
     Uses non-overlapping index advance so ``new`` containing ``old`` cannot loop.
+    Result is redistributed across original runs to preserve rPr/styles better
+    than dumping everything into the first run.
     """
     if not old or not nodes:
         return False
@@ -346,15 +371,13 @@ def _replace_across_text_nodes(nodes: list, old: str, new: str) -> bool:
     if old not in joined:
         return False
 
-    # Single pass: non-overlapping replacements on the full paragraph string,
-    # then put the entire result in the first text node and clear the rest so
-    # multi-run spans cannot re-match and cannot infinite-loop when new⊃old.
     replaced = _replace_all_non_overlapping(joined, old, new)
     if replaced == joined:
         return False
-    nodes[0].text = replaced
-    for node in nodes[1:]:
-        node.text = ""
+    lengths = [len(t) for t in texts]
+    parts = _redistribute_to_runs(replaced, lengths)
+    for index, node in enumerate(nodes):
+        node.text = parts[index] if index < len(parts) else ""
     return True
 
 
