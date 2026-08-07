@@ -5,7 +5,7 @@ import { access, lstat, mkdir, mkdtemp, readFile, readdir, readlink, rm, symlink
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
-import { createBridgeServer } from "../apps/bridge/server.mjs";
+import { artifactStable, createBridgeServer } from "../apps/bridge/server.mjs";
 
 async function withServer(options, fn) {
   const server = createBridgeServer({ artifactStableAgeMs: 0, ...options });
@@ -18,6 +18,20 @@ async function withServer(options, fn) {
     await new Promise((resolve) => server.close(resolve));
   }
 }
+
+test("artifact stability accepts same-millisecond writes and rejects fresh files under a positive stable age", () => {
+  const now = Date.now();
+  // Sub-millisecond APFS-style timestamp inside the current integer millisecond
+  // must not be treated as "in the future" (regression for flaky empty listings).
+  const subMillisecond = { mtimeMs: now + 0.5, ctimeMs: now + 0.5 };
+  assert.equal(artifactStable(subMillisecond, 0), true);
+
+  const oldEnough = { mtimeMs: now - 1_000, ctimeMs: now - 1_000 };
+  assert.equal(artifactStable(oldEnough, 500), true);
+
+  const stillFresh = { mtimeMs: now - 100, ctimeMs: now - 100 };
+  assert.equal(artifactStable(stillFresh, 500), false);
+});
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");

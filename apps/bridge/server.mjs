@@ -3268,11 +3268,20 @@ async function sha256FileHandle(fileHandle, size) {
   return { sha256: digest.digest("hex"), bytesRead: position };
 }
 
+// APFS timestamps carry sub-millisecond precision: a file written in the current
+// integer-millisecond window can look like its mtime is "in the future" when
+// compared with Date.now(). Floor the timestamp so same-millisecond writes are
+// treated as stable when the configured stable age is 0.
+export function artifactStable(stats, stableAgeMs) {
+  const writtenAtMs = Math.floor(Math.max(stats.mtimeMs, stats.ctimeMs));
+  return Date.now() - writtenAtMs >= stableAgeMs;
+}
+
 async function inspectStableArtifact(projectPath, absolutePath, relativePath, limits, artifactHashCache) {
   try {
     const first = await lstat(absolutePath);
     if (first.isSymbolicLink() || !first.isFile() || first.size <= 0) return null;
-    if (Date.now() - Math.max(first.mtimeMs, first.ctimeMs) < limits.artifactStableAgeMs) return null;
+    if (!artifactStable(first, limits.artifactStableAgeMs)) return null;
     const fileReal = await realpath(absolutePath);
     if (!isNestedPath(projectPath, fileReal)) return null;
     const cacheKey = `${fileReal}\0${first.dev}:${first.ino}:${first.size}:${first.mtimeMs}:${first.ctimeMs}`;
@@ -3421,7 +3430,7 @@ async function resolveProjectArtifact({
     if (
       !before.isFile()
       || before.size <= 0
-      || Date.now() - Math.max(before.mtimeMs, before.ctimeMs) < artifactLimits.artifactStableAgeMs
+      || !artifactStable(before, artifactLimits.artifactStableAgeMs)
     ) {
       throw requestError("artifact is empty, temporary, or still being written.", 409);
     }
