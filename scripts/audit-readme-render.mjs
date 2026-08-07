@@ -5,7 +5,8 @@ const root = resolve(import.meta.dirname, "..");
 const repository = process.env.GITHUB_REPOSITORY || "kdnsna/ultimate-ppt-master-skill";
 const token = process.env.GITHUB_TOKEN?.trim();
 const documents = [
-  { path: "README.md", marker: "把真实资料变成可继续修改的原生 PowerPoint" },
+  // Keep markers in lockstep with the live homepage value statements.
+  { path: "README.md", marker: "把真实资料变成可继续修改的 PowerPoint" },
   { path: "README.en.md", marker: "Turn real source material into a native PowerPoint" },
 ];
 
