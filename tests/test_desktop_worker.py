@@ -15,7 +15,6 @@ from apps.desktop.worker.desktop_worker import (
     validate_job,
 )
 
-
 ROOT = Path(__file__).resolve().parents[1]
 
 

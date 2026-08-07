@@ -5,7 +5,6 @@ from pathlib import Path
 
 from scripts.audit_pptx_native_objects import expectation_errors, inspect_pptx
 
-
 SLIDE_XML = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
   <p:cSld><p:spTree>

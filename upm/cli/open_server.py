@@ -22,7 +22,6 @@ from upm.paths import assert_writable, normalize_relative_path
 from upm.pptd.io import load_project, write_yaml
 from upm.render.svg import render_page_svg
 
-
 MAX_REQUEST_BYTES = 8 * 1024 * 1024
 
 

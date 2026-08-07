@@ -29,7 +29,6 @@ from upm.pptd.model import (
 )
 from upm.pptd.paths import page_path_from_index
 
-
 W, H = 960.0, 540.0
 MARGIN = 56.0
 TITLE_Y = 48.0
@@ -172,7 +171,6 @@ def _layout(
     role = str(slide.get("role") or "context")
     recipe = str(slide.get("recipeId") or "")
     title = str(slide.get("title") or f"第 {page_index} 页")
-    background = {"type": "solid", "color": "$paper"}
     notes = _notes_text(slide, claim_by_id)
     source = _source_note(slide, claim_by_id)
     body = _body_text(slide, claim_by_id)

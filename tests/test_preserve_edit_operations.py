@@ -5,7 +5,6 @@ import xml.etree.ElementTree as ET
 import zipfile
 from pathlib import Path
 
-from scripts import preserve_edit_pptx as engine
 from scripts.preserve_edit_pptx import apply_operations, summarize_changes
 
 A = "http://schemas.openxmlformats.org/drawingml/2006/main"

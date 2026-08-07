@@ -1,9 +1,7 @@
-import json
 import sys
 import tempfile
 import unittest
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -11,9 +9,8 @@ sys.path.insert(0, str(ROOT))
 from upm.compiler.compiler import compile_deck  # noqa: E402
 from upm.compiler.deckir import build_deckir  # noqa: E402
 from upm.qa.contact_sheet import stitch_overview  # noqa: E402
-from upm.qa.render import render_pages_local  # noqa: E402
-from upm.qa.report import build_quality_report  # noqa: E402
 from upm.qa.repair import RepairState, plan_repairs  # noqa: E402
+from upm.qa.report import build_quality_report  # noqa: E402
 from upm.qa.rubric import run_rubric  # noqa: E402
 
 

@@ -6,13 +6,12 @@ import json
 from pathlib import Path
 from typing import Any
 
-from upm.cli.common import print_delivery
 from upm.errors import ProjectError
 from upm.pptd.io import require_valid_project
 from upm.pptd.schema import issues_by_severity, validate_pptd_project
 from upm.qa.render import render_pages_local
-from upm.qa.report import build_quality_report
 from upm.qa.repair import RepairState, plan_repairs, write_repair_plan
+from upm.qa.report import build_quality_report
 from upm.qa.rubric import run_rubric
 
 

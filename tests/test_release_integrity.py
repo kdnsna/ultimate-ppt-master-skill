@@ -5,7 +5,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = "6.3.9"
 CANDIDATE_VERSIONS = tuple(f"6.3.{patch}" for patch in range(2, 6))

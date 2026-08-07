@@ -6,19 +6,17 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
 import time
-import uuid
 import zipfile
 from pathlib import Path
 from typing import Any
 
 from upm.adapters.kimi.protocol import (
     HOST_HTML,
-    BrowserSession,
     OOPIF_URL_HINT,
+    BrowserSession,
     build_payload,
     configure_downloads,
     ensure_agent_browser,
@@ -28,10 +26,9 @@ from upm.adapters.kimi.protocol import (
     serve,
     wait_for_export_dialog,
 )
-from upm.pptd.io import find_manifest
 from upm.errors import AdapterProtocolError, AdapterUnavailableError, ExportError
+from upm.pptd.io import find_manifest
 from upm.qa.contact_sheet import stitch_overview
-
 
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
 

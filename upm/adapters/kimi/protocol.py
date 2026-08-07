@@ -187,7 +187,9 @@ class QuietHandler(SimpleHTTPRequestHandler):
 
 
 def serve(directory: Path) -> tuple[ThreadingHTTPServer, threading.Thread, str]:
-    handler = lambda *args, **kwargs: QuietHandler(*args, directory=str(directory), **kwargs)
+    def handler(*args, **kwargs):
+        return QuietHandler(*args, directory=str(directory), **kwargs)
+
     server = ThreadingHTTPServer(("127.0.0.1", 0), handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()

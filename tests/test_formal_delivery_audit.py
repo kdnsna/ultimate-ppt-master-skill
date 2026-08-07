@@ -5,7 +5,6 @@ import zipfile
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests" / "fixtures" / "formal_delivery" / "bad_repeated_cards"
 

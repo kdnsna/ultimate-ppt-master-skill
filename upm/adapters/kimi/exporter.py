@@ -28,9 +28,9 @@ from upm.adapters.kimi.protocol import (
     verify_output,
     wait_for_export_dialog,
 )
-from upm.pptd.io import find_manifest
 from upm.errors import ExportError
 from upm.export.base import ExportResult
+from upm.pptd.io import find_manifest
 
 
 def export_kimi(

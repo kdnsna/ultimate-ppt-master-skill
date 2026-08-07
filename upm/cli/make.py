@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-import re
 from pathlib import Path
 from typing import Any
 
@@ -17,13 +15,13 @@ from upm.cli.common import (
 )
 from upm.compiler.compiler import compile_deck
 from upm.compiler.deckir import build_deckir, load_deckir
-from upm.errors import InputError, QaError, StructureGateError
+from upm.errors import InputError, StructureGateError
 from upm.export.registry import export_pptx
-from upm.pptd.io import ensure_project_layout, require_valid_project, write_quality_artifact
+from upm.pptd.io import ensure_project_layout, write_quality_artifact
 from upm.pptd.schema import issues_by_severity, validate_pptd_project
 from upm.qa.renders import render_and_review
-from upm.qa.report import build_quality_report
 from upm.qa.repair import RepairState, plan_repairs, write_repair_plan
+from upm.qa.report import build_quality_report
 
 
 def _parse_image_flags(flags: list[str]) -> dict[str, str]:
@@ -107,7 +105,6 @@ def run_make(args: Any) -> int:
             hint="检查上方的错误定位并修复 .pptd/.page 后重跑 upm make。",
         )
 
-    qa_state: dict[str, Any] = {}
     render_records: list[dict[str, Any]] = []
     rubric_findings: list[dict[str, Any]] = []
     rounds_used = 0

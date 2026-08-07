@@ -2,7 +2,6 @@ import sys
 import unittest
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
@@ -12,7 +11,6 @@ from upm.pptd.io import find_manifest, load_project, require_valid_project  # no
 from upm.pptd.model import create_manifest, create_page, text_element  # noqa: E402
 from upm.pptd.paths import assert_page_path, validate_element_src  # noqa: E402
 from upm.pptd.schema import validate_pptd_project  # noqa: E402
-
 
 FIXTURES = ROOT / "tests" / "fixtures" / "pptd"
 

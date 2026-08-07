@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
 
@@ -33,10 +32,8 @@ def render_and_review(
                 {"page": item["page"] or f"P{item['index']:02d}", "ok": True, "path": str(root / ".upm" / "renders" / "kimi" / item["image"])}
                 for item in summary["images"]
             ]
-            overview = summary["overview"]
         else:
             render_records = render_pages_local(root)
-            overview = str(root / "preview" / "overview.jpg")
         rubric_findings = run_rubric(root, render_records, deckir=deckir, structure_errors=structure_errors)
         errors = [f for f in rubric_findings if f["severity"] == "error"]
         render_failed = [rec for rec in render_records if not rec.get("ok")]

@@ -12,8 +12,8 @@ from typing import Any
 import yaml
 
 from upm.errors import ProjectError, ValidationError
-from upm.paths import normalize_relative_path, resolve_inside
-from upm.pptd.paths import assert_media_path, assert_page_path, media_basename
+from upm.paths import normalize_relative_path
+from upm.pptd.paths import assert_media_path, media_basename
 from upm.pptd.schema import validate_pptd_project
 
 

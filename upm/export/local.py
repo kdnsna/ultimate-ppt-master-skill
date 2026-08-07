@@ -20,7 +20,6 @@ from upm.export.base import ExportResult, healthcheck_shape
 from upm.pptd.io import load_project
 from upm.render.svg import render_page_svg
 
-
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS_DIR = ROOT / "scripts"
 PPTX_CONTENT_TYPE = (
@@ -35,7 +34,6 @@ def local_healthcheck() -> dict[str, Any]:
         pptx_ok = True
     except ImportError:
         pptx_ok = False
-    svglib_ok = importlib.util.find_spec("svglib") is not None
     return healthcheck_shape(
         "local",
         pptx_ok,

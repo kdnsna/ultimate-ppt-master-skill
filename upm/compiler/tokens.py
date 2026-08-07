@@ -13,7 +13,6 @@ from typing import Any
 
 from upm.errors import CompilerError
 
-
 DIRECTIONS_FILE = Path(__file__).resolve().parents[2] / "templates" / "visual-directions" / "v6-direction-manifest.json"
 
 
