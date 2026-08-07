@@ -1,6 +1,6 @@
 # UPM v7 RC 已知问题
 
-> 候选 SHA：`8b92dc137ddf291f6e28b7568d7cbd5cf3fa2df3`（最终 PR Head 仅可能再差验收文档提交）
+> 候选 SHA：`02a4a66227be68c83d72239fbe33a782b9e5a30c`（最终 PR Head 仅可能再差验收文档提交）
 
 | ID | 级别 | 状态 | 描述 |
 |---|---|---|---|
@@ -23,6 +23,7 @@
 | K17 | P3 | OPEN | Kimi 宿主/上游宿主方法面一致（diff 为空），进一步排除适配器差异；K1 定性为 Kimi 前端/SDK 兼容失效。 |
 | K18 | P2 | FIXED | Windows CI：`bin/upm` 与 `upm.cli.common.resolve_python` 只认 Unix venv 路径，Windows 找不到 Python；现支持 `.venv/Scripts/python.exe` 与 `python` 回退（回归测试覆盖）。 |
 | K19 | P2 | FIXED | Windows CI：cp1252 控制台无法输出中文导致 `upm doctor` 崩溃；CLI 入口强制 PYTHONUTF8/PYTHONIOENCODING 并 reconfigure stdout/stderr（回归测试覆盖）。 |
+| K20 | P2 | FIXED | Windows CI：`upm doctor` 的“仓库本地 .venv”检查只认 `.venv/bin/python`；现兼容 `.venv/Scripts/python.exe` 与 `python`（回归测试覆盖）。 |
 
 严重等级约定：P0=数据损坏/安全问题/无法生成；P1=无法打开/页面丢失/主要功能失败；P2=视觉明显不佳/偶发失败；P3=文档/提示/轻微问题。
 

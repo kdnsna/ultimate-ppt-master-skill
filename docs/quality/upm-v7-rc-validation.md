@@ -1,8 +1,8 @@
 # UPM v7 Release Candidate Validation（RC 验收记录）
 
 > 候选分支：`feat/upm-v7-unification` → 目标：`main`（origin/main `656c2d8`）
-> 最终候选代码 SHA：`8b92dc137ddf291f6e28b7568d7cbd5cf3fa2df3`（最终 PR Head 与本文件随后提交，若仅相差验收文档则沿用本记录）
-> 历史候选 SHA（测试期间修复导致变更，已重跑受影响轮次）：`2103e4c` → `e87d6ac` → `d15ba0b` → `cf9c9db` → `c7781b7` → `2413441` → `1b476e7` → `3457e1c` → `8b92dc1`
+> 最终候选代码 SHA：`02a4a66227be68c83d72239fbe33a782b9e5a30c`（最终 PR Head 与本文件随后提交，若仅相差验收文档则沿用本记录）
+> 历史候选 SHA（测试期间修复导致变更，已重跑受影响轮次）：`2103e4c` → `e87d6ac` → `d15ba0b` → `cf9c9db` → `c7781b7` → `2413441` → `1b476e7` → `3457e1c` → `8b92dc1` → `9c7c2ac` → `02a4a66`
 > 本地证据目录（gitignore）：`.upm-test-results/upm-v7-rc1-*`
 
 ## 结论
@@ -39,10 +39,10 @@ doctor 全 profile（Round 0）：core/pptx/kimi 0 关键缺失；visual-review 
 
 ## Round 2：自动化测试清零（PASS）
 
-最新代码 Head `8b92dc1` 上重跑（受影响的 c7781b7→8b92dc1 修复均已在最新 Head 验证）：
+最新代码 Head `02a4a66` 上重跑（受影响的 c7781b7→02a4a66 修复均已在最新 Head 验证）：
 
 - contracts sync：通过
-- Python `test:worker`：229 项全过（含修复后的 MCP stdio、resolve_python Windows 路径、Windows UTF-8 stdio 回归测试）
+- Python `test:worker`：230 项全过（含修复后的 MCP stdio、resolve_python Windows 路径、Windows UTF-8 stdio、doctor Windows venv 检测回归测试）
 - Node `test:node` 73/73、`test:bridge` 52/52
 - Web build（371ms）、Desktop build（280ms）：通过
 - Rust：fmt / clippy（-D warnings）/ test 通过
@@ -120,7 +120,7 @@ Round 8 第二 Agent 子项 PASS。
 
 `.github/workflows/windows-ci.yml`：Windows latest × Python 3.10/3.12，覆盖 unit/integration、`upm doctor`、local quick make、preserve edit、PPTX ZIP 校验。PowerPoint GUI 仍保留为 Windows 人工验收门槛。
 
-Windows CI 修复链：`bin/upm` 找不到 `.venv/Scripts/python.exe`（已修，新增回归测试）→ cp1252 无法输出中文（已修：PYTHONUTF8 + stdio reconfigure，新增回归测试）。最新 Head `8b92dc1` 的运行结果以 PR 状态为准（见最终报告）。
+Windows CI 修复链：`bin/upm` 找不到 `.venv/Scripts/python.exe`（已修，新增回归测试）→ cp1252 无法输出中文（已修：PYTHONUTF8 + stdio reconfigure，新增回归测试）→ doctor `.venv` 检查只认 Unix 路径（已修：兼容 Scripts/python.exe，新增回归测试）。最新 Head `02a4a66` 的运行结果以 PR 状态为准（见最终报告）。
 
 ## 合并建议
 
