@@ -4,7 +4,7 @@
 
 ## 状态
 
-**NOT RUN（待人工执行与签字）**。本机可用：LibreOfficeDev 26.8.0.0.alpha0（codex runtime 路径）、WPS Office（/Applications/wpsoffice.app）。Microsoft PowerPoint 未安装，Windows 平台无本机。
+**LibreOffice PASS（自动化）· WPS 部分 PASS + 明确自动化缺陷（编辑/另存/重开待人工签字）· PowerPoint 待真实机器（本机未安装）。**
 
 ## 覆盖样本
 
@@ -25,6 +25,17 @@ A01（local PPTX）、A05、A06、A09、A12；Kimi 输出待 K1 修复后补入�
 ## 证据要求（人工）
 
 首次打开截图、代表页截图、编辑后截图、保存重开截图、应用名称与版本；签字后本文件状态更新为 PASS，未签字不得视为通过。
+
+## WPS 实机记录（2026-08-07，版本 12.1.26035）
+
+- A01 打开：窗口正常、无修复提示；截图 `/tmp/wps-a01-1-open.png`。
+- 全屏放映：菜单“幻灯片放映→观看放映”成功，截图 `/tmp/wps-a01-2-play.png`；Esc 退出正常（`-3-after-esc.png`）。
+- 自动化受限（明确缺陷）：通过 System Events 对“替换/另存为/输出为PDF”对话框键入时出现 AppleEvent 错误（-10000），另存为与 PDF 导出未能落盘到指定路径；因此“编辑标题/正文、移动形状、另存、重开”步骤必须由人工在本机 WPS 完成并签字（清单见上）。
+- 结论：WPS 子项 = 打开/放映 PASS + 编辑/另存/重开待人工（自动化缺陷已记录，未冒充 PASS）。
+
+## Microsoft PowerPoint（待真实机器）
+
+本机未安装 PowerPoint。验收包与逐项清单已就绪：对 A01/A06/A11 执行打开→播放→编辑文字→移动对象→保存→关闭→重开，观察字体替换/中文换行/图片裁切/透明度/分组/修复提示/非目标页一致性。PowerPoint 子项在真实 Windows 或 macOS 机器上完成前不得标记 PASS。
 
 ## 边界声明
 

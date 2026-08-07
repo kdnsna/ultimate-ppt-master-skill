@@ -35,6 +35,8 @@
 
 两个内核：**Preserve Edit Engine**（已有 PPTX 保真修改）与 **Deck Generation Engine**（DeckIR → PPTD → 导出 → 视觉 QA）。三条用户路径：`preserve-edit` / `editable-deck` / `web-deck`（仅在明确要求网页时启用）。
 
+导出后端：`local`（默认，离线，表格/图表为可编辑 DrawingML 形状而非原生数据对象）与 `kimi`（实验性外部兼容能力，当前上游环境存在导出交付失效，不构成正式交付保证；仅显式 opt-in）。
+
 ```bash
 bin/upm make <source-or-topic>     # 生成可编辑 PPTX（默认）
 bin/upm edit <file.pptx> "修改要求" # 保真局部修改

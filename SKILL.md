@@ -123,8 +123,9 @@ bin/upm edit deck.pptx --edits edits.json         # 显式 edits JSON
 导出后端（可替换）：
 
 - `local`（默认）：PPTD → 确定性 SVG → 现有 SVG→DrawingML 原生可编辑对象引擎，离线可用。
-- `kimi`（可选）：PPTD → Kimi 公共编辑器浏览器导出，封装在 `upm/adapters/kimi/`（版本化选择器、healthcheck、错误边界）；不可用时返回明确适配器错误，不影响主项目。
+- `kimi`（实验性外部兼容能力，仅显式 opt-in）：PPTD → Kimi 公共编辑器浏览器导出，封装在 `upm/adapters/kimi/`（版本化选择器、healthcheck、错误边界）；当前上游环境存在导出交付失效（compatibility risk），不作为正式交付保证；不可用时返回明确适配器错误，不影响主项目。
 - 每次导出记录实际后端到 `.upm/export-record.json`；禁止把“浏览器成功下载”表述为 PowerPoint/WPS 完全兼容。
+- 表格/图表边界：local 后端产出可编辑 DrawingML 形状（非原生 a:tbl/chart 数据对象）；需要原生表格/图表对象时请在 PowerPoint/WPS 中重建。
 
 ## 5. Web Deck（仅在明确要求时启用）
 

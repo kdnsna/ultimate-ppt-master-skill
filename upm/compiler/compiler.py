@@ -143,11 +143,11 @@ def _body_text(slide: dict[str, Any], claim_by_id: dict[str, dict[str, Any]]) ->
 
 
 def _extract_number(text: str) -> tuple[str, str]:
-    match = re.search(r"([+\-]?\d[\d,.]*\s*[%％万亿]?|[零一二三四五六七八九十百]+%)", text or "")
+    match = re.search(r"([+\-]?\d[\d,.]*\s*[%％万亿元]?|[零一二三四五六七八九十百]+%)", text or "")
     if not match:
         return "", ""
     value = match.group(1)
-    remainder = (text or "").replace(value, "", 1).strip(" ：:，。")
+    remainder = (text or "").replace(value, "", 1).strip(" ：:，。、")
     return value, remainder
 
 

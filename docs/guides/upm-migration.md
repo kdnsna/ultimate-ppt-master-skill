@@ -45,5 +45,5 @@ deck.pptd / pages/ / media/ / sources/ / exports/ / preview/ / .upm/
 ## 风险与边界
 
 - Kimi 公共编辑器为逆向兼容协议：`upm/adapters/kimi/manifest.json` 版本化其 URL/选择器/RPC；失效时返回明确适配器错误，本地后端不受影响。
-- 本地导出把图表编译为可编辑 DrawingML 形状（非原生图表对象）；需要原生图表对象时使用 Kimi 后端或在 PowerPoint 中重建。
+- 本地导出把表格/图表编译为可编辑 DrawingML 形状（非原生数据对象）。Kimi 适配器为实验性外部兼容能力，当前上游环境存在导出交付失效（K1），不作为正式交付保证；需要原生表格/图表对象时请在 PowerPoint/WPS 中重建。
 - `test_ppt_preserve_mcp.McpStdioTransportTest` 的 stdio 测试在 Python 3.11 下存在与本次改动无关的既有缺陷（`communicate()` 在关闭 stdin 后调用），已在报告中注明。

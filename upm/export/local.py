@@ -1,8 +1,8 @@
 """Local PPTD -> PPTX exporter (default backend).
 
 Chain: PPTD -> deterministic SVG -> existing SVG->DrawingML native-shape engine
-(scripts/svg_to_pptx). Everything runs locally; charts become editable
-DrawingML shapes and tables become native tables.
+(scripts/svg_to_pptx). Everything runs locally; tables and charts become
+editable DrawingML shapes (not native a:tbl/chart data objects).
 """
 
 from __future__ import annotations

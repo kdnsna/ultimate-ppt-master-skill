@@ -228,6 +228,10 @@ input (file/url/text)
 2. PPTD core (model/schema/io/paths/fixtures/tests)
 3. DeckIR → PPTD compiler
 4. Kimi adapter (exporter/renderer/healthcheck/manifest/tests)
+
+### Compatibility-risk declaration (K1)
+
+As of 2026-08-07, the Kimi public-editor export delivery channel is non-functional in this environment and for the current upstream tool (see `docs/quality/upm-v7-rc-known-issues.md` K1 and its follow-up issue). The adapter remains opt-in and is not part of the formal delivery guarantee; `local` is the default backend. Re-validation triggers: upstream fix, upstream exporter works again, Kimi frontend/SDK version change, or an official stable export API.
 5. Unified visual QA
 6. Unified CLI + local exporter fallback
 7. Contract/routing convergence, SKILL.md shortening, third-party notices, docs

@@ -7,9 +7,9 @@
 
 ## 结论
 
-**NOT READY — FIX AND RETEST**
+**NOT READY — FIX AND RETEST（截至 2026-08-07；阻塞项：PowerPoint 真实机器、WPS 实机收尾、第二 Agent 会话）**
 
-Round 0–3 通过；Round 4（Kimi 成功导出链路）在真实环境中未达成；Round 5（PowerPoint/WPS 实机）与 Round 8（第二 Agent）依赖人工/缺失机器，尚未完成。
+K1 已重分类为 `EXTERNAL-BLOCKED / compatibility-risk`（见独立 Issue），不再阻塞 UPM 主线合并，但合并前仍需 PowerPoint/WPS 实机签字与第二 Agent 旅程。
 
 ## 环境矩阵（Round 0）
 
@@ -89,9 +89,16 @@ LibreOfficeDev 26.8.0.0.alpha0 对 local A01/A05/A06/A09/A12 全 5 样本通过�
 
 功能：页面列表/清单/页面 YAML/SVG 预览/保存刷新/本地导出/质量报告/并发保存/中文路径/大项目。安全：路径穿越（..、绝对路径、Windows 盘符、media/../）全拒、符号链接逃逸修复（K15）、非法 YAML 不覆盖、非 JSON 拒绝、超大请求体 413（K14）、原子保存、仅绑定 127.0.0.1、关闭后端口释放。
 
-## Round 8：Agent 用户旅程（Codex 4/4；第二 Agent 待执行）
+## Round 8：Agent 用户旅程（Codex 4/4；第二 Agent Hermes 3/3 PASS）
 
-Codex 风格 4 任务（PDF→8 页正式稿、改第 3 页标题且 fidelity safe、review 溢出/空白、open 工程改第 5 页）全部完成。第二 Agent：本机已安装 hermes 与 openclaw，本轮未执行其独立会话（记为 NOT RUN，列入人工清单）。
+Codex 风格 4 任务（PDF→8 页正式稿、改第 3 页标题且 fidelity safe、review 溢出/空白、open 工程改第 5 页）全部完成。
+
+第二 Agent（Hermes，DeepSeek/deepseek-v4-flash，独立 `hermes -z` 会话，仅提供仓库作为 Skill，不透露内部实现）：
+- make：由 A05 材料生成 6 页 deck，PPTX ZIP 正常、gates 全 pass、overview/质量报告齐全；
+- edit：`upm edit` 保真修改，仅 `ppt/slides/slide1.xml` 变化，0 added/0 removed，标记文本落盘；
+- review：`upm review` 成功并正确说明 PPTX/预览/报告位置。
+
+Round 8 第二 Agent 子项 PASS。
 
 ## Round 9：稳定性/重复性/压力（PASS）
 
