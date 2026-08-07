@@ -1,6 +1,6 @@
 # UPM v7 RC 已知问题
 
-> 候选 SHA：`7abfd1301a6c84ad9aea94392dff7301068f9053`（最终 PR Head 仅可能再差验收文档提交）
+> 候选 SHA：`993c42df5d19803d50a935a66edbdaf97620eddf`（最终 PR Head 仅可能再差验收文档提交）
 
 | ID | 级别 | 状态 | 描述 |
 |---|---|---|---|
@@ -27,6 +27,7 @@
 | K21 | P2 | FIXED | bridge artifact 发现偶发返回空列表：APFS 亚毫秒 mtime 在同一整数毫秒内被 `Date.now()` 减出负值，文件被误判为“仍在写入”；`artifactStable` 先 floor 再比较，新增确定性回归测试。 |
 | K22 | P2 | FIXED | Windows Python 测试套件：job 未启用 UTF-8 导致子进程中文输出解码/编码崩溃；`cairo_available` 对缺失 pkg-config 未捕获 OSError；PIL 测试未关闭句柄导致临时目录删除失败（WinError 32）；均已修复并同步 desktop worker 打包副本。 |
 | K23 | P2 | FIXED | Windows Python 测试套件（第二批）：`audit_visual_recipes.py` 用 `str(item).endswith("assets/...")` 匹配正斜杠路径，Windows 反斜杠永不命中；`test_desktop_worker`/`test_visual_review_contract` 同样问题；`int.from_bytes` 未传 byteorder（3.12.10 无默认值）；均改为 posix 匹配/显式 `"big"`。 |
+| K24 | P2 | FIXED | Windows Node 测试：agent-job 状态写入用 temp+rename，Windows 上并发 status 读取正打开目标文件时 rename 抛 EPERM/EBUSY，completed 状态无法落盘；`renameWithRetry` 有界重试修复；测试对 Windows 不存在的 Unix 权限位（key 0o600）断言按平台区分。 |
 
 严重等级约定：P0=数据损坏/安全问题/无法生成；P1=无法打开/页面丢失/主要功能失败；P2=视觉明显不佳/偶发失败；P3=文档/提示/轻微问题。
 
