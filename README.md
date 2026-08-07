@@ -27,6 +27,11 @@
 </p>
 
 <p align="center">
+  <img alt="曾获 160+ Stars" src="https://img.shields.io/badge/曾获_Stars-160%2B_(2026--08)-FFD700?style=flat-square">
+  <sub>&nbsp;仓库曾获 160+ Stars；2026-08 短暂转私有后，GitHub 不恢复私有化前的 Stars。感谢每一位点亮过它的朋友，欢迎再次点亮。</sub>
+</p>
+
+<p align="center">
   <!-- Community try-it surface (Socialistic): optional, not a substitute for local CLI quality gates -->
   <a href="https://socialistic.ai/zh/skill/ultimate-ppt-master-skill-99fe3d?utm_source=github&utm_medium=readme&utm_campaign=try-badge"><img alt="Try on Socialistic" src="https://socialistic.ai/api/embed/ultimate-ppt-master-skill-99fe3d"></a>
 </p>

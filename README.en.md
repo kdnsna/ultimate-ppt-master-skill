@@ -25,6 +25,11 @@
   <img alt="editable PPTX" src="https://img.shields.io/badge/output-editable_PPTX-1D4ED8?style=flat-square">
 </p>
 
+<p align="center">
+  <img alt="Once 160+ Stars" src="https://img.shields.io/badge/Once_Stars-160%2B_(2026--08)-FFD700?style=flat-square">
+  <sub>&nbsp;This repository once had 160+ stars; GitHub does not restore stars after a temporary privatization (2026-08). Thanks to everyone who starred it — feel free to star it again.</sub>
+</p>
+
 <br>
 
 ---
