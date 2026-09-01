@@ -56,7 +56,7 @@ PyMuPDF>=1.23.0
 #   .ipynb  → nbconvert
 mammoth>=1.6.0
 markdownify>=0.11.6
-ebooklib>=0.18
+ebooklib>=0.20
 nbconvert>=7.0.0
 
 # ─────────────────────────────────────────────────────────────
