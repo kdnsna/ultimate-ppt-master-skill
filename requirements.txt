@@ -35,7 +35,7 @@ edge-tts>=7.2.8
 # Office compatibility dependency / Office 兼容依赖
 # Converts SVG to PNG fallback images for Office LTSC 2021 etc.
 # 用于将 SVG 转换为 PNG 后备图片，确保 Office LTSC 2021 等版本正常显示
-svglib>=1.5.0
+svglib>=2.1.0
 reportlab>=4.0.0
 
 # ─────────────────────────────────────────────────────────────
