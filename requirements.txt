@@ -64,7 +64,7 @@ nbconvert>=7.0.0
 # ─────────────────────────────────────────────────────────────
 # Converts .xlsx/.xlsm workbooks to Markdown while preserving sheet structure.
 # 用于将 .xlsx/.xlsm 工作簿转换为 Markdown，并保留工作表结构。
-openpyxl>=3.1.0
+openpyxl>=3.1.5
 #
 # Fallback path — only needed for less common formats
 # (.doc .odt .rtf .tex/.latex .rst .org .typ).
