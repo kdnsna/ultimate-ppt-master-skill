@@ -57,7 +57,7 @@ PyMuPDF>=1.23.0
 mammoth>=1.6.0
 markdownify>=0.11.6
 ebooklib>=0.18
-nbconvert>=7.0.0
+nbconvert>=7.17.1
 
 # ─────────────────────────────────────────────────────────────
 # Excel to Markdown tool / Excel 转 Markdown 工具 (skills/ppt-master/scripts/source_to_md/excel_to_md.py)
